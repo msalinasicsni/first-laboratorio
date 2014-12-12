@@ -14,6 +14,7 @@ public class Laboratorio {
 
     String codigo;
     String nombre;
+    String codTipo;
 
     @Id
     @Column(name = "CODIGO", nullable = false, insertable = true, updatable = true, length = 10)
@@ -33,5 +34,15 @@ public class Laboratorio {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    @Basic
+    @Column(name = "COD_TIPO", nullable = false, insertable = true, updatable = true, length = 10)
+    public String getCodTipo() {
+        return codTipo;
+    }
+
+    public void setCodTipo(String codTipo) {
+        this.codTipo = codTipo;
     }
 }
