@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by FIRSTICT on 12/9/2014.
  */
 @Entity
-@Table(name = "ETIQUETA_MX", schema = "LABORATORIO")
+@Table(name = "etiquta_mx", schema = "laboratorio")
 public class EtiquetaMx {
     String idEtiquetaMx;
     Laboratorio laboratorio;

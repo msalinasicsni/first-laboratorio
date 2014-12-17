@@ -107,18 +107,11 @@
                                 <div class="widget-body no-padding">
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
-                                    <input id="msg_sending_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
-                                    <input id="msg_sending_select_order" type="hidden" value="<spring:message code="msg.receipt.select.order"/>"/>
-                                    <input id="msg_sending_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
-                                    <input id="msg_sending_confirm_t" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
-                                    <input id="msg_sending_confirm_c" type="hidden" value="<spring:message code="msg.confirm.content"/>"/>
-                                    <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
-                                    <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
-                                            <section class="col col-6">
+                                            <section class="col col-sm-12 col-md-12 col-lg-5">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.receipt.person.name" />
                                                 </label>
@@ -127,7 +120,7 @@
                                                     <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.receipt.name"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-3">
+                                            <section class="col col-sm-6 col-md-4 col-lg-2">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.receipt.start.date.mx" />
                                                 </label>
@@ -139,7 +132,7 @@
                                                     <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-3">
+                                            <section class="col col-sm-6 col-md-4 col-lg-2">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.receipt.end.date.mx" />
                                                 </label>
@@ -151,9 +144,23 @@
                                                     <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
                                                 </label>
                                             </section>
-                                     </div>
+                                            <section class="col col-sm-6 col-md-4 col-lg-3">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.sample.type" /> </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                    <select id="codTipoMx" name="codTipoMx"
+                                                            class="select2">
+                                                        <option value=""><spring:message code="lbl.select" />...</option>
+                                                        <c:forEach items="${tipoMuestra}" var="tipoMuestra">
+                                                            <option value="${tipoMuestra.idTipoMx}">${tipoMuestra.nombre}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+                                            </section>
+                                        </div>
                                         <div class="row">
-                                            <section class="col col-4">
+                                            <section class="col col-sm-12 col-md-5 col-lg-5">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.silais" /> </label>
                                                 <div class="input-group">
@@ -167,28 +174,14 @@
                                                     </select>
                                                 </div>
                                             </section>
-                                            <section class="col col-6">
+                                            <section class="col col-sm-12 col-md-7 col-lg-7">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.health.unit" /> </label>
                                                 <div class="input-group">
                                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codUnidadSalud" name="codSilais"
+                                                    <select id="codUnidadSalud" name="codUnidadSalud"
                                                             class="select2">
                                                         <option value=""><spring:message code="lbl.select" />...</option>
-                                                    </select>
-                                                </div>
-                                            </section>
-                                            <section class="col col-2">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.sample.type" /> </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codTipoMx" name="codTipoMx"
-                                                            class="select2">
-                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                        <c:forEach items="${tipoMuestra}" var="tipoMuestra">
-                                                            <option value="${tipoMuestra.codigo}">${tipoMuestra.valor}</option>
-                                                        </c:forEach>
                                                     </select>
                                                 </div>
                                             </section>
@@ -329,7 +322,6 @@
                 sOrdersUrl : "${ordersUrl}",
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
-                sTableToolsPath : "${tabletools}",
                 sAgregarEnvioUrl: "${sAddReceiptUrl}",
                 sActionUrl : "${sCreateReceiptUrl}"
             };

@@ -12,6 +12,7 @@ public class FiltroOrdenExamen {
     String codSilais;
     String codUnidadSalud;
     String codTipoMx;
+    String codEstado;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -59,5 +60,13 @@ public class FiltroOrdenExamen {
 
     public void setCodTipoMx(String codTipoMx) {
         this.codTipoMx = codTipoMx;
+    }
+
+    public String getCodEstado() {
+        return codEstado;
+    }
+
+    public void setCodEstado(String codEstado) {
+        this.codEstado = codEstado;
     }
 }

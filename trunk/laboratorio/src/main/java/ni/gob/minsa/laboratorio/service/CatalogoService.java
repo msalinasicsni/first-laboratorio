@@ -268,7 +268,7 @@ public class CatalogoService {
         //Retrieve session Hibernate
         Session session = sessionFactory.getCurrentSession();
         //Create a hibernate query (HQL)
-        Query query = session.createQuery("FROM TipoMx tpmx where tpmx.pasivo = false order by orden");
+        Query query = session.createQuery("select distinct tpmx.tipoMx FROM TipoMx_TipoNotificacion tpmx where tpmx.pasivo = false order by tpmx.tipoMx.nombre");
         //retrieve all
         return query.list();
 
@@ -291,17 +291,6 @@ public class CatalogoService {
         Session session = sessionFactory.getCurrentSession();
         //Create a hibernate query (HQL)
         Query query = session.createQuery("FROM TipoNotificacion noti where noti.pasivo = false order by orden");
-        //retrieve all
-        return query.list();
-
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<NombreExamenes> getExamenes(){
-        //Retrieve session Hibernate
-        Session session = sessionFactory.getCurrentSession();
-        //Create a hibernate query (HQL)
-        Query query = session.createQuery("FROM NombreExamenes exa where exa.pasivo = false order by orden");
         //retrieve all
         return query.list();
 
@@ -837,17 +826,6 @@ public class CatalogoService {
         return query.list();
     }
 
-
-
-    public TipoMx getTipoMuestra (String tmx){
-        //Retrieve session from hibernated
-        Session session = sessionFactory.getCurrentSession();
-        //Create a hibernate query (HQL)
-        Query query = session.getNamedQuery("getTipoMxByCodigo").setString("pCodigo", tmx);
-        //Retrieve all
-        return (TipoMx) query.uniqueResult();
-    }
-
     public EstadoMx getEstadoMx (String tmx){
         //Retrieve session from hibernated
         Session session = sessionFactory.getCurrentSession();
@@ -874,15 +852,6 @@ public class CatalogoService {
         Query query = session.getNamedQuery("getEstadoOrdenExByCodigo").setString("pCodigo", est);
         //Retrieve all
         return (EstadoOrdenEx) query.uniqueResult();
-    }
-
-    public NombreExamenes getExamenes(String exa){
-        //Retrieve session from hibernated
-        Session session = sessionFactory.getCurrentSession();
-        //Create a hibernate query (HQL)
-        Query query = session.getNamedQuery("getExamenByCodigo").setString("pCodigo", exa);
-        //Retrieve all
-        return (NombreExamenes) query.uniqueResult();
     }
 
     //LABORATORIO

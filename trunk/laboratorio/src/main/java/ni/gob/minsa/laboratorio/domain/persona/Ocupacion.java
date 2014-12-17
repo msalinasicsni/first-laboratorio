@@ -19,7 +19,7 @@ import org.hibernate.annotations.LazyCollectionOption;
             )
 })
 @Entity
-@Table(name="OCUPACIONES"
+@Table(name="ocupaciones"
     ,schema="alerta"
     , uniqueConstraints = @UniqueConstraint(columnNames="CODIGO") 
 )

@@ -2,9 +2,11 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.ciportal.dto.InfoResultado;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
@@ -13,12 +15,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,6 +49,10 @@ public class RecepcionMxController {
     private SeguridadService seguridadService;
 
     @Autowired
+    @Qualifier(value = "usuarioService")
+    private UsuarioService usuarioService;
+
+    @Autowired
     @Qualifier(value = "catalogosService")
     private CatalogoService catalogosService;
 
@@ -53,6 +67,10 @@ public class RecepcionMxController {
     @Autowired
     @Qualifier(value = "recepcionMxService")
     private RecepcionMxService recepcionMxService;
+
+    @Autowired
+    @Qualifier(value = "ordenExamenMxService")
+    private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
     @Qualifier(value = "tomaMxService")
@@ -114,7 +132,7 @@ public class RecepcionMxController {
             List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
             List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = recepcionMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             mav.addObject("ordenExamen",ordenExamen);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -135,8 +153,82 @@ public class RecepcionMxController {
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroOrdenExamen filtroOrdenExamen= jsonToFiltroOrdenExamen(filtro);
-        List<DaOrdenExamen> ordenExamenList = recepcionMxService.getOrdenesExamen(filtroOrdenExamen);
+        filtroOrdenExamen.setCodEstado("ESTORDEN|ENV"); // sólo las enviadas
+        List<DaOrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamen(filtroOrdenExamen);
         return OrdenesExamenToJson(ordenExamenList);
+    }
+
+    @RequestMapping(value = "agregarRecepcion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void agregarEnvioOrdenes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json = "";
+        String resultado = "";
+        String strOrdenes="";
+        String idRecepcion = "";
+        String verificaCantTb = "";
+        String verificaTipoMx = "";
+        String idOrdenExamen = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            verificaCantTb = jsonpObject.get("verificaCantTb").getAsString();
+            verificaTipoMx = jsonpObject.get("verificaTipoMx").getAsString();
+            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
+            //Se obtiene estado recepcionado
+            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTORDEN|RCP");
+            TipoRecepcionMx tipoRecepcionMx = catalogosService.getTipoRecepcionMx("TPRECPMX|VRT");
+            //se obtiene orden de examen a recepcionar
+            DaOrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
+
+            RecepcionMx recepcionMx = new RecepcionMx();
+
+            recepcionMx.setUsuarioRecepcion(usuario);
+            recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+            recepcionMx.setTipoMxCk(Boolean.valueOf(verificaTipoMx));
+            recepcionMx.setCantidadTubosCk(Boolean.valueOf(verificaCantTb));
+            recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
+            recepcionMx.setOrdenExamen(ordenExamen);
+            //recepcionMx.setLaboratorioEnvio(labProcedencia);
+
+            try {
+                idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+            }catch (Exception ex){
+                resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
+                resultado=resultado+". \n "+ex.getMessage();
+                ex.printStackTrace();
+            }
+            if (!idRecepcion.isEmpty()) {
+               //se tiene que actualizar la orden de examen
+                ordenExamen.setCodEstado(estadoOrdenEx);
+                try {
+                    ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                }catch (Exception ex){
+                    resultado = messageSource.getMessage("msg.update.order.error",null,null);
+                    resultado=resultado+". \n "+ex.getMessage();
+                    ex.printStackTrace();
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idRecepcion",idRecepcion);
+            map.put("mensaje",resultado);
+            map.put("idOrdenExamen", strOrdenes);
+            map.put("verificaCantTb", verificaCantTb);
+            map.put("verificaTipoMx", verificaTipoMx);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
     }
 
     private String OrdenesExamenToJson(List<DaOrdenExamen> ordenExamenList){
@@ -154,10 +246,10 @@ public class RecepcionMxController {
             map.put("estadoOrden",orden.getCodEstado().getValor());
             map.put("separadaMx",(orden.getIdTomaMx().getMxSeparada()!=null?(orden.getIdTomaMx().getMxSeparada()?"Si":"No"):""));
             map.put("cantidadTubos", (orden.getIdTomaMx().getCanTubos()!=null?String.valueOf(orden.getIdTomaMx().getCanTubos()):""));
-            map.put("tipoMuestra",orden.getIdTomaMx().getCodTipoMx().getValor());
-            map.put("tipoExamen",orden.getCodExamen().getCodExamen().getValor());
+            map.put("tipoMuestra",orden.getIdTomaMx().getCodTipoMx().getNombre());
+            map.put("tipoExamen",orden.getCodExamen().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = recepcionMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -173,20 +265,8 @@ public class RecepcionMxController {
                 if (orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
                     nombreCompleto = nombreCompleto +" "+ orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
-                //Se calcula la edad
-                //int edad = calcularEdadAnios(orden.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento());
-                //map.put("edad",String.valueOf(edad));
-                //se obtiene el sexo
-                //map.put("sexo",orden.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor());
-                //if(edad > 12 && orden.getIdTomaMx().getIdNotificacion().getPersona().isSexoFemenino()){
-                    //map.put("embarazada",envioOrdenExamenMxService.estaEmbarazada(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion()));
-                //}else
-                    //map.put("embarazada"," ");
             }else{
                 map.put("persona"," ");
-                map.put("edad"," ");
-                map.put("sexo"," ");
-                map.put("embarazada"," ");
             }
 
             mapResponse.put(indice, map);

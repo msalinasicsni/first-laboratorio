@@ -8,7 +8,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.RelacionGrupoOcupacion;
 
 
 @Entity
-@Table(name="GRUPOS_OCUPACIONES"
+@Table(name="grupos_ocupaciones"
     ,schema="alerta"
     , uniqueConstraints = @UniqueConstraint(columnNames="CODIGO_CIUO") 
 )

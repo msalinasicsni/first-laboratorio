@@ -11,7 +11,7 @@ import java.sql.Timestamp;
  * Created by FIRSTICT on 11/21/2014.
  */
 @Entity
-@Table(name = "DA_ENVIO_ORDEN_EXAMEN", schema = "ALERTA")
+@Table(name = "da_envio_orden_examen", schema = "alerta")
 public class DaEnvioOrden {
     private String idEnvioOrden;
     private String nombreTransporta;

@@ -1,6 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.muestra.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.DaOrdenExamen;
 import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
 import org.hibernate.Query;

@@ -14,7 +14,7 @@ import java.util.Date;
  * Created by souyen-ics
  */
 @Entity
-@Table(name = "DA_VACUNAS_IRAG", schema = "ALERTA")
+@Table(name = "da_vacunas_irag", schema = "alerta")
 public class DaVacunasIrag implements Serializable {
 
 

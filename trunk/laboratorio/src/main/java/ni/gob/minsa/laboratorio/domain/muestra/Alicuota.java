@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Created by FIRSTICT on 12/9/2014.
  */
 @Entity
-@Table(name = "ALICUTAS_MX", schema = "LABORATORIO")
+@Table(name = "alicuotas_mx", schema = "laboratorio")
 public class Alicuota {
     int idAlicuota;
     String alicuota;

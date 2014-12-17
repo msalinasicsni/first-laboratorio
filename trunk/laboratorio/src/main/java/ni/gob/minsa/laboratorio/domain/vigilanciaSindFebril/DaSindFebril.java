@@ -18,7 +18,7 @@ import ni.gob.minsa.laboratorio.domain.irag.Respuesta;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.estructura.Procedencia;
 @Entity
-@Table(name = "DA_FICHA_SINDFEB", schema = "ALERTA")
+@Table(name = "da_ficha_sindfeb", schema = "alerta")
 public class DaSindFebril implements Serializable{
 	
 	/**

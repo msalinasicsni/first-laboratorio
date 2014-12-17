@@ -7,7 +7,7 @@ import java.sql.Timestamp;
  * Created by FIRSTICT on 9/2/2014.
  */
 @Entity
-@Table(name = "CALENDARIO_EPI", schema = "ALERTA",  uniqueConstraints = @UniqueConstraint(columnNames = {"ANIO","NO_SEMANA"}))
+@Table(name = "calendario_epi", schema = "alerta",  uniqueConstraints = @UniqueConstraint(columnNames = {"ANIO","NO_SEMANA"}))
 public class CalendarioEpi {
     private int anio;
     private int noSemana;
