@@ -31,4 +31,11 @@ public class LaboratoriosService {
         q.setParameter("codTipo","REG");
         return q.list();
     }
+
+    public Laboratorio getLaboratorioByCodigo(String codLaboratorio){
+        String query = "from Laboratorio where codigo =:codLaboratorio order by nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codLaboratorio","codLaboratorio");
+        return (Laboratorio)q.uniqueResult();
+    }
 }

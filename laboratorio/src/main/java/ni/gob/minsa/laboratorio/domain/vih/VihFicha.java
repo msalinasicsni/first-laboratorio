@@ -12,7 +12,7 @@ import java.sql.Timestamp;
  * Created by USER on 13/10/2014.
  */
 @Entity
-@Table(name = "SIVE_VIH_FICHA", schema = "ALERTA")
+@Table(name = "sive_vih_ficha", schema = "alerta")
 public class VihFicha {
 
     private Integer id_ficha_vih;

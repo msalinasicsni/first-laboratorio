@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,7 +13,7 @@ import java.sql.Timestamp;
  * Created by souyen-ics on 11-20-14.
  */
 @Entity
-@Table(name = "DA_ORDEN_EXAMEN", schema = "ALERTA")
+@Table(name = "da_orden_examen", schema = "alerta")
 public class DaOrdenExamen {
 
     private String idOrdenExamen;

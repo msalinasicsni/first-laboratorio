@@ -11,7 +11,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 
 @Entity
-@Table(name="RELACION_GRUPOS_OCUPACIONES"
+@Table(name="relacion_grupos_ocupaciones"
     ,schema="alerta"
 )
 public class RelacionGrupoOcupacion  implements java.io.Serializable {

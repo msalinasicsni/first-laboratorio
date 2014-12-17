@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  * Created by souyen-ics on 11-05-14.
  */
 @Entity
-@Table(name = "DA_TOMAMX", schema = "ALERTA")
+@Table(name = "da_tomamx", schema = "alerta")
 public class DaTomaMx {
 
     private String idTomaMx;
@@ -55,8 +55,8 @@ public class DaTomaMx {
         this.idNotificacion = idNotificacion;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = false)
-    @JoinColumn(name = "COD_TIPOMX", referencedColumnName = "CODIGO", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "COD_TIPOMX", referencedColumnName = "ID_TIPOMX", nullable = false)
     @ForeignKey(name = "COD_TIPOMX_FK")
     public TipoMx getCodTipoMx() {
         return codTipoMx;

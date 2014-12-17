@@ -15,7 +15,7 @@ import java.sql.Timestamp;
  * Created by souyen-ics on 11-17-14.
  */
 @Entity
-@Table(name = "DA_NOTIFICACION", schema = "ALERTA")
+@Table(name = "da_notificacion", schema = "alerta")
 public class DaNotificacion {
 
     private String idNotificacion;
@@ -25,6 +25,7 @@ public class DaNotificacion {
     private EntidadesAdtvas codSilaisAtencion;
     private Unidades codUnidadAtencion;
     private Usuarios usuarioRegistro;
+    private Timestamp fechaAnulacion;
     private Timestamp fechaRegistro;
 
 
@@ -116,4 +117,13 @@ public class DaNotificacion {
         this.codUnidadAtencion = codUnidadAtencion;
     }
 
+    @Basic
+    @Column(name = "FECHA_ANULACION", nullable = true, insertable = true, updatable = true)
+    public Timestamp getFechaAnulacion() {
+        return fechaAnulacion;
+    }
+
+    public void setFechaAnulacion(Timestamp fechaAnulacion) {
+        this.fechaAnulacion = fechaAnulacion;
+    }
 }

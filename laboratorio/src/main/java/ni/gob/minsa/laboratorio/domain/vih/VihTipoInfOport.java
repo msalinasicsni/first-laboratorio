@@ -7,7 +7,7 @@ import java.sql.Timestamp;
  * Created by USER on 22/09/2014.
  */
 @Entity
-@Table(name = "SIVE_VIH_TIPO_INF_OPORT", schema = "ALERTA")
+@Table(name = "sive_vih_tipo_inf_oport", schema = "alerta")
 public class VihTipoInfOport {
     private Integer id;
     private String nombre;

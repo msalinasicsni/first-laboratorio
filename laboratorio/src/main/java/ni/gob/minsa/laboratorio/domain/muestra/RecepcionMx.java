@@ -15,18 +15,14 @@ import java.util.Date;
  * Created by FIRSTICT on 12/9/2014.
  */
 @Entity
-@Table(name = "RECEPCION_MX", schema = "LABORATORIO")
+@Table(name = "recepcion_mx", schema = "laboratorio")
 public class RecepcionMx {
 
     String idRecepcion;
     String codigoUnicoMx;
     DaOrdenExamen ordenExamen;
     Timestamp fechaHoraRecepcion;
-    DaNotificacion notificacion;
-    Unidades unidadSalud;
-    Laboratorio laboratorioEnvio;
     TipoRecepcionMx tipoRecepcionMx;
-    String diagSolicitado;
     Usuarios usuarioRecepcion;
     TipoEstudio tipoEstudio;
     TecnicaxLaboratorio tecnicaxLaboratorio;
@@ -58,39 +54,6 @@ public class RecepcionMx {
         this.fechaHoraRecepcion = fechaHoraRecepcion;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_NOTIFICACION", referencedColumnName = "ID_NOTIFICACION")
-    @ForeignKey(name = "RECEPCION_NOTIFICACION_FK")
-    public DaNotificacion getNotificacion() {
-        return notificacion;
-    }
-
-    public void setNotificacion(DaNotificacion notificacion) {
-        this.notificacion = notificacion;
-    }
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "UNIDAD_SALUD", referencedColumnName = "CODIGO")
-    @ForeignKey(name = "RECEPCION_UNIDADS_FK")
-    public Unidades getUnidadSalud() {
-        return unidadSalud;
-    }
-
-    public void setUnidadSalud(Unidades unidadSalud) {
-        this.unidadSalud = unidadSalud;
-    }
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "LABORATORIO", referencedColumnName = "CODIGO")
-    @ForeignKey(name = "RECEPCION_LAB_FK")
-    public Laboratorio getLaboratorioEnvio() {
-        return laboratorioEnvio;
-    }
-
-    public void setLaboratorioEnvio(Laboratorio laboratorioEnvio) {
-        this.laboratorioEnvio = laboratorioEnvio;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = false)
     @JoinColumn(name = "TIPO_RECEPCION", referencedColumnName = "CODIGO")
     @ForeignKey(name = "RECEPCION_TIPORECEP_FK")
@@ -100,16 +63,6 @@ public class RecepcionMx {
 
     public void setTipoRecepcionMx(TipoRecepcionMx tipoRecepcionMx) {
         this.tipoRecepcionMx = tipoRecepcionMx;
-    }
-
-    @Basic
-    @Column(name = "DIAG_SOLICITADO", nullable = true, insertable = true, updatable = true, length = 1000)
-    public String getDiagSolicitado() {
-        return diagSolicitado;
-    }
-
-    public void setDiagSolicitado(String diagSolicitado) {
-        this.diagSolicitado = diagSolicitado;
     }
 
     @ManyToOne(optional = false)
@@ -124,7 +77,7 @@ public class RecepcionMx {
     }
 
     @Basic
-    @Column(name = "CODUNICOMX", nullable = false, insertable = true, updatable = true, length = 12)
+    @Column(name = "CODUNICOMX", nullable = true, insertable = true, updatable = true, length = 12)
     public String getCodigoUnicoMx() {
         return codigoUnicoMx;
     }
@@ -155,7 +108,7 @@ public class RecepcionMx {
         this.tipoEstudio = tipoEstudio;
     }
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "TECNICA_LAB", referencedColumnName = "ID_TECNICALAB")
     @ForeignKey(name = "RECEPCION_TECLAB_FK")
     public TecnicaxLaboratorio getTecnicaxLaboratorio() {
@@ -209,7 +162,7 @@ public class RecepcionMx {
     }
 
     @Basic
-    @Column(name = "CAUSA", nullable = false, insertable = true, updatable = true, length = 200)
+    @Column(name = "CAUSA", nullable = true, insertable = true, updatable = true, length = 200)
     public String getCausaRechazo() {
         return causaRechazo;
     }

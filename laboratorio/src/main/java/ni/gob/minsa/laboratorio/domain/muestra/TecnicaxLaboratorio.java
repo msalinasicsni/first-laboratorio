@@ -9,7 +9,7 @@ import javax.persistence.*;
  * Created by FIRSTICT on 12/10/2014.
  */
 @Entity
-@Table(name = "TECNICA_LABORATORIO", schema = "LABORATORIO")
+@Table(name = "tecnica_laboratorio", schema = "laboratorio")
 public class TecnicaxLaboratorio {
     int idTecnicaLab;
     Laboratorio laboratorio;
