@@ -183,7 +183,7 @@ public class RecepcionMx {
         this.fechaHoraRecepcionLab = fechaHoraRecepcionLab;
     }
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "USUARIO_RECEPCIONLAB", referencedColumnName = "USUARIO_ID")
     @ForeignKey(name = "RECEPCIONLAB_USUARIO_FK")
     public Usuarios getUsuarioRecepcionLab() {
