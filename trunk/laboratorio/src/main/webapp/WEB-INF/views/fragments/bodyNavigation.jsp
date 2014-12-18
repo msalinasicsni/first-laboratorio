@@ -52,6 +52,12 @@
                     <li class="tomaMx">
                         <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>" title="<spring:message code="menu.receipt.orders.vig" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.orders.vig" /></a>
                     </li>
+                    <li class="tomaMx">
+                        <a href="<spring:url value="/recepcionMx/initLab" htmlEscape="true "/>" title="<spring:message code="menu.receipt.orders.lab" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.orders.lab" /></a>
+                    </li>
+                    <li class="tomaMx">
+                        <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>" title="<spring:message code="menu.send.receipt.orders" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.send.receipt.orders" /></a>
+                    </li>
                 </ul>
             </li>
             <li>

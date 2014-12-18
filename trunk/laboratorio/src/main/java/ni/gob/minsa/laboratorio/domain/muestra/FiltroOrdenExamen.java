@@ -7,12 +7,13 @@ import java.util.Date;
  */
 public class FiltroOrdenExamen {
     String nombreApellido;
-    Date fechaInicioTomaMx;
-    Date fechaFinTomaMx;
+    Date fechaInicio;
+    Date fechaFin;
     String codSilais;
     String codUnidadSalud;
     String codTipoMx;
     String codEstado;
+    String idAreaProcesa;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -22,20 +23,20 @@ public class FiltroOrdenExamen {
         this.nombreApellido = nombreApellido;
     }
 
-    public Date getFechaInicioTomaMx() {
-        return fechaInicioTomaMx;
+    public Date getFechaInicio() {
+        return fechaInicio;
     }
 
-    public void setFechaInicioTomaMx(Date fechaInicioTomaMx) {
-        this.fechaInicioTomaMx = fechaInicioTomaMx;
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFinTomaMx() {
-        return fechaFinTomaMx;
+    public Date getFechaFin() {
+        return fechaFin;
     }
 
-    public void setFechaFinTomaMx(Date fechaFinTomaMx) {
-        this.fechaFinTomaMx = fechaFinTomaMx;
+    public void setFechaFin(Date fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
     public String getCodSilais() {
@@ -68,5 +69,13 @@ public class FiltroOrdenExamen {
 
     public void setCodEstado(String codEstado) {
         this.codEstado = codEstado;
+    }
+
+    public String getIdAreaProcesa() {
+        return idAreaProcesa;
+    }
+
+    public void setIdAreaProcesa(String idAreaProcesa) {
+        this.idAreaProcesa = idAreaProcesa;
     }
 }

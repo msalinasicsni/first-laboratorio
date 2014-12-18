@@ -1,4 +1,4 @@
-var ReceiptOrders = function () {
+var SendOrdersReceipt = function () {
     var bloquearUI = function(mensaje){
         var loc = window.location;
         var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
@@ -27,9 +27,12 @@ var ReceiptOrders = function () {
 				tablet : 1024,
 				phone : 480
 			};
+            var text_selected_all = $("#text_selected_all").val();
+            var text_selected_none = $("#text_selected_none").val();
 			var table1 = $('#orders_result').dataTable({
 				"sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-					"t"+
+                    "T"+
+                    "t"+
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true, //"T<'clear'>"+
                 "preDrawCallback" : function() {
@@ -43,14 +46,19 @@ var ReceiptOrders = function () {
 				},
 				"drawCallback" : function(oSettings) {
 					responsiveHelper_dt_basic.respond();
-				}
+				},
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                }
 			});
 
             $('#searchOrders-form').validate({
     			// Rules for form validation
                 rules: {
-                    fecFinTomaMx:{required:function(){return $('#fecInicioTomaMx').val().length>0;}},
-                    fecInicioTomaMx:{required:function(){return $('#fecFinTomaMx').val().length>0;}}
+                    fechaFinRecepcion:{required:function(){return $('#fechaInicioRecep').val().length>0;}},
+                    fechaInicioRecep:{required:function(){return $('#fechaFinRecepcion').val().length>0;}}
                 },
     				// Do not change code below
     				errorPlacement : function(error, element) {
@@ -63,27 +71,17 @@ var ReceiptOrders = function () {
                     }
             });
 
-            $('#receiptOrders-form').validate({
+            $('#sendOrders-form').validate({
                 // Rules for form validation
                 rules: {
-                    rdCantTubos: {required : true},
-                    rdTipoMx: {required : true}
                 },
                 // Do not change code below
                 errorPlacement : function(error, element) {
-                    if (element.attr("name") === "rdCantTubos") {
-                        $("#dErrorCantTubos").fadeIn('slow');
-                    }else if (element.attr("name") === "rdTipoMx") {
-                        $("#dErrorTipoMx").fadeIn('slow');
-                    }else {
                         error.insertAfter(element.parent());
-                    }
                 },
                 submitHandler: function (form) {
-                    $("#dErrorCantTubos").fadeOut('slow');
-                    $("#dErrorCantTubos").fadeOut('slow');
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                    guardarRecepcion();
+                    enviarRecepcionesSeleccionadas();
                 }
             });
 
@@ -112,20 +110,18 @@ var ReceiptOrders = function () {
                 var encuestaFiltros = {};
                 if (showAll){
                     encuestaFiltros['nombreApellido'] = '';
-                    encuestaFiltros['fechaInicioTomaMx'] = '';
-                    encuestaFiltros['fechaFinTomaMx'] = '';
+                    encuestaFiltros['fechaInicioRecep'] = '';
+                    encuestaFiltros['fechaFinRecepcion'] = '';
                     encuestaFiltros['codSilais'] = '';
                     encuestaFiltros['codUnidadSalud'] = '';
                     encuestaFiltros['codTipoMx'] = '';
-                    encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                 }else {
                     encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     encuestaFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    encuestaFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    encuestaFiltros['fechaFinRecepcion'] = $('#fechaFinRecepcion').val();
                     encuestaFiltros['codSilais'] = $('#codSilais option:selected').val();
                     encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
-                    encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
@@ -136,18 +132,9 @@ var ReceiptOrders = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idOrdenExamen
-                            /*table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra +" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].edad,'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            */
                             table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            /*table1.fnAddData(
-                                [dataToLoad[i].fechaHOrden, '', dataToLoad[i].idTomaMx.fechaHTomaMx, dataToLoad[i].idTomaMx.idNotificacion.codSilaisAtencion.nombre, dataToLoad[i].idTomaMx.idNotificacion.codUnidadAtencion.nombre,
-                                    dataToLoad[i].idTomaMx.idNotificacion.persona.primerNombre, dataToLoad[i].codEstado.valor, "<input type='hidden' id='idOrden"+i+"' value='"+dataToLoad[i].idOrdenExamen+"'/>"]);
-                            */
+                                [dataToLoad[i].areaProcesa,dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);
                         }
                     }else{
                         $.smallBox({
@@ -170,8 +157,22 @@ var ReceiptOrders = function () {
                 getOrders(true);
             });
 
-            function guardarRecepcion() {
+            function enviarRecepcionesSeleccionadas() {
+                var oTT = TableTools.fnGetInstance('orders_result');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                if (len > 0) {
+                    $.SmartMessageBox({
+                        title: $("#msg_sending_confirm_t").val(),
+                        content: $("#msg_sending_confirm_c").val(),
+                        buttons: '['+opcSi+']['+opcNo+']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
                             bloquearUI(parametros.blockMess);
+                          alert('exito');
+                          /*
                             var ordenesObj = {};
                             ordenesObj['idRecepcion'] = '';
                             ordenesObj['mensaje'] = '';
@@ -214,6 +215,28 @@ var ReceiptOrders = function () {
                                         alert("error: " + data + " status: " + status + " er:" + er);
                                     }
                                 });
+                        */
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msg_sending_cancel").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                color: "#C46A69",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 4000
+                            });
+                        }
+
+                    });
+                }else{
+                    $.smallBox({
+                        title : $("#msg_sending_select_order").val(),
+                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                        color : "#C46A69",
+                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                        timeout : 4000
+                    });
+                }
 
             }
 

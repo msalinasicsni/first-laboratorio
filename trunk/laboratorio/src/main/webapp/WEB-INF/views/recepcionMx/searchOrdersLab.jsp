@@ -108,7 +108,7 @@
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
-                                    <input id="txtEsLaboratorio" type="hidden" value="false"/>
+                                    <input id="txtEsLaboratorio" type="hidden" value="true"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -314,8 +314,7 @@
     <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-    <c:url var="sAddReceiptUrl" value="/recepcionMx/create/"/>
-    <c:url var="sCreateReceiptUrl" value="/recepcionMx/create/"/>
+    <c:url var="sCreateReceiptUrl" value="/recepcionMx/createLab/"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -323,7 +322,6 @@
                 sOrdersUrl : "${ordersUrl}",
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
-                sAgregarEnvioUrl: "${sAddReceiptUrl}",
                 sActionUrl : "${sCreateReceiptUrl}"
             };
 			ReceiptOrders.init(parametros);
