@@ -47,9 +47,9 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-group"></i> 
-							<spring:message code="lbl.receipt.orders.title" />
+							<spring:message code="lbl.send.receipt.orders.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.receipt.orders" />
+							<spring:message code="lbl.send.receipt.orders" />
 						</span>
 					</h1>
 				</div>
@@ -108,7 +108,14 @@
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
-                                    <input id="txtEsLaboratorio" type="hidden" value="false"/>
+                                    <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
+                                    <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
+                                    <input id="msg_sending_select_order" type="hidden" value="<spring:message code="msg.receipt.select.order"/>"/>
+                                    <input id="msg_sending_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
+                                    <input id="msg_sending_confirm_t" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                    <input id="msg_sending_confirm_c" type="hidden" value="<spring:message code="msg.send.confirm.content"/>"/>
+                                    <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                                    <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -123,11 +130,11 @@
                                             </section>
                                             <section class="col col-sm-6 col-md-4 col-lg-2">
                                                 <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.start.date.mx" />
+                                                    <spring:message code="lbl.receipt.start.date" />
                                                 </label>
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                                    <input type="text" name="fecInicioTomaMx" id="fecInicioTomaMx"
+                                                    <input type="text" name="fechaInicioRecep" id="fechaInicioRecep"
                                                            placeholder="<spring:message code="lbl.date.format"/>"
                                                            class="form-control from_date" data-date-end-date="+0d"/>
                                                     <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
@@ -135,11 +142,11 @@
                                             </section>
                                             <section class="col col-sm-6 col-md-4 col-lg-2">
                                                 <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.end.date.mx" />
+                                                    <spring:message code="lbl.receipt.end.date" />
                                                 </label>
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                                    <input type="text" name="fecFinTomaMx" id="fecFinTomaMx"
+                                                    <input type="text" name="fechaFinRecepcion" id="fechaFinRecepcion"
                                                            placeholder="<spring:message code="lbl.date.format"/>"
                                                            class="form-control to_date" data-date-end-date="+0d"/>
                                                     <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
@@ -222,8 +229,10 @@
                                     <table id="orders_result" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
                                         <tr>
+                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.dateTime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.send.dateTime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
@@ -232,10 +241,14 @@
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
-                                            <th></th>
                                         </tr>
                                         </thead>
                                     </table>
+                                   <form id="sendOrders-form" class="smart-form" autocomplete="off">
+                                       <footer>
+                                           <button type="submit" id="send-orders-lab" class="btn btn-info"><i class="fa fa-send"></i> <spring:message code="act.send.selected" /></button>
+                                       </footer>
+                                   </form>
                                 </div>
                                 <!-- end widget content -->
                             </div>
@@ -300,8 +313,8 @@
     <script src="${jqueryInputMask}"></script>
 	<!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />
-	<script src="${receiptOrders}"></script>
+	<spring:url value="/resources/scripts/recepcionMx/send-orders-receipt.js" var="sendOrders" />
+	<script src="${sendOrders}"></script>
     <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
     <script src="${handleDatePickers}"></script>
     <spring:url value="/resources/scripts/utilidades/calcularEdad.js" var="calculateAge" />
@@ -311,11 +324,10 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
+    <c:url var="ordersUrl" value="/sendMxReceipt/searchOrders"/>
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-    <c:url var="sAddReceiptUrl" value="/recepcionMx/create/"/>
-    <c:url var="sCreateReceiptUrl" value="/recepcionMx/create/"/>
+    <c:url var="sAddReceiptUrl" value="/sendMxReceipt/sendReceipt"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -326,7 +338,7 @@
                 sAgregarEnvioUrl: "${sAddReceiptUrl}",
                 sActionUrl : "${sCreateReceiptUrl}"
             };
-			ReceiptOrders.init(parametros);
+			SendOrdersReceipt.init(parametros);
 
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();

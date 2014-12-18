@@ -1,10 +1,8 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
-import ni.gob.minsa.laboratorio.domain.muestra.DaEnvioOrden;
 import ni.gob.minsa.laboratorio.domain.muestra.DaOrdenExamen;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroOrdenExamen;
-import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
@@ -15,7 +13,6 @@ import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -62,10 +59,11 @@ public class OrdenExamenMxService {
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado 'PENDIENTE'
-        crit.add( Restrictions.and(
-                Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
-
+        );//y las ordenes en estado según filtro
+        if (filtro.getCodEstado()!=null) {
+            crit.add(Restrictions.and(
+                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+        }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
             crit.createAlias("notifi.persona", "person");
@@ -104,9 +102,9 @@ public class OrdenExamenMxService {
             );
         }
         //Se filtra por rango de fecha de toma de muestra
-        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
+        if (filtro.getFechaInicio()!=null && filtro.getFechaFin()!=null){
             crit.add( Restrictions.and(
-                            Restrictions.between("tomaMx.fechaRegistro", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+                            Restrictions.between("tomaMx.fechaRegistro", filtro.getFechaInicio(),filtro.getFechaFin()))
             );
         }
         // se filtra por tipo de muestra
