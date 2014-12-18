@@ -31,6 +31,8 @@ public class RecepcionMx {
     boolean cantidadTubosCk;
     boolean tipoMxCk;
     String causaRechazo;
+    Timestamp fechaHoraRecepcionLab;
+    Usuarios usuarioRecepcionLab;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -169,5 +171,26 @@ public class RecepcionMx {
 
     public void setCausaRechazo(String causaRechazo) {
         this.causaRechazo = causaRechazo;
+    }
+
+    public Timestamp getFechaHoraRecepcionLab() {
+        return fechaHoraRecepcionLab;
+    }
+
+    @Basic
+    @Column(name = "FECHAHORA_RECEPCIONLAB", nullable = false, insertable = true, updatable = false)
+    public void setFechaHoraRecepcionLab(Timestamp fechaHoraRecepcionLab) {
+        this.fechaHoraRecepcionLab = fechaHoraRecepcionLab;
+    }
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "USUARIO_RECEPCIONLAB", referencedColumnName = "USUARIO_ID")
+    @ForeignKey(name = "RECEPCIONLAB_USUARIO_FK")
+    public Usuarios getUsuarioRecepcionLab() {
+        return usuarioRecepcionLab;
+    }
+
+    public void setUsuarioRecepcionLab(Usuarios usuarioRecepcionLab) {
+        this.usuarioRecepcionLab = usuarioRecepcionLab;
     }
 }
