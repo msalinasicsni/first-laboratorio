@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
+import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
@@ -23,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -68,8 +68,8 @@ public class SendMxReceiptController {
     private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
-    @Qualifier(value = "tomaMxService")
-    private TomaMxService tomaMxService;
+    @Qualifier(value = "areaService")
+    private AreaService areaService;
 
     @Autowired
     @Qualifier(value = "unidadesService")
@@ -95,8 +95,11 @@ public class SendMxReceiptController {
         if (urlValidacion.isEmpty()) {
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+            List<Area> areaList = areaService.getAreas();
+
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("tipoMuestra", tipoMxList);
+            mav.addObject("area",areaList);
             mav.setViewName("recepcionMx/sendOrdersReceiptToLab");
         }else
             mav.setViewName(urlValidacion);
@@ -110,7 +113,7 @@ public class SendMxReceiptController {
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroOrdenExamen filtroOrdenExamen= jsonToFiltroOrdenExamen(filtro);
         List<RecepcionMx> recepcionMxList = recepcionMxService.getRecepcionesByFiltro(filtroOrdenExamen);
-        return OrdenesExamenToJson(recepcionMxList);
+        return RecepcionMxToJson(recepcionMxList);
     }
 
     @RequestMapping(value = "sendReceipt", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -118,54 +121,39 @@ public class SendMxReceiptController {
         String json = "";
         String resultado = "";
         String strOrdenes="";
-        String idRecepcion = "";
-        String verificaCantTb = "";
-        String verificaTipoMx = "";
-        String idOrdenExamen = "";
+        Integer cantRecepciones = 0;
+        Integer cantRecepProc = 0;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
-            verificaCantTb = jsonpObject.get("verificaCantTb").getAsString();
-            verificaTipoMx = jsonpObject.get("verificaTipoMx").getAsString();
-            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+            strOrdenes = jsonpObject.get("strOrdenes").toString();
+            cantRecepciones = jsonpObject.get("cantRecepciones").getAsInt();
 
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
             //Se obtiene estado recepcionado
-            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTORDEN|RCP");
-            TipoRecepcionMx tipoRecepcionMx = catalogosService.getTipoRecepcionMx("TPRECPMX|VRT");
+            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTORDEN|EPLAB");
             //se obtiene recepcion de examen a recepcionar
-            DaOrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
-
-            RecepcionMx recepcionMx = new RecepcionMx();
-
-            recepcionMx.setUsuarioRecepcion(usuario);
-            recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-            recepcionMx.setTipoMxCk(Boolean.valueOf(verificaTipoMx));
-            recepcionMx.setCantidadTubosCk(Boolean.valueOf(verificaCantTb));
-            recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
-            recepcionMx.setOrdenExamen(ordenExamen);
-            //recepcionMx.setLaboratorioEnvio(labProcedencia);
-
-            try {
-                idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
-            }catch (Exception ex){
-                resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
-                resultado=resultado+". \n "+ex.getMessage();
-                ex.printStackTrace();
-            }
-            if (!idRecepcion.isEmpty()) {
-               //se tiene que actualizar la recepcion de examen
-                ordenExamen.setCodEstado(estadoOrdenEx);
-                try {
-                    ordenExamenMxService.updateOrdenExamen(ordenExamen);
-                }catch (Exception ex){
-                    resultado = messageSource.getMessage("msg.update.order.error",null,null);
-                    resultado=resultado+". \n "+ex.getMessage();
-                    ex.printStackTrace();
+            DaOrdenExamen ordenExamen;
+            JsonObject jObjectOrdenes = new Gson().fromJson(strOrdenes, JsonObject.class);
+            for(int i = 0; i< cantRecepciones;i++) {
+                String idOrden = jObjectOrdenes.get(String.valueOf(i)).getAsString();
+                ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrden);
+                if (ordenExamen != null) {
+                    //se tiene que actualizar el estado de la orden a ENVIADA PARA PROCESAR EN LABORATORIO
+                    ordenExamen.setCodEstado(estadoOrdenEx);
+                    try {
+                        ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                        cantRecepProc++;
+                    } catch (Exception ex) {
+                        resultado = messageSource.getMessage("msg.update.order.error", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
+                        ex.printStackTrace();
+                    }
                 }
+                ordenExamen = null; //se limpia el objeto
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -175,18 +163,17 @@ public class SendMxReceiptController {
 
         }finally {
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idRecepcion",idRecepcion);
+            map.put("strOrdenes",strOrdenes);
             map.put("mensaje",resultado);
-            map.put("idOrdenExamen", strOrdenes);
-            map.put("verificaCantTb", verificaCantTb);
-            map.put("verificaTipoMx", verificaTipoMx);
+            map.put("cantRecepciones",cantRecepciones.toString());
+            map.put("cantRecepProc",cantRecepProc.toString());
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
     }
 
-    private String OrdenesExamenToJson(List<RecepcionMx> recepcionMxList){
+    private String RecepcionMxToJson(List<RecepcionMx> recepcionMxList){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -237,8 +224,8 @@ public class SendMxReceiptController {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
         FiltroOrdenExamen filtroOrdenExamen = new FiltroOrdenExamen();
         String nombreApellido = null;
-        Date fechaInicioTomaMx = null;
-        Date fechaFinTomaMx = null;
+        Date fechaInicioRecep = null;
+        Date fechaFinRecep = null;
         String codSilais = null;
         String codUnidadSalud = null;
         String codTipoMx = null;
@@ -247,22 +234,25 @@ public class SendMxReceiptController {
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
         if (jObjectFiltro.get("fechaInicioRecep") != null && !jObjectFiltro.get("fechaInicioRecep").getAsString().isEmpty())
-            fechaInicioTomaMx = StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
+            fechaInicioRecep = StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
         if (jObjectFiltro.get("fechaFinRecepcion") != null && !jObjectFiltro.get("fechaFinRecepcion").getAsString().isEmpty())
-            fechaFinTomaMx = StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
+            fechaFinRecep = StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsString();
         if (jObjectFiltro.get("codUnidadSalud") != null && !jObjectFiltro.get("codUnidadSalud").getAsString().isEmpty())
             codUnidadSalud = jObjectFiltro.get("codUnidadSalud").getAsString();
         if (jObjectFiltro.get("codTipoMx") != null && !jObjectFiltro.get("codTipoMx").getAsString().isEmpty())
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
+        if (jObjectFiltro.get("idArea") != null && !jObjectFiltro.get("idArea").getAsString().isEmpty())
+            idAreaProcesa = jObjectFiltro.get("idArea").getAsString();
 
         filtroOrdenExamen.setCodSilais(codSilais);
         filtroOrdenExamen.setCodUnidadSalud(codUnidadSalud);
-        filtroOrdenExamen.setFechaInicio(fechaInicioTomaMx);
-        filtroOrdenExamen.setFechaFin(fechaFinTomaMx);
+        filtroOrdenExamen.setFechaInicioRecep(fechaInicioRecep);
+        filtroOrdenExamen.setFechaFinRecep(fechaFinRecep);
         filtroOrdenExamen.setNombreApellido(nombreApellido);
         filtroOrdenExamen.setCodTipoMx(codTipoMx);
+        filtroOrdenExamen.setIdAreaProcesa(idAreaProcesa);
         filtroOrdenExamen.setCodEstado("ESTORDEN|RCP"); // sólo las recepcionadas
 
         return filtroOrdenExamen;

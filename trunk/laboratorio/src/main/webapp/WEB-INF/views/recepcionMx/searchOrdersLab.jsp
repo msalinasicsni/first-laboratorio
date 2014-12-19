@@ -32,7 +32,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/envioOrdenMx/create" htmlEscape="true "/>"><spring:message code="menu.receipt.orders" /></a></li>
+                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/recepcionMx/searchOrdersLab" htmlEscape="true "/>"><spring:message code="menu.receipt.orders.lab" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -49,7 +49,7 @@
 						<i class="fa-fw fa fa-group"></i> 
 							<spring:message code="lbl.receipt.orders.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.receipt.orders" />
+							<spring:message code="lbl.receipt.orders.lab" />
 						</span>
 					</h1>
 				</div>
@@ -311,7 +311,7 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
+    <c:url var="ordersUrl" value="/recepcionMx/searchOrdersLab"/>
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sCreateReceiptUrl" value="/recepcionMx/createLab/"/>

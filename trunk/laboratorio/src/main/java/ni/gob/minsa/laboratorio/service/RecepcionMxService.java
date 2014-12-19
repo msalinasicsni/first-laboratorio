@@ -1,11 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
-import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
-import ni.gob.minsa.laboratorio.domain.muestra.DaOrdenExamen;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroOrdenExamen;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
-import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -19,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,6 +51,21 @@ public class RecepcionMxService {
             throw ex;
         }
         return idMaestro;
+    }
+
+    public void updateRecepcionMx(RecepcionMx dto) throws Exception {
+        String idMaestro;
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.update(dto);
+            }
+            else
+                throw new Exception("Objeto Recepción Muestra es NULL");
+        }catch (Exception ex){
+            logger.error("Error al actualizar recepción de muestra",ex);
+            throw ex;
+        }
     }
 
     public RecepcionMx getRecepcionMx(String idRecepcion){
@@ -121,9 +131,15 @@ public class RecepcionMxService {
             );
         }
         //Se filtra por rango de fecha de toma de muestra
-        if (filtro.getFechaInicio()!=null && filtro.getFechaFin()!=null){
+        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
             crit.add( Restrictions.and(
-                            Restrictions.between("recepcion.fechaHoraRecepcion", filtro.getFechaInicio(),filtro.getFechaFin()))
+                            Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+        }
+        //Se filtra por rango de fecha de recepción
+        if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("recepcion.fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
             );
         }
         // se filtra por tipo de muestra
@@ -134,8 +150,9 @@ public class RecepcionMxService {
         }
         //se filtra por area que procesa
         if (filtro.getIdAreaProcesa()!=null){
+            crit.createAlias("orden.codExamen", "examen");
             crit.add( Restrictions.and(
-                            Restrictions.eq("orden.codExamen.area.idArea", Integer.valueOf(filtro.getIdAreaProcesa())))
+                            Restrictions.eq("examen.area.idArea", Integer.valueOf(filtro.getIdAreaProcesa())))
             );
         }
 

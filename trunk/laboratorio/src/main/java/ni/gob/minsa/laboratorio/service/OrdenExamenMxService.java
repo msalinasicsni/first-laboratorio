@@ -102,9 +102,9 @@ public class OrdenExamenMxService {
             );
         }
         //Se filtra por rango de fecha de toma de muestra
-        if (filtro.getFechaInicio()!=null && filtro.getFechaFin()!=null){
+        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
             crit.add( Restrictions.and(
-                            Restrictions.between("tomaMx.fechaRegistro", filtro.getFechaInicio(),filtro.getFechaFin()))
+                            Restrictions.between("tomaMx.fechaRegistro", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
         // se filtra por tipo de muestra

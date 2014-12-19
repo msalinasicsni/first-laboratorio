@@ -46,6 +46,7 @@ var ReceiptOrders = function () {
 				}
 			});
 
+            <!-- formulario de búsqueda de ordenes -->
             $('#searchOrders-form').validate({
     			// Rules for form validation
                 rules: {
@@ -63,6 +64,7 @@ var ReceiptOrders = function () {
                     }
             });
 
+            <!-- formulario de recepción general -->
             $('#receiptOrders-form').validate({
                 // Rules for form validation
                 rules: {
@@ -81,9 +83,25 @@ var ReceiptOrders = function () {
                 },
                 submitHandler: function (form) {
                     $("#dErrorCantTubos").fadeOut('slow');
-                    $("#dErrorCantTubos").fadeOut('slow');
+                    $("#dErrorTipoMx").fadeOut('slow');
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
                     guardarRecepcion();
+                }
+            });
+
+            <!-- formulario de recepción en laboratorio -->
+            $('#receiptOrdersLab-form').validate({
+                // Rules for form validation
+                rules: {
+                    codCalidadMx: {required : true},
+                    causaRechazo: {required : true}
+                },
+                // Do not change code below
+                errorPlacement : function(error, element) {
+                        error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    guardarRecepcionLab();
                 }
             });
 
@@ -136,7 +154,13 @@ var ReceiptOrders = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idOrdenExamen
+                            var idLoad;
+                            if ($('#txtEsLaboratorio').val()=='true'){
+                                idLoad =dataToLoad[i]. idRecepcion;
+                            }else{
+                                idLoad = dataToLoad[i].idOrdenExamen;
+                            }
+                            var actionUrl = parametros.sActionUrl+idLoad;
                             /*table1.fnAddData(
                                 [dataToLoad[i].tipoMuestra +" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].edad,'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
@@ -170,6 +194,7 @@ var ReceiptOrders = function () {
                 getOrders(true);
             });
 
+            <!-- para guardar recepción general -->
             function guardarRecepcion() {
                             bloquearUI(parametros.blockMess);
                             var ordenesObj = {};
@@ -217,11 +242,73 @@ var ReceiptOrders = function () {
 
             }
 
+            <!-- para guardar recepción en laboratorio -->
+            function guardarRecepcionLab() {
+                bloquearUI(parametros.blockMess);
+                var ordenesObj = {};
+                ordenesObj['mensaje'] = '';
+                ordenesObj['idRecepcion']=$("#idRecepcion").val();
+                ordenesObj['calidadMx'] = $('#codCalidadMx option:selected').val();
+                ordenesObj['causaRechazo'] = $('#causaRechazo').val();
+                $.ajax(
+                    {
+                        url: parametros.sAddReceiptUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(ordenesObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                var msg = $("#msg_receipt_added").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                                limpiarDatosRecepcion();
+                                setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},2000);
+                            }
+                            desbloquearUI();
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+
+            }
+
             function limpiarDatosRecepcion(){
                 //$("#txtNombreTransporta").val('');
                 //$("#txtTemperatura").val('');
                 //$("#codLaboratorioProce").val('').change();
             }
+
+            <!--al seleccionar calidad de la muestra -->
+            $('#codCalidadMx').change(function(){
+                $('#causaRechazo').val('');
+                if ($(this).val().length > 0) {
+                    if ($(this).val()=='CALIDMX|IDC'){
+                        $("#dvCausa").show();
+                    }else{
+                        $("#dvCausa").hide();
+                    }
+                }else{
+                    $("#dvCausa").hide();
+                }
+            });
+
             <!-- al seleccionar SILAIS -->
             $('#codSilais').change(function(){
                 blockUI();
