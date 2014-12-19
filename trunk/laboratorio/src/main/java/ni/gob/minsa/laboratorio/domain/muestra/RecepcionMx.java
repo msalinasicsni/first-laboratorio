@@ -178,7 +178,7 @@ public class RecepcionMx {
     }
 
     @Basic
-    @Column(name = "FECHAHORA_RECEPCIONLAB", nullable = false, insertable = true, updatable = false)
+    @Column(name = "FECHAH_RECEPCION_LAB", nullable = false, insertable = true, updatable = false)
     public void setFechaHoraRecepcionLab(Timestamp fechaHoraRecepcionLab) {
         this.fechaHoraRecepcionLab = fechaHoraRecepcionLab;
     }

@@ -156,6 +156,17 @@ public class RecepcionMxService {
             );
         }
 
+        //Se filtra por rango de fecha de recepcion en laboratorio
+        if (filtro.getFechaInicioRecepLab()!=null && filtro.getFechaFinRecepLab()!=null){
+            crit.add( Restrictions.or(
+                            Restrictions.between("recepcion.fechaHoraRecepcionLab", filtro.getFechaInicioRecepLab(),filtro.getFechaFinRecepLab()))
+            );
+        }
+
+        if(filtro.getIncluirMxInadecuada()){
+           crit.add(Restrictions.or(Restrictions.eq("recepcion.calidadMx", "CALIDMX|IDC")));
+        }
+
         return crit.list();
     }
 

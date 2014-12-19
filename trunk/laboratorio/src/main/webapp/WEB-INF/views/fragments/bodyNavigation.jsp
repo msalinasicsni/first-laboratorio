@@ -47,17 +47,28 @@
                 <a href="<spring:url value="/" htmlEscape="true "/>" title="<spring:message code="menu.home" />"><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent"><spring:message code="menu.home" /></span></a>
             </li>
             <li class="recepcion">
-                <a href="#" title="<spring:message code="menu.receipt.orders" />"><i class="fa fa-lg fa-fw fa-flask"></i> <span class="menu-item-parent"><spring:message code="menu.receipt.orders" /></span></a>
+                <a href="#" title="<spring:message code="menu.receipt.orders" />"><i class="fa fa-lg fa-fw fa-tint"></i> <span class="menu-item-parent"><spring:message code="menu.receipt.orders" /></span></a>
                 <ul>
                     <li class="receipt">
                         <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>" title="<spring:message code="menu.receipt.orders.vig" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.orders.vig" /></a>
                     </li>
-                    <li class="receiptLab">
-                        <a href="<spring:url value="/recepcionMx/initLab" htmlEscape="true "/>" title="<spring:message code="menu.receipt.orders.lab" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.orders.lab" /></a>
-                    </li>
                     <li class="sendReceipt">
-                        <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>" title="<spring:message code="menu.send.receipt.orders" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.send.receipt.orders" /></a>
+                        <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>" title="<spring:message code="menu.send.receipt.orders" />"><i class="fa fa-lg fa-fw fa-shopping-cart "></i> <spring:message code="menu.send.receipt.orders" /></a>
                     </li>
+
+                </ul>
+            </li>
+
+            <li class="laboratorio">
+                <a href="#" title="<spring:message code="menu.lab" />"><i class="fa fa-lg fa-fw fa-flask"></i> <span class="menu-item-parent"><spring:message code="menu.lab" /></span></a>
+                <ul>
+                    <li class="receiptLab">
+                        <a href="<spring:url value="/recepcionMx/initLab" htmlEscape="true "/>" title="<spring:message code="menu.receipt.orders.lab" />"><i class="fa fa-lg fa-fw fa-thumbs-up"></i> <spring:message code="menu.receipt.orders.lab" /></a>
+                    </li>
+                    <li class="generacionAlicuota">
+                        <a href="<spring:url value="/generacionAlicuota/init" htmlEscape="true "/>" title="<spring:message code="menu.generate.aliquot" />"><i class="fa fa-lg fa-fw fa-ticket"></i> <spring:message code="menu.generate.aliquot" /></a>
+                    </li>
+
                 </ul>
             </li>
             <li>
