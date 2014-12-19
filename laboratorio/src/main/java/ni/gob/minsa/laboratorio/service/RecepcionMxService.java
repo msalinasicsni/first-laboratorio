@@ -163,8 +163,8 @@ public class RecepcionMxService {
             );
         }
 
-        if(filtro.getIncluirMxInadecuada()){
-           crit.add(Restrictions.or(Restrictions.eq("recepcion.calidadMx", "CALIDMX|IDC")));
+        if(filtro.getIncluirMxInadecuada()!=null && filtro.getIncluirMxInadecuada()){
+           crit.add(Restrictions.and(Restrictions.eq("recepcion.calidadMx.codigo", "CALIDMX|IDC")));
         }
 
         return crit.list();
