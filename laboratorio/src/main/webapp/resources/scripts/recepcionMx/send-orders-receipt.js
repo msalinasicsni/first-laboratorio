@@ -117,11 +117,12 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['codTipoMx'] = '';
                 }else {
                     encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    encuestaFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
+                    encuestaFiltros['fechaInicioRecep'] = $('#fechaInicioRecep').val();
                     encuestaFiltros['fechaFinRecepcion'] = $('#fechaFinRecepcion').val();
                     encuestaFiltros['codSilais'] = $('#codSilais option:selected').val();
                     encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
+                    encuestaFiltros['idArea'] = $('#codAreaProcesa option:selected').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
@@ -133,7 +134,7 @@ var SendOrdersReceipt = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].areaProcesa,dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                [dataToLoad[i].areaProcesa+" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);
                         }
                     }else{
@@ -171,17 +172,25 @@ var SendOrdersReceipt = function () {
                     }, function (ButtonPressed) {
                         if (ButtonPressed === opcSi) {
                             bloquearUI(parametros.blockMess);
-                          alert('exito');
-                          /*
+                            var idOrdenes = {};
+                            //el input hidden debe estar siempre en la primera columna
+                            for (var i = 0; i < len; i++) {
+                                //var texto = aSelectedTrs[i].cells[7].innerHTML;
+                                var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                console.log(texto);
+                                var input = texto.substring(texto.lastIndexOf("<"),texto.length);
+                                //console.log(input);
+                                console.log($(input).val());
+                                idOrdenes[i]=$(input).val();
+                            }
                             var ordenesObj = {};
-                            ordenesObj['idRecepcion'] = '';
+                            ordenesObj['strOrdenes'] = idOrdenes;
                             ordenesObj['mensaje'] = '';
-                            ordenesObj['idOrdenExamen']=$("#idOrdenExamen").val();
-                            ordenesObj['verificaCantTb'] = $('input[name="rdCantTubos"]:checked', '#receiptOrders-form').val();
-                            ordenesObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val()
+                            ordenesObj['cantRecepciones']=len;
+                            ordenesObj['cantRecepProc'] = '';
                             $.ajax(
                                 {
-                                    url: parametros.sAddReceiptUrl,
+                                    url: parametros.sAgregarEnvioUrl,
                                     type: 'POST',
                                     dataType: 'json',
                                     data: JSON.stringify(ordenesObj),
@@ -197,7 +206,8 @@ var SendOrdersReceipt = function () {
                                                 timeout: 4000
                                             });
                                         }else{
-                                            var msg = $("#msg_receipt_added").val();
+                                            var msg = $("#msg_send_receipt_succes").val();
+                                            msg = msg.replace(/\{0\}/,data.cantRecepProc);
                                             $.smallBox({
                                                 title: msg ,
                                                 content: $("#smallBox_content").val(),
@@ -215,7 +225,6 @@ var SendOrdersReceipt = function () {
                                         alert("error: " + data + " status: " + status + " er:" + er);
                                     }
                                 });
-                        */
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({

@@ -116,6 +116,7 @@
                                     <input id="msg_sending_confirm_c" type="hidden" value="<spring:message code="msg.send.confirm.content"/>"/>
                                     <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                     <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                                    <input id="msg_send_receipt_succes" type="hidden" value="<spring:message code="msg.receipt.successfully.sending"/>"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -168,7 +169,7 @@
                                             </section>
                                         </div>
                                         <div class="row">
-                                            <section class="col col-sm-12 col-md-5 col-lg-5">
+                                            <section class="col col-sm-12 col-md-5 col-lg-3">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.silais" /> </label>
                                                 <div class="input-group">
@@ -182,7 +183,7 @@
                                                     </select>
                                                 </div>
                                             </section>
-                                            <section class="col col-sm-12 col-md-7 col-lg-7">
+                                            <section class="col col-sm-12 col-md-7 col-lg-6">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.health.unit" /> </label>
                                                 <div class="input-group">
@@ -190,6 +191,20 @@
                                                     <select id="codUnidadSalud" name="codUnidadSalud"
                                                             class="select2">
                                                         <option value=""><spring:message code="lbl.select" />...</option>
+                                                    </select>
+                                                </div>
+                                            </section>
+                                            <section class="col col-sm-12 col-md-7 col-lg-3">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.receipt.pcr.area" /> </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                    <select id="codAreaProcesa" name="codAreaProcesa"
+                                                            class="select2">
+                                                        <option value=""><spring:message code="lbl.select" />...</option>
+                                                        <c:forEach items="${area}" var="area">
+                                                            <option value="${area.idArea}">${area.nombre}</option>
+                                                        </c:forEach>
                                                     </select>
                                                 </div>
                                             </section>
@@ -230,23 +245,23 @@
                                         <thead>
                                         <tr>
                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
-                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.dateTime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.send.dateTime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>
+                                            <th data-hide="phone,tablet"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
+                                            <th data-hide="phone,tablet"><spring:message code="lbl.sample.separation"/></th>
+                                            <th data-hide="phone,tablet"><spring:message code="lbl.sample.number.tubes"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
-                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
                                         </tr>
                                         </thead>
                                     </table>
                                    <form id="sendOrders-form" class="smart-form" autocomplete="off">
                                        <footer>
-                                           <button type="submit" id="send-orders-lab" class="btn btn-info"><i class="fa fa-send"></i> <spring:message code="act.send.selected" /></button>
+                                           <button type="submit" id="send-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-send"></i> <spring:message code="act.send.selected" /></button>
                                        </footer>
                                    </form>
                                 </div>
@@ -289,6 +304,7 @@
     <script src="${dataTablesBootstrap}"></script>
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
+    <!-- Table Tools Path-->
     <spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
     <!-- jQuery Selecte2 Input -->
     <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
@@ -325,7 +341,7 @@
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="ordersUrl" value="/sendMxReceipt/searchOrders"/>
-
+    <c:url var="initUrl" value="/sendMxReceipt/init"/>
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/sendMxReceipt/sendReceipt"/>
     <script type="text/javascript">
@@ -336,7 +352,8 @@
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
                 sAgregarEnvioUrl: "${sAddReceiptUrl}",
-                sActionUrl : "${sCreateReceiptUrl}"
+                sTableToolsPath : "${tabletools}",
+                sSearchReceiptUrl: "${initUrl}"
             };
 			SendOrdersReceipt.init(parametros);
 

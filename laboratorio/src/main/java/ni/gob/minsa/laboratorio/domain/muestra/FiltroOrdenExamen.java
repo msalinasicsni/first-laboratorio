@@ -7,13 +7,15 @@ import java.util.Date;
  */
 public class FiltroOrdenExamen {
     String nombreApellido;
-    Date fechaInicio;
-    Date fechaFin;
+    Date fechaInicioTomaMx;
+    Date fechaFinTomaMx;
     String codSilais;
     String codUnidadSalud;
     String codTipoMx;
     String codEstado;
     String idAreaProcesa;
+    Date fechaInicioRecep;
+    Date fechaFinRecep;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -23,20 +25,20 @@ public class FiltroOrdenExamen {
         this.nombreApellido = nombreApellido;
     }
 
-    public Date getFechaInicio() {
-        return fechaInicio;
+    public Date getFechaInicioTomaMx() {
+        return fechaInicioTomaMx;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
-        this.fechaInicio = fechaInicio;
+    public void setFechaInicioTomaMx(Date fechaInicioTomaMx) {
+        this.fechaInicioTomaMx = fechaInicioTomaMx;
     }
 
-    public Date getFechaFin() {
-        return fechaFin;
+    public Date getFechaFinTomaMx() {
+        return fechaFinTomaMx;
     }
 
-    public void setFechaFin(Date fechaFin) {
-        this.fechaFin = fechaFin;
+    public void setFechaFinTomaMx(Date fechaFinTomaMx) {
+        this.fechaFinTomaMx = fechaFinTomaMx;
     }
 
     public String getCodSilais() {
@@ -77,5 +79,21 @@ public class FiltroOrdenExamen {
 
     public void setIdAreaProcesa(String idAreaProcesa) {
         this.idAreaProcesa = idAreaProcesa;
+    }
+
+    public Date getFechaInicioRecep() {
+        return fechaInicioRecep;
+    }
+
+    public void setFechaInicioRecep(Date fechaInicioRecep) {
+        this.fechaInicioRecep = fechaInicioRecep;
+    }
+
+    public Date getFechaFinRecep() {
+        return fechaFinRecep;
+    }
+
+    public void setFechaFinRecep(Date fechaFinRecep) {
+        this.fechaFinRecep = fechaFinRecep;
     }
 }

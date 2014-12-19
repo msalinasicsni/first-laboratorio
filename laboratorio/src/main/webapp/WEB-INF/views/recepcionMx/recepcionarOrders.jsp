@@ -109,6 +109,7 @@
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
+                                    <input id="txtEsLaboratorio" type="hidden" value="true"/>
                                     <form id="receiptOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
