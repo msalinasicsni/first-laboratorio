@@ -16,6 +16,9 @@ public class FiltroOrdenExamen {
     String idAreaProcesa;
     Date fechaInicioRecep;
     Date fechaFinRecep;
+    Date fechaInicioRecepLab;
+    Date fechaFinRecepLab;
+    Boolean incluirMxInadecuada;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -96,4 +99,16 @@ public class FiltroOrdenExamen {
     public void setFechaFinRecep(Date fechaFinRecep) {
         this.fechaFinRecep = fechaFinRecep;
     }
+
+    public Date getFechaInicioRecepLab() { return fechaInicioRecepLab;  }
+
+    public void setFechaInicioRecepLab(Date fechaInicioRecepLab) { this.fechaInicioRecepLab = fechaInicioRecepLab; }
+
+    public Date getFechaFinRecepLab() { return fechaFinRecepLab; }
+
+    public void setFechaFinRecepLab(Date fechaFinRecepLab) { this.fechaFinRecepLab = fechaFinRecepLab; }
+
+    public Boolean getIncluirMxInadecuada() { return incluirMxInadecuada; }
+
+    public void setIncluirMxInadecuada(Boolean incluirMxInadecuada) { this.incluirMxInadecuada = incluirMxInadecuada; }
 }
