@@ -32,9 +32,9 @@ public class RecepcionMxService {
     public RecepcionMxService(){}
 
     /**
-     * Agrega una Registro de encuesta al maestro y al detalle
+     * Agrega una Registro de Recepción de muestra
      *
-     * @param dto
+     * @param dto Objeto a agregar
      * @throws Exception
      */
     public String addRecepcionMx(RecepcionMx dto) throws Exception {
@@ -53,8 +53,13 @@ public class RecepcionMxService {
         return idMaestro;
     }
 
+    /**
+     * Actualiza una Registro de Recepción de muestra
+     *
+     * @param dto Objeto a actualizar
+     * @throws Exception
+     */
     public void updateRecepcionMx(RecepcionMx dto) throws Exception {
-        String idMaestro;
         try {
             if (dto != null) {
                 Session session = sessionFactory.getCurrentSession();
@@ -74,6 +79,15 @@ public class RecepcionMxService {
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setString("idRecepcion", idRecepcion);
+        return  (RecepcionMx)q.uniqueResult();
+    }
+
+    public RecepcionMx getRecepcionMxByCodUnicoMx(String codigoUnicoMx){
+        String query = "from RecepcionMx as a where codigoUnicoMx= :codigoUnicoMx";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codigoUnicoMx", codigoUnicoMx);
         return  (RecepcionMx)q.uniqueResult();
     }
 
