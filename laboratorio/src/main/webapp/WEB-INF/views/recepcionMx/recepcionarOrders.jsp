@@ -326,6 +326,12 @@
                                                 </section>
                                             </div>
                                         </fieldset>
+                                        <!--<fieldset>
+                                            <div id="bcTarget" style="width: 100px;height: 100px"></div>
+                                            <button onclick="imprimir();">
+                                                IMPRIMIR
+                                            </button>
+                                        </fieldset>-->
                                         <footer>
                                             <input id="idOrdenExamen" type="hidden" value="${ordenExamen.idOrdenExamen}"/>
                                             <button type="submit" id="receipt-orders" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-check"></i> <spring:message code="act.receipt" /></button>
@@ -381,6 +387,11 @@
 	<!-- JQUERY BLOCK UI -->
 	<spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
 	<script src="${jqueryBlockUi}"></script>
+    <!-- JQUERY BAR CODE -->
+    <spring:url value="/resources/js/plugin/jquery-barcode-2.0.3/jquery-barcode.js" var="jqueryBarCode" />
+    <script src="${jqueryBarCode}"></script>
+    <spring:url value="/resources/js/plugin/jquery-barcode-2.0.3/jquery-barcode.min.js" var="jqueryBarCodeM" />
+    <script src="${jqueryBarCodeM}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />
@@ -393,6 +404,17 @@
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
+    <script language="JavaScript" type="text/javascript">
+        function imprimir()
+        {
+            var ficha = document.getElementById('bcTarget');
+            var ventimp =window.open('','_blank');
+            ventimp.document.write( ficha.innerHTML );
+            ventimp.document.close();
+            ventimp.print( );
+            ventimp.close();
+        }
+    </script>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -409,6 +431,7 @@
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
 	    	}
+            $("#bcTarget").barcode("1A1D2A1n", "datamatrix");
         });
 	</script>
 	<!-- END JAVASCRIPTS -->

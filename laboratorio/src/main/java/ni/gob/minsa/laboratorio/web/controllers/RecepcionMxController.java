@@ -8,6 +8,8 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
+import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("recepcionMx")
 public class RecepcionMxController {
-
     private static final Logger logger = LoggerFactory.getLogger(RecepcionMxController.class);
     @Autowired
     @Qualifier(value = "seguridadService")
@@ -233,6 +234,7 @@ public class RecepcionMxController {
         String verificaCantTb = "";
         String verificaTipoMx = "";
         String idOrdenExamen = "";
+        String codigoUnicoMx = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -259,7 +261,9 @@ public class RecepcionMxController {
             recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
             recepcionMx.setOrdenExamen(ordenExamen);
             //recepcionMx.setLaboratorioEnvio(labProcedencia);
-
+            //Se genara código único de muestra (sólo para vigilancia) y se valida que aún no exista en BD
+            codigoUnicoMx = generarCodigoUnicoMx();
+            recepcionMx.setCodigoUnicoMx(codigoUnicoMx);
             try {
                 idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
             }catch (Exception ex){
@@ -291,6 +295,7 @@ public class RecepcionMxController {
             map.put("idOrdenExamen", strOrdenes);
             map.put("verificaCantTb", verificaCantTb);
             map.put("verificaTipoMx", verificaTipoMx);
+            //map.put("codigoUnicoMx",codigoUnicoMx);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -375,8 +380,8 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen",orden.getIdOrdenExamen());
             map.put("idTomaMx",orden.getIdTomaMx().getIdTomaMx());
-            map.put("fechaHoraOrden",DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateToString(orden.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaHoraOrden",DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(orden.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("codSilais",orden.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             map.put("codUnidadSalud",orden.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
             map.put("estadoOrden",orden.getCodEstado().getValor());
@@ -387,7 +392,7 @@ public class RecepcionMxController {
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
+                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
@@ -421,9 +426,9 @@ public class RecepcionMxController {
             map.put("idRecepcion", recepcion.getIdRecepcion());
             map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getOrdenExamen().getIdTomaMx().getIdTomaMx());
-            map.put("fechaHoraOrden",DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateToString(recepcion.getOrdenExamen().getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaRecepcion",DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getOrdenExamen().getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("codSilais", recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             map.put("codUnidadSalud", recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
             map.put("estadoOrden", recepcion.getOrdenExamen().getCodEstado().getValor());
@@ -435,7 +440,7 @@ public class RecepcionMxController {
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
+                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
@@ -476,13 +481,13 @@ public class RecepcionMxController {
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
         if (jObjectFiltro.get("fechaInicioTomaMx") != null && !jObjectFiltro.get("fechaInicioTomaMx").getAsString().isEmpty())
-            fechaInicioTomaMx = StringToDate(jObjectFiltro.get("fechaInicioTomaMx").getAsString()+" 00:00:00");
+            fechaInicioTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioTomaMx").getAsString() + " 00:00:00");
         if (jObjectFiltro.get("fechaFinTomaMx") != null && !jObjectFiltro.get("fechaFinTomaMx").getAsString().isEmpty())
-            fechaFinTomaMx = StringToDate(jObjectFiltro.get("fechaFinTomaMx").getAsString()+" 23:59:59");
+            fechaFinTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaFinTomaMx").getAsString()+" 23:59:59");
         if (jObjectFiltro.get("fechaInicioRecep") != null && !jObjectFiltro.get("fechaInicioRecep").getAsString().isEmpty())
-            fechaInicioRecep = StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
+            fechaInicioRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
         if (jObjectFiltro.get("fechaFinRecepcion") != null && !jObjectFiltro.get("fechaFinRecepcion").getAsString().isEmpty())
-            fechaFinRecep = StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
+            fechaFinRecep =DateUtil. StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsString();
         if (jObjectFiltro.get("codUnidadSalud") != null && !jObjectFiltro.get("codUnidadSalud").getAsString().isEmpty())
@@ -508,25 +513,22 @@ public class RecepcionMxController {
         return filtroOrdenExamen;
     }
 
-    //region ****** UTILITARIOS *******
-
     /**
-     * Convierte un string a Date con formato dd/MM/yyyy
-     * @param strFecha cadena a convertir
-     * @return Fecha
-     * @throws java.text.ParseException
+     * Método para generar un string alfanumérico de 8 caracteres, que se usará como código único de muestra
+     * @return String codigoUnicoMx
      */
-    private Date StringToDate(String strFecha) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        return simpleDateFormat.parse(strFecha);
+    private String generarCodigoUnicoMx(){
+        RecepcionMx validaRecepcionMx;
+        //Se genera el código
+        String codigoUnicoMx = StringUtil.getCadenaAlfanumAleatoria(8);
+        //Se consulta BD para ver si existe recepción con muestra que tenga mismo código
+        validaRecepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(codigoUnicoMx);
+        //si existe, de manera recursiva se solicita un nuevo código
+        if (validaRecepcionMx!=null){
+            codigoUnicoMx = generarCodigoUnicoMx();
+        }
+        //si no existe se retorna el último código generado
+        return codigoUnicoMx;
     }
 
-    private String DateToString(Date dtFecha, String format)  {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        if(dtFecha!=null)
-            return simpleDateFormat.format(dtFecha);
-        else
-            return null;
-    }
-    //endregion
 }

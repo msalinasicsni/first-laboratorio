@@ -8,6 +8,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
+import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -181,9 +182,9 @@ public class SendMxReceiptController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getOrdenExamen().getIdTomaMx().getIdTomaMx());
-            map.put("fechaHoraOrden",DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateToString(recepcion.getOrdenExamen().getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaRecepcion",DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getOrdenExamen().getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("codSilais", recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             map.put("codUnidadSalud", recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
             map.put("estadoOrden", recepcion.getOrdenExamen().getCodEstado().getValor());
@@ -195,7 +196,7 @@ public class SendMxReceiptController {
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
+                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
@@ -234,9 +235,9 @@ public class SendMxReceiptController {
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
         if (jObjectFiltro.get("fechaInicioRecep") != null && !jObjectFiltro.get("fechaInicioRecep").getAsString().isEmpty())
-            fechaInicioRecep = StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
+            fechaInicioRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
         if (jObjectFiltro.get("fechaFinRecepcion") != null && !jObjectFiltro.get("fechaFinRecepcion").getAsString().isEmpty())
-            fechaFinRecep = StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
+            fechaFinRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsString();
         if (jObjectFiltro.get("codUnidadSalud") != null && !jObjectFiltro.get("codUnidadSalud").getAsString().isEmpty())
@@ -257,26 +258,4 @@ public class SendMxReceiptController {
 
         return filtroOrdenExamen;
     }
-
-    //region ****** UTILITARIOS *******
-
-    /**
-     * Convierte un string a Date con formato dd/MM/yyyy
-     * @param strFecha cadena a convertir
-     * @return Fecha
-     * @throws java.text.ParseException
-     */
-    private Date StringToDate(String strFecha) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        return simpleDateFormat.parse(strFecha);
-    }
-
-    private String DateToString(Date dtFecha, String format)  {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        if(dtFecha!=null)
-            return simpleDateFormat.format(dtFecha);
-        else
-            return null;
-    }
-    //endregion
 }
