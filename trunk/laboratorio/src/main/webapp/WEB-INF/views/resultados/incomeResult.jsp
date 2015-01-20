@@ -32,7 +32,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/envioOrdenMx/create" htmlEscape="true "/>"><spring:message code="menu.receipt.orders" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/recepcionMx/searchOrdersLab" htmlEscape="true "/>"><spring:message code="menu.receipt.orders.lab" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -47,9 +47,9 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-group"></i> 
-							<spring:message code="lbl.receipt.orders.title" />
+							<spring:message code="lbl.result.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.receipt.orders" />
+							<spring:message code="lbl.result.income.subtitle" />
 						</span>
 					</h1>
 				</div>
@@ -110,7 +110,7 @@
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <input id="txtEsLaboratorio" type="hidden" value="true"/>
-                                    <form id="receiptOrders-form" class="smart-form" autocomplete="off">
+                                    <form id="receiptOrdersLab-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
                                                 <section class="col col-sm-6 col-md-3 col-lg-3">
@@ -210,47 +210,6 @@
                                                         </label>
                                                     </div>
                                                 </section>
-                                                <section class="col col-sm-12 col-md-6 col-lg-2">
-                                                    <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.sample.number.tubes.full"/>
-                                                    </label>
-                                                    <div class="">
-                                                        <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="cantidadTubos" name="cantidadTubos" value="${ordenExamen.idTomaMx.canTubos}"
-                                                                   placeholder=" <spring:message code="lbl.sample.number.tubes.full" />">
-                                                            <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.number.tubes.full"/>
-                                                            </b>
-                                                        </label>
-                                                    </div>
-                                                </section>
-                                                <section class="col col-sm-12 col-md-6 col-lg-2">
-                                                    <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.sample.separation.full"/>
-                                                    </label>
-                                                    <div class="inline-group">
-                                                        <label class="radio state-disabled">
-                                                            <c:choose>
-                                                                <c:when test="${ordenExamen.idTomaMx.mxSeparada==true}">
-                                                                    <input type="radio" name="radio-inline" disabled checked="checked">
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <input type="radio" name="radio-inline" disabled>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                            <i></i><spring:message code="lbl.yes"/></label>
-                                                        <label class="radio state-disabled">
-                                                            <c:choose>
-                                                                <c:when test="${ordenExamen.idTomaMx.mxSeparada==false}">
-                                                                    <input type="radio" name="radio-inline" disabled checked="checked">
-                                                                </c:when>
-                                                                <c:otherwise>
-                                                                    <input type="radio" name="radio-inline" disabled>
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                            <i></i><spring:message code="lbl.no"/></label>
-                                                    </div>
-                                                </section>
                                             </div>
                                             <div class="row">
                                                 <section class="col col-sm-12 col-md-4 col-lg-3">
@@ -293,48 +252,58 @@
                                         </fieldset>
                                         <fieldset>
                                             <header>
-                                                <spring:message code="lbl.header.receipt.orders.form" />
+                                                <spring:message code="lbl.header.result.orders.form" />
                                             </header>
+                                            <br>
                                             <div class="row">
-                                                <section class="col col-3">
+                                                <!--<section class="col col-sm-12 col-md-6 col-lg-8">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>Verifica Cantidad Tubos
-                                                    </label>
-                                                    <div class="inline-group">
-                                                        <label class="radio">
-                                                             <input type="radio" name="rdCantTubos" value="true">
-                                                            <i></i><spring:message code="lbl.yes"/></label>
-                                                        <label class="radio">
-                                                            <input type="radio" name="rdCantTubos" value="false">
-                                                            <i></i><spring:message code="lbl.no"/></label>
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.result" /> </label>
+                                                    <div class="">
+                                                        <label class="textarea">
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <textarea class="form-control" rows="3" name="resultadoEx" id="resultadoEx"
+                                                                      placeholder="<spring:message code="lbl.result" />"></textarea>
+                                                            <b class="tooltip tooltip-bottom-right"> <i
+                                                                    class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.result"/>
+                                                            </b>
+                                                        </label>
                                                     </div>
-                                                    <div hidden="hidden" id="dErrorCantTubos" class="errorDiv txt-color-red">Este campo es obligatorio</div>
-                                                </section>
-                                                <section class="col col-3">
+                                                </section>-->
+                                                <section class="col col-sm-12 col-md-6 col-lg-6">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>Verifica Tipo Mx
-                                                    </label>
-                                                    <div class="inline-group">
-                                                        <label class="radio">
-                                                            <input type="radio" name="rdTipoMx" value="true">
-                                                            <i></i><spring:message code="lbl.yes"/></label>
-                                                        <label class="radio">
-                                                            <input type="radio" name="rdTipoMx" value="false">
-                                                            <i></i><spring:message code="lbl.no"/></label>
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i> <spring:message code="lbl.result" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codResultado" name="codResultado"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <option value="1">Positivo</option>
+                                                            <option value="2">Negativo</option>
+                                                            <option value="3">Descartado</option>
+                                                        </select>
                                                     </div>
-                                                    <div hidden="hidden" id="dErrorTipoMx" class="errorDiv txt-color-red">Este campo es obligatorio</div>
                                                 </section>
+                                                <div id="divSerotipo" class="col col-sm-12 col-md-6 col-lg-6">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i> Serotipo</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codSerotipo" name="codSerotipo"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <option value="1">1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <option value="4">4</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </fieldset>
-                                        <!--<fieldset>
-                                            <div id="bcTarget"></div>
-                                            <button onclick="imprimir();">
-                                                IMPRIMIR
-                                            </button>
-                                        </fieldset>-->
                                         <footer>
-                                            <input id="idOrdenExamen" type="hidden" value="${ordenExamen.idOrdenExamen}"/>
-                                            <button type="submit" id="receipt-orders" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-check"></i> <spring:message code="act.receipt" /></button>
+                                            <input id="idRecepcion" type="hidden" value=""/>
+                                            <button type="submit" id="receipt-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
                                         </footer>
                                     </form>
                                 </div>
@@ -378,7 +347,10 @@
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
     <spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
-	<!-- JQUERY VALIDATE -->
+    <!-- jQuery Selecte2 Input -->
+    <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
+    <script src="${selectPlugin}"></script>
+    <!-- JQUERY VALIDATE -->
 	<spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 	<script src="${jqueryValidate}"></script>
 	<spring:url value="/resources/js/plugin/jquery-validate/messages_{language}.js" var="jQValidationLoc">
@@ -387,34 +359,18 @@
 	<!-- JQUERY BLOCK UI -->
 	<spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
 	<script src="${jqueryBlockUi}"></script>
-    <!-- JQUERY BAR CODE -->
-    <spring:url value="/resources/js/plugin/jquery-barcode-2.0.3/jquery-barcode.js" var="jqueryBarCode" />
-    <script src="${jqueryBarCode}"></script>
-    <spring:url value="/resources/js/plugin/jquery-barcode-2.0.3/jquery-barcode.min.js" var="jqueryBarCodeM" />
-    <script src="${jqueryBarCodeM}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />
-	<script src="${receiptOrders}"></script>
+	<spring:url value="/resources/scripts/resultados/income-Result.js" var="incomeResult" />
+	<script src="${incomeResult}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
+    <c:url var="ordersUrl" value="/resultados/searchOrders"/>
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-    <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
-    <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
-    <script language="JavaScript" type="text/javascript">
-        function imprimir()
-        {
-            var ficha = document.getElementById('bcTarget');
-            var ventimp =window.open('','_blank');
-            ventimp.document.write( ficha.innerHTML );
-            ventimp.document.close();
-            ventimp.print( );
-            ventimp.close();
-        }
-    </script>
+    <c:url var="sAddReceiptUrl" value="/recepcionMx/receiptLaboratory"/>
+    <c:url var="sSearchReceiptUrl" value="/resultados/ver"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -425,22 +381,14 @@
                 sAddReceiptUrl: "${sAddReceiptUrl}",
                 sSearchReceiptUrl : "${sSearchReceiptUrl}"
             };
-			ReceiptOrders.init(parametros);
+			IncomeResult.init(parametros);
+            $("#divSerotipo").hide();
 	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+	    	$("li.recepcion").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.recepcion").parents("ul").slideDown(200);
 	    	}
-            var settings = {
-                output: 'bmp',
-                barWidth: 1,
-                barHeight: 200,
-                moduleSize: 10,
-                posX: 0,
-                posY: 0
-            };
-           $("#bcTarget").html("").show().barcode("1A1D2A1n", "code128",settings);
-
+            $('#codCalidadMx').change();
         });
 	</script>
 	<!-- END JAVASCRIPTS -->
