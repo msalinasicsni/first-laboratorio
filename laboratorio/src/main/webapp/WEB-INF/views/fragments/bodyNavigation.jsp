@@ -71,6 +71,14 @@
 
                 </ul>
             </li>
+            <li class="resultado">
+                <a href="#" title="<spring:message code="menu.result" />"><i class="fa fa-lg fa-fw fa-th-list"></i> <span class="menu-item-parent"><spring:message code="menu.result" /></span></a>
+                <ul>
+                    <li class="ingresoResultado">
+                        <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="menu.result.income" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="menu.result.income" /></a>
+                    </li>
+                </ul>
+            </li>
             <li>
                 <a href="<spring:url value="/logout" htmlEscape="true "/>"> <i class="fa fa-lg fa-fw fa-sign-out"></i> <span class="menu-item-parent"><spring:message code="menu.logout" /></span></a>
             </li>
