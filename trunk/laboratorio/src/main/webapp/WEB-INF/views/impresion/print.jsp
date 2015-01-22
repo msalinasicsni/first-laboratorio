@@ -24,17 +24,7 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <script language="javascript">
     $(document).ready(function() {
-        deployQZ();
-        useDefaultPrinter();
-        var codigosImprimir = "${strBarCodes}"; //$("#barCodesPrint").val();
-        console.log(codigosImprimir);
-        var arrayCodigos = codigosImprimir.split(',');
-        var lengthArray = arrayCodigos.length;
-        for (var i = 0; i < lengthArray; i++) {
-            console.log(arrayCodigos[i]);
-            printEPL(arrayCodigos[i]);
-        }
-        window['qzDoneAppending'] = null;
+
         /**
          * Deploys different versions of the applet depending on Java version.
          * Useful for removing warning dialogs for Java 6.  This function is optional
@@ -92,7 +82,7 @@
             }
 
             // Alert success message
-            alert('Successfully sent print data to "' + qz.getPrinter() + '" queue.');
+            //alert('Successfully sent print data to "' + qz.getPrinter() + '" queue.');
         }
 
 
@@ -104,19 +94,19 @@
          ***************************************************************************/
         function useDefaultPrinter() {
             //if (isLoaded()) {
-                // Searches for default printer
-                qz.findPrinter();
+            // Searches for default printer
+            qz.findPrinter();
 
-                // Automatically gets called when "qz.findPrinter()" is finished.
-                window['qzDoneFinding'] = function() {
-                    // Alert the printer name to user
-                    var printer = qz.getPrinter();
-                    /*alert(printer !== null ? 'Default printer found: "' + printer + '"':
-                            'Default printer ' + 'not found');*/
+            // Automatically gets called when "qz.findPrinter()" is finished.
+            window['qzDoneFinding'] = function() {
+                // Alert the printer name to user
+                var printer = qz.getPrinter();
+                /*alert(printer !== null ? 'Default printer found: "' + printer + '"':
+                 'Default printer ' + 'not found');*/
 
-                    // Remove reference to this function
-                    window['qzDoneFinding'] = null;
-                };
+                // Remove reference to this function
+                window['qzDoneFinding'] = null;
+            };
             //}
         }
 
@@ -152,6 +142,19 @@
             var path = window.location.href;
             return path.substring(0, path.lastIndexOf("/")) + "/";
         }
+
+        deployQZ();
+        useDefaultPrinter();
+        var codigosImprimir = "${strBarCodes}";
+        console.log(codigosImprimir);
+        var arrayCodigos = codigosImprimir.split(',');
+        var lengthArray = arrayCodigos.length;
+        for (var i = 0; i < lengthArray; i++) {
+            console.log(arrayCodigos[i]);
+            printEPL(arrayCodigos[i]);
+        }
+        window['qzDoneAppending'] = null;
+        setTimeout(function () {window.close();},1500);
     });
 </script>
 </body>

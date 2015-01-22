@@ -392,6 +392,7 @@
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
+    <spring:url var="sPrintUrl" value="/resultados/printBC/"/>
     <script language="JavaScript" type="text/javascript">
         function imprimir()
         {
@@ -411,7 +412,8 @@
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
                 sAddReceiptUrl: "${sAddReceiptUrl}",
-                sSearchReceiptUrl : "${sSearchReceiptUrl}"
+                sSearchReceiptUrl : "${sSearchReceiptUrl}",
+                sPrintUrl : "${sPrintUrl}"
             };
 			ReceiptOrders.init(parametros);
 	    	$("li.samples").addClass("open");

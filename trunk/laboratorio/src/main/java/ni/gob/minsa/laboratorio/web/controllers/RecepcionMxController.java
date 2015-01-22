@@ -146,15 +146,15 @@ public class RecepcionMxController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            DaTomaMx ordenExamen = tomaMxService.getTomaMxById(strIdOrden);
+            DaTomaMx tomaMx = tomaMxService.getTomaMxById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             //List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
-            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(ordenExamen.getIdNotificacion().getIdNotificacion());
-            mav.addObject("ordenExamen",ordenExamen);
+            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+            mav.addObject("ordenExamen",tomaMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
             mav.addObject("tipoMuestra", tipoMxList);
@@ -275,6 +275,7 @@ public class RecepcionMxController {
                 tomaMx.setEstadoMx(estadoMx);
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
+                    codigoUnicoMx = tomaMx.getCodigoUnicoMx();
                 }catch (Exception ex){
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
@@ -294,7 +295,7 @@ public class RecepcionMxController {
             map.put("idOrdenExamen", strOrdenes);
             map.put("verificaCantTb", verificaCantTb);
             map.put("verificaTipoMx", verificaTipoMx);
-            //map.put("codigoUnicoMx",codigoUnicoMx);
+            map.put("codigoUnicoMx",codigoUnicoMx);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -323,7 +324,7 @@ public class RecepcionMxController {
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
             //Se obtiene estado recepcionado en laboratorio
-            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTORDEN|RCLAB");
+            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTDMX|RCLAB");
             //se obtiene calidad de la muestra
             CalidadMx calidadMx = catalogosService.getCalidadMx(codCalidadMx);
             //se obtiene recepción a actualizar

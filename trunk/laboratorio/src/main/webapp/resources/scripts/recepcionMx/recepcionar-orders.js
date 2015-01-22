@@ -197,12 +197,14 @@ var ReceiptOrders = function () {
             <!-- para guardar recepción general -->
             function guardarRecepcion() {
                             bloquearUI(parametros.blockMess);
+                    var urlImpresion ='';
                             var ordenesObj = {};
                             ordenesObj['idRecepcion'] = '';
                             ordenesObj['mensaje'] = '';
                             ordenesObj['idOrdenExamen']=$("#idOrdenExamen").val();
                             ordenesObj['verificaCantTb'] = $('input[name="rdCantTubos"]:checked', '#receiptOrders-form').val();
-                            ordenesObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val()
+                            ordenesObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val();
+                            ordenesObj['codigoUnicoMx'] = '';
                             $.ajax(
                                 {
                                     url: parametros.sAddReceiptUrl,
@@ -211,6 +213,7 @@ var ReceiptOrders = function () {
                                     data: JSON.stringify(ordenesObj),
                                     contentType: 'application/json',
                                     mimeType: 'application/json',
+                                    async:false,
                                     success: function (data) {
                                         if (data.mensaje.length > 0){
                                             $.smallBox({
@@ -229,8 +232,10 @@ var ReceiptOrders = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
+                                            var loc = window.location;
+                                            urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+data.codigoUnicoMx;
                                             limpiarDatosRecepcion();
-                                            setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},2000);
+                                            setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},4000);
                                         }
                                         desbloquearUI();
                                     },
@@ -239,7 +244,16 @@ var ReceiptOrders = function () {
                                         alert("error: " + data + " status: " + status + " er:" + er);
                                     }
                                 });
+                imprimir(urlImpresion);
 
+            }
+
+            function imprimir (urlImpresion) {
+                console.log('2- '+urlImpresion);
+                console.log('length: '+urlImpresion.length);
+                if (urlImpresion.length>0) {
+                    window.open(urlImpresion, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
+                }
             }
 
             <!-- para guardar recepción en laboratorio -->
