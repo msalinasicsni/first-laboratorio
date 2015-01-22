@@ -67,6 +67,10 @@ public class SendMxReceiptController {
     private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
+    @Qualifier(value = "tomaMxService")
+    private TomaMxService tomaMxService;
+
+    @Autowired
     @Qualifier(value = "areaService")
     private AreaService areaService;
 
@@ -133,18 +137,18 @@ public class SendMxReceiptController {
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
             //Se obtiene estado recepcionado
-            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTORDEN|EPLAB");
-            //se obtiene recepcion de examen a recepcionar
-            DaOrdenExamen ordenExamen;
-            JsonObject jObjectOrdenes = new Gson().fromJson(strOrdenes, JsonObject.class);
+            EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
+            //se obtiene muestra a recepcionar
+            DaTomaMx tomaMx;
+            JsonObject jObjectTomasMx = new Gson().fromJson(strOrdenes, JsonObject.class);
             for(int i = 0; i< cantRecepciones;i++) {
-                String idOrden = jObjectOrdenes.get(String.valueOf(i)).getAsString();
-                ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrden);
-                if (ordenExamen != null) {
-                    //se tiene que actualizar el estado de la orden a ENVIADA PARA PROCESAR EN LABORATORIO
-                    ordenExamen.setCodEstado(estadoOrdenEx);
+                String idTomaMx = jObjectTomasMx.get(String.valueOf(i)).getAsString();
+                tomaMx = tomaMxService.getTomaMxById(idTomaMx);
+                if (tomaMx != null) {
+                    //se tiene que actualizar el estado de la muestra a ENVIADA PARA PROCESAR EN LABORATORIO
+                    tomaMx.setEstadoMx(estadoMx);
                     try {
-                        ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                        tomaMxService.updateTomaMx(tomaMx);
                         cantRecepProc++;
                     } catch (Exception ex) {
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
@@ -152,12 +156,12 @@ public class SendMxReceiptController {
                         ex.printStackTrace();
                     }
                 }
-                ordenExamen = null; //se limpia el objeto
+                tomaMx = null; //se limpia el objeto
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
+            resultado =  messageSource.getMessage("msg.send.receipt.error",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {

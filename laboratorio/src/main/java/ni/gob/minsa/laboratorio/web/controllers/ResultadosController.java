@@ -223,7 +223,7 @@ public class ResultadosController {
         return jsonResponse;
     }
 
-    @RequestMapping(value = "print/{strBarCodes}", method = RequestMethod.GET)
+    @RequestMapping(value = "printBC/{strBarCodes}", method = RequestMethod.GET)
     //public String openFile(@RequestParam(value = "path", required = true) String path, @RequestParam(value="objectName", required = true) String objectName,@RequestParam(value="objectType", required = true) String objectType, HttpServletRequest request) {
     public ModelAndView openFile(HttpServletRequest request,@PathVariable("strBarCodes")  String strBarCodes) {
         logger.debug("buscar ordenes para recepcion");
