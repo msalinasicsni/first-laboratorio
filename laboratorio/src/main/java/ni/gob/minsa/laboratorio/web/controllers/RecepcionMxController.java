@@ -28,8 +28,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -148,14 +146,14 @@ public class RecepcionMxController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            DaOrdenExamen ordenExamen = tomaMxService.getOrdenExamenById(strIdOrden);
+            DaTomaMx ordenExamen = tomaMxService.getTomaMxById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
-            List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
-            List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
-            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            //List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
+            //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
+            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(ordenExamen.getIdNotificacion().getIdNotificacion());
             mav.addObject("ordenExamen",ordenExamen);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -190,8 +188,8 @@ public class RecepcionMxController {
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
-            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcionMx.getOrdenExamen().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
             mav.addObject("recepcionMx",recepcionMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -211,17 +209,17 @@ public class RecepcionMxController {
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroOrdenExamen filtroOrdenExamen= jsonToFiltroOrdenExamen(filtro);
-        List<DaOrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamen(filtroOrdenExamen);
-        return OrdenesExamenToJson(ordenExamenList);
+        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
+        List<DaTomaMx> tomaMxList = ordenExamenMxService.getTomaMxByFiltro(filtroMx);
+        return tomaMxToJson(tomaMxList);
     }
 
     @RequestMapping(value = "searchOrdersLab", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchOrdersLabJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroOrdenExamen filtroOrdenExamen= jsonToFiltroOrdenExamen(filtro);
-        List<RecepcionMx> recepcionMxList = recepcionMxService.getRecepcionesByFiltro(filtroOrdenExamen);
+        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
+        List<RecepcionMx> recepcionMxList = recepcionMxService.getRecepcionesByFiltro(filtroMx);
         return RecepcionMxToJson(recepcionMxList);
     }
 
@@ -247,10 +245,10 @@ public class RecepcionMxController {
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
             //Se obtiene estado recepcionado
-            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTORDEN|RCP");
+            EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCP");
             TipoRecepcionMx tipoRecepcionMx = catalogosService.getTipoRecepcionMx("TPRECPMX|VRT");
-            //se obtiene orden de examen a recepcionar
-            DaOrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
+            //se obtiene tomaMx de examen a recepcionar
+            DaTomaMx tomaMx = tomaMxService.getTomaMxById(idOrdenExamen);
 
             RecepcionMx recepcionMx = new RecepcionMx();
 
@@ -259,11 +257,12 @@ public class RecepcionMxController {
             recepcionMx.setTipoMxCk(Boolean.valueOf(verificaTipoMx));
             recepcionMx.setCantidadTubosCk(Boolean.valueOf(verificaCantTb));
             recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
-            recepcionMx.setOrdenExamen(ordenExamen);
+            recepcionMx.setTomaMx(tomaMx);
+            //recepcionMx.setOrdenExamen(ordenExamen);
             //recepcionMx.setLaboratorioEnvio(labProcedencia);
             //Se genara código único de muestra (sólo para vigilancia) y se valida que aún no exista en BD
-            codigoUnicoMx = generarCodigoUnicoMx();
-            recepcionMx.setCodigoUnicoMx(codigoUnicoMx);
+            //codigoUnicoMx = generarCodigoUnicoMx();
+            //recepcionMx.setCodigoUnicoMx(codigoUnicoMx);
             try {
                 idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
             }catch (Exception ex){
@@ -272,10 +271,10 @@ public class RecepcionMxController {
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
-               //se tiene que actualizar la orden de examen
-                ordenExamen.setCodEstado(estadoOrdenEx);
+               //se tiene que actualizar la tomaMx de examen
+                tomaMx.setEstadoMx(estadoMx);
                 try {
-                    ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                    tomaMxService.updateTomaMx(tomaMx);
                 }catch (Exception ex){
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
@@ -343,8 +342,8 @@ public class RecepcionMxController {
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
-                //se tiene que actualizar la orden de examen
-                DaOrdenExamen ordenExamen = recepcionMx.getOrdenExamen();
+                //se tiene que actualizar la tomaMx de examen
+                /*DaOrdenExamen ordenExamen = recepcionMx.getOrdenExamen();
                 ordenExamen.setCodEstado(estadoOrdenEx);
                 try {
                     ordenExamenMxService.updateOrdenExamen(ordenExamen);
@@ -352,7 +351,7 @@ public class RecepcionMxController {
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
                     ex.printStackTrace();
-                }
+                }*/
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -372,39 +371,39 @@ public class RecepcionMxController {
         }
     }
 
-    private String OrdenesExamenToJson(List<DaOrdenExamen> ordenExamenList){
+    private String tomaMxToJson(List<DaTomaMx> tomaMxList){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-        for(DaOrdenExamen orden:ordenExamenList){
+        for(DaTomaMx tomaMx : tomaMxList){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idOrdenExamen",orden.getIdOrdenExamen());
-            map.put("idTomaMx",orden.getIdTomaMx().getIdTomaMx());
-            map.put("fechaHoraOrden",DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(orden.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais",orden.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud",orden.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            map.put("estadoOrden",orden.getCodEstado().getValor());
-            map.put("separadaMx",(orden.getIdTomaMx().getMxSeparada()!=null?(orden.getIdTomaMx().getMxSeparada()?"Si":"No"):""));
-            map.put("cantidadTubos", (orden.getIdTomaMx().getCanTubos()!=null?String.valueOf(orden.getIdTomaMx().getCanTubos()):""));
-            map.put("tipoMuestra",orden.getIdTomaMx().getCodTipoMx().getNombre());
-            map.put("tipoExamen",orden.getCodExamen().getNombre());
+            //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
+            map.put("idTomaMx", tomaMx.getIdTomaMx());
+            //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+            map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+            //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
+            map.put("separadaMx",(tomaMx.getMxSeparada()!=null?(tomaMx.getMxSeparada()?"Si":"No"):""));
+            map.put("cantidadTubos", (tomaMx.getCanTubos()!=null?String.valueOf(tomaMx.getCanTubos()):""));
+            map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
+            //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
-            if (orden.getIdTomaMx().getIdNotificacion().getPersona()!=null){
+            if (tomaMx.getIdNotificacion().getPersona()!=null){
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto = "";
-                nombreCompleto = orden.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+orden.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto+" "+ tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
             }else{
                 map.put("persona"," ");
@@ -424,35 +423,35 @@ public class RecepcionMxController {
         for(RecepcionMx recepcion : recepcionMxList){
             Map<String, String> map = new HashMap<String, String>();
             map.put("idRecepcion", recepcion.getIdRecepcion());
-            map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
-            map.put("idTomaMx", recepcion.getOrdenExamen().getIdTomaMx().getIdTomaMx());
-            map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getOrdenExamen().getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+            //map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
+            map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
+            //map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            map.put("estadoOrden", recepcion.getOrdenExamen().getCodEstado().getValor());
-            map.put("separadaMx",(recepcion.getOrdenExamen().getIdTomaMx().getMxSeparada()!=null?(recepcion.getOrdenExamen().getIdTomaMx().getMxSeparada()?"Si":"No"):""));
-            map.put("cantidadTubos", (recepcion.getOrdenExamen().getIdTomaMx().getCanTubos()!=null?String.valueOf(recepcion.getOrdenExamen().getIdTomaMx().getCanTubos()):""));
-            map.put("tipoMuestra", recepcion.getOrdenExamen().getIdTomaMx().getCodTipoMx().getNombre());
-            map.put("tipoExamen", recepcion.getOrdenExamen().getCodExamen().getNombre());
-            map.put("areaProcesa", recepcion.getOrdenExamen().getCodExamen().getArea().getNombre());
+            map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+            map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            //map.put("estadoOrden", recepcion.getOrdenExamen().getCodEstado().getValor());
+            map.put("separadaMx",(recepcion.getTomaMx().getMxSeparada()!=null?(recepcion.getTomaMx().getMxSeparada()?"Si":"No"):""));
+            map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos()!=null?String.valueOf(recepcion.getTomaMx().getCanTubos()):""));
+            map.put("tipoMuestra", recepcion.getTomaMx().getCodTipoMx().getNombre());
+            //map.put("tipoExamen", recepcion.getOrdenExamen().getCodExamen().getNombre());
+            //map.put("areaProcesa", recepcion.getOrdenExamen().getCodExamen().getArea().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
-            if (recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona()!=null){
+            if (recepcion.getTomaMx().getIdNotificacion().getPersona()!=null){
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto = "";
-                nombreCompleto = recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ recepcion.getOrdenExamen().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                nombreCompleto = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                    nombreCompleto = nombreCompleto +" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto+" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                    nombreCompleto = nombreCompleto +" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
             }else{
                 map.put("persona"," ");
@@ -465,9 +464,9 @@ public class RecepcionMxController {
         return jsonResponse;
     }
 
-    private FiltroOrdenExamen jsonToFiltroOrdenExamen(String strJson) throws Exception {
+    private FiltroMx jsonToFiltroOrdenExamen(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
-        FiltroOrdenExamen filtroOrdenExamen = new FiltroOrdenExamen();
+        FiltroMx filtroMx = new FiltroMx();
         String nombreApellido = null;
         Date fechaInicioTomaMx = null;
         Date fechaFinTomaMx = null;
@@ -497,20 +496,20 @@ public class RecepcionMxController {
         if (jObjectFiltro.get("esLab") !=null && !jObjectFiltro.get("esLab").getAsString().isEmpty())
             esLab = jObjectFiltro.get("esLab").getAsString();
 
-        filtroOrdenExamen.setCodSilais(codSilais);
-        filtroOrdenExamen.setCodUnidadSalud(codUnidadSalud);
-        filtroOrdenExamen.setFechaInicioTomaMx(fechaInicioTomaMx);
-        filtroOrdenExamen.setFechaFinTomaMx(fechaFinTomaMx);
-        filtroOrdenExamen.setFechaInicioRecep(fechaInicioRecep);
-        filtroOrdenExamen.setFechaFinRecep(fechaFinRecep);
-        filtroOrdenExamen.setNombreApellido(nombreApellido);
-        filtroOrdenExamen.setCodTipoMx(codTipoMx);
+        filtroMx.setCodSilais(codSilais);
+        filtroMx.setCodUnidadSalud(codUnidadSalud);
+        filtroMx.setFechaInicioTomaMx(fechaInicioTomaMx);
+        filtroMx.setFechaFinTomaMx(fechaFinTomaMx);
+        filtroMx.setFechaInicioRecep(fechaInicioRecep);
+        filtroMx.setFechaFinRecep(fechaFinRecep);
+        filtroMx.setNombreApellido(nombreApellido);
+        filtroMx.setCodTipoMx(codTipoMx);
         if (!Boolean.valueOf(esLab)) //es recepción general
-            filtroOrdenExamen.setCodEstado("ESTORDEN|ENV"); // sólo las enviadas
+            filtroMx.setCodEstado("ESTDMX|ENV"); // sólo las enviadas
         else //es recepción en laboratorio
-            filtroOrdenExamen.setCodEstado("ESTORDEN|EPLAB"); // sólo las enviadas para procesar en laboratorio
+            filtroMx.setCodEstado("ESTDMX|EPLAB"); // sólo las enviadas para procesar en laboratorio
 
-        return filtroOrdenExamen;
+        return filtroMx;
     }
 
     /**

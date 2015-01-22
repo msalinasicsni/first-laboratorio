@@ -1,6 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroOrdenExamen;
+import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
@@ -91,7 +91,7 @@ public class RecepcionMxService {
         return  (RecepcionMx)q.uniqueResult();
     }
 
-    public List<RecepcionMx> getRecepcionesByFiltro(FiltroOrdenExamen filtro){
+    public List<RecepcionMx> getRecepcionesByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
         Criteria crit = session.createCriteria(RecepcionMx.class, "recepcion");

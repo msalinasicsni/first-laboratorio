@@ -120,7 +120,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="primerNombre" name="primerNombre" value="${ordenExamen.idTomaMx.idNotificacion.persona.primerNombre}" placeholder=" <spring:message code="person.name1" />">
+                                                            <input class="form-control" type="text" disabled id="primerNombre" name="primerNombre" value="${ordenExamen.idNotificacion.persona.primerNombre}" placeholder=" <spring:message code="person.name1" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.nombre1"/>
                                                             </b>
                                                         </label>
@@ -133,7 +133,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled name="segundoNombre" id="segundoNombre" value="${ordenExamen.idTomaMx.idNotificacion.persona.segundoNombre}" placeholder=" <spring:message code="person.name2" />" />
+                                                            <input class="form-control" type="text" disabled name="segundoNombre" id="segundoNombre" value="${ordenExamen.idNotificacion.persona.segundoNombre}" placeholder=" <spring:message code="person.name2" />" />
                                                             <b class="tooltip tooltip-bottom-right"> <i
                                                                     class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.nombre2"/>
                                                             </b>
@@ -147,7 +147,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled name="primerApellido" id="primerApellido" value="${ordenExamen.idTomaMx.idNotificacion.persona.primerApellido}" placeholder=" <spring:message code="person.lastname1" />" />
+                                                            <input class="form-control" type="text" disabled name="primerApellido" id="primerApellido" value="${ordenExamen.idNotificacion.persona.primerApellido}" placeholder=" <spring:message code="person.lastname1" />" />
                                                             <b class="tooltip tooltip-bottom-right"> <i
                                                                     class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.apellido1"/>
                                                             </b>
@@ -161,7 +161,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled name="segundoApellido" id="segundoApellido" value="${ordenExamen.idTomaMx.idNotificacion.persona.segundoApellido}" placeholder=" <spring:message code="person.lastname2" />"/>
+                                                            <input class="form-control" type="text" disabled name="segundoApellido" id="segundoApellido" value="${ordenExamen.idNotificacion.persona.segundoApellido}" placeholder=" <spring:message code="person.lastname2" />"/>
                                                             <b class="tooltip tooltip-bottom-right"> <i
                                                                     class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.apellido2"/>
                                                             </b>
@@ -190,7 +190,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="codTipoMx" name="codTipoMx" value="${ordenExamen.idTomaMx.codTipoMx.nombre}" placeholder=" <spring:message code="lbl.sample.type" />">
+                                                            <input class="form-control" type="text" disabled id="codTipoMx" name="codTipoMx" value="${ordenExamen.codTipoMx.nombre}" placeholder=" <spring:message code="lbl.sample.type" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.type"/>
                                                             </b>
                                                         </label>
@@ -203,7 +203,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${ordenExamen.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
+                                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${ordenExamen.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                                                    placeholder=" <spring:message code="lbl.sampling.datetime" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sampling.datetime"/>
                                                             </b>
@@ -217,7 +217,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="cantidadTubos" name="cantidadTubos" value="${ordenExamen.idTomaMx.canTubos}"
+                                                            <input class="form-control" type="text" disabled id="cantidadTubos" name="cantidadTubos" value="${ordenExamen.canTubos}"
                                                                    placeholder=" <spring:message code="lbl.sample.number.tubes.full" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.number.tubes.full"/>
                                                             </b>
@@ -231,7 +231,7 @@
                                                     <div class="inline-group">
                                                         <label class="radio state-disabled">
                                                             <c:choose>
-                                                                <c:when test="${ordenExamen.idTomaMx.mxSeparada==true}">
+                                                                <c:when test="${ordenExamen.mxSeparada==true}">
                                                                     <input type="radio" name="radio-inline" disabled checked="checked">
                                                                 </c:when>
                                                                 <c:otherwise>
@@ -241,7 +241,7 @@
                                                             <i></i><spring:message code="lbl.yes"/></label>
                                                         <label class="radio state-disabled">
                                                             <c:choose>
-                                                                <c:when test="${ordenExamen.idTomaMx.mxSeparada==false}">
+                                                                <c:when test="${ordenExamen.mxSeparada==false}">
                                                                     <input type="radio" name="radio-inline" disabled checked="checked">
                                                                 </c:when>
                                                                 <c:otherwise>
@@ -259,7 +259,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="codSilais" name="codSilais" value="${ordenExamen.idTomaMx.idNotificacion.codSilaisAtencion.nombre}" placeholder=" <spring:message code="lbl.silais" />">
+                                                            <input class="form-control" type="text" disabled id="codSilais" name="codSilais" value="${ordenExamen.idNotificacion.codSilaisAtencion.nombre}" placeholder=" <spring:message code="lbl.silais" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.silais"/>
                                                             </b>
                                                         </label>
@@ -271,20 +271,8 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="codUnidadSalud" name="codUnidadSalud" value="${ordenExamen.idTomaMx.idNotificacion.codUnidadAtencion.nombre}" placeholder=" <spring:message code="lbl.health.unit" />">
+                                                            <input class="form-control" type="text" disabled id="codUnidadSalud" name="codUnidadSalud" value="${ordenExamen.idNotificacion.codUnidadAtencion.nombre}" placeholder=" <spring:message code="lbl.health.unit" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.health.unit"/>
-                                                            </b>
-                                                        </label>
-                                                    </div>
-                                                </section>
-                                                <section class="col col-sm-12 col-md-4 col-lg-3">
-                                                    <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.receipt.pcr.area" /> </label>
-                                                    <div class="">
-                                                        <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="codAreaPrc" name="codAreaPrc" value="${ordenExamen.codExamen.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />">
-                                                            <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.receipt.pcr.area"/>
                                                             </b>
                                                         </label>
                                                     </div>
@@ -333,7 +321,7 @@
                                             </button>
                                         </fieldset>-->
                                         <footer>
-                                            <input id="idOrdenExamen" type="hidden" value="${ordenExamen.idOrdenExamen}"/>
+                                            <input id="idOrdenExamen" type="hidden" value="${ordenExamen.idTomaMx}"/>
                                             <button type="submit" id="receipt-orders" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-check"></i> <spring:message code="act.receipt" /></button>
                                         </footer>
                                     </form>

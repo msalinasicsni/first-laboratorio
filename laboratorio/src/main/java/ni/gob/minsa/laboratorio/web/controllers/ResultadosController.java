@@ -20,10 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by FIRSTICT on 1/9/2015.
@@ -131,14 +128,14 @@ public class ResultadosController {
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroOrdenExamen filtroOrdenExamen= jsonToFiltroOrdenExamen(filtro);
-        List<DaOrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamen(filtroOrdenExamen);
+        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
+        List<DaOrdenExamen> ordenExamenList = null; //ordenExamenMxService.getTomaMxByFiltro(filtroMx);
         return OrdenesExamenToJson(ordenExamenList);
     }
 
-    private FiltroOrdenExamen jsonToFiltroOrdenExamen(String strJson) throws Exception {
+    private FiltroMx jsonToFiltroOrdenExamen(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
-        FiltroOrdenExamen filtroOrdenExamen = new FiltroOrdenExamen();
+        FiltroMx filtroMx = new FiltroMx();
         String nombreApellido = null;
         Date fechaInicioTomaMx = null;
         Date fechaFinTomaMx = null;
@@ -168,17 +165,17 @@ public class ResultadosController {
         if (jObjectFiltro.get("esLab") !=null && !jObjectFiltro.get("esLab").getAsString().isEmpty())
             esLab = jObjectFiltro.get("esLab").getAsString();
 
-        filtroOrdenExamen.setCodSilais(codSilais);
-        filtroOrdenExamen.setCodUnidadSalud(codUnidadSalud);
-        filtroOrdenExamen.setFechaInicioTomaMx(fechaInicioTomaMx);
-        filtroOrdenExamen.setFechaFinTomaMx(fechaFinTomaMx);
-        filtroOrdenExamen.setFechaInicioRecep(fechaInicioRecep);
-        filtroOrdenExamen.setFechaFinRecep(fechaFinRecep);
-        filtroOrdenExamen.setNombreApellido(nombreApellido);
-        filtroOrdenExamen.setCodTipoMx(codTipoMx);
-        filtroOrdenExamen.setCodEstado("ESTORDEN|RCLAB"); // sólo las recepcionadas en laboratorio
+        filtroMx.setCodSilais(codSilais);
+        filtroMx.setCodUnidadSalud(codUnidadSalud);
+        filtroMx.setFechaInicioTomaMx(fechaInicioTomaMx);
+        filtroMx.setFechaFinTomaMx(fechaFinTomaMx);
+        filtroMx.setFechaInicioRecep(fechaInicioRecep);
+        filtroMx.setFechaFinRecep(fechaFinRecep);
+        filtroMx.setNombreApellido(nombreApellido);
+        filtroMx.setCodTipoMx(codTipoMx);
+        filtroMx.setCodEstado("ESTORDEN|RCLAB"); // sólo las recepcionadas en laboratorio
 
-        return filtroOrdenExamen;
+        return filtroMx;
     }
 
     private String OrdenesExamenToJson(List<DaOrdenExamen> ordenExamenList){
