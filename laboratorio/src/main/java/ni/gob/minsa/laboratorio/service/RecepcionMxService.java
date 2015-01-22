@@ -83,7 +83,7 @@ public class RecepcionMxService {
     }
 
     public RecepcionMx getRecepcionMxByCodUnicoMx(String codigoUnicoMx){
-        String query = "from RecepcionMx as a where codigoUnicoMx= :codigoUnicoMx";
+        String query = "from RecepcionMx as a where tomaMx.codigoUnicoMx= :codigoUnicoMx";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -95,9 +95,9 @@ public class RecepcionMxService {
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
         Criteria crit = session.createCriteria(RecepcionMx.class, "recepcion");
-        crit.createAlias("recepcion.ordenExamen","orden");
-        crit.createAlias("orden.codEstado","estado");
-        crit.createAlias("orden.idTomaMx", "tomaMx");
+        crit.createAlias("recepcion.tomaMx","tomaMx");
+        crit.createAlias("tomaMx.estadoMx","estado");
+        //crit.createAlias("orden.idTomaMx", "tomaMx");
         crit.createAlias("tomaMx.idNotificacion", "notifi");
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(
@@ -163,12 +163,12 @@ public class RecepcionMxService {
             );
         }
         //se filtra por area que procesa
-        if (filtro.getIdAreaProcesa()!=null){
+        /*if (filtro.getIdAreaProcesa()!=null){
             crit.createAlias("orden.codExamen", "examen");
             crit.add( Restrictions.and(
                             Restrictions.eq("examen.area.idArea", Integer.valueOf(filtro.getIdAreaProcesa())))
             );
-        }
+        }*/
 
         //Se filtra por rango de fecha de recepcion en laboratorio
         if (filtro.getFechaInicioRecepLab()!=null && filtro.getFechaFinRecepLab()!=null){

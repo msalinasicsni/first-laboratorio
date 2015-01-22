@@ -7,6 +7,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -14,7 +15,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "da_tomamx", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = "CODUNICOMX"))
-public class DaTomaMx {
+public class DaTomaMx implements Serializable {
 
     private String idTomaMx;
     private DaNotificacion idNotificacion;

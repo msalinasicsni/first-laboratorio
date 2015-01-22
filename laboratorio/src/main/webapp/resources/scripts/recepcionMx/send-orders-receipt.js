@@ -134,8 +134,11 @@ var SendOrdersReceipt = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].areaProcesa+" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                [dataToLoad[i].tipoMuestra+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);
+                            /*table1.fnAddData(
+                                [dataToLoad[i].areaProcesa+" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);*/
                         }
                     }else{
                         $.smallBox({
