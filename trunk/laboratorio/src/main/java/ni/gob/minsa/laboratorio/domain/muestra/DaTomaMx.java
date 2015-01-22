@@ -13,13 +13,12 @@ import java.sql.Timestamp;
  * Created by souyen-ics on 11-05-14.
  */
 @Entity
-@Table(name = "da_tomamx", schema = "alerta")
+@Table(name = "da_tomamx", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = "CODUNICOMX"))
 public class DaTomaMx {
 
     private String idTomaMx;
     private DaNotificacion idNotificacion;
     private TipoMx codTipoMx;
-    private String examenes;
     private Timestamp fechaHTomaMx;
     private String horaRefrigeracion;
     private Integer canTubos;
@@ -30,6 +29,9 @@ public class DaTomaMx {
     private Timestamp fechaRegistro;
     private boolean anulada;
     private Timestamp fechaAnulacion;
+    private String codigoUnicoMx;
+    private DaEnvioMx envio;
+
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -64,16 +66,6 @@ public class DaTomaMx {
 
     public void setCodTipoMx(TipoMx codTipoMx) {
         this.codTipoMx = codTipoMx;
-    }
-
-    @Basic
-    @Column(name = "EXAMENES", nullable = false, insertable = true, updatable = true, length = 100)
-    public String getExamenes() {
-        return examenes;
-    }
-
-    public void setExamenes(String examenes) {
-        this.examenes = examenes;
     }
 
     @Basic
@@ -177,5 +169,26 @@ public class DaTomaMx {
 
     public void setHoraRefrigeracion(String horaRefrigeracion) {
         this.horaRefrigeracion = horaRefrigeracion;
+    }
+
+    @Basic
+    @Column(name = "CODUNICOMX", nullable = true, insertable = true, updatable = true, length = 12)
+    public String getCodigoUnicoMx() {
+        return codigoUnicoMx;
+    }
+
+    public void setCodigoUnicoMx(String codigoUnicoMx) {
+        this.codigoUnicoMx = codigoUnicoMx;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "ID_ENVIO", referencedColumnName = "ID_ENVIO")
+    @ForeignKey(name = "ENVIOMX_MX_FK")
+    public DaEnvioMx getEnvio() {
+        return envio;
+    }
+
+    public void setEnvio(DaEnvioMx envio) {
+        this.envio = envio;
     }
 }

@@ -18,10 +18,6 @@
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <spring:url value="/resources/js/plugin/qz-print/deployJava.js" var="qzDeploy" />
 <script src="${qzDeploy}"></script>
-<spring:url value="/resources/js/plugin/jquery-html2canvas/html2canvas.js" var="html2canvas" />
-<script src="${html2canvas}"></script>
-<spring:url value="/resources/js/plugin/jquery-html2canvas/jquery.plugin.html2canvas.js" var="jQueryhtml2canvas" />
-<script src="${jQueryhtml2canvas}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
 <spring:url value="/resources/qzAppletPrint/qz-print_jnlp.jnlp" var="qzprint_jnlp" />

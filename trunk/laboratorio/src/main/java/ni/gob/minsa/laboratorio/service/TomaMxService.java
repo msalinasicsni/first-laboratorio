@@ -31,20 +31,19 @@ public class TomaMxService {
         return (DaOrdenExamen)q.uniqueResult();
     }
 
-    public void updateOrdenExamen(DaOrdenExamen dto) throws Exception {
+    public void updateTomaMx(DaTomaMx dto) throws Exception {
         try {
             if (dto != null) {
                 Session session = sessionFactory.getCurrentSession();
                 session.update(dto);
             }
             else
-                throw new Exception("Objeto Orden Examen es NULL");
+                throw new Exception("Objeto toma Mx es NULL");
         }catch (Exception ex){
             ex.printStackTrace();
             throw ex;
         }
     }
-
     /**
      *
      *

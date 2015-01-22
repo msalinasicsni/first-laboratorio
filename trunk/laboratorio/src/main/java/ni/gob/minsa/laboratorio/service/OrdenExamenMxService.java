@@ -2,7 +2,8 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.DaOrdenExamen;
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroOrdenExamen;
+import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
+import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
@@ -49,12 +50,11 @@ public class OrdenExamenMxService {
         return (DaOrdenExamen)q.uniqueResult();
     }
 
-    public List<DaOrdenExamen> getOrdenesExamen(FiltroOrdenExamen filtro){
+    public List<DaTomaMx> getTomaMxByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
-        Criteria crit = session.createCriteria(DaOrdenExamen.class, "orden");
-        crit.createAlias("orden.codEstado","estado");
-        crit.createAlias("orden.idTomaMx", "tomaMx");
+        Criteria crit = session.createCriteria(DaTomaMx.class, "tomaMx");
+        crit.createAlias("tomaMx.estadoMx","estado");
         crit.createAlias("tomaMx.idNotificacion", "notifi");
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(

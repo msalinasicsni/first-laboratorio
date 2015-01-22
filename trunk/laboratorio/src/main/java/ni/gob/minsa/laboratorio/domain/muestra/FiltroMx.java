@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Created by FIRSTICT on 11/21/2014.
  */
-public class FiltroOrdenExamen {
+public class FiltroMx {
     String nombreApellido;
     Date fechaInicioTomaMx;
     Date fechaFinTomaMx;

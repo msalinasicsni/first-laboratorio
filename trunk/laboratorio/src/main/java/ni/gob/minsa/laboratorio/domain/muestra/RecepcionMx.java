@@ -19,8 +19,7 @@ import java.util.Date;
 public class RecepcionMx {
 
     String idRecepcion;
-    String codigoUnicoMx;
-    DaOrdenExamen ordenExamen;
+    DaTomaMx tomaMx;
     Timestamp fechaHoraRecepcion;
     TipoRecepcionMx tipoRecepcionMx;
     Usuarios usuarioRecepcion;
@@ -78,25 +77,15 @@ public class RecepcionMx {
         this.usuarioRecepcion = usuarioRecepcion;
     }
 
-    @Basic
-    @Column(name = "CODUNICOMX", nullable = true, insertable = true, updatable = true, length = 12)
-    public String getCodigoUnicoMx() {
-        return codigoUnicoMx;
-    }
-
-    public void setCodigoUnicoMx(String codigoUnicoMx) {
-        this.codigoUnicoMx = codigoUnicoMx;
-    }
-
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_ORDEN_EXAMEN", referencedColumnName = "ID_ORDEN_EXAMEN")
-    @ForeignKey(name = "RECEPCION_EXAMEN_FK")
-    public DaOrdenExamen getOrdenExamen() {
-        return ordenExamen;
+    @JoinColumn(name = "CODUNICOMX", referencedColumnName = "CODUNICOMX")
+    @ForeignKey(name = "RECEPCION_TOMAMX_FK")
+    public DaTomaMx getTomaMx() {
+        return tomaMx;
     }
 
-    public void setOrdenExamen(DaOrdenExamen ordenExamen) {
-        this.ordenExamen = ordenExamen;
+    public void setTomaMx(DaTomaMx tomaMx) {
+        this.tomaMx = tomaMx;
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
@@ -173,12 +162,12 @@ public class RecepcionMx {
         this.causaRechazo = causaRechazo;
     }
 
+    @Basic
+    @Column(name = "FECHAH_RECEPCION_LAB", nullable = true, insertable = true, updatable = false)
     public Timestamp getFechaHoraRecepcionLab() {
         return fechaHoraRecepcionLab;
     }
 
-    @Basic
-    @Column(name = "FECHAH_RECEPCION_LAB", nullable = false, insertable = true, updatable = false)
     public void setFechaHoraRecepcionLab(Timestamp fechaHoraRecepcionLab) {
         this.fechaHoraRecepcionLab = fechaHoraRecepcionLab;
     }
