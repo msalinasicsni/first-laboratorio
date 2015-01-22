@@ -44,17 +44,14 @@ public class ResultadosController {
     @Autowired
     @Qualifier(value = "entidadAdmonService")
     private EntidadAdmonService entidadAdmonService;
-    @Autowired
-    @Qualifier(value = "recepcionMxService")
-    private RecepcionMxService recepcionMxService;
-
-    @Autowired
-    @Qualifier(value = "ordenExamenMxService")
-    private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
     @Qualifier(value = "tomaMxService")
     private TomaMxService tomaMxService;
+
+    @Autowired
+    @Qualifier(value = "ordenExamenMxService")
+    private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
     @Qualifier(value = "unidadesService")
@@ -107,11 +104,11 @@ public class ResultadosController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            DaOrdenExamen ordenExamen = tomaMxService.getOrdenExamenById(strIdOrden);
+            DaOrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             mav.addObject("ordenExamen",ordenExamen);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -128,12 +125,12 @@ public class ResultadosController {
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
+        FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaOrdenExamen> ordenExamenList = null; //ordenExamenMxService.getTomaMxByFiltro(filtroMx);
         return OrdenesExamenToJson(ordenExamenList);
     }
 
-    private FiltroMx jsonToFiltroOrdenExamen(String strJson) throws Exception {
+    private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
         FiltroMx filtroMx = new FiltroMx();
         String nombreApellido = null;
@@ -196,7 +193,7 @@ public class ResultadosController {
             map.put("tipoMuestra",orden.getIdTomaMx().getCodTipoMx().getNombre());
             map.put("tipoExamen",orden.getCodExamen().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else

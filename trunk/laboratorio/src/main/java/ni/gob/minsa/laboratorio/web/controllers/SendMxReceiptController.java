@@ -63,10 +63,6 @@ public class SendMxReceiptController {
     private RecepcionMxService recepcionMxService;
 
     @Autowired
-    @Qualifier(value = "ordenExamenMxService")
-    private OrdenExamenMxService ordenExamenMxService;
-
-    @Autowired
     @Qualifier(value = "tomaMxService")
     private TomaMxService tomaMxService;
 
@@ -114,7 +110,7 @@ public class SendMxReceiptController {
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
+        FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<RecepcionMx> recepcionMxList = recepcionMxService.getRecepcionesByFiltro(filtroMx);
         return RecepcionMxToJson(recepcionMxList);
     }
@@ -196,7 +192,7 @@ public class SendMxReceiptController {
             //map.put("tipoExamen", recepcion.getOrdenExamen().getCodExamen().getNombre());
             //map.put("areaProcesa", recepcion.getOrdenExamen().getCodExamen().getArea().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -223,7 +219,7 @@ public class SendMxReceiptController {
         return jsonResponse;
     }
 
-    private FiltroMx jsonToFiltroOrdenExamen(String strJson) throws Exception {
+    private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
         FiltroMx filtroMx = new FiltroMx();
         String nombreApellido = null;
@@ -257,7 +253,7 @@ public class SendMxReceiptController {
         filtroMx.setCodTipoMx(codTipoMx);
         filtroMx.setIdAreaProcesa(idAreaProcesa);
         filtroMx.setCodEstado("ESTDMX|RCP"); // sólo las recepcionadas
-
+        filtroMx.setIncluirMxInadecuada(true);
         return filtroMx;
     }
 }
