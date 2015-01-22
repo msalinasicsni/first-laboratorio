@@ -65,10 +65,6 @@ public class RecepcionMxController {
     private RecepcionMxService recepcionMxService;
 
     @Autowired
-    @Qualifier(value = "ordenExamenMxService")
-    private OrdenExamenMxService ordenExamenMxService;
-
-    @Autowired
     @Qualifier(value = "tomaMxService")
     private TomaMxService tomaMxService;
 
@@ -152,9 +148,13 @@ public class RecepcionMxController {
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             //List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
-            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
-            mav.addObject("ordenExamen",tomaMx);
+            List<Unidades> unidades = null;
+            Date fechaInicioSintomas = null;
+            if (tomaMx!=null) {
+                unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+                fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+            }
+            mav.addObject("tomaMx",tomaMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
             mav.addObject("tipoMuestra", tipoMxList);
@@ -188,8 +188,12 @@ public class RecepcionMxController {
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
-            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
+            List<Unidades> unidades = null;
+            Date fechaInicioSintomas = null;
+            if (recepcionMx!=null) {
+                unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+                fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
+            }
             mav.addObject("recepcionMx",recepcionMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -209,8 +213,8 @@ public class RecepcionMxController {
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
-        List<DaTomaMx> tomaMxList = ordenExamenMxService.getTomaMxByFiltro(filtroMx);
+        FiltroMx filtroMx = jsonToFiltroMx(filtro);
+        List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
         return tomaMxToJson(tomaMxList);
     }
 
@@ -218,7 +222,7 @@ public class RecepcionMxController {
     public @ResponseBody
     String fetchOrdersLabJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
-        FiltroMx filtroMx = jsonToFiltroOrdenExamen(filtro);
+        FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<RecepcionMx> recepcionMxList = recepcionMxService.getRecepcionesByFiltro(filtroMx);
         return RecepcionMxToJson(recepcionMxList);
     }
@@ -227,12 +231,12 @@ public class RecepcionMxController {
     protected void agregarRecepcion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json = "";
         String resultado = "";
-        String strOrdenes="";
         String idRecepcion = "";
         String verificaCantTb = "";
         String verificaTipoMx = "";
-        String idOrdenExamen = "";
+        String idTomaMx = "";
         String codigoUnicoMx = "";
+        String causaRechazo = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -240,7 +244,8 @@ public class RecepcionMxController {
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             verificaCantTb = jsonpObject.get("verificaCantTb").getAsString();
             verificaTipoMx = jsonpObject.get("verificaTipoMx").getAsString();
-            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+            idTomaMx = jsonpObject.get("idTomaMx").getAsString();
+            causaRechazo = jsonpObject.get("causaRechazo").getAsString();
 
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
@@ -248,7 +253,7 @@ public class RecepcionMxController {
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCP");
             TipoRecepcionMx tipoRecepcionMx = catalogosService.getTipoRecepcionMx("TPRECPMX|VRT");
             //se obtiene tomaMx de examen a recepcionar
-            DaTomaMx tomaMx = tomaMxService.getTomaMxById(idOrdenExamen);
+            DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
 
             RecepcionMx recepcionMx = new RecepcionMx();
 
@@ -256,13 +261,14 @@ public class RecepcionMxController {
             recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
             recepcionMx.setTipoMxCk(Boolean.valueOf(verificaTipoMx));
             recepcionMx.setCantidadTubosCk(Boolean.valueOf(verificaCantTb));
+            if (!causaRechazo.isEmpty()) {
+                recepcionMx.setCausaRechazo(causaRechazo);
+                //se obtiene calidad de la muestra inadecuada
+                CalidadMx calidadMx = catalogosService.getCalidadMx("CALIDMX|IDC");
+                recepcionMx.setCalidadMx(calidadMx);
+            }
             recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
             recepcionMx.setTomaMx(tomaMx);
-            //recepcionMx.setOrdenExamen(ordenExamen);
-            //recepcionMx.setLaboratorioEnvio(labProcedencia);
-            //Se genara código único de muestra (sólo para vigilancia) y se valida que aún no exista en BD
-            //codigoUnicoMx = generarCodigoUnicoMx();
-            //recepcionMx.setCodigoUnicoMx(codigoUnicoMx);
             try {
                 idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
             }catch (Exception ex){
@@ -271,7 +277,7 @@ public class RecepcionMxController {
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
-               //se tiene que actualizar la tomaMx de examen
+               //se tiene que actualizar la tomaMx
                 tomaMx.setEstadoMx(estadoMx);
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
@@ -292,7 +298,7 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idRecepcion",idRecepcion);
             map.put("mensaje",resultado);
-            map.put("idOrdenExamen", strOrdenes);
+            map.put("idTomaMx", idTomaMx);
             map.put("verificaCantTb", verificaCantTb);
             map.put("verificaTipoMx", verificaTipoMx);
             map.put("codigoUnicoMx",codigoUnicoMx);
@@ -306,7 +312,6 @@ public class RecepcionMxController {
     protected void recepcionLaboratorio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json = "";
         String resultado = "";
-        String strOrdenes="";
         String idRecepcion = "";
         String causaRechazo = null;
         String codCalidadMx = "";
@@ -324,7 +329,7 @@ public class RecepcionMxController {
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
             //Se obtiene estado recepcionado en laboratorio
-            EstadoOrdenEx estadoOrdenEx = catalogosService.getEstadoOrdenEx("ESTDMX|RCLAB");
+            EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCLAB");
             //se obtiene calidad de la muestra
             CalidadMx calidadMx = catalogosService.getCalidadMx(codCalidadMx);
             //se obtiene recepción a actualizar
@@ -343,16 +348,16 @@ public class RecepcionMxController {
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
-                //se tiene que actualizar la tomaMx de examen
-                /*DaOrdenExamen ordenExamen = recepcionMx.getOrdenExamen();
-                ordenExamen.setCodEstado(estadoOrdenEx);
+                //se tiene que actualizar la tomaMx
+                DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
+                tomaMx.setEstadoMx(estadoMx);
                 try {
-                    ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                    tomaMxService.updateTomaMx(tomaMx);
                 }catch (Exception ex){
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
                     ex.printStackTrace();
-                }*/
+                }
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -390,7 +395,7 @@ public class RecepcionMxController {
             map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
             //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -438,7 +443,7 @@ public class RecepcionMxController {
             //map.put("tipoExamen", recepcion.getOrdenExamen().getCodExamen().getNombre());
             //map.put("areaProcesa", recepcion.getOrdenExamen().getCodExamen().getArea().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = ordenExamenMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -465,7 +470,7 @@ public class RecepcionMxController {
         return jsonResponse;
     }
 
-    private FiltroMx jsonToFiltroOrdenExamen(String strJson) throws Exception {
+    private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
         FiltroMx filtroMx = new FiltroMx();
         String nombreApellido = null;
@@ -505,10 +510,12 @@ public class RecepcionMxController {
         filtroMx.setFechaFinRecep(fechaFinRecep);
         filtroMx.setNombreApellido(nombreApellido);
         filtroMx.setCodTipoMx(codTipoMx);
-        if (!Boolean.valueOf(esLab)) //es recepción general
+        if (!Boolean.valueOf(esLab)) { //es recepción general
             filtroMx.setCodEstado("ESTDMX|ENV"); // sólo las enviadas
-        else //es recepción en laboratorio
+        } else { //es recepción en laboratorio
             filtroMx.setCodEstado("ESTDMX|EPLAB"); // sólo las enviadas para procesar en laboratorio
+            filtroMx.setIncluirMxInadecuada(true);
+        }
 
         return filtroMx;
     }

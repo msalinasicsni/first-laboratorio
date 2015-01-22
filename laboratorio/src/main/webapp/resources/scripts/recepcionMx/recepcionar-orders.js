@@ -69,7 +69,8 @@ var ReceiptOrders = function () {
                 // Rules for form validation
                 rules: {
                     rdCantTubos: {required : true},
-                    rdTipoMx: {required : true}
+                    rdTipoMx: {required : true},
+                    causaRechazo: {required : true}
                 },
                 // Do not change code below
                 errorPlacement : function(error, element) {
@@ -196,56 +197,57 @@ var ReceiptOrders = function () {
 
             <!-- para guardar recepción general -->
             function guardarRecepcion() {
-                            bloquearUI(parametros.blockMess);
-                    var urlImpresion ='';
-                            var ordenesObj = {};
-                            ordenesObj['idRecepcion'] = '';
-                            ordenesObj['mensaje'] = '';
-                            ordenesObj['idOrdenExamen']=$("#idOrdenExamen").val();
-                            ordenesObj['verificaCantTb'] = $('input[name="rdCantTubos"]:checked', '#receiptOrders-form').val();
-                            ordenesObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val();
-                            ordenesObj['codigoUnicoMx'] = '';
-                            $.ajax(
-                                {
-                                    url: parametros.sAddReceiptUrl,
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: JSON.stringify(ordenesObj),
-                                    contentType: 'application/json',
-                                    mimeType: 'application/json',
-                                    async:false,
-                                    success: function (data) {
-                                        if (data.mensaje.length > 0){
-                                            $.smallBox({
-                                                title: data.mensaje ,
-                                                content: $("#smallBox_content").val(),
-                                                color: "#C46A69",
-                                                iconSmall: "fa fa-warning",
-                                                timeout: 4000
-                                            });
-                                        }else{
-                                            var msg = $("#msg_receipt_added").val();
-                                            $.smallBox({
-                                                title: msg ,
-                                                content: $("#smallBox_content").val(),
-                                                color: "#739E73",
-                                                iconSmall: "fa fa-success",
-                                                timeout: 4000
-                                            });
-                                            var loc = window.location;
-                                            urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+data.codigoUnicoMx;
-                                            limpiarDatosRecepcion();
-                                            setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},4000);
-                                        }
-                                        desbloquearUI();
-                                    },
-                                    error: function (data, status, er) {
-                                        desbloquearUI();
-                                        alert("error: " + data + " status: " + status + " er:" + er);
-                                    }
-                                });
-                imprimir(urlImpresion);
+                bloquearUI(parametros.blockMess);
+                var urlImpresion ='';
+                var recepcionObj = {};
+                recepcionObj['idRecepcion'] = '';
+                recepcionObj['mensaje'] = '';
+                recepcionObj['idTomaMx']=$("#idTomaMx").val();
+                recepcionObj['verificaCantTb'] = $('input[name="rdCantTubos"]:checked', '#receiptOrders-form').val();
+                recepcionObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val();
+                recepcionObj['causaRechazo'] = $('#causaRechazo').val();
+                recepcionObj['codigoUnicoMx'] = '';
 
+                $.ajax(
+                    {
+                        url: parametros.sAddReceiptUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(recepcionObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        async:false,
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                var msg = $("#msg_receipt_added").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                                var loc = window.location;
+                                urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+data.codigoUnicoMx;
+                                limpiarDatosRecepcion();
+                                setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},4000);
+                            }
+                            desbloquearUI();
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+                imprimir(urlImpresion);
             }
 
             function imprimir (urlImpresion) {
@@ -259,17 +261,17 @@ var ReceiptOrders = function () {
             <!-- para guardar recepción en laboratorio -->
             function guardarRecepcionLab() {
                 bloquearUI(parametros.blockMess);
-                var ordenesObj = {};
-                ordenesObj['mensaje'] = '';
-                ordenesObj['idRecepcion']=$("#idRecepcion").val();
-                ordenesObj['calidadMx'] = $('#codCalidadMx option:selected').val();
-                ordenesObj['causaRechazo'] = $('#causaRechazo').val();
+                var recepcionObj = {};
+                recepcionObj['mensaje'] = '';
+                recepcionObj['idRecepcion']=$("#idRecepcion").val();
+                recepcionObj['calidadMx'] = $('#codCalidadMx option:selected').val();
+                recepcionObj['causaRechazo'] = $('#causaRechazo').val();
                 $.ajax(
                     {
                         url: parametros.sAddReceiptUrl,
                         type: 'POST',
                         dataType: 'json',
-                        data: JSON.stringify(ordenesObj),
+                        data: JSON.stringify(recepcionObj),
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
@@ -348,6 +350,16 @@ var ReceiptOrders = function () {
                 }
                 $('#codUnidadSalud').val('').change();
                 unBlockUI();
+            });
+
+            //En recepción general Se valida que si selecciona "Si" en Mx Inadecuada se solicite causa de rechazo
+            $("input[name$='rdMxInadequate']").click(function () {
+                var valor = $(this).val();
+                $('#causaRechazo').val('');
+                if (valor=='true')
+                    $('#dvCausa').show();
+                else
+                    $('#dvCausa').hide();
             });
         }
     };
