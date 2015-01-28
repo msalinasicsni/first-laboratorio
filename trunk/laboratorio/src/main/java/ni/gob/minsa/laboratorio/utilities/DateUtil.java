@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.utilities;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -45,5 +46,37 @@ public class DateUtil {
             return simpleDateFormat.format(dtFecha);
         else
             return null;
+    }
+
+    public static int CalcularDiferenciaDiasFechas(Date fecha1, Date fecha2){
+        // Crear 2 instancias de Calendar
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(fecha1);
+        cal2.setTime(fecha2);
+        // conseguir la representacion de la fecha en milisegundos
+        long milis1 = cal1.getTimeInMillis();
+        long milis2 = cal2.getTimeInMillis();
+        // calcular la diferencia en milisengundos
+        long diff = milis2 - milis1;
+        // calcular la diferencia en horas
+        Long diffHours = diff / (24 * 60 * 60 * 1000);
+        return diffHours.intValue();
+    }
+
+    public static long CalcularDiferenciaHorasFechas(Date fecha1, Date fecha2){
+        // Crear 2 instancias de Calendar
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(fecha1);
+        cal2.setTime(fecha2);
+        // conseguir la representacion de la fecha en milisegundos
+        long milis1 = cal1.getTimeInMillis();
+        long milis2 = cal2.getTimeInMillis();
+        // calcular la diferencia en milisengundos
+        long diff = milis2 - milis1;
+        // calcular la diferencia en horas
+        long diffHours = diff / (60 * 60 * 1000);
+        return diffHours;
     }
 }

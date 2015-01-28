@@ -176,7 +176,7 @@
                                                     </label>
                                                     <div class="">
                                                         <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                             <input class="form-control" type="text" disabled id="fechaIniSintomas" name="fechaIniSintomas" value="<fmt:formatDate value="${fechaInicioSintomas}" pattern="dd/MM/yyyy" />"
                                                                    placeholder=" <spring:message code="lbl.receipt.symptoms.start.date.full" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.receipt.symptoms.start.date.full"/>
@@ -202,7 +202,7 @@
                                                     </label>
                                                     <div class="">
                                                         <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                             <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${tomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                                                    placeholder=" <spring:message code="lbl.sampling.datetime" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sampling.datetime"/>
@@ -216,7 +216,7 @@
                                                     </label>
                                                     <div class="">
                                                         <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
                                                             <input class="form-control" type="text" disabled id="cantidadTubos" name="cantidadTubos" value="${tomaMx.canTubos}"
                                                                    placeholder=" <spring:message code="lbl.sample.number.tubes.full" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.number.tubes.full"/>
@@ -278,11 +278,43 @@
                                                     </div>
                                                 </section>
                                             </div>
+                                            <div>
+                                                <header>
+                                                    <label class="text-left txt-color-blue" style="font-weight: bold">
+                                                        <spring:message code="lbl.header.receipt.dx" />
+                                                    </label>
+                                                </header>
+                                                <br/>
+                                                <br/>
+                                                <div class="widget-body no-padding">
+                                                    <table id="dx_list" class="table table-striped table-bordered table-hover" width="100%">
+                                                        <thead>
+                                                        <tr>
+                                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.receipt.pcr.area"/></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <c:forEach items="${dxList}" var="record">
+                                                            <tr>
+                                                                <td><c:out value="${record.codDx.nombre}" /></td>
+                                                                <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
+                                                                <td><c:out value="${record.codDx.area.nombre}" /></td>
+                                                            </tr>
+                                                            </c:forEach>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </fieldset>
                                         <fieldset>
                                             <header>
-                                                <spring:message code="lbl.header.receipt.orders.form" />
+                                                <label class="text-left txt-color-blue" style="font-weight: bold">
+                                                    <spring:message code="lbl.header.receipt.orders.form" />
+                                                </label>
                                             </header>
+                                            <br/>
                                             <div class="row">
                                                 <section class="col col-sm-12 col-md-6 col-lg-2">
                                                     <label class="text-left txt-color-blue font-md">
@@ -339,6 +371,13 @@
                                                         </label>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div class="row">
+                                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                                    <label class="text-left txt-color-red font-md">
+                                                        ${inadecuada}
+                                                    </label>
+                                                </section>
                                             </div>
                                         </fieldset>
                                         <footer>

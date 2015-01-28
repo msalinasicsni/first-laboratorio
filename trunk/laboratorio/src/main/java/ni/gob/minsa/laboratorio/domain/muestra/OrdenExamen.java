@@ -10,19 +10,19 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
- * Created by souyen-ics on 11-20-14.
+ * Miguel Salinas
+ * V 1.0
  */
 @Entity
-@Table(name = "da_orden_examen", schema = "alerta")
-public class DaOrdenExamen {
+@Table(name = "orden_examen", schema = "laboratorio")
+public class OrdenExamen {
 
     private String idOrdenExamen;
-    private EstadoOrdenEx codEstado;
-    private DaTomaMx idTomaMx;
+    private DaSolicitudDx solicitudDx;
     private Timestamp fechaHOrden;
     private CatalogoExamenes codExamen;
-    private DaEnvioOrden envio;
     private Usuarios usarioRegistro;
+    private boolean anulado;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -36,27 +36,15 @@ public class DaOrdenExamen {
         this.idOrdenExamen = idOrdenExamen;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = false)
-    @JoinColumn(name = "COD_ESTADO", referencedColumnName = "CODIGO", nullable = false)
-    @ForeignKey(name = "COD_ESTADO_FK")
-    public EstadoOrdenEx getCodEstado() {
-        return codEstado;
-    }
-
-    public void setCodEstado(EstadoOrdenEx codEstado) {
-        this.codEstado = codEstado;
-    }
-
-
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_TOMAMX", referencedColumnName = "ID_TOMAMX")
-    @ForeignKey(name = "ID_TOMAMX_FK")
-    public DaTomaMx getIdTomaMx() {
-        return idTomaMx;
+    @JoinColumn(name = "ID_SOLICITUD_DX", referencedColumnName = "ID_SOLICITUD_DX")
+    @ForeignKey(name = "SOLICITUD_DX_EX_FK")
+    public DaSolicitudDx getSolicitudDx() {
+        return solicitudDx;
     }
 
-    public void setIdTomaMx(DaTomaMx idTomaMx) {
-        this.idTomaMx = idTomaMx;
+    public void setSolicitudDx(DaSolicitudDx solicitudDx) {
+        this.solicitudDx = solicitudDx;
     }
 
     @Basic
@@ -80,18 +68,6 @@ public class DaOrdenExamen {
         this.codExamen = codExamen;
     }
 
-
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "ID_ORDEN_ENVIO", referencedColumnName = "ID_ENVIO_ORDEN")
-    @ForeignKey(name = "ENVIORDEN_FK")
-    public DaEnvioOrden getEnvio() {
-        return envio;
-    }
-
-    public void setEnvio(DaEnvioOrden envio) {
-        this.envio = envio;
-    }
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "USUARIO", referencedColumnName = "USUARIO_ID")
     @ForeignKey(name = "USUARIO_FK")
@@ -101,5 +77,15 @@ public class DaOrdenExamen {
 
     public void setUsarioRegistro(Usuarios usarioRegistro) {
         this.usarioRegistro = usarioRegistro;
+    }
+
+    @Basic
+    @Column(name = "ANULADO", nullable = true, insertable = true, updatable = true)
+    public boolean isAnulado() {
+        return anulado;
+    }
+
+    public void setAnulado(boolean anulado) {
+        this.anulado = anulado;
     }
 }

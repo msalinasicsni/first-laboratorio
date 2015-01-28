@@ -8,9 +8,18 @@
 <!-- BEGIN HEAD -->
 <head>
 	<jsp:include page="../fragments/headTag.jsp" />
+    <spring:url value="/resources/img/plus.png" var="plus"/>
+    <spring:url value="/resources/img/minus.png" var="minus"/>
     <style>
         textarea {
             resize: none;
+        }
+        td.details-control {
+            background: url("${plus}") no-repeat center center;
+            cursor: pointer;
+        }
+        tr.shown td.details-control {
+            background: url("${minus}") no-repeat center center;
         }
     </style>
 </head>
@@ -117,6 +126,8 @@
                                     <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                     <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                     <input id="msg_send_receipt_succes" type="hidden" value="<spring:message code="msg.receipt.successfully.sending"/>"/>
+                                    <input id="text_dx" type="hidden" value="<spring:message code="lbl.receipt.send.dx"/>"/>
+                                    <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.receipt.send.dx.date"/>"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -257,6 +268,7 @@
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th><spring:message code="lbl.dx"/></th>
                                         </tr>
                                         </thead>
                                     </table>

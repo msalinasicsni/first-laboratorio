@@ -12,6 +12,18 @@
         textarea {
             resize: none;
         }
+        .styleButton {
+
+            float: right;
+            height: 31px;
+            margin: 10px 0px 0px 5px;
+            padding: 0px 22px;
+            font: 300 15px/29px "Open Sans", Helvetica, Arial, sans-serif;
+            cursor: pointer;
+        }
+        .modal .modal-dialog {
+            width: 60%;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -176,7 +188,7 @@
                                                     </label>
                                                     <div class="">
                                                         <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                             <input class="form-control" type="text" disabled id="fechaIniSintomas" name="fechaIniSintomas" value="<fmt:formatDate value="${fechaInicioSintomas}" pattern="dd/MM/yyyy" />"
                                                                    placeholder=" <spring:message code="lbl.receipt.symptoms.start.date.full" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.receipt.symptoms.start.date.full"/>
@@ -202,7 +214,7 @@
                                                     </label>
                                                     <div class="">
                                                         <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                             <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${recepcionMx.tomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                                                    placeholder=" <spring:message code="lbl.sampling.datetime" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sampling.datetime"/>
@@ -216,7 +228,7 @@
                                                     </label>
                                                     <div class="">
                                                         <label class="input">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
                                                             <input class="form-control" type="text" disabled id="cantidadTubos" name="cantidadTubos" value="${recepcionMx.tomaMx.canTubos}"
                                                                    placeholder=" <spring:message code="lbl.sample.number.tubes.full" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.number.tubes.full"/>
@@ -277,11 +289,69 @@
                                                         </label>
                                                     </div>
                                                 </section>
+                                                <section class="col col-sm-12 col-md-6 col-lg-3">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.notification.type" /> </label>
+                                                    <div class="">
+                                                        <label class="input">
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                            <input class="form-control" type="text" disabled id="codTipoNoti" name="codTipoNoti" value="${recepcionMx.tomaMx.idNotificacion.codTipoNotificacion.valor}" placeholder=" <spring:message code="lbl.sample.type" />">
+                                                            <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.type"/>
+                                                            </b>
+                                                        </label>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                            <div>
+                                                <header>
+                                                    <label class="text-left txt-color-blue" style="font-weight: bold">
+                                                        <spring:message code="lbl.header.receipt.lab" />
+                                                    </label>
+                                                </header>
+                                                <br/>
+                                                <br/>
+                                                <div class="widget-body no-padding">
+                                                    <table id="dx_list" class="table table-striped table-bordered table-hover" width="100%">
+                                                        <thead>
+                                                        <tr>
+                                                            <th data-class="expand"><spring:message code="lbl.receipt.test"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.receipt.pcr.area"/></th>
+                                                            <th><spring:message code="act.cancel"/></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <c:forEach items="${examenesList}" var="record">
+                                                            <tr>
+                                                                <td><c:out value="${record.codExamen.nombre}" /></td>
+                                                                <td><c:out value="${record.solicitudDx.codDx.nombre}" /></td>
+                                                                <td><c:out value="${record.solicitudDx.codDx.area.nombre}" /></td>
+                                                                <spring:url value="/recepcionMx/eliminarExamen/{idExamen}" var="editUrl">
+                                                                    <spring:param name="idExamen" value="${record.idOrdenExamen}" />
+                                                                </spring:url>
+                                                                <td><a href="#" onClick="anularExamen('${record.idOrdenExamen}'); return false;" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a></td>
+
+                                                            </tr>
+                                                        </c:forEach>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                                    <button type="button" id="btnAddTest" class="btn btn-primary styleButton" data-toggle="modal"
+                                                            data-target="myModal">
+                                                        <i class="fa fa-plus icon-white"></i>
+                                                        <spring:message code="act.add.test"/>
+                                                    </button>
+                                                </section>
                                             </div>
                                         </fieldset>
                                         <fieldset>
                                             <header>
-                                                <spring:message code="lbl.header.receipt.orders.form" />
+                                                <label class="text-left txt-color-blue" style="font-weight: bold">
+                                                    <spring:message code="lbl.header.receipt.orders.form" />
+                                                </label>
                                             </header>
                                             <br>
                                             <div class="row">
@@ -290,7 +360,8 @@
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sample.quality" /> </label>
                                                     <div class="input-group">
                                                         <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                        <select id="codCalidadMx" name="codCalidadMx"
+                                                        <label for="codCalidadMx">
+                                                        </label><select id="codCalidadMx" name="codCalidadMx"
                                                                 class="select2">
                                                             <option value=""><spring:message code="lbl.select" />...</option>
                                                             <c:forEach items="${calidadMx}" var="calidadMx">
@@ -355,7 +426,68 @@
 				<!-- end row -->
 			</section>
 			<!-- end widget grid -->
-		</div>
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static"> <!--tabindex="-1" role="dialog" -->
+            <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                    </button>-->
+                <h4 class="modal-title">
+                    <spring:message code="lbl.receipt.widgettitle.modal.test" />
+                </h4>
+            </div>
+            <div class="modal-body"> <!--  no-padding -->
+            <form id="frmAgregarExamen" class="smart-form" novalidate="novalidate">
+            <fieldset>
+            <div class="row">
+                <section class="col col-sm-12 col-md-5 col-lg-5">
+                    <label class="text-left txt-color-blue font-md">
+                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.type" />
+                    </label>
+                    <div class="input-group">
+    		        <span class="input-group-addon">
+                        <i class="fa fa-location-arrow fa-fw"></i>
+			        </span>
+                        <select  class="select2" id="coddiagnostico" name="coddiagnostico" >
+                            <option value=""><spring:message code="lbl.select" />...</option>
+                        </select>
+                    </div>
+                </section>
+                <section class="col col-sm-12 col-md-7 col-lg-7">
+                    <label class="text-left txt-color-blue font-md">
+                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.test" />
+                    </label>
+                    <div class="input-group">
+	    					        <span class="input-group-addon">
+                                        <i class="fa fa-location-arrow fa-fw"></i>
+		    				        </span>
+                        <select class="select2" id="codExamen" name="codExamen" >
+                            <option value=""><spring:message code="lbl.select" />...</option>
+                        </select>
+                    </div>
+                </section>
+            </div>
+            </fieldset>
+
+            <footer>
+                <button type="submit" class="btn btn-primary" id="btnAgregarExamen">
+                    <spring:message code="act.save" />
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <spring:message code="act.end" />
+                </button>
+
+            </footer>
+
+            </form>
+            </div>
+            </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+        </div>
 		<!-- END MAIN CONTENT -->
 	</div>
 	<!-- END MAIN PANEL -->
@@ -400,6 +532,47 @@
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/receiptLaboratory"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/initLab"/>
+    <c:url var="sAnularExamentUrl" value="/recepcionMx/anularExamen"/>
+    <script language="JavaScript" type="text/javascript">
+        function anularExamen(idOrdenExamen) {
+            var anulacionObj = {};
+            anulacionObj['idOrdenExamen'] = idOrdenExamen;
+            anulacionObj['mensaje'] = '';
+            $.ajax(
+                    {
+                        url: "${sAnularExamentUrl}",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(anulacionObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        async:false,
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                var msg = $("#msg_receipt_added").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                        },
+                        error: function (data, status, er) {
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+        }
+    </script>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -417,6 +590,7 @@
 	    		$("li.recepcion").parents("ul").slideDown(200);
 	    	}
             $('#codCalidadMx').change();
+
         });
 	</script>
 	<!-- END JAVASCRIPTS -->

@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
+import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
@@ -154,5 +155,21 @@ public class TomaMxService {
             fecInicioSintomas = sinFebNoti.getFechaInicioSintomas();
 
         return fecInicioSintomas;
+    }
+
+    public List<DaSolicitudDx> getSolicitudesDxByMx(String idTomaMx){
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+    public DaSolicitudDx getSolicitudesDxByMxDx(String idTomaMx,  Integer idDiagnostico){
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx " +
+                "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("idDiagnostico",idDiagnostico);
+        return (DaSolicitudDx)q.uniqueResult();
     }
 }

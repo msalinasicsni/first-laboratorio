@@ -1,22 +1,15 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
-import ni.gob.minsa.laboratorio.domain.muestra.DaOrdenExamen;
-import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
-import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
-import org.apache.commons.codec.language.Soundex;
-import org.hibernate.Criteria;
+import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Junction;
-import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,10 +19,41 @@ import java.util.List;
 @Transactional
 public class OrdenExamenMxService {
 
+    private Logger logger = LoggerFactory.getLogger(OrdenExamenMxService.class);
+
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
 
-    public void updateOrdenExamen(DaOrdenExamen dto) throws Exception {
+
+    /**
+     * Agrega una Registro de orden de examen
+     *
+     * @param dto Objeto a agregar
+     * @throws Exception
+     */
+    public String addOrdenExamen(OrdenExamen dto) throws Exception {
+        String idMaestro;
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                idMaestro = (String)session.save(dto);
+            }
+            else
+                throw new Exception("Objeto Orden examen es NULL");
+        }catch (Exception ex){
+            logger.error("Error al agregar orden de examen",ex);
+            throw ex;
+        }
+        return idMaestro;
+    }
+
+    /**
+     * Actualiza una orden de examen
+     *
+     * @param dto Objeto a actualizar
+     * @throws Exception
+     */
+    public void updateOrdenExamen(OrdenExamen dto) throws Exception {
         try {
             if (dto != null) {
                 Session session = sessionFactory.getCurrentSession();
@@ -38,16 +62,23 @@ public class OrdenExamenMxService {
             else
                 throw new Exception("Objeto Orden Examen es NULL");
         }catch (Exception ex){
-            ex.printStackTrace();
+            logger.error("Error al actualizar recepción de muestra",ex);
             throw ex;
         }
     }
 
-    public  DaOrdenExamen getOrdenExamenById(String idOrdenExamen){
+    public OrdenExamen getOrdenExamenById(String idOrdenExamen){
         Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery("from DaOrdenExamen where idOrdenExamen =:idOrdenExamen");
+        Query q = session.createQuery("from OrdenExamen where idOrdenExamen =:idOrdenExamen");
         q.setParameter("idOrdenExamen",idOrdenExamen);
-        return (DaOrdenExamen)q.uniqueResult();
+        return (OrdenExamen)q.uniqueResult();
+    }
+
+    public List<OrdenExamen> getOrdenesExamenByIdMx(String idTomaMx){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.idTomaMx =:idTomaMx");
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
     }
 
 }
