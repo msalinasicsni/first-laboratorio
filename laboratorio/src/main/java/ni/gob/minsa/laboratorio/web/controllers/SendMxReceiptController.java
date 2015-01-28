@@ -212,6 +212,19 @@ public class SendMxReceiptController {
                 map.put("persona"," ");
             }
 
+            //se arma estructura de diagnósticos
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcion.getTomaMx().getIdTomaMx());
+            Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
+            Map<String, String> mapDx = new HashMap<String, String>();
+            int subIndice=0;
+            for(DaSolicitudDx solicitudDx: solicitudDxList){
+                mapDx.put("nombre",solicitudDx.getCodDx().getNombre());
+                mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                subIndice++;
+            }
+            mapDxList.put(subIndice,mapDx);
+            map.put("diagnosticos", new Gson().toJson(mapDxList));
+
             mapResponse.put(indice, map);
             indice ++;
         }

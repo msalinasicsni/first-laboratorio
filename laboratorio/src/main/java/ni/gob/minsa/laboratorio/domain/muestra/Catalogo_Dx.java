@@ -1,5 +1,8 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.examen.Area;
+import org.hibernate.annotations.ForeignKey;
+
 import javax.persistence.*;
 
 /**
@@ -9,9 +12,10 @@ import javax.persistence.*;
 @Table(name = "catalogo_dx", schema = "alerta")
 public class Catalogo_Dx {
 
-    Integer idDiagnostico;
-    String nombre;
-    boolean pasivo;
+    private Integer idDiagnostico;
+    private String nombre;
+    private boolean pasivo;
+    private Area area;
 
 
     @Id
@@ -43,5 +47,16 @@ public class Catalogo_Dx {
 
     public void setPasivo(boolean pasivo) {
         this.pasivo = pasivo;
+    }
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name="ID_AREA", referencedColumnName = "ID_AREA", nullable = false)
+    @ForeignKey(name = "DX_AREA_FK")
+    public Area getArea() {
+        return area;
+    }
+
+    public void setArea(Area area) {
+        this.area = area;
     }
 }

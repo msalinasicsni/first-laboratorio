@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -71,6 +74,18 @@ public class RecepcionMxController {
     @Autowired
     @Qualifier(value = "unidadesService")
     private UnidadesService unidadesService;
+
+    @Autowired
+    @Qualifier(value = "parametrosService")
+    private ParametrosService parametrosService;
+
+    @Autowired
+    @Qualifier(value = "examenesService")
+    private ExamenesService examenesService;
+
+    @Autowired
+    @Qualifier(value = "ordenExamenMxService")
+    private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
     MessageSource messageSource;
@@ -146,13 +161,21 @@ public class RecepcionMxController {
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
-            //List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
-            //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
             List<Unidades> unidades = null;
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(tomaMx.getIdTomaMx());
             Date fechaInicioSintomas = null;
             if (tomaMx!=null) {
                 unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+            }
+            String html = "";
+            //si hay fecha de inicio de síntomas validar si es muestra válida para vigilancia rutinaria
+            if (fechaInicioSintomas!=null){
+                Parametro diasMinRecepMx = parametrosService.getParametroByName("DIAS_MIN_MX_VIG_RUT");
+                int diffDias = DateUtil.CalcularDiferenciaDiasFechas(fechaInicioSintomas,new Date());
+                if (diffDias < Integer.valueOf(diasMinRecepMx.getValor())){
+                    html = messageSource.getMessage("msg.mx.must.be.inadequate",null,null).replace("{0}",diasMinRecepMx.getValor()); //"La cantidad de días desde el inicio de síntomas no es mayor o igual a "+diasMinRecepMx.getValor()+", la muestra debería marcarse como inadecuada";
+                }
             }
             mav.addObject("tomaMx",tomaMx);
             mav.addObject("entidades",entidadesAdtvases);
@@ -160,6 +183,8 @@ public class RecepcionMxController {
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("laboratorios",laboratorioList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
+            mav.addObject("inadecuada",html);
+            mav.addObject("dxList",solicitudDxList);
             mav.setViewName("recepcionMx/recepcionarOrders");
         }else
             mav.setViewName(urlValidacion);
@@ -189,18 +214,55 @@ public class RecepcionMxController {
             List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
             List<Unidades> unidades = null;
+            List<Examen_Dx> examenesList = null;
+            List<OrdenExamen> ordenExamenList = null;
             Date fechaInicioSintomas = null;
             if (recepcionMx!=null) {
                 unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
+                ordenExamenList = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
+                if (ordenExamenList==null || ordenExamenList.size()<=0) {
+                    //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
+                    Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                    if (pTipoNoti != null) {
+                        //se obtienen los id de los examenes por defecto
+                        Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
+                        if (pExamenesDefecto != null)
+                            examenesList = examenesService.getExamenesByIds(pExamenesDefecto.getValor());
+                        if (examenesList != null) {
+                            //se registran los examenes por defecto
+                            for (Examen_Dx examenTmp : examenesList) {
+                                OrdenExamen ordenExamen = new OrdenExamen();
+                                DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(recepcionMx.getTomaMx().getIdTomaMx(), examenTmp.getDiagnostico().getIdDiagnostico());
+                                long idUsuario = seguridadService.obtenerIdUsuario(request);
+                                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+                                ordenExamen.setSolicitudDx(solicitudDx);
+                                ordenExamen.setCodExamen(examenTmp.getExamen());
+                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                ordenExamen.setUsarioRegistro(usuario);
+                                try {
+                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                }catch (Exception ex){
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                    List<OrdenExamen> ordenExamenListNew = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
+                    mav.addObject("examenesList",ordenExamenListNew);
+                }else{
+                    mav.addObject("examenesList",ordenExamenList);
+                }
             }
+
             mav.addObject("recepcionMx",recepcionMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("laboratorios",laboratorioList);
             mav.addObject("calidadMx",calidadMx);
-            //mav.addObject("tipoTubo",tipoTubos);
+            //mav.addObject("examenesDfList",examenesList);
+
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
             mav.setViewName("recepcionMx/recepcionarOrdersLab");
         }else
@@ -371,6 +433,55 @@ public class RecepcionMxController {
             map.put("mensaje",resultado);
             map.put("calidadMx", codCalidadMx);
             map.put("causaRechazo", causaRechazo);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "anularExamen", method = RequestMethod.POST)
+    public void anularExamen(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        logger.debug("buscar ordenes para recepcion");
+        String urlValidacion="";
+        String idOrdenExamen = "";
+        String json="";
+        String resultado = "";
+        try {
+
+        try {
+            urlValidacion = seguridadService.validarLogin(request);
+            //si la url esta vacia significa que la validación del login fue exitosa
+            if (urlValidacion.isEmpty())
+                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
+        }catch (Exception e){
+            e.printStackTrace();
+            urlValidacion = "404";
+        }
+        if (urlValidacion.isEmpty()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            json = br.readLine();
+            idOrdenExamen = jsonpObject.get("idOrdenExamen").toString();
+            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
+            if(ordenExamen!=null){
+                ordenExamen.setAnulado(true);
+                try{
+                ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                    resultado="Orden de examen anulada exitosamente";
+                }catch (Exception ex){
+                 resultado = "Error al anular orden de examen";
+               }
+            }
+        }else{
+            resultado = "No tiene permisos para realizar esta operación";
+        }
+
+        }catch (Exception ex){
+            resultado = "Sucedio un error al anular orden de examen";
+        } finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idOrdenExamen", idOrdenExamen);
+            map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

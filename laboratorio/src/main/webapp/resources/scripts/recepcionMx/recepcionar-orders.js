@@ -31,7 +31,7 @@ var ReceiptOrders = function () {
 				"sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
 					"t"+
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-				"autoWidth" : true, //"T<'clear'>"+
+				"autoWidth" : true,
                 "preDrawCallback" : function() {
 					// Initialize the responsive datatables helper once.
 					if (!responsiveHelper_dt_basic) {
@@ -45,6 +45,28 @@ var ReceiptOrders = function () {
 					responsiveHelper_dt_basic.respond();
 				}
 			});
+            var table2 = $('#dx_list').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth" : true,
+                "paging":   false,
+                "ordering": false,
+                "searching": false,
+                "lengthChange": false,
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#dx_list'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                }
+            });
 
             <!-- formulario de búsqueda de ordenes -->
             $('#searchOrders-form').validate({
@@ -162,16 +184,9 @@ var ReceiptOrders = function () {
                                 idLoad = dataToLoad[i].idTomaMx;
                             }
                             var actionUrl = parametros.sActionUrl+idLoad;
-                            /*table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra +" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].edad,'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            */
                             table1.fnAddData(
                                 [dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            /*table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);*/
 
                         }
                     }else{
@@ -251,8 +266,6 @@ var ReceiptOrders = function () {
             }
 
             function imprimir (urlImpresion) {
-                console.log('2- '+urlImpresion);
-                console.log('length: '+urlImpresion.length);
                 if (urlImpresion.length>0) {
                     window.open(urlImpresion, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
                 }
@@ -360,6 +373,12 @@ var ReceiptOrders = function () {
                     $('#dvCausa').show();
                 else
                     $('#dvCausa').hide();
+            });
+
+            $("#btnAddTest").click(function(){
+                $("#myModal").modal({
+                    show: true
+                });
             });
         }
     };

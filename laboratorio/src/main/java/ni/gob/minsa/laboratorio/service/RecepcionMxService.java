@@ -24,7 +24,7 @@ import java.util.List;
 @Transactional
 public class RecepcionMxService {
 
-    private Logger logger = LoggerFactory.getLogger(CatalogoService.class);
+    private Logger logger = LoggerFactory.getLogger(RecepcionMxService.class);
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;

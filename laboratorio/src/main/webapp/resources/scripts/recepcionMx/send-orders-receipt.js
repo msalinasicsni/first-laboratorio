@@ -34,7 +34,16 @@ var SendOrdersReceipt = function () {
                     "T"+
                     "t"+
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-				"autoWidth" : true, //"T<'clear'>"+
+				"autoWidth" : true,
+                "columns": [
+                    null,null,null,null,null,null,null,null,null,
+                    {
+                        "className":      'details-control',
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": ''
+                    }
+                ],
                 "preDrawCallback" : function() {
 					// Initialize the responsive datatables helper once.
 					if (!responsiveHelper_dt_basic) {
@@ -85,6 +94,40 @@ var SendOrdersReceipt = function () {
                 }
             });
 
+            /*PARA MOSTRAR TABLA DETALLE DX*/
+            function format (d,indice) {
+                // `d` is the original data object for the row
+                var texto = d[indice]; //indice donde esta el input hidden
+                var diagnosticos = $(texto).val();
+                var json =JSON.parse(diagnosticos);
+                var len = Object.keys(json).length;
+                var childTable = '<table style="padding-left:50px;">'+
+                    '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td></tr>';
+                for (var i = 1; i <= len; i++) {
+                    childTable =childTable +
+                        '<tr></tr><td>'+json[i].nombre+'</td>'+
+                        '<td>'+json[i].fechaSolicitud+'</td></tr>';
+                }
+                childTable = childTable + '</table>';
+                return childTable;
+            }
+
+            $('#orders_result tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table1.api().row(tr);
+                if ( row.child.isShown() ) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else {
+                    // Open this row
+                    row.child( format(row.data(),9)).show();
+                    tr.addClass('shown');
+                }
+            } );
+
+            //FIN
             function blockUI(){
                 var loc = window.location;
                 var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
@@ -135,7 +178,7 @@ var SendOrdersReceipt = function () {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
                                 [dataToLoad[i].tipoMuestra+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona," <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>"]);
                             /*table1.fnAddData(
                                 [dataToLoad[i].areaProcesa+" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);*/

@@ -8,7 +8,6 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
-import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,11 +103,11 @@ public class ResultadosController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            DaOrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrden);
+            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Unidades> unidades = unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            List<Unidades> unidades = null; //unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+            Date fechaInicioSintomas = null; //tomaMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             mav.addObject("ordenExamen",ordenExamen);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -126,7 +125,7 @@ public class ResultadosController {
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
-        List<DaOrdenExamen> ordenExamenList = null; //ordenExamenMxService.getTomaMxByFiltro(filtroMx);
+        List<OrdenExamen> ordenExamenList = null; //ordenExamenMxService.getTomaMxByFiltro(filtroMx);
         return OrdenesExamenToJson(ordenExamenList);
     }
 
@@ -175,9 +174,9 @@ public class ResultadosController {
         return filtroMx;
     }
 
-    private String OrdenesExamenToJson(List<DaOrdenExamen> ordenExamenList){
+    private String OrdenesExamenToJson(List<OrdenExamen> ordenExamenList){
         String jsonResponse="";
-        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        /*Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         for(DaOrdenExamen orden:ordenExamenList){
             Map<String, String> map = new HashMap<String, String>();
@@ -216,7 +215,7 @@ public class ResultadosController {
             mapResponse.put(indice, map);
             indice ++;
         }
-        jsonResponse = new Gson().toJson(mapResponse);
+        jsonResponse = new Gson().toJson(mapResponse);*/
         return jsonResponse;
     }
 
