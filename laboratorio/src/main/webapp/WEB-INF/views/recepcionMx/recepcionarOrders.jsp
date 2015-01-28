@@ -291,7 +291,7 @@
                                                         <thead>
                                                         <tr>
                                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
-                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
                                                             <th data-hide="phone"><spring:message code="lbl.receipt.pcr.area"/></th>
                                                         </tr>
                                                         </thead>
@@ -435,11 +435,6 @@
 	<!-- JQUERY BLOCK UI -->
 	<spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
 	<script src="${jqueryBlockUi}"></script>
-    <!-- JQUERY BAR CODE -->
-    <spring:url value="/resources/js/plugin/jquery-barcode-2.0.3/jquery-barcode.js" var="jqueryBarCode" />
-    <script src="${jqueryBarCode}"></script>
-    <spring:url value="/resources/js/plugin/jquery-barcode-2.0.3/jquery-barcode.min.js" var="jqueryBarCodeM" />
-    <script src="${jqueryBarCodeM}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />

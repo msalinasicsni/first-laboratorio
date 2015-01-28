@@ -67,7 +67,9 @@ var ReceiptOrders = function () {
                     responsiveHelper_dt_basic.respond();
                 }
             });
-
+            if($("#txtEsLaboratorio").val()=='true') {
+                getOrdersReview();
+            }
             <!-- formulario de búsqueda de ordenes -->
             $('#searchOrders-form').validate({
     			// Rules for form validation
@@ -82,7 +84,7 @@ var ReceiptOrders = function () {
     				submitHandler: function (form) {
                         table1.fnClearTable();
                         //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                        getOrders(false)
+                        getMxs(false)
                     }
             });
 
@@ -128,6 +130,22 @@ var ReceiptOrders = function () {
                 }
             });
 
+            <!-- formulario de recepción en laboratorio -->
+            $('#AgregarExamen-form').validate({
+                // Rules for form validation
+                rules: {
+                    codDX: {required : true},
+                    codExamen: {required : true}
+                },
+                // Do not change code below
+                errorPlacement : function(error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    guardarExamen();
+                }
+            });
+
             function blockUI(){
                 var loc = window.location;
                 var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
@@ -149,7 +167,7 @@ var ReceiptOrders = function () {
                 setTimeout($.unblockUI, 500);
             }
 
-            function getOrders(showAll) {
+            function getMxs(showAll) {
                 var encuestaFiltros = {};
                 if (showAll){
                     encuestaFiltros['nombreApellido'] = '';
@@ -206,8 +224,35 @@ var ReceiptOrders = function () {
 				});
             }
 
+            function getOrdersReview(){
+                $.getJSON(parametros.sgetOrdenesExamenUrl, {
+                    idTomaMx: $("#idTomaMx").val(),
+                    contentType : "charset=ISO-8859-1",
+                    ajax : 'true'
+                }, function(response) {
+                    table2.fnClearTable();
+                    var len = Object.keys(response).length;
+                    for (var i = 0; i < len; i++) {
+                        table2.fnAddData(
+                            [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].nombreDx, response[i].fechaSolicitudDx,
+                                    '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id='+response[i].idOrdenExamen+'><i class="fa fa-times"></i></a>']);
+
+                    }
+                    $(".anularExamen").on("click", function(){
+                        anularExamen($(this).data('id'));
+                    });
+
+                    //al paginar se define nuevamente la función de cargar el detalle
+                    $(".dataTables_paginate").on('click', function() {
+                        $(".anularExamen").on('click', function () {
+                            anularExamen($(this).data('id'));
+                        });
+                    });
+                });
+            }
+
             $("#all-orders").click(function() {
-                getOrders(true);
+                getMxs(true);
             });
 
             <!-- para guardar recepción general -->
@@ -324,6 +369,92 @@ var ReceiptOrders = function () {
                 //$("#codLaboratorioProce").val('').change();
             }
 
+            function anularExamen(idOrdenExamen) {
+                var anulacionObj = {};
+                anulacionObj['idOrdenExamen'] = idOrdenExamen;
+                anulacionObj['mensaje'] = '';
+                blockUI();
+                $.ajax(
+                    {
+                        url: parametros.sAnularExamenUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(anulacionObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                getOrdersReview();
+                                var msg = $("#msg_review_cancel").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            unBlockUI();
+                        },
+                        error: function (data, status, er) {
+                            unBlockUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
+            function guardarExamen() {
+                var ordenExamenObj = {};
+                ordenExamenObj['idTomaMx'] = $("#idTomaMx").val();
+                ordenExamenObj['idDiagnostico'] = $('#codDX').find('option:selected').val();
+                ordenExamenObj['idExamen'] = $('#codExamen').find('option:selected').val();
+                ordenExamenObj['mensaje'] = '';
+                blockUI();
+                $.ajax(
+                    {
+                        url: parametros.sAgregarOrdenExamenUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(ordenExamenObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                getOrdersReview();
+                                var msg = $("#msg_review_added").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            unBlockUI();
+                        },
+                        error: function (data, status, er) {
+                            unBlockUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
             <!--al seleccionar calidad de la muestra -->
             $('#codCalidadMx').change(function(){
                 $('#causaRechazo').val('');
@@ -376,9 +507,53 @@ var ReceiptOrders = function () {
             });
 
             $("#btnAddTest").click(function(){
+                getDiagnosticos($("#idTipoMx").val(),$("#codTipoNoti").val());
                 $("#myModal").modal({
                     show: true
                 });
+            });
+
+            <!-- cargar dx -->
+            function getDiagnosticos(idTipoMx, codTipoNoti) {
+                $.getJSON(parametros.sDxURL, {
+                    codMx: idTipoMx, tipoNoti : codTipoNoti,
+                    ajax: 'true'
+                }, function (data) {
+                    var html = null;
+                    var len = data.length;
+                    html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
+                            + data[i].diagnostico.nombre
+                            + '</option>';
+                    }
+                    $('#codDX').html(html);
+                });
+            }
+
+            <!-- Al seleccionar diagnóstico-->
+            $('#codDX').change(function () {
+                if ($(this).val().length > 0){
+                    $.getJSON(parametros.sExamenesURL, {
+                        idDx: $(this).val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].idExamen + '">'
+                                + data[i].nombre
+                                + '</option>';
+                            html += '</option>';
+                        }
+                        $('#codExamen').html(html);
+                    });
+                }else {
+                    var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    $('#codExamen').html(html);
+                }
+                $('#codExamen').val('').change();
             });
         }
     };

@@ -163,7 +163,7 @@ public class RecepcionMx {
     }
 
     @Basic
-    @Column(name = "FECHAH_RECEPCION_LAB", nullable = true, insertable = true, updatable = false)
+    @Column(name = "FECHAH_RECEPCION_LAB", nullable = true, insertable = true, updatable = true)
     public Timestamp getFechaHoraRecepcionLab() {
         return fechaHoraRecepcionLab;
     }

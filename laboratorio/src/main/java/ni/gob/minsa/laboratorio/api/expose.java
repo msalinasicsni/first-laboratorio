@@ -2,6 +2,8 @@ package ni.gob.minsa.laboratorio.api;
 
 import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.poblacion.Sectores;
@@ -62,6 +64,14 @@ public class expose {
     @Autowired
     @Qualifier(value = "sectoresService")
     private SectoresService sectoresService;
+
+    @Autowired
+    @Qualifier(value = "tomaMxService")
+    private TomaMxService tomaMxService;
+
+    @Autowired
+    @Qualifier(value = "examenesService")
+    private ExamenesService examenesService;
 
     @RequestMapping(value = "unidades", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public
@@ -196,6 +206,26 @@ public class expose {
         List<Sectores> sectoresList = new ArrayList<Sectores>();
         sectoresList = sectoresService.getSectoresByUnidad(codUnidad);
         return sectoresList;
+    }
+
+    @RequestMapping(value = "getDiagnosticos", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<Dx_TipoMx_TipoNoti> getDiagnosticos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
+        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Dx_TipoMx_TipoNoti>();
+        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti);
+        return dxTipoMxTipoNotis;
+    }
+
+    @RequestMapping(value = "getExamenes", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<CatalogoExamenes> getExamenes(@RequestParam(value = "idDx", required = true) int idDx) throws Exception {
+        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        List<CatalogoExamenes> dxTipoMxTipoNotis = new ArrayList<CatalogoExamenes>();
+        dxTipoMxTipoNotis = examenesService.getExamenesByIdDx(idDx);
+        return dxTipoMxTipoNotis;
     }
 
 }

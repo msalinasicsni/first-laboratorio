@@ -120,6 +120,8 @@
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
+                                    <input id="msg_review_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel.test"/>"/>
+                                    <input id="msg_review_added" type="hidden" value="<spring:message code="msg.receipt.add.test"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <input id="txtEsLaboratorio" type="hidden" value="true"/>
                                     <form id="receiptOrdersLab-form" class="smart-form" autocomplete="off">
@@ -295,7 +297,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="codTipoNoti" name="codTipoNoti" value="${recepcionMx.tomaMx.idNotificacion.codTipoNotificacion.valor}" placeholder=" <spring:message code="lbl.sample.type" />">
+                                                            <input class="form-control" type="text" disabled id="TipoNoti" name="TipoNoti" value="${recepcionMx.tomaMx.idNotificacion.codTipoNotificacion.valor}" placeholder=" <spring:message code="lbl.sample.type" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.sample.type"/>
                                                             </b>
                                                         </label>
@@ -315,24 +317,13 @@
                                                         <thead>
                                                         <tr>
                                                             <th data-class="expand"><spring:message code="lbl.receipt.test"/></th>
-                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
                                                             <th data-hide="phone"><spring:message code="lbl.receipt.pcr.area"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
                                                             <th><spring:message code="act.cancel"/></th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <c:forEach items="${examenesList}" var="record">
-                                                            <tr>
-                                                                <td><c:out value="${record.codExamen.nombre}" /></td>
-                                                                <td><c:out value="${record.solicitudDx.codDx.nombre}" /></td>
-                                                                <td><c:out value="${record.solicitudDx.codDx.area.nombre}" /></td>
-                                                                <spring:url value="/recepcionMx/eliminarExamen/{idExamen}" var="editUrl">
-                                                                    <spring:param name="idExamen" value="${record.idOrdenExamen}" />
-                                                                </spring:url>
-                                                                <td><a href="#" onClick="anularExamen('${record.idOrdenExamen}'); return false;" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a></td>
-
-                                                            </tr>
-                                                        </c:forEach>
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -403,6 +394,9 @@
                                         </fieldset>
                                         <footer>
                                             <input id="idRecepcion" type="hidden" value="${recepcionMx.idRecepcion}"/>
+                                            <input id="idTipoMx" type="hidden" value="${recepcionMx.tomaMx.codTipoMx.idTipoMx}"/>
+                                            <input id="codTipoNoti" type="hidden" value="${recepcionMx.tomaMx.idNotificacion.codTipoNotificacion.codigo}"/>
+                                            <input id="idTomaMx" type="hidden" value="${recepcionMx.tomaMx.idTomaMx}"/>
                                             <button type="submit" id="receipt-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-check"></i> <spring:message code="act.receipt" /></button>
                                         </footer>
                                     </form>
@@ -439,7 +433,7 @@
                 </h4>
             </div>
             <div class="modal-body"> <!--  no-padding -->
-            <form id="frmAgregarExamen" class="smart-form" novalidate="novalidate">
+            <form id="AgregarExamen-form" class="smart-form" novalidate="novalidate">
             <fieldset>
             <div class="row">
                 <section class="col col-sm-12 col-md-5 col-lg-5">
@@ -450,7 +444,7 @@
     		        <span class="input-group-addon">
                         <i class="fa fa-location-arrow fa-fw"></i>
 			        </span>
-                        <select  class="select2" id="coddiagnostico" name="coddiagnostico" >
+                        <select  class="select2" id="codDX" name="codDX" >
                             <option value=""><spring:message code="lbl.select" />...</option>
                         </select>
                     </div>
@@ -532,47 +526,11 @@
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/receiptLaboratory"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/initLab"/>
-    <c:url var="sAnularExamentUrl" value="/recepcionMx/anularExamen"/>
-    <script language="JavaScript" type="text/javascript">
-        function anularExamen(idOrdenExamen) {
-            var anulacionObj = {};
-            anulacionObj['idOrdenExamen'] = idOrdenExamen;
-            anulacionObj['mensaje'] = '';
-            $.ajax(
-                    {
-                        url: "${sAnularExamentUrl}",
-                        type: 'POST',
-                        dataType: 'json',
-                        data: JSON.stringify(anulacionObj),
-                        contentType: 'application/json',
-                        mimeType: 'application/json',
-                        async:false,
-                        success: function (data) {
-                            if (data.mensaje.length > 0){
-                                $.smallBox({
-                                    title: data.mensaje ,
-                                    content: $("#smallBox_content").val(),
-                                    color: "#C46A69",
-                                    iconSmall: "fa fa-warning",
-                                    timeout: 4000
-                                });
-                            }else{
-                                var msg = $("#msg_receipt_added").val();
-                                $.smallBox({
-                                    title: msg ,
-                                    content: $("#smallBox_content").val(),
-                                    color: "#739E73",
-                                    iconSmall: "fa fa-success",
-                                    timeout: 4000
-                                });
-                            }
-                        },
-                        error: function (data, status, er) {
-                            alert("error: " + data + " status: " + status + " er:" + er);
-                        }
-                    });
-        }
-    </script>
+    <c:url var="sAnularExamenUrl" value="/recepcionMx/anularExamen"/>
+    <c:url var="sAgregarOrdenExamenUrl" value="/recepcionMx/agregarOrdenExamen"/>
+    <c:url var="sgetOrdenesExamenUrl" value="/recepcionMx/getOrdenesExamen"/>
+    <c:url var="sDxURL" value="/api/v1/getDiagnosticos"/>
+    <c:url var="sExamenesURL" value="/api/v1/getExamenes"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -581,13 +539,18 @@
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
                 sAddReceiptUrl: "${sAddReceiptUrl}",
-                sSearchReceiptUrl : "${sSearchReceiptUrl}"
+                sSearchReceiptUrl : "${sSearchReceiptUrl}",
+                sgetOrdenesExamenUrl : "${sgetOrdenesExamenUrl}",
+                sAnularExamenUrl : "${sAnularExamenUrl}",
+                sDxURL : "${sDxURL}",
+                sExamenesURL : "${sExamenesURL}",
+                sAgregarOrdenExamenUrl : "${sAgregarOrdenExamenUrl}"
             };
 			ReceiptOrders.init(parametros);
-	    	$("li.samples").addClass("open");
-	    	$("li.recepcion").addClass("active");
+	    	$("li.laboratorio").addClass("open");
+	    	$("li.receiptLab").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.recepcion").parents("ul").slideDown(200);
+	    		$("li.receiptLab").parents("ul").slideDown(200);
 	    	}
             $('#codCalidadMx').change();
 
