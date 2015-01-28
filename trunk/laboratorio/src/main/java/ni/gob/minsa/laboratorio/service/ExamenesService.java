@@ -44,4 +44,12 @@ public class ExamenesService {
                 " where ex.idExamen in("+ idExamenes +")");
         return q.list();
     }
+
+    public List<CatalogoExamenes> getExamenesByIdDx(int idDx){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select ex from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
+                "where dx.idDiagnostico = :idDx");
+        q.setParameter("idDx",idDx);
+        return q.list();
+    }
 }

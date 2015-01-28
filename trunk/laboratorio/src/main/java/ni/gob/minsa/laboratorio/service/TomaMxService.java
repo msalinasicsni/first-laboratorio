@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.service;
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
+import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
@@ -171,5 +172,21 @@ public class TomaMxService {
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idDiagnostico",idDiagnostico);
         return (DaSolicitudDx)q.uniqueResult();
+    }
+
+    /**
+     *Retorna una lista de dx segun tipoMx y tipo Notificacion
+     * @param codMx tipo de Mx
+     * @param tipoNoti tipo Notificacion
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public List<Dx_TipoMx_TipoNoti> getDx(String codMx, String tipoNoti) throws Exception {
+        String query = "select dx from Dx_TipoMx_TipoNoti dx where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codMx", codMx);
+        q.setString("tipoNoti", tipoNoti);
+        return q.list();
     }
 }

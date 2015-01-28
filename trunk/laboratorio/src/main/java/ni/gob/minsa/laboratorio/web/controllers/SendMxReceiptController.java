@@ -9,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,7 +230,9 @@ public class SendMxReceiptController {
             indice ++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
-        return jsonResponse;
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
     }
 
     private FiltroMx jsonToFiltroMx(String strJson) throws Exception {

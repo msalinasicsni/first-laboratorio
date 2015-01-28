@@ -14,6 +14,7 @@ import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,7 +94,7 @@ public class RecepcionMxController {
 
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
-        logger.debug("buscar ordenes para recepcion");
+        logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -118,7 +120,7 @@ public class RecepcionMxController {
 
     @RequestMapping(value = "initLab", method = RequestMethod.GET)
     public ModelAndView initSearchLabForm(HttpServletRequest request) throws Exception {
-        logger.debug("buscar ordenes para recepcion");
+        logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -144,7 +146,7 @@ public class RecepcionMxController {
 
     @RequestMapping(value = "create/{strIdOrden}", method = RequestMethod.GET)
     public ModelAndView createReceiptForm(HttpServletRequest request, @PathVariable("strIdOrden")  String strIdOrden) throws Exception {
-        logger.debug("buscar ordenes para recepcion");
+        logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -194,7 +196,7 @@ public class RecepcionMxController {
 
     @RequestMapping(value = "createLab/{strIdRecepcion}", method = RequestMethod.GET)
     public ModelAndView createReceiptLabForm(HttpServletRequest request, @PathVariable("strIdRecepcion")  String strIdRecepcion) throws Exception {
-        logger.debug("buscar ordenes para recepcion");
+        logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -439,9 +441,18 @@ public class RecepcionMxController {
         }
     }
 
+    @RequestMapping(value = "getOrdenesExamen", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getOrdenesExamen(@RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
+        List<OrdenExamen> ordenExamenList = null;
+        ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx);
+        return OrdenesExamenToJson(ordenExamenList);
+    }
+
     @RequestMapping(value = "anularExamen", method = RequestMethod.POST)
-    public void anularExamen(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        logger.debug("buscar ordenes para recepcion");
+    protected void anularExamen(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion="";
         String idOrdenExamen = "";
         String json="";
@@ -459,29 +470,88 @@ public class RecepcionMxController {
         }
         if (urlValidacion.isEmpty()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
-            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             json = br.readLine();
-            idOrdenExamen = jsonpObject.get("idOrdenExamen").toString();
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
             if(ordenExamen!=null){
                 ordenExamen.setAnulado(true);
                 try{
-                ordenExamenMxService.updateOrdenExamen(ordenExamen);
-                    resultado="Orden de examen anulada exitosamente";
+                    ordenExamenMxService.updateOrdenExamen(ordenExamen);
                 }catch (Exception ex){
+                    logger.error("Error al anular orden de examen",ex);
                  resultado = "Error al anular orden de examen";
                }
+            }else{
+                throw new Exception("No se encontró el registro de la orden de examen");
             }
         }else{
             resultado = "No tiene permisos para realizar esta operación";
         }
 
         }catch (Exception ex){
-            resultado = "Sucedio un error al anular orden de examen";
+            logger.error("Sucedio un error al anular orden de examen",ex);
+            resultado = "Sucedio un error al anular orden de examen\n"+ex.getMessage();
         } finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", idOrdenExamen);
             map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "agregarOrdenExamen", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void agregarOrdenExamen(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String idTomaMx = "";
+        int idDiagnostico = 0;
+        int idExamen = 0;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idTomaMx = jsonpObject.get("idTomaMx").getAsString();
+            idDiagnostico = jsonpObject.get("idDiagnostico").getAsInt();
+            idExamen = jsonpObject.get("idExamen").getAsInt();
+            //se valida si existe una orden activa para la muestra, el diagnóstico y el examen
+            List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, idDiagnostico, idExamen);
+            if (ordenExamenList!=null && ordenExamenList.size()>0) {
+                resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
+            }else{
+                CatalogoExamenes examen = examenesService.getExamenesById(idExamen);
+                long idUsuario = seguridadService.obtenerIdUsuario(request);
+                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+                OrdenExamen ordenExamen = new OrdenExamen();
+                DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
+                ordenExamen.setSolicitudDx(solicitudDx);
+                ordenExamen.setCodExamen(examen);
+                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                ordenExamen.setUsarioRegistro(usuario);
+                try {
+                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                } catch (Exception ex) {
+                    resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
+                    resultado = resultado + ". \n " + ex.getMessage();
+                    ex.printStackTrace();
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idTomaMx",idTomaMx);
+            map.put("idDiagnostico", String.valueOf(idDiagnostico));
+            map.put("idExamen", String.valueOf(idExamen));
+            map.put("mensaje",escaper.translate(resultado));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -540,19 +610,19 @@ public class RecepcionMxController {
         for(RecepcionMx recepcion : recepcionMxList){
             Map<String, String> map = new HashMap<String, String>();
             map.put("idRecepcion", recepcion.getIdRecepcion());
-            //map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
+            //map.put("idOrdenExamen", ordenExamen.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
-            //map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            //map.put("fechaHoraOrden",DateUtil.DateToString(ordenExamen.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            //map.put("estadoOrden", recepcion.getOrdenExamen().getCodEstado().getValor());
+            //map.put("estadoOrden", ordenExamen.getOrdenExamen().getCodEstado().getValor());
             map.put("separadaMx",(recepcion.getTomaMx().getMxSeparada()!=null?(recepcion.getTomaMx().getMxSeparada()?"Si":"No"):""));
             map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos()!=null?String.valueOf(recepcion.getTomaMx().getCanTubos()):""));
             map.put("tipoMuestra", recepcion.getTomaMx().getCodTipoMx().getNombre());
-            //map.put("tipoExamen", recepcion.getOrdenExamen().getCodExamen().getNombre());
-            //map.put("areaProcesa", recepcion.getOrdenExamen().getCodExamen().getArea().getNombre());
+            //map.put("tipoExamen", ordenExamen.getOrdenExamen().getCodExamen().getNombre());
+            //map.put("areaProcesa", ordenExamen.getOrdenExamen().getCodExamen().getArea().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
@@ -579,6 +649,27 @@ public class RecepcionMxController {
         }
         jsonResponse = new Gson().toJson(mapResponse);
         return jsonResponse;
+    }
+
+    private String OrdenesExamenToJson(List<OrdenExamen> ordenesExamenList) throws UnsupportedEncodingException {
+        String jsonResponse="";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice=0;
+        for(OrdenExamen ordenExamen : ordenesExamenList){
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+            map.put("idOrdenExamen",ordenExamen.getIdOrdenExamen());
+            map.put("nombreExamen",ordenExamen.getCodExamen().getNombre());
+            map.put("nombreDx",ordenExamen.getSolicitudDx().getCodDx().getNombre());
+            map.put("nombreAreaPrc",ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
+            map.put("fechaSolicitudDx",DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
     }
 
     private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
