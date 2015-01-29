@@ -39,7 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by FIRSTICT on 12/10/2014.
+ * Created by Miguel Salinas on 12/10/2014.
+ * V 1.0
  */
 @Controller
 @RequestMapping("recepcionMx")
@@ -92,10 +93,16 @@ public class RecepcionMxController {
     @Autowired
     MessageSource messageSource;
 
+    /**
+     * Método que se llama al entrar a la opción de menu "Recepción Mx Vigilancia". Se encarga de inicializar las listas para realizar la búsqueda de envios de Mx
+     * @param request para obtener información de la petición del cliente
+     * @return ModelAndView
+     * @throws Exception
+     */
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
-        String urlValidacion="";
+        String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
             //si la url esta vacia significa que la validación del login fue exitosa
@@ -118,10 +125,16 @@ public class RecepcionMxController {
         return mav;
     }
 
+    /**
+     * Método que se llama al entrar a la opción de menu "Recepción Mx Laboratorio". Se encarga de inicializar las listas para realizar la búsqueda de envios de Mx
+     * @param request para obtener información de la petición del cliente
+     * @return ModelAndView
+     * @throws Exception
+     */
     @RequestMapping(value = "initLab", method = RequestMethod.GET)
     public ModelAndView initSearchLabForm(HttpServletRequest request) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
-        String urlValidacion="";
+        String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
             //si la url esta vacia significa que la validación del login fue exitosa
@@ -144,10 +157,17 @@ public class RecepcionMxController {
         return mav;
     }
 
+    /***
+     * Método que se llama para crear una Recepción Mx Vigilancia. Setea los datos de la Muestra e inicializa listas y demas controles
+     * @param request para obtener información de la petición del cliente
+     * @param strIdOrden Id de la toma de Muestra a recepcionar
+     * @return ModelAndView
+     * @throws Exception
+     */
     @RequestMapping(value = "create/{strIdOrden}", method = RequestMethod.GET)
     public ModelAndView createReceiptForm(HttpServletRequest request, @PathVariable("strIdOrden")  String strIdOrden) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
-        String urlValidacion="";
+        String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
             //si la url esta vacia significa que la validación del login fue exitosa
@@ -166,7 +186,7 @@ public class RecepcionMxController {
             List<Unidades> unidades = null;
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(tomaMx.getIdTomaMx());
             Date fechaInicioSintomas = null;
-            if (tomaMx!=null) {
+            if (tomaMx.getIdNotificacion()!=null) {
                 unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
             }
@@ -194,10 +214,19 @@ public class RecepcionMxController {
         return mav;
     }
 
+    /**
+     * Método que se llama para crear una Recepción Mx en el Laboratorio. Setea los datos de la recepción e inicializa listas y demas controles.
+     * Además si es la primera vez que se carga el registro se registran ordenes de examen para los examenes configurados por defecto en la tabla
+     * de parámetros según el tipo de notificación, tipo de mx, tipo dx
+     * @param request para obtener información de la petición del cliente
+     * @param strIdRecepcion Id de la recepción general a recepcionar en el laboratorio
+     * @return ModelAndView
+     * @throws Exception
+     */
     @RequestMapping(value = "createLab/{strIdRecepcion}", method = RequestMethod.GET)
     public ModelAndView createReceiptLabForm(HttpServletRequest request, @PathVariable("strIdRecepcion")  String strIdRecepcion) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
-        String urlValidacion="";
+        String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
             //si la url esta vacia significa que la validación del login fue exitosa
@@ -217,7 +246,7 @@ public class RecepcionMxController {
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
             List<Unidades> unidades = null;
             List<Examen_Dx> examenesList = null;
-            List<OrdenExamen> ordenExamenList = null;
+            List<OrdenExamen> ordenExamenList;
             Date fechaInicioSintomas = null;
             if (recepcionMx!=null) {
                 unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
@@ -273,6 +302,12 @@ public class RecepcionMxController {
         return mav;
     }
 
+    /**
+     * Método para realizar la búsqueda de Mx para recepcionar en Mx Vigilancia general
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * @return String con las Mx encontradas
+     * @throws Exception
+     */
     @RequestMapping(value = "searchOrders", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
@@ -282,6 +317,12 @@ public class RecepcionMxController {
         return tomaMxToJson(tomaMxList);
     }
 
+    /**
+     * Método para realizar la búsqueda de Recepcion Mx para recepcionar en laboratorio
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * @return String con las Recepciones encontradas
+     * @throws Exception
+     */
     @RequestMapping(value = "searchOrdersLab", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchOrdersLabJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
@@ -291,16 +332,23 @@ public class RecepcionMxController {
         return RecepcionMxToJson(recepcionMxList);
     }
 
+    /**
+     * Método para registrar una recepción de muestra de vigilancia. Modifica la Mx al estado ESTDMX|RCP
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a agregar
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws ServletException
+     * @throws IOException
+     */
     @RequestMapping(value = "agregarRecepcion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void agregarRecepcion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String json = "";
+        String json;
         String resultado = "";
         String idRecepcion = "";
         String verificaCantTb = "";
         String verificaTipoMx = "";
         String idTomaMx = "";
         String codigoUnicoMx = "";
-        String causaRechazo = "";
+        String causaRechazo;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -372,9 +420,16 @@ public class RecepcionMxController {
         }
     }
 
+    /**
+     * Método para actualizar una recepción de vigilancia indicando que se ha recepcionado en el laboratorio. Modifica la Mx al estado ESTDMX|RCLAB
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a actualizar
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws ServletException
+     * @throws IOException
+     */
     @RequestMapping(value = "receiptLaboratory", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void recepcionLaboratorio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String json = "";
+        String json;
         String resultado = "";
         String idRecepcion = "";
         String causaRechazo = null;
@@ -441,19 +496,30 @@ public class RecepcionMxController {
         }
     }
 
+    /***
+     * Método para recuperar las ordenes de examen registradas para la mx en la recepción.
+     * @param idTomaMx id de la toma mx a obtener ordenes
+     * @return String con las ordenes en formato Json
+     * @throws Exception
+     */
     @RequestMapping(value = "getOrdenesExamen", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
     String getOrdenesExamen(@RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
-        List<OrdenExamen> ordenExamenList = null;
-        ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx);
+        List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx);
         return OrdenesExamenToJson(ordenExamenList);
     }
 
+    /**
+     * Método para anular una orden de examen
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a anular
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws Exception
+     */
     @RequestMapping(value = "anularExamen", method = RequestMethod.POST)
     protected void anularExamen(HttpServletRequest request, HttpServletResponse response) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
-        String urlValidacion="";
+        String urlValidacion;
         String idOrdenExamen = "";
         String json="";
         String resultado = "";
@@ -468,30 +534,32 @@ public class RecepcionMxController {
             e.printStackTrace();
             urlValidacion = "404";
         }
-        if (urlValidacion.isEmpty()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
-            json = br.readLine();
-            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
-            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
-            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
-            if(ordenExamen!=null){
-                ordenExamen.setAnulado(true);
-                try{
-                    ordenExamenMxService.updateOrdenExamen(ordenExamen);
-                }catch (Exception ex){
-                    logger.error("Error al anular orden de examen",ex);
-                 resultado = "Error al anular orden de examen";
-               }
+            if (urlValidacion.isEmpty()) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+                json = br.readLine();
+                JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+                idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+                OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
+                if(ordenExamen!=null){
+                    ordenExamen.setAnulado(true);
+                    try{
+                        ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                    }catch (Exception ex){
+                        logger.error("Error al anular orden de examen",ex);
+                        resultado = messageSource.getMessage("msg.receipt.test.cancel.error2", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
+                   }
+                }else{
+                    throw new Exception(messageSource.getMessage("msg.receipt.test.order.notfound", null, null));
+                }
             }else{
-                throw new Exception("No se encontró el registro de la orden de examen");
+                resultado = messageSource.getMessage("msg.not.have.permission", null, null);
             }
-        }else{
-            resultado = "No tiene permisos para realizar esta operación";
-        }
 
         }catch (Exception ex){
             logger.error("Sucedio un error al anular orden de examen",ex);
-            resultado = "Sucedio un error al anular orden de examen\n"+ex.getMessage();
+            resultado = messageSource.getMessage("msg.receipt.test.cancel.error1", null, null);
+            resultado = resultado + ". \n " + ex.getMessage();
         } finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", idOrdenExamen);
@@ -502,6 +570,13 @@ public class RecepcionMxController {
         }
     }
 
+    /**
+     * Método para agregar una orden de examen para una mx
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a agregar
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws ServletException
+     * @throws IOException
+     */
     @RequestMapping(value = "agregarOrdenExamen", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void agregarOrdenExamen(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
@@ -534,7 +609,7 @@ public class RecepcionMxController {
                 try {
                     ordenExamenMxService.addOrdenExamen(ordenExamen);
                 } catch (Exception ex) {
-                    resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
+                    resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
                     resultado = resultado + ". \n " + ex.getMessage();
                     ex.printStackTrace();
                 }
@@ -542,7 +617,7 @@ public class RecepcionMxController {
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
+            resultado =  messageSource.getMessage("msg.receipt.test.error",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
@@ -558,8 +633,13 @@ public class RecepcionMxController {
         }
     }
 
+    /**
+     * Método que convierte una lista de tomaMx a un string con estructura Json
+     * @param tomaMxList lista con las tomaMx a convertir
+     * @return String
+     */
     private String tomaMxToJson(List<DaTomaMx> tomaMxList){
-        String jsonResponse="";
+        String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         for(DaTomaMx tomaMx : tomaMxList){
@@ -603,6 +683,11 @@ public class RecepcionMxController {
         return jsonResponse;
     }
 
+    /**
+     * Método para convertir una lista de RecepcionMx a un string con estructura Json
+     * @param recepcionMxList lista con las Recepciones a convertir
+     * @return String
+     */
     private String RecepcionMxToJson(List<RecepcionMx> recepcionMxList){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
@@ -651,6 +736,12 @@ public class RecepcionMxController {
         return jsonResponse;
     }
 
+    /**
+     * Método para convertir una lista de Ordenes Examen a un string con estructura Json
+     * @param ordenesExamenList lista con las ordenes de examen a convertir
+     * @return String
+     * @throws UnsupportedEncodingException
+     */
     private String OrdenesExamenToJson(List<OrdenExamen> ordenesExamenList) throws UnsupportedEncodingException {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
@@ -672,6 +763,12 @@ public class RecepcionMxController {
         return escaper.translate(jsonResponse);
     }
 
+    /**
+     * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
+     * @param strJson String con la información de los filtros
+     * @return FiltroMx
+     * @throws Exception
+     */
     private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
         FiltroMx filtroMx = new FiltroMx();
