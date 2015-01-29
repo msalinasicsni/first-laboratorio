@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -32,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by FIRSTICT on 12/10/2014.
+ * Created by Miguel Salinas on 12/10/2014.
+ * V 1.0
  */
 @Controller
 @RequestMapping("sendMxReceipt")
@@ -44,20 +44,12 @@ public class SendMxReceiptController {
     private SeguridadService seguridadService;
 
     @Autowired
-    @Qualifier(value = "usuarioService")
-    private UsuarioService usuarioService;
-
-    @Autowired
     @Qualifier(value = "catalogosService")
     private CatalogoService catalogosService;
 
     @Autowired
     @Qualifier(value = "entidadAdmonService")
     private EntidadAdmonService entidadAdmonService;
-
-    @Autowired
-    @Qualifier(value = "laboratoriosService")
-    private LaboratoriosService laboratoriosService;
 
     @Autowired
     @Qualifier(value = "recepcionMxService")
@@ -72,16 +64,18 @@ public class SendMxReceiptController {
     private AreaService areaService;
 
     @Autowired
-    @Qualifier(value = "unidadesService")
-    private UnidadesService unidadesService;
-
-    @Autowired
     MessageSource messageSource;
 
+    /**
+     * Método que se llama al entrar a la opción de menu "Enviar Mx Recepcionadas". Se encarga de inicializar las listas para realizar la búsqueda de recepcionesMx
+     * @param request para obtener información de la petición del cliente
+     * @return ModelAndView
+     * @throws Exception
+     */
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
         logger.debug("buscar ordenes para recepcion");
-        String urlValidacion="";
+        String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
             //si la url esta vacia significa que la validación del login fue exitosa
@@ -107,6 +101,12 @@ public class SendMxReceiptController {
         return mav;
     }
 
+    /**
+     * Método para realizar la búsqueda de recepcionesMx para enviar a recepción de Mx en laboratorio
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * @return String con las recepcionesMx encontradas
+     * @throws Exception
+     */
     @RequestMapping(value = "searchOrders", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
@@ -116,9 +116,16 @@ public class SendMxReceiptController {
         return RecepcionMxToJson(recepcionMxList);
     }
 
+    /**
+     * Método para enviar una recepción de muestra de vigilancia a recepción en laboratorio que procesa. Modifica la Mx al estado ESTDMX|EPLAB
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a actualizar
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws ServletException
+     * @throws IOException
+     */
     @RequestMapping(value = "sendReceipt", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void sendReceiptLaboratory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String json = "";
+        String json;
         String resultado = "";
         String strOrdenes="";
         Integer cantRecepciones = 0;
@@ -131,8 +138,6 @@ public class SendMxReceiptController {
             strOrdenes = jsonpObject.get("strOrdenes").toString();
             cantRecepciones = jsonpObject.get("cantRecepciones").getAsInt();
 
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
             //Se obtiene estado recepcionado
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
             //se obtiene muestra a recepcionar
@@ -153,7 +158,6 @@ public class SendMxReceiptController {
                         ex.printStackTrace();
                     }
                 }
-                tomaMx = null; //se limpia el objeto
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -173,8 +177,13 @@ public class SendMxReceiptController {
         }
     }
 
+    /**
+     * Método para convertir una lista de RecepcionMx a un string con estructura Json
+     * @param recepcionMxList lista con las Recepciones a convertir
+     * @return String
+     */
     private String RecepcionMxToJson(List<RecepcionMx> recepcionMxList){
-        String jsonResponse="";
+        String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         for(RecepcionMx recepcion : recepcionMxList){
@@ -201,7 +210,7 @@ public class SendMxReceiptController {
             //Si hay persona
             if (recepcion.getTomaMx().getIdNotificacion().getPersona()!=null){
                 /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
+                String nombreCompleto;
                 nombreCompleto = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
                 if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
                     nombreCompleto = nombreCompleto +" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
@@ -235,6 +244,12 @@ public class SendMxReceiptController {
         return escaper.translate(jsonResponse);
     }
 
+    /**
+     * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
+     * @param strJson String con la información de los filtros
+     * @return FiltroMx
+     * @throws Exception
+     */
     private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
         JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
         FiltroMx filtroMx = new FiltroMx();
