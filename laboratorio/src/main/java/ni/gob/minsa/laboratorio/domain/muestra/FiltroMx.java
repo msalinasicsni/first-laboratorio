@@ -19,6 +19,7 @@ public class FiltroMx {
     Date fechaInicioRecepLab;
     Date fechaFinRecepLab;
     Boolean incluirMxInadecuada;
+    String codigoUnicoMx;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -111,4 +112,12 @@ public class FiltroMx {
     public Boolean getIncluirMxInadecuada() { return incluirMxInadecuada; }
 
     public void setIncluirMxInadecuada(Boolean incluirMxInadecuada) { this.incluirMxInadecuada = incluirMxInadecuada; }
+
+    public String getCodigoUnicoMx() {
+        return codigoUnicoMx;
+    }
+
+    public void setCodigoUnicoMx(String codigoUnicoMx) {
+        this.codigoUnicoMx = codigoUnicoMx;
+    }
 }

@@ -646,6 +646,7 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
             map.put("idTomaMx", tomaMx.getIdTomaMx());
+            map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
@@ -697,6 +698,7 @@ public class RecepcionMxController {
             map.put("idRecepcion", recepcion.getIdRecepcion());
             //map.put("idOrdenExamen", ordenExamen.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
+            map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
             //map.put("fechaHoraOrden",DateUtil.DateToString(ordenExamen.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
@@ -781,6 +783,7 @@ public class RecepcionMxController {
         String codUnidadSalud = null;
         String codTipoMx = null;
         String esLab = null;
+        String codigoUnicoMx = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -800,6 +803,8 @@ public class RecepcionMxController {
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
         if (jObjectFiltro.get("esLab") !=null && !jObjectFiltro.get("esLab").getAsString().isEmpty())
             esLab = jObjectFiltro.get("esLab").getAsString();
+        if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
+            codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -815,6 +820,7 @@ public class RecepcionMxController {
             filtroMx.setCodEstado("ESTDMX|EPLAB"); // sólo las enviadas para procesar en laboratorio
             filtroMx.setIncluirMxInadecuada(true);
         }
+        filtroMx.setCodigoUnicoMx(codigoUnicoMx);
 
         return filtroMx;
     }

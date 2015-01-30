@@ -185,6 +185,7 @@ var ReceiptOrders = function () {
                     encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
+                    encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
@@ -203,7 +204,7 @@ var ReceiptOrders = function () {
                             }
                             var actionUrl = parametros.sActionUrl+idLoad;
                             table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                [dataToLoad[i].codigoUnicoMx,dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
@@ -554,6 +555,40 @@ var ReceiptOrders = function () {
                     $('#codExamen').html(html);
                 }
                 $('#codExamen').val('').change();
+            });
+
+            <!-- para buscar código de barra -->
+            var timer;
+            var iniciado=false;
+            var contador;
+            //var codigo;
+            function tiempo(){
+                console.log('tiempo');
+                contador++;
+                if(contador >= 10){
+                    clearInterval(timer);
+                    iniciado = false;
+                    //codigo = $.trim($('#codigo').val());
+                    console.log('consulta con tiempo');
+                    getMxs(false);
+
+                }
+            }
+            $('#txtCodUnicoMx').keypress(function(event){
+                if(!iniciado){
+                    timer    = setInterval(tiempo(),100);
+                    iniciado = true;
+                }
+                contador = 0;
+
+                if (event.keyCode == '13') {
+                    clearInterval(timer);
+                    iniciado = false;
+                    event.preventDefault();
+                    //codigo = $.trim($(this).val());
+                    getMxs(false);
+                    $('#txtCodUnicoMx').val('');
+                }
             });
         }
     };

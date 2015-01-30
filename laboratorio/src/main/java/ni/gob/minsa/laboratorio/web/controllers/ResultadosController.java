@@ -140,7 +140,6 @@ public class ResultadosController {
         String codSilais = null;
         String codUnidadSalud = null;
         String codTipoMx = null;
-        String esLab = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -158,8 +157,6 @@ public class ResultadosController {
             codUnidadSalud = jObjectFiltro.get("codUnidadSalud").getAsString();
         if (jObjectFiltro.get("codTipoMx") != null && !jObjectFiltro.get("codTipoMx").getAsString().isEmpty())
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
-        if (jObjectFiltro.get("esLab") !=null && !jObjectFiltro.get("esLab").getAsString().isEmpty())
-            esLab = jObjectFiltro.get("esLab").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);

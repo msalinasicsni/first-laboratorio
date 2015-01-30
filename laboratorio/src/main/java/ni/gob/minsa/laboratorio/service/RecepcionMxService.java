@@ -180,6 +180,11 @@ public class RecepcionMxService {
         if(filtro.getIncluirMxInadecuada()!=null && filtro.getIncluirMxInadecuada()){
             crit.add(Restrictions.or(Restrictions.isNull("recepcion.calidadMx.codigo")).add(Restrictions.or(Restrictions.ne("recepcion.calidadMx.codigo", "CALIDMX|IDC"))));
         }
+        if(filtro.getCodigoUnicoMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            );
+        }
 
         return crit.list();
     }
