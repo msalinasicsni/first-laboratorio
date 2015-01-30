@@ -190,6 +190,7 @@ public class SendMxReceiptController {
             Map<String, String> map = new HashMap<String, String>();
             //map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
+            map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
             //map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
@@ -260,6 +261,7 @@ public class SendMxReceiptController {
         String codUnidadSalud = null;
         String codTipoMx = null;
         String idAreaProcesa = null;
+        String codigoUnicoMx=null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -275,6 +277,8 @@ public class SendMxReceiptController {
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
         if (jObjectFiltro.get("idArea") != null && !jObjectFiltro.get("idArea").getAsString().isEmpty())
             idAreaProcesa = jObjectFiltro.get("idArea").getAsString();
+        if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
+            codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -285,6 +289,7 @@ public class SendMxReceiptController {
         filtroMx.setIdAreaProcesa(idAreaProcesa);
         filtroMx.setCodEstado("ESTDMX|RCP"); // sólo las recepcionadas
         filtroMx.setIncluirMxInadecuada(true);
+        filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         return filtroMx;
     }
 }

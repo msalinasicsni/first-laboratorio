@@ -36,7 +36,7 @@ var SendOrdersReceipt = function () {
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true,
                 "columns": [
-                    null,null,null,null,null,null,null,null,null,
+                    null,null,null,null,null,null,null,null,null,null,
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -122,7 +122,7 @@ var SendOrdersReceipt = function () {
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),9)).show();
+                    row.child( format(row.data(),10)).show();
                     tr.addClass('shown');
                 }
             } );
@@ -166,6 +166,7 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     encuestaFiltros['idArea'] = $('#codAreaProcesa option:selected').val();
+                    encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
@@ -177,7 +178,7 @@ var SendOrdersReceipt = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona," <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>"]);
                             /*table1.fnAddData(
                                 [dataToLoad[i].areaProcesa+" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
@@ -219,6 +220,7 @@ var SendOrdersReceipt = function () {
                         if (ButtonPressed === opcSi) {
                             bloquearUI(parametros.blockMess);
                             var idOrdenes = {};
+                            console.log(len);
                             //el input hidden debe estar siempre en la primera columna
                             for (var i = 0; i < len; i++) {
                                 //var texto = aSelectedTrs[i].cells[7].innerHTML;
@@ -325,6 +327,39 @@ var SendOrdersReceipt = function () {
                 }
                 $('#codUnidadSalud').val('').change();
                 unBlockUI();
+            });
+            <!-- para buscar código de barra -->
+            var timer;
+            var iniciado=false;
+            var contador;
+            //var codigo;
+            function tiempo(){
+                console.log('tiempo');
+                contador++;
+                if(contador >= 10){
+                    clearInterval(timer);
+                    iniciado = false;
+                    //codigo = $.trim($('#codigo').val());
+                    console.log('consulta con tiempo');
+                    getOrders(false);
+
+                }
+            }
+            $('#txtCodUnicoMx').keypress(function(event){
+                if(!iniciado){
+                    timer    = setInterval(tiempo(),100);
+                    iniciado = true;
+                }
+                contador = 0;
+
+                if (event.keyCode == '13') {
+                    clearInterval(timer);
+                    iniciado = false;
+                    event.preventDefault();
+                    //codigo = $.trim($(this).val());
+                    getOrders(false);
+                    $('#txtCodUnicoMx').val('');
+                }
             });
         }
     };
