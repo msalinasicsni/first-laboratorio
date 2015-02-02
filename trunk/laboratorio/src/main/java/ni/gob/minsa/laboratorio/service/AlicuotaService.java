@@ -36,4 +36,5 @@ public class AlicuotaService {
         q.setParameter("idAlicuota",idAlicuota);
         return (Alicuota)q.uniqueResult();
     }
+
 }

@@ -81,6 +81,13 @@ public class OrdenExamenMxService {
         return q.list();
     }
 
+    public List<OrdenExamen> getOrdenesExamenNoAnuladasByCodigoUnico(String codigoUnico){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.codigoUnicoMx =:codigoUnico and oe.anulado = false ");
+        q.setParameter("codigoUnico",codigoUnico);
+        return q.list();
+    }
+
     public List<OrdenExamen> getOrdenesExamenNoAnuladasByIdMx(String idTomaMx){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.idTomaMx =:idTomaMx and oe.anulado = false ");

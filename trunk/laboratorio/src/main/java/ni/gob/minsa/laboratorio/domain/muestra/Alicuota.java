@@ -2,7 +2,10 @@ package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 
@@ -12,24 +15,26 @@ import javax.persistence.*;
 @Entity
 @Table(name = "alicuotas_mx", schema = "laboratorio")
 public class Alicuota {
-    int idAlicuota;
+    Integer idAlicuota;
     String alicuota;
     Float volumen;
     String etiquetaPara;
-    int cantidad;
-    int dia;
+    Integer cantidad;
+    Integer dia;
     TipoMx tipoMuestra;
-    TipoRecepcionMx tipoRecepcionMx;
     TipoNotificacion tipoNotificacion;
+    TipoRecepcionMx tipoRecepcionMx;
+    TipoEstudio tipoEstudio;
+
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "ID_ALICUOTA", nullable = false, updatable = true, insertable = true, precision = 0)
-    public int getIdAlicuota() {
+    public Integer getIdAlicuota() {
         return idAlicuota;
     }
 
-    public void setIdAlicuota(int idAlicuota) {
+    public void setIdAlicuota(Integer idAlicuota) {
         this.idAlicuota = idAlicuota;
     }
 
@@ -63,25 +68,26 @@ public class Alicuota {
     }
 
     @Column(name = "CANTIDAD", nullable = false, length = 2)
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 
     @Column(name = "DIA", nullable = true, length = 2)
-    public int getDia() {
+    public Integer getDia() {
         return dia;
     }
 
-    public void setDia(int dia) {
+    public void setDia(Integer dia) {
         this.dia = dia;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = false)
-    @JoinColumn(name = "TIPO_MUESTRA", referencedColumnName = "CODIGO", nullable = false)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "TIPO_MUESTRA", referencedColumnName = "ID_TIPOMX", nullable = false)
     @ForeignKey(name = "ALICUOTA_TIPOMX_FK")
     public TipoMx getTipoMuestra() {
         return tipoMuestra;
@@ -90,6 +96,18 @@ public class Alicuota {
     public void setTipoMuestra(TipoMx tipoMuestra) {
         this.tipoMuestra = tipoMuestra;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
+    @JoinColumn(name = "TIPO_NOTIFICACION", referencedColumnName = "CODIGO", nullable = false)
+    @ForeignKey(name = "ALICUOTA_TIPONOTI_FK")
+    public TipoNotificacion getTipoNotificacion() {
+        return tipoNotificacion;
+    }
+
+    public void setTipoNotificacion(TipoNotificacion tipoNotificacion) {
+        this.tipoNotificacion = tipoNotificacion;
+    }
+
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
     @JoinColumn(name = "TIPO_RECEPCION", referencedColumnName = "CODIGO", nullable = false)
@@ -103,13 +121,9 @@ public class Alicuota {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
-    @JoinColumn(name = "TIPO_NOTIFICACION", referencedColumnName = "CODIGO", nullable = false)
-    @ForeignKey(name = "ALICUOTA_TIPONOTI_FK")
-    public TipoNotificacion getTipoNotificacion() {
-        return tipoNotificacion;
-    }
+    @JoinColumn(name = "TIPO_ESTUDIO", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "ALICUOTA_TIPOEST_FK")
+    public TipoEstudio getTipoEstudio() { return tipoEstudio; }
 
-    public void setTipoNotificacion(TipoNotificacion tipoNotificacion) {
-        this.tipoNotificacion = tipoNotificacion;
-    }
+    public void setTipoEstudio(TipoEstudio tipoEstudio) { this.tipoEstudio = tipoEstudio; }
 }
