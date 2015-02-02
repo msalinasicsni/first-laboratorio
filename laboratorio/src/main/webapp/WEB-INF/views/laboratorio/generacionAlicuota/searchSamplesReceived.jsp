@@ -8,9 +8,17 @@
 <!-- BEGIN HEAD -->
 <head>
     <jsp:include page="../../fragments/headTag.jsp" />
+    <spring:url value="/resources/img/plus.png" var="plus"/>
+    <spring:url value="/resources/img/minus.png" var="minus"/>
     <style>
-        textarea {
-            resize: none;
+
+
+        td.details-control {
+            background: url("${plus}") no-repeat center center;
+            cursor: pointer;
+        }
+        tr.shown td.details-control {
+            background: url("${minus}") no-repeat center center;
         }
     </style>
 </head>
@@ -105,13 +113,15 @@
                     <!-- end widget edit box -->
                     <!-- widget content -->
                     <div class="widget-body no-padding">
+                        <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.receipt.send.dx.date"/>"/>
+                        <input id="text_dx" type="hidden" value="<spring:message code="lbl.receipt.send.dx"/>"/>
                         <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                         <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                         <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                         <form id="searchOrders-form" class="smart-form" autocomplete="off">
                             <fieldset>
                                 <div class="row">
-                                    <section class="col col-sm-12 col-md-12 col-lg-5">
+                                    <section class="col col-sm-12 col-md-12 col-lg-4">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.receipt.person.name" />
                                         </label>
@@ -120,7 +130,7 @@
                                             <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.receipt.name"/></b>
                                         </label>
                                     </section>
-                                    <section class="col col-sm-6 col-md-3 col-lg-3">
+                                    <section class="col col-sm-6 col-md-3 col-lg-4">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.start.date.lab.reception" />
                                         </label>
@@ -132,7 +142,7 @@
                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receiptlab.startdate"/></b>
                                         </label>
                                     </section>
-                                    <section class="col col-sm-6 col-md-3 col-lg-3">
+                                    <section class="col col-sm-6 col-md-3 col-lg-4">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.end.date.lab.reception" />
                                         </label>
@@ -224,15 +234,14 @@
                             <thead>
                             <tr>
                                 <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
-                                <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
-                                <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.send.dateTime"/></th>
-                                <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
+                                <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
+                                <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
                                 <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.date.lab"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>
-                                <th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                 <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                <th><spring:message code="lbl.dx"/></th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -315,7 +324,7 @@
 <c:url var="ordersUrl" value="/generacionAlicuota/search"/>
 
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-<c:url var="sCreateReceiptUrl" value="/recepcionMx/createLab/"/>
+<c:url var="generateAliquot" value="/generacionAlicuota/create/"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
@@ -323,7 +332,7 @@
             sOrdersUrl : "${ordersUrl}",
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}",
-            sActionUrl : "${sCreateReceiptUrl}"
+            sActionUrl : "${generateAliquot}"
         };
         ReceiptLabOrders.init(parametros);
 

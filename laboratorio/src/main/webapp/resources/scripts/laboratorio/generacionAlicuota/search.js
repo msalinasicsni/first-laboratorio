@@ -35,7 +35,16 @@ var ReceiptLabOrders = function () {
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
                     "t"+
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true, //"T<'clear'>"+
+                "autoWidth" : true,
+                "columns": [
+                    null,null,null,null,null,null,null,null,
+                    {
+                        "className":      'details-control',
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": ''
+                    }, null
+                ],
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -90,38 +99,39 @@ var ReceiptLabOrders = function () {
             }
 
             function getOrders(showAll) {
-                var encuestaFiltros = {};
+                var filtros = {};
                 if (showAll){
-                    encuestaFiltros['nombreApellido'] = '';
-                    encuestaFiltros['fecInicioRecepcionLab'] = '';
-                    encuestaFiltros['fecFinRecepcionLab'] = '';
-                    encuestaFiltros['codSilais'] = '';
-                    encuestaFiltros['codUnidadSalud'] = '';
-                    encuestaFiltros['codTipoMx'] = '';
+                    filtros['nombreApellido'] = '';
+                    filtros['fecInicioRecepcionLab'] = '';
+                    filtros['fecFinRecepcionLab'] = '';
+                    filtros['codSilais'] = '';
+                    filtros['codUnidadSalud'] = '';
+                    filtros['codTipoMx'] = '';
 
                 }else {
-                    encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    encuestaFiltros['fecInicioRecepcionLab'] = $('#fecInicioRecepcionLab').val();
-                    encuestaFiltros['fecFinRecepcionLab'] = $('#fecFinRecepcionLab').val();
-                    encuestaFiltros['codSilais'] = $('#codSilais option:selected').val();
-                    encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
-                    encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
+                    filtros['nombreApellido'] = $('#txtfiltroNombre').val();
+                    filtros['fecInicioRecepcionLab'] = $('#fecInicioRecepcionLab').val();
+                    filtros['fecFinRecepcionLab'] = $('#fecFinRecepcionLab').val();
+                    filtros['codSilais'] = $('#codSilais option:selected').val();
+                    filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
+                    filtros['codTipoMx'] = $('#codTipoMx option:selected').val();
+                    filtros['fecFinRecepcionLab'] = $('#fec').val();
 
                 }
                 blockUI();
                 $.getJSON(parametros.sOrdersUrl, {
-                    strFilter: JSON.stringify(encuestaFiltros),
+                    strFilter: JSON.stringify(filtros),
                     ajax : 'true'
                 }, function(dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idOrdenExamen
+                            var actionUrl = parametros.sActionUrl + dataToLoad[i].codigoUnicoMx;
 
                             table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                [dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>", '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
                     }else{
@@ -144,6 +154,41 @@ var ReceiptLabOrders = function () {
             $("#all-orders").click(function() {
                 getOrders(true);
             });
+
+            /*PARA MOSTRAR TABLA DETALLE DX*/
+            function format (d,indice) {
+                // `d` is the original data object for the row
+                var texto = d[indice]; //indice donde esta el input hidden
+                var diagnosticos = $(texto).val();
+                var json =JSON.parse(diagnosticos);
+                var len = Object.keys(json).length;
+                var childTable = '<table style="padding-left:50px;">'+
+                    '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td></tr>';
+                for (var i = 1; i <= len; i++) {
+                    childTable =childTable +
+                        '<tr></tr><td>'+json[i].nombre+'</td>'+
+                        '<td>'+json[i].fechaSolicitud+'</td></tr>';
+                }
+                childTable = childTable + '</table>';
+                return childTable;
+            }
+
+            $('#orders_result tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table1.api().row(tr);
+                if ( row.child.isShown() ) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else {
+                    // Open this row
+                    row.child( format(row.data(),8)).show();
+                    tr.addClass('shown');
+                }
+            } );
+
+            //FIN
 
 
             <!-- al seleccionar SILAIS -->
