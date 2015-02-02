@@ -189,4 +189,13 @@ public class TomaMxService {
         q.setString("tipoNoti", tipoNoti);
         return q.list();
     }
+
+    public DaTomaMx getTomaMxByCodUnicoMx(String codigoUnicoMx){
+        String query = "from DaTomaMx as a where codigoUnicoMx= :codigoUnicoMx";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codigoUnicoMx", codigoUnicoMx);
+        return  (DaTomaMx)q.uniqueResult();
+    }
 }
