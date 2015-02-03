@@ -37,7 +37,7 @@ var ReceiptLabOrders = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth" : true,
                 "columns": [
-                    null,null,null,null,null,null,null,null,
+                    null,null,null,null,null,null,null,null,null,
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -116,6 +116,7 @@ var ReceiptLabOrders = function () {
                     filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     filtros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     filtros['fecFinRecepcionLab'] = $('#fec').val();
+                    filtros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
 
                 }
                 blockUI();
@@ -130,7 +131,7 @@ var ReceiptLabOrders = function () {
                             var actionUrl = parametros.sActionUrl + dataToLoad[i].codigoUnicoMx;
 
                             table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
+                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>", '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
@@ -183,7 +184,7 @@ var ReceiptLabOrders = function () {
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),8)).show();
+                    row.child( format(row.data(),9)).show();
                     tr.addClass('shown');
                 }
             } );
@@ -216,6 +217,40 @@ var ReceiptLabOrders = function () {
                 }
                 $('#codUnidadSalud').val('').change();
                 unBlockUI();
+            });
+
+            <!-- para buscar código de barra -->
+            var timer;
+            var iniciado=false;
+            var contador;
+            //var codigo;
+            function tiempo(){
+                console.log('tiempo');
+                contador++;
+                if(contador >= 10){
+                    clearInterval(timer);
+                    iniciado = false;
+                    //codigo = $.trim($('#codigo').val());
+                    console.log('consulta con tiempo');
+                    getMxs(false);
+
+                }
+            }
+            $('#txtCodUnicoMx').keypress(function(event){
+                if(!iniciado){
+                    timer    = setInterval(tiempo(),100);
+                    iniciado = true;
+                }
+                contador = 0;
+
+                if (event.keyCode == '13') {
+                    clearInterval(timer);
+                    iniciado = false;
+                    event.preventDefault();
+                    //codigo = $.trim($(this).val());
+                    getMxs(false);
+                    $('#txtCodUnicoMx').val('');
+                }
             });
 
 
