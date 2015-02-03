@@ -193,6 +193,9 @@
                             <th data-hide="phone"><i
                                     class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i>
                                 <spring:message code="lbl.volume"/></th>
+                            <th data-hide="phone"><i
+                                    class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i>
+                                <spring:message code="lbl.receipt.test"/></th>
                             <th></th>
                         </tr>
                         </thead>

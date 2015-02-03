@@ -40,7 +40,7 @@ var GenerateAliquot  = function () {
             var aliquotsTable = $('#aliquots-list').dataTable({
 
 
-                "pageLength": 2,
+                "pageLength": 10,
 
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
                     "T"+
@@ -159,7 +159,6 @@ var GenerateAliquot  = function () {
                                 });
                                 aliqObj['etiqueta'] = $('#etiqueta').val('').change();
                                 aliqObj['volumen'] = $('#volumen').val('');
-                                 aliqObj['idOrden'] = $('#idOrden').val('');
                             }
                             unBlockUI();
                         },
@@ -219,7 +218,7 @@ var GenerateAliquot  = function () {
                         var idDiv = "divBarcode" + i;
 
                         aliquotsTable.fnAddData(
-                            ['<div  id="' + idDiv + '"></div>', data[i].idAlicuota,  data[i].alicuotaCatalogo.etiquetaPara, data[i].volumen, '<a href=' + overrideUrl + ' class="btn btn-default btn-xs btn-danger"><i class="fa fa-times"></i></a>']);
+                            ['<div  id="' + idDiv + '"></div>', data[i].idAlicuota,  data[i].alicuotaCatalogo.etiquetaPara, data[i].volumen, data[i].idOrden.codExamen.nombre,  '<a href=' + overrideUrl + ' class="btn btn-default btn-xs btn-danger"><i class="fa fa-times"></i></a>']);
 
                         $('#' + idDiv + '').html("").show().barcode(data[i].idAlicuota, "datamatrix", settings);
 
