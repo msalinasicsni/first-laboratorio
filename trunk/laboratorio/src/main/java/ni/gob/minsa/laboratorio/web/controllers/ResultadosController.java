@@ -8,6 +8,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +50,8 @@ public class ResultadosController {
     private TomaMxService tomaMxService;
 
     @Autowired
-    @Qualifier(value = "ordenExamenMxService")
-    private OrdenExamenMxService ordenExamenMxService;
+    @Qualifier(value = "alicuotaService")
+    private AlicuotaService alicuotaService;
 
     @Autowired
     @Qualifier(value = "unidadesService")
@@ -103,7 +104,7 @@ public class ResultadosController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrden);
+            OrdenExamen ordenExamen = null; //ordenExamenMxService.getOrdenExamenById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Unidades> unidades = null; //unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
@@ -125,8 +126,8 @@ public class ResultadosController {
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
-        List<OrdenExamen> ordenExamenList = null; //ordenExamenMxService.getTomaMxByFiltro(filtroMx);
-        return OrdenesExamenToJson(ordenExamenList);
+        List<AlicuotaRegistro> ordenExamenList = alicuotaService.getAlicutoasByFiltro(filtroMx);
+        return RegistroAlicuotaToJson(ordenExamenList);
     }
 
     private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
@@ -140,6 +141,7 @@ public class ResultadosController {
         String codSilais = null;
         String codUnidadSalud = null;
         String codTipoMx = null;
+        String codigoUnicoMx = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -157,6 +159,8 @@ public class ResultadosController {
             codUnidadSalud = jObjectFiltro.get("codUnidadSalud").getAsString();
         if (jObjectFiltro.get("codTipoMx") != null && !jObjectFiltro.get("codTipoMx").getAsString().isEmpty())
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
+        if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
+            codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -166,44 +170,48 @@ public class ResultadosController {
         filtroMx.setFechaFinRecep(fechaFinRecep);
         filtroMx.setNombreApellido(nombreApellido);
         filtroMx.setCodTipoMx(codTipoMx);
-        filtroMx.setCodEstado("ESTORDEN|RCLAB"); // sólo las recepcionadas en laboratorio
+        filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las recepcionadas en laboratorio
+        filtroMx.setCodigoUnicoMx(codigoUnicoMx);
 
         return filtroMx;
     }
 
-    private String OrdenesExamenToJson(List<OrdenExamen> ordenExamenList){
+    private String RegistroAlicuotaToJson(List<AlicuotaRegistro> alicuotaRegistros){
         String jsonResponse="";
-        /*Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-        for(DaOrdenExamen orden:ordenExamenList){
+        for(AlicuotaRegistro alicuota :alicuotaRegistros){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idOrdenExamen",orden.getIdOrdenExamen());
-            map.put("idTomaMx",orden.getIdTomaMx().getIdTomaMx());
-            map.put("fechaHoraOrden",DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(orden.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais",orden.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud",orden.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            map.put("estadoOrden",orden.getCodEstado().getValor());
-            map.put("separadaMx",(orden.getIdTomaMx().getMxSeparada()!=null?(orden.getIdTomaMx().getMxSeparada()?"Si":"No"):""));
-            map.put("cantidadTubos", (orden.getIdTomaMx().getCanTubos()!=null?String.valueOf(orden.getIdTomaMx().getCanTubos()):""));
-            map.put("tipoMuestra",orden.getIdTomaMx().getCodTipoMx().getNombre());
-            map.put("tipoExamen",orden.getCodExamen().getNombre());
+            map.put("idAlicuota", alicuota.getIdAlicuota());
+            map.put("idOrdenExamen", alicuota.getIdOrden().getIdOrdenExamen());
+            map.put("idTomaMx", alicuota.getCodUnicoMx().getIdTomaMx());
+            map.put("codigoUnicoMx", alicuota.getCodUnicoMx().getCodigoUnicoMx());
+            map.put("etiquetaPara", alicuota.getAlicuotaCatalogo().getEtiquetaPara());
+            map.put("volumen", String.valueOf(alicuota.getVolumen()));
+            map.put("fechaHoraOrden",DateUtil.DateToString(alicuota.getIdOrden().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("examen", alicuota.getIdOrden().getCodExamen().getNombre());
+            map.put("fechaHoraDx",DateUtil.DateToString(alicuota.getIdOrden().getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("tipoDx", alicuota.getIdOrden().getSolicitudDx().getCodDx().getNombre());
+            map.put("fechaTomaMx",DateUtil.DateToString(alicuota.getCodUnicoMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("codSilais", alicuota.getCodUnicoMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+            map.put("codUnidadSalud", alicuota.getCodUnicoMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            map.put("tipoMuestra", alicuota.getCodUnicoMx().getCodTipoMx().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(alicuota.getCodUnicoMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
-            if (orden.getIdTomaMx().getIdNotificacion().getPersona()!=null){
+            if (alicuota.getCodUnicoMx().getIdNotificacion().getPersona()!=null){
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto = "";
-                nombreCompleto = orden.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+orden.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ orden.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                nombreCompleto = alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getPrimerNombre();
+                if (alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                    nombreCompleto = nombreCompleto +" "+ alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto+" "+ alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getPrimerApellido();
+                if (alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                    nombreCompleto = nombreCompleto +" "+ alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
             }else{
                 map.put("persona"," ");
@@ -212,8 +220,10 @@ public class ResultadosController {
             mapResponse.put(indice, map);
             indice ++;
         }
-        jsonResponse = new Gson().toJson(mapResponse);*/
-        return jsonResponse;
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
     }
 
     @RequestMapping(value = "printBC/{strBarCodes}", method = RequestMethod.GET)

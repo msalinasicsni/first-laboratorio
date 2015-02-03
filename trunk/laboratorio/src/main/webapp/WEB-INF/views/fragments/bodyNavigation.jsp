@@ -79,6 +79,20 @@
                     </li>
                 </ul>
             </li>
+            <li class="administracion">
+                <a href="#" title="<spring:message code="menu.administration" />"><i class="fa fa-lg fa-fw fa-cogs"></i> <span class="menu-item-parent"><spring:message code="menu.administration" /></span></a>
+                <ul>
+                    <li class="catalogos">
+                        <a href="<spring:url value="/administracion/catalogo/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.catalog" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.admin.catalog" /></a>
+                    </li>
+                    <li class="tipoDatos">
+                        <a href="<spring:url value="/administracion/tipoDato/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.datatipe" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.datatipe" /></a>
+                    </li>
+                    <li class="conceptos">
+                        <a href="<spring:url value="/administracion/concepto/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.concept" /></a>
+                    </li>
+                </ul>
+            </li>
             <li>
                 <a href="<spring:url value="/logout" htmlEscape="true "/>"> <i class="fa fa-lg fa-fw fa-sign-out"></i> <span class="menu-item-parent"><spring:message code="menu.logout" /></span></a>
             </li>

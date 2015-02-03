@@ -60,7 +60,7 @@ var IncomeResult = function () {
     				submitHandler: function (form) {
                         table1.fnClearTable();
                         //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                        getOrders(false)
+                        getAlicuotas(false)
                     }
             });
             <!-- formulario de recepción en laboratorio -->
@@ -108,7 +108,7 @@ var IncomeResult = function () {
                 setTimeout($.unblockUI, 500);
             }
 
-            function getOrders(showAll) {
+            function getAlicuotas(showAll) {
                 var encuestaFiltros = {};
                 if (showAll){
                     encuestaFiltros['nombreApellido'] = '';
@@ -126,6 +126,7 @@ var IncomeResult = function () {
                     encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
+                    encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
@@ -143,17 +144,9 @@ var IncomeResult = function () {
                                 idLoad = dataToLoad[i].idOrdenExamen;
                             }
                             var actionUrl = parametros.sActionUrl+idLoad;
-                            /*table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra +" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].edad,'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            */
                             table1.fnAddData(
-                                [dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                [dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara, dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx ,dataToLoad[i].fechaInicioSintomas,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            /*table1.fnAddData(
-                                [dataToLoad[i].fechaHOrden, '', dataToLoad[i].idTomaMx.fechaHTomaMx, dataToLoad[i].idTomaMx.idNotificacion.codSilaisAtencion.nombre, dataToLoad[i].idTomaMx.idNotificacion.codUnidadAtencion.nombre,
-                                    dataToLoad[i].idTomaMx.idNotificacion.persona.primerNombre, dataToLoad[i].codEstado.valor, "<input type='hidden' id='idOrden"+i+"' value='"+dataToLoad[i].idOrdenExamen+"'/>"]);
-                            */
                         }
                     }else{
                         $.smallBox({
@@ -173,7 +166,7 @@ var IncomeResult = function () {
             }
 
             $("#all-orders").click(function() {
-                getOrders(true);
+                getAlicuotas(true);
             });
 
             <!-- para guardar recepción en laboratorio -->
@@ -268,6 +261,40 @@ var IncomeResult = function () {
                     }
                 }else{
                     $("#divSerotipo").hide();
+                }
+            });
+
+            <!-- para buscar código de barra -->
+            var timer;
+            var iniciado=false;
+            var contador;
+            //var codigo;
+            function tiempo(){
+                console.log('tiempo');
+                contador++;
+                if(contador >= 10){
+                    clearInterval(timer);
+                    iniciado = false;
+                    //codigo = $.trim($('#codigo').val());
+                    console.log('consulta con tiempo');
+                    getAlicuotas(false);
+
+                }
+            }
+            $('#txtCodUnicoMx').keypress(function(event){
+                if(!iniciado){
+                    timer    = setInterval(tiempo(),100);
+                    iniciado = true;
+                }
+                contador = 0;
+
+                if (event.keyCode == '13') {
+                    clearInterval(timer);
+                    iniciado = false;
+                    event.preventDefault();
+                    //codigo = $.trim($(this).val());
+                    getAlicuotas(false);
+                    $('#txtCodUnicoMx').val('');
                 }
             });
         }
