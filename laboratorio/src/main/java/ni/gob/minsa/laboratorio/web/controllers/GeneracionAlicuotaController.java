@@ -181,6 +181,7 @@ public class GeneracionAlicuotaController {
         String codSilais = null;
         String codUnidadSalud = null;
         String codTipoMx = null;
+        String codigoUnicoMx = null;
 
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
@@ -195,6 +196,8 @@ public class GeneracionAlicuotaController {
             codUnidadSalud = jObjectFiltro.get("codUnidadSalud").getAsString();
         if (jObjectFiltro.get("codTipoMx") != null && !jObjectFiltro.get("codTipoMx").getAsString().isEmpty())
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
+        if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
+            codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -204,6 +207,7 @@ public class GeneracionAlicuotaController {
         filtroMx.setCodTipoMx(codTipoMx);
         filtroMx.setCodEstado("ESTDMX|RCLAB"); // recepcionadas en lab
         filtroMx.setIncluirMxInadecuada(true);
+        filtroMx.setCodigoUnicoMx(codigoUnicoMx);
 
         return filtroMx;
     }
