@@ -70,9 +70,6 @@ public class GeneracionAlicuotaController {
     @Resource(name = "usuarioService")
     private UsuarioService usuarioService;
 
-   @Resource(name = "catalogosService")
-    private CatalogoService catalogosService;
-
     @Resource(name= "alicuotaService")
     private AlicuotaService alicuotaService;
 

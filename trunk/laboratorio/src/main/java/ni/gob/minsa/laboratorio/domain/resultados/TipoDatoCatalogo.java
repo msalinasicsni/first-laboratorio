@@ -7,8 +7,8 @@ import javax.persistence.*;
 
 @NamedQueries({
         @NamedQuery(
-                name = "getTipoDato",
-                query = "select tpdato from TipoDatoCatalogo tpdato where tpdato.codigo = :pCodigo"
+                name = "getTipoDatoCatalogo",
+                query = "select cat from TipoDatoCatalogo cat where cat.codigo = :pCodigo"
         )
 })
 
@@ -20,7 +20,7 @@ import javax.persistence.*;
 @DiscriminatorValue(value = "TPDATO")
 public class TipoDatoCatalogo extends Catalogo {
 
-    private static final long serialVersionUID = 6222112588070443487L;
+    private static final long serialVersionUID = 215694335378247572L;
 
     public TipoDatoCatalogo() {
     }

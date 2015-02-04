@@ -24,7 +24,7 @@ import java.util.List;
 @Transactional
 public class GeneracionAlicuotaService {
 
-    private Logger logger = LoggerFactory.getLogger(CatalogoService.class);
+    private Logger logger = LoggerFactory.getLogger(GeneracionAlicuotaService.class);
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;

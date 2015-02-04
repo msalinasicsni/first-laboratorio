@@ -3,25 +3,23 @@ package ni.gob.minsa.laboratorio.domain.resultados;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
-import org.joda.time.DateTime;
-
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.io.Serializable;
 
 /**
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "tipodato", schema = "laboratorio")
+@Table(name = "tipo_dato", schema = "laboratorio")
 public class TipoDato implements Serializable {
 
     Integer idTipoDato;
     String nombre;
     boolean pasivo;
     TipoDatoCatalogo tipo;
-    CatalogoLista catalogoLista;
     Usuarios usuarioRegistro;
-    DateTime fechahRegistro;
+    Timestamp fechahRegistro;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -57,8 +55,8 @@ public class TipoDato implements Serializable {
 
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
-    @JoinColumn(name = "COD_TIPO_DATO", referencedColumnName = "CODIGO", nullable = true)
-    @ForeignKey(name = "COD_DATO_FK")
+    @JoinColumn(name = "TIPO_DATO_CATALOGO", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "TPDATO_FK")
     public TipoDatoCatalogo getTipo() {
         return tipo;
     }
@@ -67,17 +65,6 @@ public class TipoDato implements Serializable {
         this.tipo = tipo;
     }
 
-
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
-    @JoinColumn(name = "COD_LISTA", referencedColumnName = "CODIGO", nullable = true)
-    @ForeignKey(name = "COD_LISTA_FK")
-    public CatalogoLista getCatalogoLista() {
-        return catalogoLista;
-    }
-
-    public void setCatalogoLista(CatalogoLista catalogoLista) {
-        this.catalogoLista = catalogoLista;
-    }
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "USUARIO_ID")
@@ -92,11 +79,13 @@ public class TipoDato implements Serializable {
 
     @Basic
     @Column(name = "FECHAH_REGISTRO", nullable = false, insertable = true, updatable = false)
-    public DateTime getFechahRegistro() {
+    public Timestamp getFechahRegistro() {
         return fechahRegistro;
     }
 
-    public void setFechahRegistro(DateTime fechahRegistro) {
+    public void setFechahRegistro(Timestamp fechahRegistro) {
         this.fechahRegistro = fechahRegistro;
     }
+
+
 }
