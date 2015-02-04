@@ -6,7 +6,6 @@ import ni.gob.minsa.laboratorio.domain.irag.*;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.persona.*;
-import ni.gob.minsa.laboratorio.domain.resultados.CatalogoLista;
 import ni.gob.minsa.laboratorio.domain.resultados.TipoDatoCatalogo;
 import ni.gob.minsa.laboratorio.domain.vih.*;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.Animales;
@@ -310,21 +309,11 @@ public class CatalogoService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<CatalogoLista> getCatalogoLista(){
-        //Retrieve session Hibernate
-        Session session = sessionFactory.getCurrentSession();
-        //Create a hibernate query (HQL)
-        Query query = session.createQuery("FROM CatalogoLista cat where cat.pasivo = false order by orden");
-        //Retrieve all
-        return query.list();
-    }
-
-    @SuppressWarnings("unchecked")
     public List<TipoDatoCatalogo> getTipoDatoCatalogo(){
         //Retrieve session Hibernate
         Session session = sessionFactory.getCurrentSession();
         //Create a hibernate query (HQL)
-        Query query = session.createQuery("FROM TipoDatoCatalogo tp where tp.pasivo = false order by orden");
+        Query query = session.createQuery("FROM TipoDatoCatalogo cat where cat.pasivo = false order by orden");
         //Retrieve all
         return query.list();
     }
@@ -965,21 +954,13 @@ public class CatalogoService {
         return (CalidadMx) query.uniqueResult();
     }
 
-    public TipoDatoCatalogo getTipoDatoCatalogo(String codigo){
-     //Retrieve session from Hibernate
-        Session session = sessionFactory.getCurrentSession();
-        //Create a hibernate query (HQL)
-        Query query = session.getNamedQuery("getTipoDato").setString("pCodigo", codigo);
-        //Retrieve all
-        return  (TipoDatoCatalogo) query.uniqueResult();
-    }
 
-    public CatalogoLista getCatalogoLista(String codigo){
+    public TipoDatoCatalogo getTipoDatoCatalogo(String codigo){
         //Retrieve session from Hibernate
         Session session = sessionFactory.getCurrentSession();
         //Create a hibernate query (HQL)
-        Query query = session.getNamedQuery("getCatalogoLista").setString("pCodigo", codigo);
+        Query query = session.getNamedQuery("getTipoDatoCatalogo").setString("pCodigo", codigo);
         //Retrieve all
-        return  (CatalogoLista) query.uniqueResult();
+        return  (TipoDatoCatalogo) query.uniqueResult();
     }
 }
