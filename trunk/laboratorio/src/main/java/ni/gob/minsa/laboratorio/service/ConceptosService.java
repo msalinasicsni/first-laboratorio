@@ -2,7 +2,9 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
+import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.Conceptos;
+import ni.gob.minsa.laboratorio.domain.resultados.TipoDato;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -84,6 +86,15 @@ public class ConceptosService {
         return q.list();
     }
 
+    public List<Conceptos> getConceptosActivosByExamen(Integer idExamen){
+        String query = "from Conceptos as a where a.idExamen.idExamen = :idExamen and pasivo = false order by orden asc";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idExamen", idExamen);
+        return q.list();
+    }
+
     public Conceptos getConceptoById(Integer idConcepto){
         String query = "from Conceptos as a where idConcepto =:idConcepto";
 
@@ -91,6 +102,17 @@ public class ConceptosService {
         Query q = session.createQuery(query);
         q.setParameter("idConcepto", idConcepto);
         return (Conceptos)q.uniqueResult();
+    }
+
+    public List<Catalogo_Lista> getCatalogoListaConceptoByIdExamen(Integer idExamen) throws Exception {
+        String query = "Select a from Catalogo_Lista as a inner join a.idTipoDato tdl , Conceptos as c inner join c.tipoDato tdc " +
+                "where a.pasivo = false and tdl.idTipoDato = tdc.idTipoDato and c.idExamen.idExamen =:idExamen" +
+                " order by  a.valor";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idExamen",idExamen);
+
+        return q.list();
     }
 
 }

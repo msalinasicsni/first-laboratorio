@@ -26,7 +26,7 @@ public class Catalogo_Lista implements Serializable {
    Timestamp fechaHRegistro;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_CATALOGO_LISTA", nullable = false, insertable = true, updatable = false)
     public Integer getIdCatalogoLista() {
         return idCatalogoLista;

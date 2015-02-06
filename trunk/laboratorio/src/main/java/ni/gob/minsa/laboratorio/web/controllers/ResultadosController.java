@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.resultados.Conceptos;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -54,8 +56,12 @@ public class ResultadosController {
     private AlicuotaService alicuotaService;
 
     @Autowired
-    @Qualifier(value = "unidadesService")
-    private UnidadesService unidadesService;
+    @Qualifier(value = "generacionAlicuotaService")
+    private GeneracionAlicuotaService generacionAlicuotaService;
+
+    @Autowired
+    @Qualifier(value = "conceptosService")
+    private ConceptosService conceptosService;
 
     @Autowired
     MessageSource messageSource;
@@ -89,8 +95,8 @@ public class ResultadosController {
         return mav;
     }
 
-    @RequestMapping(value = "create/{strIdOrden}", method = RequestMethod.GET)
-    public ModelAndView createReceiptForm(HttpServletRequest request, @PathVariable("strIdOrden")  String strIdOrden) throws Exception {
+    @RequestMapping(value = "create/{strIdRegAli}", method = RequestMethod.GET)
+    public ModelAndView createReceiptForm(HttpServletRequest request, @PathVariable("strIdRegAli")  String strIdRegAli) throws Exception {
         logger.debug("buscar ordenes para recepcion");
         String urlValidacion="";
         try {
@@ -104,16 +110,16 @@ public class ResultadosController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            OrdenExamen ordenExamen = null; //ordenExamenMxService.getOrdenExamenById(strIdOrden);
-            List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+            AlicuotaRegistro alicuota =  generacionAlicuotaService.getAliquotById(strIdRegAli);
+            List<Conceptos> conceptosList = conceptosService.getConceptosActivosByExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
+            List<Catalogo_Lista> listas = conceptosService.getCatalogoListaConceptoByIdExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Unidades> unidades = null; //unidadesService.getPrimaryUnitsBySilais(ordenExamen.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
-            Date fechaInicioSintomas = null; //tomaMxService.getFechaInicioSintomas(ordenExamen.getIdTomaMx().getIdNotificacion().getIdNotificacion());
-            mav.addObject("ordenExamen",ordenExamen);
-            mav.addObject("entidades",entidadesAdtvases);
-            mav.addObject("unidades",unidades);
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(alicuota.getCodUnicoMx().getIdNotificacion().getIdNotificacion());
+            mav.addObject("alicuota",alicuota);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
+            mav.addObject("conceptosList", conceptosList);
+            mav.addObject("valoresListas",listas);
             mav.setViewName("resultados/incomeResult");
         }else
             mav.setViewName(urlValidacion);
