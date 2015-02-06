@@ -112,21 +112,6 @@ public class TipoDatoController {
         return dataTypeList;
     }
 
-    /**
-     * Override DataType
-     *
-     * @param idTipoDato the ID of the record
-     *
-     */
-    @RequestMapping(value = "overrideDataType/{idTipoDato}" ,method = RequestMethod.GET )
-    public String overrideDataType(@PathVariable("idTipoDato") Integer idTipoDato, HttpServletRequest request) throws Exception {
-        TipoDato  dataType = tipoDatoService.getDataTypeById(idTipoDato);
-        dataType.setPasivo(true);
-        tipoDatoService.addOrUpdateDataType(dataType);
-        return  "redirect:/tipoDato/init";
-    }
-
-
     @RequestMapping(value = "addUpdateDataType", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void addUpdateDataType(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json = "";
@@ -134,6 +119,7 @@ public class TipoDatoController {
         String nombre = "";
         String tipo = "";
         Integer idTipoDato = null;
+        String pasivo = "";
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
@@ -143,6 +129,10 @@ public class TipoDatoController {
 
             nombre = jsonpObject.get("nombre").getAsString();
             tipo = jsonpObject.get("tipo").getAsString();
+
+            if(!jsonpObject.get("pasivo").getAsString().isEmpty()){
+                pasivo = jsonpObject.get("pasivo").getAsString();
+            }
 
             if(!jsonpObject.get("idTipoDato").getAsString().isEmpty() ){
                 idTipoDato = jsonpObject.get("idTipoDato").getAsInt();
@@ -157,16 +147,29 @@ public class TipoDatoController {
             if(idTipoDato != null){
              dataType = tipoDatoService.getDataTypeById(idTipoDato);
 
+                if(!pasivo.isEmpty()){
+                    dataType.setPasivo(true);
+
+                }else{
+                    dataType.setPasivo(false);
+                }
+
             }else{
              dataType = new TipoDato();
              dataType.setFechahRegistro(new Timestamp(new Date().getTime()));
              dataType.setUsuarioRegistro(usuario);
             }
 
-           dataType.setNombre(nombre);
-           // se obtiene catalago de Tipo lista por el codigo
-            TipoDatoCatalogo cat = catalogoService.getTipoDatoCatalogo(tipo);
-            dataType.setTipo(cat);
+            if(!nombre.isEmpty()){
+                dataType.setNombre(nombre);
+            }
+
+           if(!tipo.isEmpty()){
+               // se obtiene catalago de Tipo lista por el codigo
+               TipoDatoCatalogo cat = catalogoService.getTipoDatoCatalogo(tipo);
+               dataType.setTipo(cat);
+           }
+
             tipoDatoService.addOrUpdateDataType(dataType);
 
         } catch (Exception ex) {
@@ -181,6 +184,7 @@ public class TipoDatoController {
             map.put("mensaje", resultado);
             map.put("tipo", tipo);
             map.put("idTipoDato", "");
+            map.put("pasivo", "");
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

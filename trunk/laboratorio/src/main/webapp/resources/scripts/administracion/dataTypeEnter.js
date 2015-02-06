@@ -40,6 +40,23 @@ var DataTypes  = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth" : true,
 
+                "columns": [
+                    null, null,
+                    {
+                        "className":      'editDataType',
+                        "orderable":      false
+                    },
+                    {
+                        "className":      'addList',
+                        "orderable":      false
+                    },
+
+                    {
+                        "className":      'overrideDataType',
+                        "orderable":      false
+                    }
+                ],
+
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -51,6 +68,22 @@ var DataTypes  = function () {
                 },
                 "drawCallback" : function(oSettings) {
                     responsiveHelper_dt_basic.respond();
+                },
+
+
+                fnDrawCallback : function() {
+
+
+                    $('.editDataType')
+                        .off("click", editDTHandler)
+                        .on("click", editDTHandler);
+                    $('.addList')
+                        .off("click", addListHandler)
+                        .on("click", addListHandler);
+                    $('.overrideDataType')
+                        .off("click", overrideDTHandler)
+                        .on("click", overrideDTHandler);
+
                 }
 
 
@@ -94,7 +127,7 @@ var DataTypes  = function () {
                         .on("click", overrideHandler);
                     $('.editValue')
                         .off("click", editHandler)
-                        .on("click", editHandler)
+                        .on("click", editHandler);
                 }
             });
 
@@ -114,6 +147,44 @@ var DataTypes  = function () {
 
             }
 
+            function overrideDTHandler(){
+                var idTipoDato = $(this.innerHTML).data('id');
+                overrideDataType(idTipoDato)
+
+
+            }
+
+            function editDTHandler(){
+                var data =  $(this.innerHTML).data('id');
+                var detalle = data.split(",");
+
+                $('#idTipoDato').val(detalle[0]);
+                $('#nombre').val(detalle[1]);
+                $('#tipo').val(detalle[2]).change();
+                showModalDataType();
+            }
+
+
+            function showModalDataType(){
+                $("#myModal").modal({
+                    show: true
+                });
+            }
+
+            function showModalValues(){
+                $("#myModal2").modal({
+                    show: true
+                });
+            }
+
+            function addListHandler(){
+                var data =  $(this.innerHTML).data('id');
+                $('#idTipoD').val(data);
+                getValues(data);
+                showModalValues();
+
+            }
+
             function getDataTypes() {
                 $.getJSON(parametros.getDataTypes, {
                     ajax: 'true'
@@ -122,41 +193,30 @@ var DataTypes  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var overrideUrl = parametros.overrideUrl + data[i].idTipoDato;
+                        var btnEditDT = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idTipoDato+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
+                            ' > <i class="fa fa-edit"></i>' ;
+
+                        var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id='+data[i].idTipoDato+' ' +
+                            '> <i class="fa fa-list-ol"></i>';
+
+
+                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-default btn-xs " data-id='+data[i].idTipoDato+' ' +
+                            '> <i class="fa fa-list-ol"></i>';
+
+
+                        var btnOverrideDT = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idTipoDato+' ' +
+                            '> <i class="fa fa-times"></i>';
+
 
                         if(data[i].tipo.valor == "Lista"){
                             dataTypesTable.fnAddData(
-                                [data[i].nombre, data[i].tipo.valor, ' <button type="button" class="btn btn-default btn-xs evento" data-toggle="modal" data-id='+data[i].idTipoDato+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
-                                    ' data-target="#myModal"> <i class="fa fa-edit"></i>'+
-                                    '</button>', ' <button type="button" class="btn btn-default btn-xs ev" data-toggle="modal" data-id='+data[i].idTipoDato+' ' +
-                                    ' data-target="#myModal2"> <i class="fa fa-list-ol"></i>'+
-                                    '</button>', '<a href=' + overrideUrl + ' class="btn btn-default btn-xs btn-danger"><i class="fa fa-times"></i></a>' ]);
+                                [data[i].nombre, data[i].tipo.valor,btnEditDT , btnAddList , btnOverrideDT ]);
                         }else{
                             dataTypesTable.fnAddData(
-                                [data[i].nombre, data[i].tipo.valor, ' <button type="button" class="btn btn-default btn-xs evento" data-toggle="modal" data-id='+data[i].idTipoDato+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
-                                    ' data-target="#myModal"> <i class="fa fa-edit"></i>'+
-                                    '</button>', ' <button type="button" disabled class="btn btn-default btn-xs ev" data-toggle="modal" data-id='+data[i].idTipoDato+' ' +
-                                    ' data-target="#myModal2"> <i class="fa fa-list-ol"></i>'+
-                                    '</button>', '<a href=' + overrideUrl + ' class="btn btn-default btn-xs btn-danger"><i class="fa fa-times"></i></a>' ]);
+                                [data[i].nombre, data[i].tipo.valor, btnEditDT, btnAddListDisabled  ,  btnOverrideDT ]);
                         }
 
                     }
-
-                    $(".evento").on("click", function(){
-                        var data = $(this).data('id');
-                        var detalle = data.split(",");
-
-                        $('#idTipoDato').val(detalle[0]);
-                        $('#nombre').val(detalle[1]);
-                        $('#tipo').val(detalle[2]).change();
-                    });
-
-                    $(".ev").on("click", function(){
-                        var data = $(this).data('id');
-                        $('#idTipoD').val(data);
-                        getValues(data);
-
-                    });
                 })
             }
 
@@ -194,6 +254,7 @@ var DataTypes  = function () {
                 dataTypeObj['nombre'] = $('#nombre').val();
                 dataTypeObj['tipo'] = $('#tipo').val();
                 dataTypeObj['idTipoDato'] = $('#idTipoDato').val();
+                dataTypeObj['pasivo'] = '';
                 $.ajax(
                     {
                         url: parametros.addUpdateUrl,
@@ -376,6 +437,53 @@ var DataTypes  = function () {
                         }
                     });
             }
+
+            function overrideDataType(idTipoDato) {
+                var dataTypeObj = {};
+                dataTypeObj['mensaje'] = '';
+                dataTypeObj['nombre'] = $('#nombre').val();
+                dataTypeObj['tipo'] = $('#tipo').val();
+                dataTypeObj['idTipoDato'] = $('#idTipoDato').val();
+                dataTypeObj['pasivo'] = 'true';
+                blockUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.addUpdateUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(dataTypeObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#disappear").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                               getDataTypes();
+                                var msg = $("#msg_dataType_cancel").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#disappear").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            unBlockUI();
+                        },
+                        error: function (data, status, er) {
+                            unBlockUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
+
         }
 };
 

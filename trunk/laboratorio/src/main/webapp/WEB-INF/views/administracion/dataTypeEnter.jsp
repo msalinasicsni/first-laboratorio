@@ -138,6 +138,7 @@
                         <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.datatype.added"/>"/>
                         <input id="msjSuccessful1" type="hidden" value="<spring:message code="msg.value.added"/>"/>
                         <input id="msg_value_cancel" type="hidden" value="<spring:message code="msg.value.successfully.cancel"/>"/>
+                        <input id="msg_dataType_cancel" type="hidden" value="<spring:message code="msg.dt.successfully.cancel"/>"/>
 
                         <table id="datatypes-records" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>
@@ -176,7 +177,7 @@
                                     &times;
                                 </button>
                                 <h4 class="modal-title">
-                                    <i class="fa-fw fa fa-font"></i>
+                                    <i class="fa-fw fa fa-list"></i>
                                     <spring:message code="lbl.add.edit.datatype" />
                                 </h4>
                             </div>
@@ -364,7 +365,6 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="getDataTypes" value="/tipoDato/getDataTypes"/>
-<c:url var="overrideUrl" value="/tipoDato/overrideDataType/"/>
 <c:url var="addUpdateUrl" value="/tipoDato/addUpdateDataType"/>
 <c:url var="getValues" value="/tipoDato/getValuesCat"/>
 <c:url var="addUpdateValue" value="/tipoDato/addUpdateValue"/>
