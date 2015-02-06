@@ -34,7 +34,7 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("administracion/tipoDato")
+@RequestMapping("tipoDato")
 public class TipoDatoController {
 
     private static final Logger logger = LoggerFactory.getLogger(TipoDatoController.class);
@@ -92,7 +92,9 @@ public class TipoDatoController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             List<TipoDato> dataTypeList =  getDataTypes();
+            List<TipoDatoCatalogo> dataTypeCat = catalogoService.getTipoDatoCatalogo();
             mav.addObject("dataTypeList",dataTypeList);
+            mav.addObject("dataTypeCat",dataTypeCat);
             mav.setViewName("administracion/dataTypeEnter");
         }else
             mav.setViewName(urlValidacion);
@@ -121,7 +123,7 @@ public class TipoDatoController {
         TipoDato  dataType = tipoDatoService.getDataTypeById(idTipoDato);
         dataType.setPasivo(true);
         tipoDatoService.addOrUpdateDataType(dataType);
-        return  "redirect:/administracion/tipoDato/init";
+        return  "redirect:/tipoDato/init";
     }
 
 
@@ -131,7 +133,7 @@ public class TipoDatoController {
         String resultado = "";
         String nombre = "";
         String tipo = "";
-        Integer idTipoDato =0;
+        Integer idTipoDato = null;
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
@@ -141,8 +143,10 @@ public class TipoDatoController {
 
             nombre = jsonpObject.get("nombre").getAsString();
             tipo = jsonpObject.get("tipo").getAsString();
-            idTipoDato = jsonpObject.get("idTipoDato").getAsInt();
 
+            if(!jsonpObject.get("idTipoDato").getAsString().isEmpty() ){
+                idTipoDato = jsonpObject.get("idTipoDato").getAsInt();
+            }
 
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
@@ -150,7 +154,7 @@ public class TipoDatoController {
 
             //se obtiene el tipo de dato segun id
             TipoDato dataType;
-            if(idTipoDato != 0){
+            if(idTipoDato != null){
              dataType = tipoDatoService.getDataTypeById(idTipoDato);
 
             }else{
@@ -176,6 +180,97 @@ public class TipoDatoController {
             map.put("nombre", nombre);
             map.put("mensaje", resultado);
             map.put("tipo", tipo);
+            map.put("idTipoDato", "");
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    //Cargar lista de Tipos de Datos
+    @RequestMapping(value = "getValuesCat", method = RequestMethod.GET,  produces = "application/json")
+    public @ResponseBody List<Catalogo_Lista> getValuesCat(@RequestParam(value = "idTipoDato", required = true) Integer idTipoDato) throws Exception {
+        logger.info("Obteniendo los valores de la lista");
+
+        List<Catalogo_Lista> valuesList = null;
+        valuesList = tipoDatoService.getValuesByIdTipoDato(idTipoDato);
+        return valuesList;
+    }
+
+    @RequestMapping(value = "addUpdateValue", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void addUpdateValue(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json = "";
+        String resultado = "";
+        String valor = "";
+        String pasivo = "";
+        Integer idTipoDato = null;
+        Integer idCatalogoLista = null;
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+
+            valor = jsonpObject.get("valor").getAsString();
+
+
+            if(!jsonpObject.get("pasivo").getAsString().isEmpty()){
+                pasivo = jsonpObject.get("pasivo").getAsString();
+            }
+
+            if(!jsonpObject.get("idTipoDato").getAsString().isEmpty() ){
+                idTipoDato = jsonpObject.get("idTipoDato").getAsInt();
+            }
+
+            if(!jsonpObject.get("idCatalogoLista").getAsString().isEmpty() ){
+                idCatalogoLista = jsonpObject.get("idCatalogoLista").getAsInt();
+            }
+
+
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+
+
+            //se obtiene el tipo de dato segun id
+            Catalogo_Lista value;
+            if(idCatalogoLista != null){
+                value = tipoDatoService.getCatalogoListaById(idCatalogoLista);
+               if(!pasivo.isEmpty()){
+                   value.setPasivo(true);
+
+               }else{
+                   value.setPasivo(false);
+               }
+
+            }else{
+
+                value = new Catalogo_Lista();
+                TipoDato tipoDato = tipoDatoService.getDataTypeById(idTipoDato);
+                value.setIdTipoDato(tipoDato);
+                value.setFechaHRegistro(new Timestamp(new Date().getTime()));
+                value.setUsarioRegistro(usuario);
+
+            }
+            if(!valor.isEmpty()){
+                value.setValor(valor);
+            }
+
+
+            tipoDatoService.addOrUpdateValue(value);
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            ex.printStackTrace();
+            resultado = messageSource.getMessage("msg.cat.error", null, null);
+            resultado = resultado + ". \n " + ex.getMessage();
+
+        } finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("valor", valor);
+            map.put("mensaje", resultado);
+            map.put("idCatalogoLista", "");
+            map.put("pasivo", pasivo);
             map.put("idTipoDato", String.valueOf(idTipoDato));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
