@@ -19,6 +19,20 @@
         textarea {
             resize: none;
         }
+
+        .styleButton {
+
+            float: right;
+            height: 31px;
+            margin: 10px 0px 0px 5px;
+            padding: 0px 22px;
+            font: 300 15px/29px "Open Sans", Helvetica, Arial, sans-serif;
+            cursor: pointer;
+        }
+
+        .alert{
+            margin-bottom: 0px;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -97,6 +111,8 @@
         <!-- NEW WIDGET START -->
            <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <!-- Widget ID (each widget will need unique ID)-->
+
+
             <div class="jarviswidget jarviswidget-color-darken" id="wid-id-1">
                 <header>
                     <span class="widget-icon"> <i class="fa fa-reorder"></i> </span>
@@ -112,16 +128,26 @@
                     <!-- end widget edit box -->
                     <!-- widget content -->
                     <div class="widget-body no-padding">
+
+                        <p class="alert alert-info" >
+
+                            <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-default"><i class="fa fa-plus"></i> <spring:message code="lbl.dataType" /></button>
+                        </p>
+
                         <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
-                        <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.aliquot.added"/>"/>
+                        <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.datatype.added"/>"/>
+                        <input id="msjSuccessful1" type="hidden" value="<spring:message code="msg.value.added"/>"/>
+                        <input id="msg_value_cancel" type="hidden" value="<spring:message code="msg.value.successfully.cancel"/>"/>
 
                         <table id="datatypes-records" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>
                             <tr>
                                 <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
                                 <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dataType"/></th>
-                                <th></th>
-                                <th></th>
+                                <th><spring:message code="act.edit"/></th>
+                                <th><spring:message code="lbl.add.values"/></th>
+                                <th><spring:message code="lbl.override"/></th>
+
                             </tr>
                             </thead>
                         </table>
@@ -141,78 +167,139 @@
         <div class="col-sm-12">
             <!-- your contents here -->
             <!-- Modal Aliquot -->
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <div class="modal-header" >
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                &times;
-                            </button>
-                            <h4 class="modal-title" id="myModalLabel"><spring:message code="lbl.add.aliquot"/></h4>
+                        <div class="modal-header">
+                               <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-font"></i>
+                                    <spring:message code="lbl.add.edit.datatype" />
+                                </h4>
+                            </div>
                         </div>
 
                         <div class="modal-body">
-                            <form:form id="generateAliquot-form" class="smart-form" autocomplete="off">
-                                <input id="idTipoDato" hidden="hidden" type="text" name="idTipoDato"/>
-
+                            <form id="dataType-form" class="smart-form" autocomplete="off">
                                 <div class="row">
-
+                                    <input id="idTipoDato" hidden="hidden" type="text" name="idTipoDato"/>
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.name"/>
                                         </label>
+
                                         <div class="">
                                             <label class="input">
-                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                <input class="form-control" type="text" name="nombre" id="nombre" placeholder=" <spring:message code="lbl.name" />" />
+                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i
+                                                    class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                <input class="form-control" type="text" name="nombre" id="nombre"
+                                                       placeholder=" <spring:message code="lbl.name" />"/>
                                                 <b class="tooltip tooltip-bottom-right"> <i
-                                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.enter.name"/>
+                                                        class="fa fa-warning txt-color-pink"></i> <spring:message
+                                                        code="tooltip.enter.name"/>
                                                 </b>
                                             </label>
                                         </div>
                                     </section>
 
 
-                                   <%-- <section class="col col-sm-12 col-md-6 col-lg-6">
+                                    <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.ticket.for" /> </label>
+                                            <spring:message code="lbl.ticket.for"/> </label>
+
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="fa fa-list fa-fw"></i></span>
-                                            <select id="etiqueta" name="etiqueta"
+                                            <select id="tipo" name="tipo"
                                                     class="select2">
-                                                <option value=""><spring:message code="lbl.select" />...</option>
-                                                <c:forEach items="${alicuotaCat}" var="alic">
-                                                    <option value="${alic.idAlicuota}">${alic.etiquetaPara}</option>
+                                                <option value=""><spring:message code="lbl.select"/>...</option>
+                                                <c:forEach items="${dataTypeCat}" var="data">
+                                                    <option value="${data.codigo}">${data.valor}</option>
                                                 </c:forEach>
                                             </select>
                                         </div>
 
                                     </section>
-
-
-                                    <section class="col col-sm-12 col-md-6 col-lg-6">
-                                        <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.volume"/>
-                                        </label>
-                                        <div class="">
-                                            <label class="input">
-                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                                <input class="form-control" type="text" name="volumen" id="volumen" placeholder=" <spring:message code="lbl.volume" />" />
-                                                <b class="tooltip tooltip-bottom-right"> <i
-                                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.enter.volume"/>
-                                                </b>
-                                            </label>
-                                        </div>
-                                    </section>--%>
                                 </div>
 
-                            </form:form>
+                            </form>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" id="btnAdd" class="btn btn-success styleButton"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                            <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
 
                         </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal -->
+
+
+            <!-- Modal Aliquot -->
+            <div class="modal fade" id="myModal2" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                   <div class="modal-header">
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-list"></i>
+                                    <spring:message code="lbl.add.edit.values" />
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="modal-body">
+                            <form id="values-form" class="smart-form" autocomplete="off">
+
+                                <div class="row">
+                                    <input id="idTipoD" hidden="hidden" type="text" name="idTipoD"/>
+                                    <input id="idCatalogoLista" hidden="hidden" type="text" name="idCatalogoLista"/>
+                                    <section class="col col-sm-12 col-md-6 col-lg-6">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <spring:message code="lbl.value"/>
+                                        </label>
+                                        <div class="">
+                                            <label class="input">
+                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                <input class="form-control" type="text" name="valor" id="valor" placeholder=" <spring:message code="lbl.value" />" />
+                                                <b class="tooltip tooltip-bottom-right"> <i
+                                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.enter.value"/>
+                                                </b>
+                                            </label>
+                                        </div>
+                                    </section>
+
+                                    <section style="padding-top: 10px" class="col col-sm-6 col-md-3 col-lg-3">
+
+                                        <button type="button" id="btnAddValue" class="btn btn-primary styleButton"><i class="fa fa-save"></i></button>
+
+                                    </section>
+                                </div>
+
+                                <div class="widget-body no-padding">
+                                    <table id="values-records" class="table table-striped table-bordered table-hover" width="80%">
+                                        <thead>
+                                        <tr>
+                                            <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.value"/></th>
+                                            <th><spring:message code="act.edit"/></th>
+                                            <th><spring:message code="lbl.override"/></th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+
+
+                                </div>
+
+                            </form>
+                        </div>
+
                     </div>
                     <!-- /.modal-content -->
                 </div>
@@ -276,9 +363,11 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="getDataTypes" value="/administracion/tipoDato/getDataTypes"/>
-<c:url var="overrideUrl" value="/administracion/tipoDato/overrideDataType/"/>
-<c:url var="addUpdateUrl" value="/administracion/tipoDato/addUpdateDataType"/>
+<c:url var="getDataTypes" value="/tipoDato/getDataTypes"/>
+<c:url var="overrideUrl" value="/tipoDato/overrideDataType/"/>
+<c:url var="addUpdateUrl" value="/tipoDato/addUpdateDataType"/>
+<c:url var="getValues" value="/tipoDato/getValuesCat"/>
+<c:url var="addUpdateValue" value="/tipoDato/addUpdateValue"/>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -286,9 +375,12 @@
         var parametros = {blockMess: "${blockMess}",
             getDataTypes : "${getDataTypes}",
             overrideUrl: "${overrideUrl}",
-            addUpdateUrl: "${addUpdateUrl}"
+            addUpdateUrl: "${addUpdateUrl}",
+            getValues: "${getValues}",
+            addUpdateValue : "${addUpdateValue}",
+            overrideValueUrl: "${overrideValueUrl}"
         };
-       DataTypes.init(parametros);
+        DataTypes.init(parametros);
 
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();

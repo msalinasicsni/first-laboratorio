@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.TipoDato;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -53,25 +54,6 @@ public class TipoDatoService {
     }
 
     /**
-     * Actualiza una Registro de Tipo de Dato
-     * @param dto Objeto a actualizar
-     * @throws Exception
-     *//*
-    public void updateDataType(TipoDato dto) throws Exception {
-        try {
-            if (dto != null) {
-                Session session = sessionFactory.getCurrentSession();
-                session.update(dto);
-            } else
-                throw new Exception("Objeto TipoDato es NULL");
-        } catch (Exception ex) {
-            logger.error("Error al actualizar TipoDato", ex);
-            throw ex;
-        }
-    }*/
-
-
-    /**
      * Actualiza o agrega una Registro de Tipo de Dato
      *
      * @param dto Objeto a actualizar o agregar
@@ -90,6 +72,55 @@ public class TipoDatoService {
             throw ex;
         }
     }
+
+
+    /**
+     * Obtiene valores de una lista segun idTipoDato
+     * @param id  IdTipoDato
+     */
+    @SuppressWarnings("unchecked")
+
+    public List<Catalogo_Lista> getValuesByIdTipoDato(Integer id) throws Exception {
+        String query = "from Catalogo_Lista as cat where cat.pasivo = false and cat.idTipoDato = :id order by cat.fechaHRegistro";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("id", id);
+        return q.list();
+    }
+
+    /**
+     * Obtiene un registro de Catalogo_Lista
+     * @param id  IdCatagoLista
+     */
+    @SuppressWarnings("unchecked")
+    public Catalogo_Lista getCatalogoListaById(Integer id){
+        Session session = sessionFactory.getCurrentSession();
+        Criteria cr = session.createCriteria(Catalogo_Lista.class, "cat");
+        cr.add(Restrictions.eq("cat.idCatalogoLista", id));
+        return (Catalogo_Lista) cr.uniqueResult();
+    }
+
+
+    /**
+     * Actualiza o agrega una registro de catalogo_lista
+     *
+     * @param dto Objeto a actualizar o agregar
+     * @throws Exception
+     */
+    public void addOrUpdateValue(Catalogo_Lista dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.saveOrUpdate(dto);
+            }
+            else
+                throw new Exception("Objeto Catalogo_lista es NULL");
+        }catch (Exception ex){
+            logger.error("Error al agregar o actualizar catalogo_lista",ex);
+            throw ex;
+        }
+    }
+
 
 
 }
