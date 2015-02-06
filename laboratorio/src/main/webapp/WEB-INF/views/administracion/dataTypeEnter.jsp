@@ -208,7 +208,7 @@
 
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.ticket.for"/> </label>
+                                            <spring:message code="lbl.dataType"/> </label>
 
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="fa fa-list fa-fw"></i></span>
