@@ -24,6 +24,21 @@
         .modal .modal-dialog {
             width: 60%;
         }
+        .anularConcepto {
+            padding-left: 0;
+            padding-right: 10px;
+            text-align: center;
+            width: 5%;
+        }
+        .editarConcepto {
+            padding-left: 0;
+            padding-right: 10px;
+            text-align: center;
+            width: 5%;
+        }
+        .alert {
+           margin-bottom: 0px;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -244,16 +259,22 @@
 			</section>
 			<!-- end widget grid -->
             <!-- Modal -->
-            <div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static"> <!--tabindex="-1" role="dialog" -->
+            <div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static">
             <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
-                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    &times;
-                    </button>-->
-                <h4 class="modal-title">
+                <!--<h4 class="modal-title">
                     <spring:message code="lbl.concepts.header.modal.add" />
-                </h4>
+                </h4>-->
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">
+                        <i class="fa-fw fa fa-font"></i>
+                        <spring:message code="lbl.concepts.header.modal.add" />
+                    </h4>
+                </div>
             </div>
             <div class="modal-body"> <!--  no-padding -->
             <form id="concepto-form" class="smart-form" novalidate="novalidate">
@@ -357,7 +378,6 @@
                     </section>
                 </div>
             </fieldset>
-
             <footer>
                 <button type="submit" class="btn btn-primary" id="btnAgregarExamen">
                     <spring:message code="act.save" />

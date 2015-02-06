@@ -22,7 +22,7 @@ public class TipoDato implements Serializable {
     Timestamp fechahRegistro;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_TIPO_DATO", nullable = false, insertable = true, updatable = false)
     public Integer getIdTipoDato() {
         return idTipoDato;

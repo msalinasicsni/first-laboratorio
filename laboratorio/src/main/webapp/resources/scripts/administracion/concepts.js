@@ -12,7 +12,8 @@ var Conceptos = function () {
                 '-moz-border-radius': '10px',
                 opacity: .5,
                 color: '#fff'
-            }
+            },
+            baseZ: 1051 // para que se muestre bien en los modales
         });
     };
 
@@ -62,6 +63,7 @@ var Conceptos = function () {
                         "orderable":      false
                     }
                 ],
+                "order": [ 2, 'asc' ],
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -99,6 +101,10 @@ var Conceptos = function () {
                 getConcept(id);
                 showModalConcept();
             }
+            jQuery.validator.addClassRules("valPrueba", {
+                required: true,
+                minlength: 2
+            });
 
             if (parametros.sFormConcept == 'SI'){
                 getConcepts();
@@ -187,7 +193,6 @@ var Conceptos = function () {
                 }, function(dataToLoad) {
                     table2.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
-                    console.log("longitud conceptos "+len);
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var req, pas, botonEditar;
@@ -207,32 +212,6 @@ var Conceptos = function () {
                                         botonEditar,
                                         '<a data-toggle="modal" class="btn btn-default btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-edit"></i></a>']);
                         }
-
-                        /*$(".anularConcepto").on("click", function(){
-                            $("#idConceptoEdit").val('');
-                            anularConcepto($(this).data('id'));
-                        });
-                        $(".editarConcepto").on("click", function(){
-                            $("#idConceptoEdit").val($(this).data('id'));
-                            getConcept($(this).data('id'));
-                            showModalConcept();
-                        });
-
-                        //al paginar se define nuevamente la función de cargar el detalle
-                        $(".dataTables_paginate").on('click', function() {
-                            /*$(".anularConcepto").on('click', function () {
-                                $("#idConceptoEdit").val('');
-                                console.log("entra anular");
-                                anularConcepto($(this).data('id'));
-                            });
-                            $(".editarConcepto").on("click", function(){
-                                console.log("entra editar");
-                                $("#idConceptoEdit").val($(this).data('id'));
-                                getConcept($(this).data('id'));
-                                showModalConcept();
-                            });
-                        });*/
-
                     }else{
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
@@ -258,13 +237,13 @@ var Conceptos = function () {
                 }, function(dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
+                        $("#codTipoDato").val(dataToLoad.tipoDato.idTipoDato).change();
                         $("#nombreConcepto").val(dataToLoad.nombre);
                         $("#ordenConcepto").val(dataToLoad.orden);
-                        $("#minimoConcepto").val(dataToLoad.minimo);
-                        $("#maximoConcepto").val(dataToLoad.maximo);
                         $("#checkbox-required").attr('checked', dataToLoad.requerido);
                         $("#checkbox-pasive").attr('checked', dataToLoad.pasivo);
-                        $("#codTipoDato").val(dataToLoad.tipoDato.idTipoDato).change();
+                        $("#minimoConcepto").val(dataToLoad.minimo);
+                        $("#maximoConcepto").val(dataToLoad.maximo);
                     }else{
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,

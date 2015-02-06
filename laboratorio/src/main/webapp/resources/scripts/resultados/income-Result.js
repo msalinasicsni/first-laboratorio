@@ -12,7 +12,8 @@ var IncomeResult = function () {
                 '-moz-border-radius': '10px',
                 opacity: .5,
                 color: '#fff'
-            }
+            },
+            baseZ: 1051 // para que se muestre bien en los modales
         });
     };
 
@@ -45,6 +46,29 @@ var IncomeResult = function () {
 					responsiveHelper_dt_basic.respond();
 				}
 			});
+
+            var table2 = $('#concepts_list').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth" : true,
+                "columns": [
+                    null,null,null,null,null,null,null
+                ],
+                "order": [ 2, 'asc' ],
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#concepts_list'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                }
+            });
 
             <!-- formulario de búsqueda de ordenes -->
             $('#searchOrders-form').validate({
@@ -87,27 +111,6 @@ var IncomeResult = function () {
                 }
             });
 
-            function blockUI(){
-                var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
-                //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
-                var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
-                $.blockUI({ message: mess,
-                    css: {
-                        border: 'none',
-                        padding: '15px',
-                        backgroundColor: '#000',
-                        '-webkit-border-radius': '10px',
-                        '-moz-border-radius': '10px',
-                        opacity: .5,
-                        color: '#fff'
-                    }});
-            }
-
-            function unBlockUI() {
-                setTimeout($.unblockUI, 500);
-            }
-
             function getAlicuotas(showAll) {
                 var encuestaFiltros = {};
                 if (showAll){
@@ -128,7 +131,7 @@ var IncomeResult = function () {
                     encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                     encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                 }
-                blockUI();
+                bloquearUI(parametros.blockMess);
     			$.getJSON(parametros.sOrdersUrl, {
                     strFilter: JSON.stringify(encuestaFiltros),
     				ajax : 'true'
@@ -137,13 +140,8 @@ var IncomeResult = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var idLoad;
-                            if ($('#txtEsLaboratorio').val()=='true'){
-                                idLoad =dataToLoad[i]. idRecepcion;
-                            }else{
-                                idLoad = dataToLoad[i].idOrdenExamen;
-                            }
-                            var actionUrl = parametros.sActionUrl+idLoad;
+                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idAlicuota;
+                            console.log(actionUrl);
                             table1.fnAddData(
                                 [dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara, dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx ,dataToLoad[i].fechaInicioSintomas,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
@@ -157,13 +155,87 @@ var IncomeResult = function () {
                             timeout: 4000
                         });
                     }
-                    unBlockUI();
+                    desbloquearUI();
     			})
     			.fail(function() {
-                    unBlockUI();
+                    desbloquearUI();
 				    alert( "error" );
 				});
             }
+
+            function getConcepts() {
+                bloquearUI(parametros.blockMess);
+                $.getJSON(parametros.sConceptosUrl, {
+                    idExamen: $("#idExamen").val() ,
+                    ajax : 'true'
+                }, function(dataToLoad) {
+                    table2.fnClearTable();
+                    var len = Object.keys(dataToLoad).length;
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            var req, pas, botonEditar;
+                            if (dataToLoad[i].requerido==true)
+                                req = $("#val_yes").val();
+                            else
+                                req = $("#val_no").val();
+                            if (dataToLoad[i].pasivo==true) {
+                                pas = $("#val_yes").val();
+                                botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
+                            } else {
+                                pas = $("#val_no").val();
+                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
+                            }
+                            table2.fnAddData(
+                                [dataToLoad[i].nombre,dataToLoad[i].tipoDato.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo
+                                    ]);
+                        }
+
+                        /*$(".anularConcepto").on("click", function(){
+                         $("#idConceptoEdit").val('');
+                         anularConcepto($(this).data('id'));
+                         });
+                         $(".editarConcepto").on("click", function(){
+                         $("#idConceptoEdit").val($(this).data('id'));
+                         getConcept($(this).data('id'));
+                         showModalConcept();
+                         });
+
+                         //al paginar se define nuevamente la función de cargar el detalle
+                         $(".dataTables_paginate").on('click', function() {
+                         /*$(".anularConcepto").on('click', function () {
+                         $("#idConceptoEdit").val('');
+                         console.log("entra anular");
+                         anularConcepto($(this).data('id'));
+                         });
+                         $(".editarConcepto").on("click", function(){
+                         console.log("entra editar");
+                         $("#idConceptoEdit").val($(this).data('id'));
+                         getConcept($(this).data('id'));
+                         showModalConcept();
+                         });
+                         });*/
+
+                    }else{
+                        $.smallBox({
+                            title: $("#msg_no_results_found").val() ,
+                            content: $("#smallBox_content").val(),
+                            color: "#C46A69",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
+                    desbloquearUI();
+                }).fail(function(er) {
+                    desbloquearUI();
+                    alert( "error "+er );
+                });
+            }
+
+            jQuery.validator.addClassRules("requiredConcept", {
+                required: true
+            });
+
+            getConcepts();
 
             $("#all-orders").click(function() {
                 getAlicuotas(true);
@@ -224,7 +296,7 @@ var IncomeResult = function () {
 
             <!-- al seleccionar SILAIS -->
             $('#codSilais').change(function(){
-                blockUI();
+                bloquearUI(parametros.blockMess);
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
                         codSilais: $(this).val(),
@@ -246,7 +318,7 @@ var IncomeResult = function () {
                     $('#codUnidadSalud').html(html);
                 }
                 $('#codUnidadSalud').val('').change();
-                unBlockUI();
+                desbloquearUI();
             });
 
             //sólo para demo, no funcional
