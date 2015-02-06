@@ -89,7 +89,7 @@
                         <a href="<spring:url value="/administracion/tipoDato/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.datatypes" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.datatypes" /></a>
                     </li>
                     <li class="conceptos">
-                        <a href="<spring:url value="/administracion/concepto/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.concept" /></a>
+                        <a href="<spring:url value="/administracion/conceptos/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.concept" /></a>
                     </li>
                 </ul>
             </li>

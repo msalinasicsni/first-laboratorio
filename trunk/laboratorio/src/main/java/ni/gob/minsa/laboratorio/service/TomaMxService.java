@@ -1,10 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
-import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
-import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
-import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
+import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
@@ -190,6 +187,14 @@ public class TomaMxService {
         return q.list();
     }
 
+    public List<Catalogo_Dx> getDxsByTipoNoti(String tipoNoti) throws Exception {
+        String query = "select dx from Dx_TipoMx_TipoNoti dxrel inner join dxrel.diagnostico dx where dxrel.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("tipoNoti", tipoNoti);
+        return q.list();
+    }
+
     public DaTomaMx getTomaMxByCodUnicoMx(String codigoUnicoMx){
         String query = "from DaTomaMx as a where codigoUnicoMx= :codigoUnicoMx";
 
@@ -197,5 +202,13 @@ public class TomaMxService {
         Query q = session.createQuery(query);
         q.setString("codigoUnicoMx", codigoUnicoMx);
         return  (DaTomaMx)q.uniqueResult();
+    }
+
+    public Catalogo_Dx getDxsById(Integer idDx) throws Exception {
+        String query = "from Catalogo_Dx where idDiagnostico = :idDx" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idDx", idDx);
+        return (Catalogo_Dx)q.uniqueResult();
     }
 }
