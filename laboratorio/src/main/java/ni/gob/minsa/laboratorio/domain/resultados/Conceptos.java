@@ -3,10 +3,12 @@ package ni.gob.minsa.laboratorio.domain.resultados;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
-import org.joda.time.DateTime;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Created by souyen-ics.
@@ -18,18 +20,18 @@ public class Conceptos implements Serializable {
     Integer idConcepto;
     String nombre;
     CatalogoExamenes idExamen;
-    Integer tipoDato;
+    TipoDato tipoDato;
     Integer orden;
     boolean requerido;
     boolean pasivo;
     Integer minimo;
     Integer maximo;
     Usuarios usuarioRegistro;
-    DateTime fechahRegistro;
+    Timestamp fechahRegistro;
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_CONCEPTO", nullable = false, insertable = true, updatable = false)
     public Integer getIdConcepto() {
         return idConcepto;
@@ -49,7 +51,8 @@ public class Conceptos implements Serializable {
         this.nombre = nombre;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = CatalogoExamenes.class, optional = false)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "ID_EXAMEN", referencedColumnName = "ID_EXAMEN", nullable = false)
     @ForeignKey(name = "ID_EXAMEN_FK")
     public CatalogoExamenes getIdExamen() {
@@ -60,12 +63,15 @@ public class Conceptos implements Serializable {
         this.idExamen = idExamen;
     }
 
-
-    public Integer getTipoDato() {
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "TIPODATO", referencedColumnName = "ID_TIPO_DATO", nullable = false)
+    @ForeignKey(name = "TIPODATO_FK")
+    public TipoDato getTipoDato() {
         return tipoDato;
     }
 
-    public void setTipoDato(Integer tipoDato) {
+    public void setTipoDato(TipoDato tipoDato) {
         this.tipoDato = tipoDato;
     }
 
@@ -132,11 +138,11 @@ public class Conceptos implements Serializable {
 
     @Basic
     @Column(name = "FECHAH_REGISTRO", nullable = false, insertable = true, updatable = false)
-    public DateTime getFechahRegistro() {
+    public Timestamp getFechahRegistro() {
         return fechahRegistro;
     }
 
-    public void setFechahRegistro(DateTime fechahRegistro) {
+    public void setFechahRegistro(Timestamp fechahRegistro) {
         this.fechahRegistro = fechahRegistro;
     }
 }

@@ -32,7 +32,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/recepcionMx/searchOrdersLab" htmlEscape="true "/>"><spring:message code="menu.receipt.orders.lab" /></a></li>
+                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/searchConcepts" htmlEscape="true "/>"><spring:message code="menu.admin.concept" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -47,9 +47,9 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-group"></i> 
-							<spring:message code="lbl.result.title" />
+							<spring:message code="lbl.concepts.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.result.search.subtitle" />
+							<spring:message code="lbl.concepts.search.subtitle" />
 						</span>
 					</h1>
 				</div>
@@ -108,95 +108,44 @@
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
-                                    <input id="txtEsLaboratorio" type="hidden" value="false"/>
-                                    <form id="searchOrders-form" class="smart-form" autocomplete="off">
+                                    <form id="search-form" class="smart-form" autocomplete="off">
                                         <fieldset>
-                                        <div class="row">
-                                            <section class="col col-sm-12 col-md-12 col-lg-5">
+                                            <div class="row">
+                                            <section class="col col-sm-12 col-md-12 col-lg-4">
                                                 <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.person.name" />
+                                                    <spring:message code="lbl.test.name" />
                                                 </label>
                                                 <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                    <input type="text" id="txtfiltroNombre" name="filtroNombre" placeholder="<spring:message code="lbl.receipt.person.name"/>">
-                                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.receipt.name"/></b>
+                                                    <input type="text" id="nombreExamen" name="nombreExamen" placeholder="<spring:message code="lbl.test.name"/>">
+                                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.test.name"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-2">
+                                            <section class="col col-sm-6 col-md-4 col-lg-4">
                                                 <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.start.date.mx" />
-                                                </label>
-                                                <label class="input">
-                                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                                    <input type="text" name="fecInicioTomaMx" id="fecInicioTomaMx"
-                                                           placeholder="<spring:message code="lbl.date.format"/>"
-                                                           class="form-control from_date" data-date-end-date="+0d"/>
-                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
-                                                </label>
-                                            </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-2">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.end.date.mx" />
-                                                </label>
-                                                <label class="input">
-                                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                                    <input type="text" name="fecFinTomaMx" id="fecFinTomaMx"
-                                                           placeholder="<spring:message code="lbl.date.format"/>"
-                                                           class="form-control to_date" data-date-end-date="+0d"/>
-                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
-                                                </label>
-                                            </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-3">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.sample.type" /> </label>
+                                                    <spring:message code="lbl.notification.type" /> </label>
                                                 <div class="input-group">
                                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codTipoMx" name="codTipoMx"
+                                                    <select id="codTipoNoti" name="codTipoNoti"
                                                             class="select2">
                                                         <option value=""><spring:message code="lbl.select" />...</option>
-                                                        <c:forEach items="${tipoMuestra}" var="tipoMuestra">
-                                                            <option value="${tipoMuestra.idTipoMx}">${tipoMuestra.nombre}</option>
+                                                        <c:forEach items="${notificaciones}" var="tipoNoti">
+                                                            <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
                                                         </c:forEach>
                                                     </select>
                                                 </div>
                                             </section>
-                                        </div>
-                                        <div class="row">
-                                            <section class="col col-sm-12 col-md-5 col-lg-5">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.silais" /> </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codSilais" name="codSilais"
-                                                            class="select2">
-                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                        <c:forEach items="${entidades}" var="entidad">
-                                                            <option value="${entidad.entidadAdtvaId}">${entidad.nombre}</option>
-                                                        </c:forEach>
-                                                    </select>
-                                                </div>
-                                            </section>
-                                            <section class="col col-sm-12 col-md-7 col-lg-7">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.health.unit" /> </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codUnidadSalud" name="codUnidadSalud"
-                                                            class="select2">
-                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                    </select>
-                                                </div>
-                                            </section>
-                                        </div>
-                                            <div class="row">
-                                                <section class="col col-sm-12 col-md-6 col-lg-3">
+                                                <section class="col col-sm-6 col-md-4 col-lg-4">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.unique.code.mx" /> </label>
-                                                    <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                        <input type="text" id="txtCodUnicoMx" name="txtCodUnicoMx" placeholder="<spring:message code="lbl.unique.code.mx"/>">
-                                                        <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.unique.code.mx"/></b>
-                                                    </label>
+                                                        <spring:message code="lbl.dx.type" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codTipoDx" name="codTipoDx"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                        </select>
+                                                    </div>
                                                 </section>
-                                            </div>
+                                        </div>
                                         </fieldset>
                                         <footer>
                                             <button type="submit" id="search-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
@@ -229,22 +178,13 @@
                                 <!-- end widget edit box -->
                                 <!-- widget content -->
                                 <div class="widget-body no-padding">
-                                    <table id="orders_result" class="table table-striped table-bordered table-hover" width="100%">
+                                    <table id="test_result" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
                                         <tr>
-                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.id.aliquot"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.ticket.for"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.order.dateTime"/></th>
+                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.unique.code.mx.short"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.silais"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
                                             <th></th>
                                         </tr>
                                         </thead>
@@ -289,7 +229,6 @@
     <script src="${dataTablesBootstrap}"></script>
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
-    <spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
     <!-- jQuery Selecte2 Input -->
     <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
     <script src="${selectPlugin}"></script>
@@ -308,43 +247,32 @@
 	<!-- JQUERY BLOCK UI -->
 	<spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
 	<script src="${jqueryBlockUi}"></script>
-    <!-- JQUERY INPUT MASK -->
-    <spring:url value="/resources/js/plugin/jquery-inputmask/jquery.inputmask.bundle.min.js" var="jqueryInputMask" />
-    <script src="${jqueryInputMask}"></script>
-	<!-- END PAGE LEVEL PLUGINS -->
+    <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/resultados/income-Result.js" var="incomeResult" />
-	<script src="${incomeResult}"></script>
-    <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
-    <script src="${handleDatePickers}"></script>
-    <spring:url value="/resources/scripts/utilidades/calcularEdad.js" var="calculateAge" />
-    <script src="${calculateAge}"></script>
-    <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
-    <script src="${handleInputMask}"></script>
+	<spring:url value="/resources/scripts/administracion/concepts.js" var="concepto" />
+	<script src="${concepto}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="ordersUrl" value="/resultados/searchOrders"/>
-
-    <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-    <c:url var="sCreateReceiptUrl" value="/resultados/create/"/>
+    <c:url var="dxUrl" value="/api/v1/getDiagnosticosNoti"/>
+    <c:url var="sCreateConceptUrl" value="/administracion/conceptos/create/"/>
+    <c:url var="sBuscarExamenes" value="/administracion/conceptos/getExamenes"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
 			var parametros = {sPersonUrl: "${sPersonUrl}",
-                sOrdersUrl : "${ordersUrl}",
-                sUnidadesUrl : "${unidadesURL}",
+                dxUrl : "${dxUrl}",
                 blockMess: "${blockMess}",
-                sActionUrl : "${sCreateReceiptUrl}"
+                sActionUrl : "${sCreateConceptUrl}",
+                sBuscarExamenes : "${sBuscarExamenes}",
+                sFormConcept : "NO"
             };
-            IncomeResult.init(parametros);
+            Conceptos.init(parametros);
 
-            handleDatePickers("${pageContext.request.locale.language}");
-            handleInputMasks();
-	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+            $("li.administracion").addClass("open");
+	    	$("li.conceptos").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.conceptos").parents("ul").slideDown(200);
 	    	}
         });
 	</script>

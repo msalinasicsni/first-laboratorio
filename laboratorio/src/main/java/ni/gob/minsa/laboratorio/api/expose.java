@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.api;
 import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
@@ -223,8 +224,18 @@ public class expose {
     @ResponseBody
     List<CatalogoExamenes> getExamenes(@RequestParam(value = "idDx", required = true) int idDx) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        List<CatalogoExamenes> dxTipoMxTipoNotis = new ArrayList<CatalogoExamenes>();
-        dxTipoMxTipoNotis = examenesService.getExamenesByIdDx(idDx);
+        List<CatalogoExamenes> catalogoExamenesList = new ArrayList<CatalogoExamenes>();
+        catalogoExamenesList = examenesService.getExamenesByIdDx(idDx);
+        return catalogoExamenesList;
+    }
+
+    @RequestMapping(value = "getDiagnosticosNoti", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<Catalogo_Dx> getDiagnosticosByNoti(@RequestParam(value = "codTipoNoti", required = true) String codTipoNoti) throws Exception {
+        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        List<Catalogo_Dx> dxTipoMxTipoNotis = new ArrayList<Catalogo_Dx>();
+        dxTipoMxTipoNotis = tomaMxService.getDxsByTipoNoti(codTipoNoti);
         return dxTipoMxTipoNotis;
     }
 
