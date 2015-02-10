@@ -64,8 +64,8 @@ public class ResultadosController {
     private AlicuotaService alicuotaService;
 
     @Autowired
-    @Qualifier(value = "generacionAlicuotaService")
-    private GeneracionAlicuotaService generacionAlicuotaService;
+    @Qualifier(value = "ordenExamenMxService")
+    private OrdenExamenMxService ordenExamenMxService;
 
     @Autowired
     @Qualifier(value = "respuestasExamenService")
@@ -107,8 +107,8 @@ public class ResultadosController {
         return mav;
     }
 
-    @RequestMapping(value = "create/{strIdRegAli}", method = RequestMethod.GET)
-    public ModelAndView createReceiptForm(HttpServletRequest request, @PathVariable("strIdRegAli")  String strIdRegAli) throws Exception {
+    @RequestMapping(value = "create/{strIdOrdenExamen}", method = RequestMethod.GET)
+    public ModelAndView createReceiptForm(HttpServletRequest request, @PathVariable("strIdOrdenExamen")  String strIdOrdenExamen) throws Exception {
         logger.debug("buscar ordenes para recepcion");
         String urlValidacion="";
         try {
@@ -122,15 +122,15 @@ public class ResultadosController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            AlicuotaRegistro alicuota =  generacionAlicuotaService.getAliquotById(strIdRegAli);
-            List<RespuestaExamen> respuestaExamenList = respuestasExamenService.getRespuestasActivasByExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
-            List<Catalogo_Lista> listas = respuestasExamenService.getCatalogoListaConceptoByIdExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
+            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrdenExamen);
+            List<RespuestaExamen> respuestaExamenList = respuestasExamenService.getRespuestasActivasByExamen(ordenExamen.getCodExamen().getIdExamen());
+            List<Catalogo_Lista> listas = respuestasExamenService.getCatalogoListaConceptoByIdExamen(ordenExamen.getCodExamen().getIdExamen());
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(alicuota.getCodUnicoMx().getIdNotificacion().getIdNotificacion());
-            mav.addObject("alicuota",alicuota);
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            mav.addObject("ordenExamen",ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
-            mav.addObject("conceptosList", respuestaExamenList);
+            mav.addObject("respuestasList", respuestaExamenList);
             mav.addObject("valoresListas",listas);
             mav.setViewName("resultados/incomeResult");
         }else
@@ -143,8 +143,8 @@ public class ResultadosController {
     public @ResponseBody  String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
-        List<AlicuotaRegistro> ordenExamenList = alicuotaService.getAlicuotasByFiltro(filtroMx);
-        return RegistroAlicuotaToJson(ordenExamenList);
+        List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenByFiltro(filtroMx);
+        return ordenesExamenToJson(ordenExamenList);
     }
 
     private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
@@ -193,42 +193,39 @@ public class ResultadosController {
         return filtroMx;
     }
 
-    private String RegistroAlicuotaToJson(List<AlicuotaRegistro> alicuotaRegistros){
+    private String ordenesExamenToJson(List<OrdenExamen> ordenesExamen){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-        for(AlicuotaRegistro alicuota :alicuotaRegistros){
+        for(OrdenExamen orden : ordenesExamen){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idAlicuota", alicuota.getIdAlicuota());
-            map.put("idOrdenExamen", alicuota.getIdOrden().getIdOrdenExamen());
-            map.put("idTomaMx", alicuota.getCodUnicoMx().getIdTomaMx());
-            map.put("codigoUnicoMx", alicuota.getCodUnicoMx().getCodigoUnicoMx());
-            map.put("etiquetaPara", alicuota.getAlicuotaCatalogo().getEtiquetaPara());
-            map.put("volumen", String.valueOf(alicuota.getVolumen()));
-            map.put("fechaHoraOrden",DateUtil.DateToString(alicuota.getIdOrden().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("examen", alicuota.getIdOrden().getCodExamen().getNombre());
-            map.put("fechaHoraDx",DateUtil.DateToString(alicuota.getIdOrden().getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("tipoDx", alicuota.getIdOrden().getSolicitudDx().getCodDx().getNombre());
-            map.put("fechaTomaMx",DateUtil.DateToString(alicuota.getCodUnicoMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", alicuota.getCodUnicoMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", alicuota.getCodUnicoMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            map.put("tipoMuestra", alicuota.getCodUnicoMx().getCodTipoMx().getNombre());
+            map.put("idOrdenExamen", orden.getIdOrdenExamen());
+            map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+            map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoUnicoMx());
+            map.put("fechaHoraOrden",DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("examen", orden.getCodExamen().getNombre());
+            map.put("fechaHoraDx",DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
+            map.put("fechaTomaMx",DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+            map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            map.put("tipoMuestra", orden.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(alicuota.getCodUnicoMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
                 map.put("fechaInicioSintomas"," ");
             //Si hay persona
-            if (alicuota.getCodUnicoMx().getIdNotificacion().getPersona()!=null){
+            if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona()!=null){
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto = "";
-                nombreCompleto = alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ alicuota.getCodUnicoMx().getIdNotificacion().getPersona().getSegundoApellido();
+                nombreCompleto = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                    nombreCompleto = nombreCompleto +" "+ orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto+" "+ orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                    nombreCompleto = nombreCompleto +" "+ orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
             }else{
                 map.put("persona"," ");
@@ -293,33 +290,33 @@ public class ResultadosController {
     protected void saveResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
-        String strConceptos="";
-        String idAlicuota="";
-        Integer cantConceptos=0;
+        String strRespuestas="";
+        String idOrdenExamen="";
+        Integer cantRespuestas=0;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
-            strConceptos = jsonpObject.get("strConceptos").toString();
-            idAlicuota = jsonpObject.get("idAlicuota").getAsString();
-            cantConceptos = jsonpObject.get("cantConceptos").getAsInt();
-            AlicuotaRegistro alicuota =  generacionAlicuotaService.getAliquotById(idAlicuota);
+            strRespuestas = jsonpObject.get("strRespuestas").toString();
+            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+            cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
+            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
             //se obtiene datos de los conceptos a registrar
 
-            JsonObject jObjectTomasMx = new Gson().fromJson(strConceptos, JsonObject.class);
-            for(int i = 0; i< cantConceptos;i++) {
-                String concepto = jObjectTomasMx.get(String.valueOf(i)).toString();
-                JsonObject jsconceptoObject = new Gson().fromJson(concepto, JsonObject.class);
-                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaById(jsconceptoObject.get("idConcepto").getAsInt());
-                String valor = jsconceptoObject.get("valor").getAsString();
+            JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
+            for(int i = 0; i< cantRespuestas;i++) {
+                String respuesta = jObjectRespuestas.get(String.valueOf(i)).toString();
+                JsonObject jsRespuestaObject = new Gson().fromJson(respuesta, JsonObject.class);
+                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaById(jsRespuestaObject.get("idRespuesta").getAsInt());
+                String valor = jsRespuestaObject.get("valor").getAsString();
                 DetalleResultado detalleResultado = new DetalleResultado();
                 detalleResultado.setFechahRegistro(new Timestamp(new Date().getTime()));
                 detalleResultado.setValor(valor);
-                detalleResultado.setConcepto(conceptoTmp);
-                detalleResultado.setAlicuotaRegistro(alicuota);
+                detalleResultado.setRespuesta(conceptoTmp);
+                detalleResultado.setExamen(ordenExamen);
                 detalleResultado.setUsuarioRegistro(usuario);
                 if (detalleResultado.getValor()!=null && !detalleResultado.getValor().isEmpty()){
                     resultadosService.addDetalleResultado(detalleResultado);
@@ -328,15 +325,15 @@ public class ResultadosController {
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("msg.send.receipt.error",null,null);
+            resultado =  messageSource.getMessage("msg.result.error.added",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idAlicuota",idAlicuota);
-            map.put("strConceptos",strConceptos);
+            map.put("idOrdenExamen",idOrdenExamen);
+            map.put("strRespuestas",strRespuestas);
             map.put("mensaje",resultado);
-            map.put("cantConceptos",cantConceptos.toString());
+            map.put("cantRespuestas",cantRespuestas.toString());
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

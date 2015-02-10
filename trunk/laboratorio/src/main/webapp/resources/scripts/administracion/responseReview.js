@@ -90,14 +90,15 @@ var Conceptos = function () {
                 var id = $(this.innerHTML).data('id');
                 var disabled = this.innerHTML;
                 var n2 = (disabled.indexOf("disabled") > -1);
-                if (!n2) anularConcepto(id);
+                if (!n2) anularRespuesta(id);
                 //alert('Click called '+id+'-'+disabled+'-'+n+'-'+n2);
 
             }
 
             function editarHandler(){
                 var id = $(this.innerHTML).data('id');
-                $("#idConceptoEdit").val(id);
+                console.log(id);
+                $("#idRespuestaEdit").val(id);
                 getConcept(id);
                 showModalConcept();
             }
@@ -128,7 +129,7 @@ var Conceptos = function () {
                 // Rules for form validation
                 rules: {
                     nombreConcepto : {required:true},
-                    codTipoDato : {required:true},
+                    codConcepto : {required:true},
                     ordenConcepto : {required:true},
                     minimoConcepto : {required:true},
                     maximoConcepto : {required:true}
@@ -140,7 +141,7 @@ var Conceptos = function () {
                 },
                 submitHandler: function (form) {
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                    guardarConcepto();
+                    guardarRespuesta();
                 }
             });
 
@@ -202,15 +203,15 @@ var Conceptos = function () {
                                 req = $("#val_no").val();
                             if (dataToLoad[i].pasivo==true) {
                                 pas = $("#val_yes").val();
-                                botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
+                                botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
                             } else {
                                 pas = $("#val_no").val();
-                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
+                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
                             }
                             table2.fnAddData(
-                                [dataToLoad[i].nombre,dataToLoad[i].tipoDato.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo,
+                                [dataToLoad[i].nombre,dataToLoad[i].concepto.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo,
                                         botonEditar,
-                                        '<a data-toggle="modal" class="btn btn-default btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-edit"></i></a>']);
+                                        '<a data-toggle="modal" class="btn btn-default btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-edit"></i></a>']);
                         }
                     }else{
                         $.smallBox({
@@ -236,7 +237,7 @@ var Conceptos = function () {
                 }, function(dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
-                        $("#codTipoDato").val(dataToLoad.tipoDato.idTipoDato).change();
+                        $("#codConcepto").val(dataToLoad.concepto.idConcepto).change();
                         $("#nombreConcepto").val(dataToLoad.nombre);
                         $("#ordenConcepto").val(dataToLoad.orden);
                         $("#checkbox-required").attr('checked', dataToLoad.requerido);
@@ -263,20 +264,20 @@ var Conceptos = function () {
                 getTests(true);
             });
 
-            function guardarConcepto() {
+            function guardarRespuesta() {
 
                 var jsonObj = {};
-                var conceptoObj = {};
-                conceptoObj['idConcepto']=$("#idConceptoEdit").val();
-                conceptoObj['idExamen']=$("#idExamen").val();
-                conceptoObj['nombre']=$("#nombreConcepto").val();
-                conceptoObj['tipoDato']=$('#codTipoDato').find('option:selected').val();
-                conceptoObj['orden']=$("#ordenConcepto").val();
-                conceptoObj['requerido']=($('#checkbox-required').is(':checked'));
-                conceptoObj['pasivo']=($('#checkbox-pasive').is(':checked'));
-                conceptoObj['minimo']=$("#minimoConcepto").val();
-                conceptoObj['maximo']=$("#maximoConcepto").val();
-                jsonObj['concepto'] = conceptoObj;
+                var respuestaObj = {};
+                respuestaObj['idRespuesta']=$("#idRespuestaEdit").val();
+                respuestaObj['idExamen']=$("#idExamen").val();
+                respuestaObj['nombre']=$("#nombreConcepto").val();
+                respuestaObj['concepto']=$('#codConcepto').find('option:selected').val();
+                respuestaObj['orden']=$("#ordenConcepto").val();
+                respuestaObj['requerido']=($('#checkbox-required').is(':checked'));
+                respuestaObj['pasivo']=($('#checkbox-pasive').is(':checked'));
+                respuestaObj['minimo']=$("#minimoConcepto").val();
+                respuestaObj['maximo']=$("#maximoConcepto").val();
+                jsonObj['concepto'] = respuestaObj;
                 jsonObj['mensaje'] = '';
                 bloquearUI(parametros.blockMess);
                 $.ajax(
@@ -300,7 +301,7 @@ var Conceptos = function () {
                                 getConcepts();
                                 var msg;
                                 //si es guardar limpiar el formulario
-                                if ($("#idConceptoEdit").val().length <= 0){
+                                if ($("#idRespuestaEdit").val().length <= 0){
                                     limpiarDatosConcepto();
                                     msg = $("#msg_concept_added").val();
                                 }else{
@@ -327,10 +328,10 @@ var Conceptos = function () {
 
             }
 
-            function anularConcepto(idConcepto) {
+            function anularRespuesta(idRespuesta) {
                 var anulacionObj = {};
                 var conceptoObj = {};
-                conceptoObj['idConcepto']=idConcepto;
+                conceptoObj['idRespuesta']=idRespuesta;
                 conceptoObj['pasivo']='true';
                 anulacionObj['concepto'] = conceptoObj;
                 anulacionObj['mensaje'] = '';
@@ -379,7 +380,7 @@ var Conceptos = function () {
                 $("#maximoConcepto").val('');
                 $("#checkbox-required").attr('checked', false);
                 $("#checkbox-pasive").attr('checked', false);
-                $("#codTipoDato").val("").change();
+                $("#codConcepto").val("").change();
             }
 
             function showModalConcept(){
@@ -389,12 +390,12 @@ var Conceptos = function () {
             }
 
             $("#btnAddConcept").click(function(){
-                $("#idConceptoEdit").val('');
+                $("#idRespuestaEdit").val('');
                 limpiarDatosConcepto();
                 showModalConcept();
             });
 
-            $('#codTipoDato').change(function() {
+            $('#codConcepto').change(function() {
                 $("#minimoConcepto").val("");
                 $("#maximoConcepto").val("");
                 $("#divNumerico").hide();

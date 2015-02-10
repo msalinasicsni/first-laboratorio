@@ -249,8 +249,8 @@
 	<script src="${jqueryBlockUi}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/administracion/responseReview.js" var="concepto" />
-	<script src="${concepto}"></script>
+	<spring:url value="/resources/scripts/administracion/responseReview.js" var="respuesta" />
+	<script src="${respuesta}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>

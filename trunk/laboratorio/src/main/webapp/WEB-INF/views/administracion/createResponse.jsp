@@ -280,7 +280,7 @@
             <form id="concepto-form" class="smart-form" novalidate="novalidate">
             <fieldset>
                 <div class="row">
-                    <input id="idConceptoEdit" type="hidden" value=""/>
+                    <input id="idRespuestaEdit" type="hidden" value=""/>
                     <input id="codigoDatoNumerico" type="hidden" value="${codigoDatoNumerico}"/>
                     <section class="col col-sm-12 col-md-6 col-lg-6">
                         <label class="text-left txt-color-blue font-md">
@@ -304,10 +304,10 @@
                         <span class="input-group-addon">
                             <i class="fa fa-location-arrow fa-fw"></i>
                         </span>
-                            <select  class="select2" id="codTipoDato" name="codTipoDato" >
+                            <select  class="select2" id="codConcepto" name="codConcepto" >
                                 <option value=""><spring:message code="lbl.select" />...</option>
-                                <c:forEach items="${tiposDatos}" var="tipoDato">
-                                    <option value="${tipoDato.idTipoDato}">${tipoDato.nombre}</option>
+                                <c:forEach items="${conceptsList}" var="respuesta">
+                                    <option value="${respuesta.idConcepto}">${respuesta.nombre}</option>
                                 </c:forEach>
                             </select>
                         </div>
