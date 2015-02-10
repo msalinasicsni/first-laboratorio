@@ -53,7 +53,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/tipoDato/init" htmlEscape="true "/>"><spring:message code="menu.admin.datatypes" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/conceptos/init" htmlEscape="true "/>"><spring:message code="menu.admin.concept" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -68,7 +68,7 @@
         <h1 class="page-title txt-color-blueDark">
             <!-- PAGE HEADER -->
             <i class="fa-fw fa fa-group"></i>
-            <spring:message code="menu.admin.datatypes" />
+            <spring:message code="menu.admin.concept" />
 						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.add.edit" />
 						</span>
@@ -131,20 +131,20 @@
 
                         <p class="alert alert-info" >
 
-                            <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-default"><i class="fa fa-plus"></i> <spring:message code="lbl.dataType" /></button>
+                            <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-default"><i class="fa fa-plus"></i> <spring:message code="lbl.concept" /></button>
                         </p>
 
                         <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
-                        <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.datatype.added"/>"/>
+                        <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.concept.added"/>"/>
                         <input id="msjSuccessful1" type="hidden" value="<spring:message code="msg.value.added"/>"/>
                         <input id="msg_value_cancel" type="hidden" value="<spring:message code="msg.value.successfully.cancel"/>"/>
-                        <input id="msg_dataType_cancel" type="hidden" value="<spring:message code="msg.dt.successfully.cancel"/>"/>
+                        <input id="msg_conc_cancel" type="hidden" value="<spring:message code="msg.conc.successfully.cancel"/>"/>
 
-                        <table id="datatypes-records" class="table table-striped table-bordered table-hover" width="100%">
+                        <table id="concepts-records" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>
                             <tr>
                                 <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
-                                <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dataType"/></th>
+                                <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.datatype"/></th>
                                 <th><spring:message code="act.edit"/></th>
                                 <th><spring:message code="lbl.add.values"/></th>
                                 <th><spring:message code="lbl.override"/></th>
@@ -178,15 +178,15 @@
                                 </button>
                                 <h4 class="modal-title">
                                     <i class="fa-fw fa fa-list"></i>
-                                    <spring:message code="lbl.add.edit.datatype" />
+                                    <spring:message code="lbl.add.edit.concept"/>
                                 </h4>
                             </div>
                         </div>
 
                         <div class="modal-body">
-                            <form id="dataType-form" class="smart-form" autocomplete="off">
+                            <form id="concepts-form" class="smart-form" autocomplete="off">
                                 <div class="row">
-                                    <input id="idTipoDato" hidden="hidden" type="text" name="idTipoDato"/>
+                                    <input id="idConcepto" hidden="hidden" type="text" name="idConcepto"/>
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.name"/>
@@ -209,7 +209,7 @@
 
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.dataType"/> </label>
+                                            <spring:message code="lbl.datatype"/> </label>
 
                                         <div class="input-group">
                                             <span class="input-group-addon"><i class="fa fa-list fa-fw"></i></span>
@@ -260,7 +260,7 @@
                             <form id="values-form" class="smart-form" autocomplete="off">
 
                                 <div class="row">
-                                    <input id="idTipoD" hidden="hidden" type="text" name="idTipoD"/>
+                                    <input id="idC" hidden="hidden" type="text" name="idC"/>
                                     <input id="idCatalogoLista" hidden="hidden" type="text" name="idCatalogoLista"/>
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
@@ -356,7 +356,7 @@
 <script src="${jqueryInputMask}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/administracion/dataTypeEnter.js" var="dataTypeScript" />
+<spring:url value="/resources/scripts/administracion/conceptEnter.js" var="dataTypeScript" />
 <script src="${dataTypeScript}"></script>
 <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 <script src="${handleDatePickers}"></script>
@@ -364,30 +364,29 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="getDataTypes" value="/tipoDato/getDataTypes"/>
-<c:url var="addUpdateUrl" value="/tipoDato/addUpdateDataType"/>
-<c:url var="getValues" value="/tipoDato/getValuesCat"/>
-<c:url var="addUpdateValue" value="/tipoDato/addUpdateValue"/>
+<c:url var="getConcepts" value="/conceptos/getConcepts"/>
+<c:url var="addUpdateUrl" value="/conceptos/addUpdateConcept"/>
+<c:url var="getValues" value="/conceptos/getValuesCat"/>
+<c:url var="addUpdateValue" value="/conceptos/addUpdateValue"/>
 
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
         var parametros = {blockMess: "${blockMess}",
-            getDataTypes : "${getDataTypes}",
-            overrideUrl: "${overrideUrl}",
+            getConcepts : "${getConcepts}",
             addUpdateUrl: "${addUpdateUrl}",
             getValues: "${getValues}",
-            addUpdateValue : "${addUpdateValue}",
-            overrideValueUrl: "${overrideValueUrl}"
+            addUpdateValue : "${addUpdateValue}"
+
         };
-        DataTypes.init(parametros);
+       Concepts.init(parametros);
 
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.administracion").addClass("open");
-        $("li.tipoDatos").addClass("active");
+        $("li.concepto").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.tipoDatos").parents("ul").slideDown(200);
+            $("li.concepto").parents("ul").slideDown(200);
         }
     });
 </script>

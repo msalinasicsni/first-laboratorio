@@ -11,10 +11,10 @@ import java.io.Serializable;
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "tipo_dato", schema = "laboratorio")
-public class TipoDato implements Serializable {
+@Table(name = "concepto", schema = "laboratorio")
+public class Concepto implements Serializable {
 
-    Integer idTipoDato;
+    Integer idConcepto;
     String nombre;
     boolean pasivo;
     TipoDatoCatalogo tipo;
@@ -23,13 +23,13 @@ public class TipoDato implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
-    @Column(name = "ID_TIPO_DATO", nullable = false, insertable = true, updatable = false)
-    public Integer getIdTipoDato() {
-        return idTipoDato;
+    @Column(name = "ID_CONCEPTO", nullable = false, insertable = true, updatable = false)
+    public Integer getIdConcepto() {
+        return idConcepto;
     }
 
-    public void setIdTipoDato(Integer idTipoDato) {
-        this.idTipoDato = idTipoDato;
+    public void setIdConcepto(Integer idConcepto) {
+        this.idConcepto = idConcepto;
     }
 
     @Basic

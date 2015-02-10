@@ -78,12 +78,18 @@
                         <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="menu.result.income" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="menu.result.income" /></a>
                     </li>
                 </ul>
+
+                <ul>
+                    <li class="approveResult">
+                        <a href="<spring:url value="/resultados/aprobacion/init" htmlEscape="true "/>" title="<spring:message code="menu.approval.results" />"><i class="fa fa-lg fa-fw fa-check-circle"></i> <spring:message code="menu.approval.results" /></a>
+                    </li>
+                </ul>
             </li>
             <li class="administracion">
                 <a href="#" title="<spring:message code="menu.administration" />"><i class="fa fa-lg fa-fw fa-cogs"></i> <span class="menu-item-parent"><spring:message code="menu.administration" /></span></a>
                 <ul>
-                    <li class="tipoDatos">
-                        <a href="<spring:url value="/tipoDato/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.datatypes" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.datatypes" /></a>
+                    <li class="concepto">
+                        <a href="<spring:url value="/conceptos/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.concept" /></a>
                     </li>
                     <li class="conceptos">
                         <a href="<spring:url value="/administracion/respuestas/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.respuestas" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.respuestas" /></a>
