@@ -1,6 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.resultados;
 
-import ni.gob.minsa.laboratorio.domain.muestra.AlicuotaRegistro;
+import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
@@ -20,8 +20,8 @@ public class DetalleResultado implements Serializable {
 
     String idDetalle;
     String valor;
-    AlicuotaRegistro alicuotaRegistro;
-    RespuestaExamen concepto;
+    OrdenExamen examen;
+    RespuestaExamen respuesta;
     Usuarios usuarioRegistro;
     Timestamp fechahRegistro;
     boolean pasivo;
@@ -93,26 +93,26 @@ public class DetalleResultado implements Serializable {
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_ALICUOTA", referencedColumnName = "ID_ALICUOTA", nullable = false)
-    @ForeignKey(name = "ID_EXAMEN_FK")
-    public AlicuotaRegistro getAlicuotaRegistro() {
-        return alicuotaRegistro;
+    @JoinColumn(name = "ID_ORDEN_EXAMEN", referencedColumnName = "ID_ORDEN_EXAMEN", nullable = false)
+    @ForeignKey(name = "ID_ORDEN_EXAMEN_FK")
+    public OrdenExamen getExamen() {
+        return examen;
     }
 
-    public void setAlicuotaRegistro(AlicuotaRegistro alicuotaRegistro) {
-        this.alicuotaRegistro = alicuotaRegistro;
+    public void setExamen(OrdenExamen alicuotaRegistro) {
+        this.examen = alicuotaRegistro;
     }
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_CONCEPTO", referencedColumnName = "ID_CONCEPTO", nullable = false)
+    @JoinColumn(name = "ID_RESPUESTA", referencedColumnName = "ID_RESPUESTA", nullable = false)
     @ForeignKey(name = "CONCEPTO_DR_FK")
-    public RespuestaExamen getConcepto() {
-        return concepto;
+    public RespuestaExamen getRespuesta() {
+        return respuesta;
     }
 
-    public void setConcepto(RespuestaExamen concepto) {
-        this.concepto = concepto;
+    public void setRespuesta(RespuestaExamen respuesta) {
+        this.respuesta = respuesta;
     }
 
     @ManyToOne(optional = true)

@@ -8,7 +8,7 @@ import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
-import ni.gob.minsa.laboratorio.domain.resultados.TipoDato;
+import ni.gob.minsa.laboratorio.domain.resultados.Concepto;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -65,8 +65,8 @@ public class RespuestasExamenController {
     private ExamenesService examenesService;
 
     @Autowired
-    @Qualifier(value = "tipoDatoService")
-    private TipoDatoService tipoDatoService;
+    @Qualifier(value = "conceptoService")
+    private ConceptoService conceptoService;
 
     @Autowired
     @Qualifier(value = "parametrosService")
@@ -92,7 +92,7 @@ public class RespuestasExamenController {
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
             mav.addObject("notificaciones", notificacionList);
-            mav.setViewName("administracion/searchConcepts");
+            mav.setViewName("administracion/searchResponse");
         }else
             mav.setViewName(urlValidacion);
 
@@ -126,12 +126,12 @@ public class RespuestasExamenController {
                 CatalogoExamenes examen = examenesService.getExamenesById(Integer.valueOf(arParametros[0]));
                 Catalogo_Dx diagnostico = tomaMxService.getDxsById(Integer.valueOf(arParametros[1]));
                 TipoNotificacion tipoNotificacion = catalogoService.getTipoNotificacion(arParametros[2]);
-                List<TipoDato> tiposDatos = tipoDatoService.getDataTypeList();
+                List<Concepto> conceptsList = conceptoService.getConceptsList();
                 Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
                 mav.addObject("examen", examen);
                 mav.addObject("tipoNotificacion", tipoNotificacion);
                 mav.addObject("diagnostico", diagnostico);
-                mav.addObject("tiposDatos",tiposDatos);
+                mav.addObject("conceptsList",conceptsList);
                 mav.addObject("codigoDatoNumerico",parametro.getValor());
             }
 
@@ -158,9 +158,9 @@ public class RespuestasExamenController {
 
     @RequestMapping(value = "getTipoDato", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    TipoDato getTipoDato(@RequestParam(value = "idTipoDato", required = true) Integer idTipoDato) throws Exception {
+    Concepto getTipoDato(@RequestParam(value = "idTipoDato", required = true) Integer idTipoDato) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        return tipoDatoService.getDataTypeById(idTipoDato);
+        return conceptoService.getConceptById(idTipoDato);
     }
 
     @RequestMapping(value = "agregarActualizarRespuesta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -179,7 +179,7 @@ public class RespuestasExamenController {
             RespuestaExamen concepto = jsonToRespuesta(strConcepto);
             concepto.setUsuarioRegistro(usuario);
             //si tiene id de concepto entonces se debe actualizar, sino se agrega
-            if (concepto.getIdConcepto()!=null)
+            if (concepto.getIdRespuesta()!=null)
                 respuestasExamenService.updateResponse(concepto);
             else
                 respuestasExamenService.addResponse(concepto);
@@ -232,34 +232,34 @@ public class RespuestasExamenController {
     }
 
     private RespuestaExamen jsonToRespuesta(String jsonRespuesta){
-        RespuestaExamen concepto = new RespuestaExamen();
+        RespuestaExamen respuestaExamen = new RespuestaExamen();
         JsonObject jsonpObject = new Gson().fromJson(jsonRespuesta, JsonObject.class);
         //si hay idConcepto se obtiene registro para actualizar, luego si vienen los demas datos se actualizan
-        if (jsonpObject.get("idConcepto")!=null && !jsonpObject.get("idConcepto").getAsString().isEmpty()) {
-            concepto = respuestasExamenService.getRespuestaById(jsonpObject.get("idConcepto").getAsInt());
+        if (jsonpObject.get("idRespuesta")!=null && !jsonpObject.get("idRespuesta").getAsString().isEmpty()) {
+            respuestaExamen = respuestasExamenService.getRespuestaById(jsonpObject.get("idRespuesta").getAsInt());
         }
         if (jsonpObject.get("idExamen")!=null && !jsonpObject.get("idExamen").getAsString().isEmpty()) {
             CatalogoExamenes examen = examenesService.getExamenesById(jsonpObject.get("idExamen").getAsInt());
-            concepto.setIdExamen(examen);
+            respuestaExamen.setIdExamen(examen);
         }
         if (jsonpObject.get("nombre")!=null && !jsonpObject.get("nombre").getAsString().isEmpty())
-            concepto.setNombre(jsonpObject.get("nombre").getAsString());
-        if (jsonpObject.get("tipoDato")!=null && !jsonpObject.get("tipoDato").getAsString().isEmpty()) {
-            TipoDato tipoDato = tipoDatoService.getDataTypeById(jsonpObject.get("tipoDato").getAsInt());
-            concepto.setTipoDato(tipoDato);
+            respuestaExamen.setNombre(jsonpObject.get("nombre").getAsString());
+        if (jsonpObject.get("concepto")!=null && !jsonpObject.get("concepto").getAsString().isEmpty()) {
+            Concepto concepto = conceptoService.getConceptById(jsonpObject.get("concepto").getAsInt());
+            respuestaExamen.setConcepto(concepto);
         }
         if (jsonpObject.get("orden")!=null && !jsonpObject.get("orden").getAsString().isEmpty())
-            concepto.setOrden(jsonpObject.get("orden").getAsInt());
+            respuestaExamen.setOrden(jsonpObject.get("orden").getAsInt());
         if (jsonpObject.get("requerido")!=null && !jsonpObject.get("requerido").getAsString().isEmpty())
-            concepto.setRequerido(jsonpObject.get("requerido").getAsBoolean());
+            respuestaExamen.setRequerido(jsonpObject.get("requerido").getAsBoolean());
         if (jsonpObject.get("pasivo")!=null && !jsonpObject.get("pasivo").getAsString().isEmpty())
-            concepto.setPasivo(jsonpObject.get("pasivo").getAsBoolean());
+            respuestaExamen.setPasivo(jsonpObject.get("pasivo").getAsBoolean());
         if (jsonpObject.get("minimo")!=null && !jsonpObject.get("minimo").getAsString().isEmpty())
-            concepto.setMinimo(jsonpObject.get("minimo").getAsInt());
+            respuestaExamen.setMinimo(jsonpObject.get("minimo").getAsInt());
         if (jsonpObject.get("maximo")!=null && !jsonpObject.get("maximo").getAsString().isEmpty())
-            concepto.setMaximo(jsonpObject.get("maximo").getAsInt());
-        concepto.setFechahRegistro(new Timestamp(new Date().getTime()));
-        return  concepto;
+            respuestaExamen.setMaximo(jsonpObject.get("maximo").getAsInt());
+        respuestaExamen.setFechahRegistro(new Timestamp(new Date().getTime()));
+        return  respuestaExamen;
     }
 
 }

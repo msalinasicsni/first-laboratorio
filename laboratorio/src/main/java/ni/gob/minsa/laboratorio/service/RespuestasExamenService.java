@@ -88,18 +88,18 @@ public class RespuestasExamenService {
         return q.list();
     }
 
-    public RespuestaExamen getRespuestaById(Integer idConcepto){
-        String query = "from RespuestaExamen as a where idConcepto =:idConcepto";
+    public RespuestaExamen getRespuestaById(Integer idRespuesta){
+        String query = "from RespuestaExamen as a where idRespuesta =:idRespuesta";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
-        q.setParameter("idConcepto", idConcepto);
+        q.setParameter("idRespuesta", idRespuesta);
         return (RespuestaExamen)q.uniqueResult();
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdExamen(Integer idExamen) throws Exception {
-        String query = "Select a from Catalogo_Lista as a inner join a.idTipoDato tdl , RespuestaExamen as c inner join c.tipoDato tdc " +
-                "where a.pasivo = false and tdl.idTipoDato = tdc.idTipoDato and c.idExamen.idExamen =:idExamen" +
+        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaExamen as r inner join r.concepto tdc " +
+                "where a.pasivo = false and tdl.idConcepto = tdc.idConcepto and r.idExamen.idExamen =:idExamen" +
                 " order by  a.valor";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);

@@ -132,9 +132,9 @@ var IncomeResult = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idAlicuota;
+                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idOrdenExamen;
                             table1.fnAddData(
-                                [dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara, dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx ,dataToLoad[i].fechaInicioSintomas,
+                                [/*dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara,*/ dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx ,dataToLoad[i].fechaInicioSintomas,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     }else{
@@ -154,79 +154,11 @@ var IncomeResult = function () {
 				});
             }
 
-            function getConcepts() {
-                bloquearUI(parametros.blockMess);
-                $.getJSON(parametros.sConceptosUrl, {
-                    idExamen: $("#idExamen").val() ,
-                    ajax : 'true'
-                }, function(dataToLoad) {
-                    table2.fnClearTable();
-                    var len = Object.keys(dataToLoad).length;
-                    if (len > 0) {
-                        for (var i = 0; i < len; i++) {
-                            var req, pas, botonEditar;
-                            if (dataToLoad[i].requerido==true)
-                                req = $("#val_yes").val();
-                            else
-                                req = $("#val_no").val();
-                            if (dataToLoad[i].pasivo==true) {
-                                pas = $("#val_yes").val();
-                                botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
-                            } else {
-                                pas = $("#val_no").val();
-                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
-                            }
-                            table2.fnAddData(
-                                [dataToLoad[i].nombre,dataToLoad[i].tipoDato.tipo.codigo,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo
-                                    ]);
-                        }
-
-                        /*$(".anularConcepto").on("click", function(){
-                         $("#idConceptoEdit").val('');
-                         anularConcepto($(this).data('id'));
-                         });
-                         $(".editarConcepto").on("click", function(){
-                         $("#idConceptoEdit").val($(this).data('id'));
-                         getConcept($(this).data('id'));
-                         showModalConcept();
-                         });
-
-                         //al paginar se define nuevamente la función de cargar el detalle
-                         $(".dataTables_paginate").on('click', function() {
-                         /*$(".anularConcepto").on('click', function () {
-                         $("#idConceptoEdit").val('');
-                         console.log("entra anular");
-                         anularConcepto($(this).data('id'));
-                         });
-                         $(".editarConcepto").on("click", function(){
-                         console.log("entra editar");
-                         $("#idConceptoEdit").val($(this).data('id'));
-                         getConcept($(this).data('id'));
-                         showModalConcept();
-                         });
-                         });*/
-
-                    }else{
-                        $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
-                            content: $("#smallBox_content").val(),
-                            color: "#C46A69",
-                            iconSmall: "fa fa-warning",
-                            timeout: 4000
-                        });
-                    }
-                    desbloquearUI();
-                }).fail(function(er) {
-                    desbloquearUI();
-                    alert( "error "+er );
-                });
-            }
-
             function guardarResultado() {
                 bloquearUI(parametros.blockMess);
                 var objResultado = {};
                 var objDetalle = {};
-                var cantConceptos = 0;
+                var cantRespuestas = 0;
                 $.getJSON(parametros.sConceptosUrl, {
                     idExamen: $("#idExamen").val() ,
                     ajax : 'false'
@@ -234,55 +166,55 @@ var IncomeResult = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var idControlConcepto;
-                            var valorControlConcepto;
-                            switch (dataToLoad[i].tipoDato.tipo.codigo) {
+                            var idControlRespuesta;
+                            var valorControlRespuesta;
+                            switch (dataToLoad[i].concepto.tipo.codigo) {
                                 case 'TPDATO|LOG':
                                     console.log('logico');
-                                    idControlConcepto = dataToLoad[i].idConcepto;
-                                    //console.log(idControlConcepto);
-                                    valorControlConcepto = $('#'+idControlConcepto).is(':checked');
-                                    //console.log(valorControlConcepto);
+                                    idControlRespuesta = dataToLoad[i].idRespuesta;
+                                    //console.log(idControlRespuesta);
+                                    valorControlRespuesta = $('#'+idControlRespuesta).is(':checked');
+                                    //console.log(valorControlRespuesta);
                                     break;
                                 case 'TPDATO|LIST':
                                     console.log('lista');
-                                    idControlConcepto = dataToLoad[i].idConcepto;
-                                    //console.log(idControlConcepto);
-                                    valorControlConcepto = $('#'+idControlConcepto).find('option:selected').val();
-                                    //console.log(valorControlConcepto);
+                                    idControlRespuesta = dataToLoad[i].idRespuesta;
+                                    //console.log(idControlRespuesta);
+                                    valorControlRespuesta = $('#'+idControlRespuesta).find('option:selected').val();
+                                    //console.log(valorControlRespuesta);
                                     break;
                                 case 'TPDATO|TXT':
                                     console.log('texto');
-                                    idControlConcepto = dataToLoad[i].idConcepto;
-                                    //console.log(idControlConcepto);
-                                    valorControlConcepto = $('#'+idControlConcepto).val();
-                                    //console.log(valorControlConcepto);
+                                    idControlRespuesta = dataToLoad[i].idRespuesta;
+                                    //console.log(idControlRespuesta);
+                                    valorControlRespuesta = $('#'+idControlRespuesta).val();
+                                    //console.log(valorControlRespuesta);
                                     break;
                                 case 'TPDATO|NMRO':
                                     console.log('numero');
-                                    idControlConcepto = dataToLoad[i].idConcepto;
-                                    //console.log(idControlConcepto);
-                                    valorControlConcepto = $('#'+idControlConcepto).val();
-                                    //console.log(valorControlConcepto);
+                                    idControlRespuesta = dataToLoad[i].idRespuesta;
+                                    //console.log(idControlRespuesta);
+                                    valorControlRespuesta = $('#'+idControlRespuesta).val();
+                                    //console.log(valorControlRespuesta);
                                     break;
                                 default:
-                                    console.log('concepto sin tipo');
+                                    console.log('respuesta sin concepto');
                                     break;
 
                             }
-                            console.log(idControlConcepto);
-                            console.log(valorControlConcepto);
+                            console.log(idControlRespuesta);
+                            console.log(valorControlRespuesta);
                             var objConcepto = {};
-                            objConcepto["idConcepto"] = idControlConcepto;
-                            objConcepto["valor"]=valorControlConcepto;
+                            objConcepto["idRespuesta"] = idControlRespuesta;
+                            objConcepto["valor"]=valorControlRespuesta;
                             console.log(objConcepto);
                             objDetalle[i] = objConcepto;
-                            cantConceptos ++;
+                            cantRespuestas ++;
                         }
-                        objResultado["idAlicuota"] = $("#idAlicuota").val();
-                        objResultado["strConceptos"] = objDetalle;
+                        objResultado["idOrdenExamen"] = $("#idOrdenExamen").val();
+                        objResultado["strRespuestas"] = objDetalle;
                         objResultado["mensaje"] = '';
-                        objResultado["cantConceptos"] = cantConceptos;
+                        objResultado["cantRespuestas"] = cantRespuestas;
                         console.log(objDetalle);
                         $.ajax(
                             {
