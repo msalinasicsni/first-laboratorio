@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * Created by FIRSTICT on 12/10/2014.
+ * V 1.0
  */
 @Service("recepcionMxService")
 @Transactional

@@ -2,20 +2,15 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
-import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
-import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import ni.gob.minsa.laboratorio.domain.resultados.Conceptos;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import ni.gob.minsa.laboratorio.domain.resultados.TipoDato;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
-import ni.gob.minsa.laboratorio.utilities.DateUtil;
-import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +36,10 @@ import java.util.*;
  * V1.0
  */
 @Controller
-@RequestMapping("administracion/conceptos")
-public class ConceptosController {
+@RequestMapping("administracion/respuestas")
+public class RespuestasExamenController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConceptosController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RespuestasExamenController.class);
     @Autowired
     @Qualifier(value = "seguridadService")
     private SeguridadService seguridadService;
@@ -54,8 +49,8 @@ public class ConceptosController {
     private UsuarioService usuarioService;
 
     @Autowired
-    @Qualifier(value = "conceptosService")
-    private ConceptosService conceptosService;
+    @Qualifier(value = "respuestasExamenService")
+    private RespuestasExamenService respuestasExamenService;
 
     @Autowired
     @Qualifier(value = "tomaMxService")
@@ -82,7 +77,7 @@ public class ConceptosController {
 
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
-        logger.debug("buscar ordenes para ordenExamen");
+        logger.debug("pantalla de inicio para crear respuestas - búsqueda examenes");
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -112,8 +107,8 @@ public class ConceptosController {
     }
 
     @RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
-    public ModelAndView createConceptsForm(HttpServletRequest request, @PathVariable("strParametros")  String strParametros) throws Exception {
-        logger.debug("buscar ordenes para ordenExamen");
+    public ModelAndView createResponseForm(HttpServletRequest request, @PathVariable("strParametros") String strParametros) throws Exception {
+        logger.debug("inicializar pantalla de creación de respuestas para examen");
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -140,18 +135,25 @@ public class ConceptosController {
                 mav.addObject("codigoDatoNumerico",parametro.getValor());
             }
 
-            mav.setViewName("administracion/createConcepts");
+            mav.setViewName("administracion/createResponse");
         }else
             mav.setViewName(urlValidacion);
 
         return mav;
     }
 
-    @RequestMapping(value = "getConceptosExamen", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getRespuetasExamen", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<Conceptos> getConceptosExamen(@RequestParam(value = "idExamen", required = true) String idExamen) throws Exception {
+    List<RespuestaExamen> getRespuetasExamen(@RequestParam(value = "idExamen", required = true) String idExamen) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        return conceptosService.getConceptosByExamen(Integer.valueOf(idExamen));
+        return respuestasExamenService.getRespuestasByExamen(Integer.valueOf(idExamen));
+    }
+
+    @RequestMapping(value = "getRespuestasActivasExamen", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<RespuestaExamen> getRespuestasActivasExamen(@RequestParam(value = "idExamen", required = true) String idExamen) throws Exception {
+        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        return respuestasExamenService.getRespuestasActivasByExamen(Integer.valueOf(idExamen));
     }
 
     @RequestMapping(value = "getTipoDato", method = RequestMethod.GET, produces = "application/json")
@@ -161,8 +163,8 @@ public class ConceptosController {
         return tipoDatoService.getDataTypeById(idTipoDato);
     }
 
-    @RequestMapping(value = "agregarActualizarConcepto", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    protected void agregarActualizarConcepto(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @RequestMapping(value = "agregarActualizarRespuesta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void agregarActualizarRespuesta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
         String strConcepto="";
@@ -174,13 +176,13 @@ public class ConceptosController {
             strConcepto = jsonpObject.get("concepto").toString();
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
-            Conceptos concepto = jsonToConcepto(strConcepto);
+            RespuestaExamen concepto = jsonToRespuesta(strConcepto);
             concepto.setUsuarioRegistro(usuario);
             //si tiene id de concepto entonces se debe actualizar, sino se agrega
             if (concepto.getIdConcepto()!=null)
-                conceptosService.updateConcept(concepto);
+                respuestasExamenService.updateResponse(concepto);
             else
-                conceptosService.addConcept(concepto);
+                respuestasExamenService.addResponse(concepto);
 
 
         } catch (Exception ex) {
@@ -199,12 +201,12 @@ public class ConceptosController {
         }
     }
 
-    @RequestMapping(value = "getConceptoById", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getRespuestaById", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    Conceptos getConceptoById(@RequestParam(value = "idConcepto", required = true) Integer idConcepto) throws Exception {
+    RespuestaExamen getRespuestaById(@RequestParam(value = "idConcepto", required = true) Integer idConcepto) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        return conceptosService.getConceptoById(idConcepto);
+        return respuestasExamenService.getRespuestaById(idConcepto);
     }
 
     private String ExamenesToJson(List<Object[]> objectsExamen){
@@ -229,12 +231,12 @@ public class ConceptosController {
         return escaper.translate(jsonResponse);
     }
 
-    private Conceptos jsonToConcepto(String jsonConcepto){
-        Conceptos concepto = new Conceptos();
-        JsonObject jsonpObject = new Gson().fromJson(jsonConcepto, JsonObject.class);
+    private RespuestaExamen jsonToRespuesta(String jsonRespuesta){
+        RespuestaExamen concepto = new RespuestaExamen();
+        JsonObject jsonpObject = new Gson().fromJson(jsonRespuesta, JsonObject.class);
         //si hay idConcepto se obtiene registro para actualizar, luego si vienen los demas datos se actualizan
         if (jsonpObject.get("idConcepto")!=null && !jsonpObject.get("idConcepto").getAsString().isEmpty()) {
-            concepto = conceptosService.getConceptoById(jsonpObject.get("idConcepto").getAsInt());
+            concepto = respuestasExamenService.getRespuestaById(jsonpObject.get("idConcepto").getAsInt());
         }
         if (jsonpObject.get("idExamen")!=null && !jsonpObject.get("idExamen").getAsString().isEmpty()) {
             CatalogoExamenes examen = examenesService.getExamenesById(jsonpObject.get("idExamen").getAsInt());

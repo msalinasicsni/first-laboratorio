@@ -59,7 +59,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/createConcepts" htmlEscape="true "/>"><spring:message code="menu.admin.concept" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/createConcepts" htmlEscape="true "/>"><spring:message code="menu.admin.respuestas" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -74,9 +74,9 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-group"></i> 
-							<spring:message code="lbl.concepts.title" />
+							<spring:message code="lbl.response.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.concepts.create.subtitle" />
+							<spring:message code="lbl.response.create.subtitle" />
 						</span>
 					</h1>
 				</div>
@@ -120,7 +120,7 @@
                         <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
                             <header>
                                 <span class="widget-icon"> <i class="fa fa-th"></i> </span>
-                                <h2><spring:message code="lbl.concepts.widgettitle" /> </h2>
+                                <h2><spring:message code="lbl.response.widgettitle" /> </h2>
                             </header>
                             <!-- widget div-->
                             <div>
@@ -134,11 +134,11 @@
                                 <div class="widget-body no-padding">
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
-                                    <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.concepts.found"/>"/>
+                                    <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.response.found"/>"/>
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
-                                    <input id="msg_concept_cancel" type="hidden" value="<spring:message code="msg.concept.successfully.cancel"/>"/>
-                                    <input id="msg_concept_added" type="hidden" value="<spring:message code="msg.concept.successfully.added"/>"/>
-                                    <input id="msg_concept_updated" type="hidden" value="<spring:message code="msg.concept.successfully.updated"/>"/>
+                                    <input id="msg_concept_cancel" type="hidden" value="<spring:message code="msg.response.successfully.cancel"/>"/>
+                                    <input id="msg_concept_added" type="hidden" value="<spring:message code="msg.response.successfully.added"/>"/>
+                                    <input id="msg_concept_updated" type="hidden" value="<spring:message code="msg.response.successfully.updated"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <input id="val_yes" type="hidden" value="<spring:message code="lbl.yes"/>"/>
                                     <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
@@ -195,7 +195,7 @@
                                             <button type="button" id="btnAddConcept" class="btn btn-primary styleButton" data-toggle="modal"
                                                     data-target="myModal">
                                                 <i class="fa fa-plus icon-white"></i>
-                                                <spring:message code="act.add.concept"/>
+                                                <spring:message code="act.add.response"/>
                                             </button>
                                             <input id="idExamen" type="hidden" value="${examen.idExamen}"/>
                                             <input id="idDx" type="hidden" value="${diagnostico.idDiagnostico}"/>
@@ -214,7 +214,7 @@
                         <div class="jarviswidget jarviswidget-color-darken" id="wid-id-1">
                             <header>
                                 <span class="widget-icon"> <i class="fa fa-font"></i> </span>
-                                <h2><spring:message code="lbl.concepts.header" /> </h2>
+                                <h2><spring:message code="lbl.response.header" /> </h2>
                             </header>
                             <!-- widget div-->
                             <div>
@@ -227,13 +227,13 @@
                                     <table id="concepts_list" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
                                         <tr>
-                                            <th data-class="expand"><spring:message code="lbl.concepts.name"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.concepts.datatype"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.concepts.order"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.concepts.required"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.concepts.pasive"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.concepts.minvalue"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.concepts.maxvalue"/></th>
+                                            <th data-class="expand"><spring:message code="lbl.response.name"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.concept"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.order"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.required"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.pasive"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.minvalue"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.maxvalue"/></th>
                                             <th><spring:message code="act.override"/></th>
                                             <th><spring:message code="act.edit"/></th>
                                         </tr>
@@ -264,7 +264,7 @@
             <div class="modal-content">
             <div class="modal-header">
                 <!--<h4 class="modal-title">
-                    <spring:message code="lbl.concepts.header.modal.add" />
+                    <spring:message code="lbl.response.header.modal.add" />
                 </h4>-->
                 <div class="alert alert-info">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
@@ -272,7 +272,7 @@
                     </button>
                     <h4 class="modal-title">
                         <i class="fa-fw fa fa-font"></i>
-                        <spring:message code="lbl.concepts.header.modal.add" />
+                        <spring:message code="lbl.response.header.modal.add" />
                     </h4>
                 </div>
             </div>
@@ -284,21 +284,21 @@
                     <input id="codigoDatoNumerico" type="hidden" value="${codigoDatoNumerico}"/>
                     <section class="col col-sm-12 col-md-6 col-lg-6">
                         <label class="text-left txt-color-blue font-md">
-                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.concepts.name"/>
+                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.name"/>
                         </label>
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                <input class="form-control" type="text" name="nombreConcepto" id="nombreConcepto" placeholder=" <spring:message code="lbl.concepts.name" />"/>
+                                <input class="form-control" type="text" name="nombreConcepto" id="nombreConcepto" placeholder=" <spring:message code="lbl.response.name" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
-                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.concepts.name"/>
+                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.name"/>
                                 </b>
                             </label>
                         </div>
                     </section>
                     <section class="col col-sm-12 col-md-6 col-lg-6">
                         <label class="text-left txt-color-blue font-md">
-                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.concepts.datatype" />
+                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.concept" />
                         </label>
                         <div class="input-group">
                         <span class="input-group-addon">
@@ -316,20 +316,20 @@
                 <div class="row">
                     <section class="col col-sm-4 col-md-3 col-lg-3">
                         <label class="text-left txt-color-blue font-md">
-                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.concepts.order"/>
+                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.order"/>
                         </label>
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                <input class="form-control entero" type="text" name="ordenConcepto" id="ordenConcepto" placeholder=" <spring:message code="lbl.concepts.order" />"/>
+                                <input class="form-control entero" type="text" name="ordenConcepto" id="ordenConcepto" placeholder=" <spring:message code="lbl.response.order" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
-                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.concepts.order"/>
+                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.order"/>
                                 </b>
                             </label>
                         </div>
                     </section>
                     <section class="col col-sm-4 col-md-3 col-lg-3">
-                        <label class="text-left txt-color-blue font-md"><spring:message code="lbl.concepts.required"/></label>
+                        <label class="text-left txt-color-blue font-md"><spring:message code="lbl.response.required"/></label>
                                 <label class="checkbox">
                                     <input type="checkbox" name="checkbox-required" id="checkbox-required">
                                     <i></i>
@@ -337,7 +337,7 @@
 
                     </section>
                     <section class="col col-sm-4 col-md-3 col-lg-3">
-                        <label class="text-left txt-color-blue font-md"><spring:message code="lbl.concepts.pasive"/></label>
+                        <label class="text-left txt-color-blue font-md"><spring:message code="lbl.response.pasive"/></label>
                         <div class="row">
                             <div class="col col-4">
                                 <label class="checkbox">
@@ -350,28 +350,28 @@
                 <div class="row" id="divNumerico">
                     <section class="col col-sm-6 col-md-3 col-lg-3">
                         <label class="text-left txt-color-blue font-md">
-                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.concepts.minvalue"/>
+                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.minvalue"/>
                         </label>
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                <input class="form-control entero" type="text" name="minimoConcepto" id="minimoConcepto" placeholder=" <spring:message code="lbl.concepts.minvalue" />"/>
+                                <input class="form-control entero" type="text" name="minimoConcepto" id="minimoConcepto" placeholder=" <spring:message code="lbl.response.minvalue" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
-                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.concepts.minvalue"/>
+                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.minvalue"/>
                                 </b>
                             </label>
                         </div>
                     </section>
                     <section class="col col-sm-6 col-md-3 col-lg-3">
                         <label class="text-left txt-color-blue font-md">
-                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.concepts.maxvalue"/>
+                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.maxvalue"/>
                         </label>
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                <input class="form-control entero" type="text" name="maximoConcepto" id="maximoConcepto" placeholder=" <spring:message code="lbl.concepts.maxvalue" />"/>
+                                <input class="form-control entero" type="text" name="maximoConcepto" id="maximoConcepto" placeholder=" <spring:message code="lbl.response.maxvalue" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
-                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.concepts.maxvalue"/>
+                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.maxvalue"/>
                                 </b>
                             </label>
                         </div>
@@ -431,17 +431,17 @@
     <script src="${jqueryInputMask}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/administracion/concepts.js" var="concepts" />
+	<spring:url value="/resources/scripts/administracion/responseReview.js" var="concepts" />
 	<script src="${concepts}"></script>
     <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
     <script src="${handleInputMask}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="sConceptosUrl" value="/administracion/conceptos/getConceptosExamen"/>
-    <c:url var="sConceptoUrl" value="/administracion/conceptos/getConceptoById"/>
-    <c:url var="sActionUrl" value="/administracion/conceptos/agregarActualizarConcepto"/>
-    <c:url var="sTipoDatoUrl" value="/administracion/conceptos/getTipoDato"/>
+    <c:url var="sConceptosUrl" value="/administracion/respuestas/getRespuetasExamen"/>
+    <c:url var="sConceptoUrl" value="/administracion/respuestas/getRespuestaById"/>
+    <c:url var="sActionUrl" value="/administracion/respuestas/agregarActualizarRespuesta"/>
+    <c:url var="sTipoDatoUrl" value="/administracion/respuestas/getTipoDato"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();

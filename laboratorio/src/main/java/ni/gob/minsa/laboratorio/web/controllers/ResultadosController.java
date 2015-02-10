@@ -3,10 +3,11 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
-import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.Conceptos;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -16,12 +17,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -60,8 +68,12 @@ public class ResultadosController {
     private GeneracionAlicuotaService generacionAlicuotaService;
 
     @Autowired
-    @Qualifier(value = "conceptosService")
-    private ConceptosService conceptosService;
+    @Qualifier(value = "respuestasExamenService")
+    private RespuestasExamenService respuestasExamenService;
+
+    @Autowired
+    @Qualifier(value = "resultadosService")
+    private ResultadosService resultadosService;
 
     @Autowired
     MessageSource messageSource;
@@ -111,14 +123,14 @@ public class ResultadosController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             AlicuotaRegistro alicuota =  generacionAlicuotaService.getAliquotById(strIdRegAli);
-            List<Conceptos> conceptosList = conceptosService.getConceptosActivosByExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
-            List<Catalogo_Lista> listas = conceptosService.getCatalogoListaConceptoByIdExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
+            List<RespuestaExamen> respuestaExamenList = respuestasExamenService.getRespuestasActivasByExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
+            List<Catalogo_Lista> listas = respuestasExamenService.getCatalogoListaConceptoByIdExamen(alicuota.getIdOrden().getCodExamen().getIdExamen());
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(alicuota.getCodUnicoMx().getIdNotificacion().getIdNotificacion());
             mav.addObject("alicuota",alicuota);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
-            mav.addObject("conceptosList", conceptosList);
+            mav.addObject("conceptosList", respuestaExamenList);
             mav.addObject("valoresListas",listas);
             mav.setViewName("resultados/incomeResult");
         }else
@@ -128,11 +140,10 @@ public class ResultadosController {
     }
 
     @RequestMapping(value = "searchOrders", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody
-    String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
+    public @ResponseBody  String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
-        List<AlicuotaRegistro> ordenExamenList = alicuotaService.getAlicutoasByFiltro(filtroMx);
+        List<AlicuotaRegistro> ordenExamenList = alicuotaService.getAlicuotasByFiltro(filtroMx);
         return RegistroAlicuotaToJson(ordenExamenList);
     }
 
@@ -276,5 +287,59 @@ public class ResultadosController {
             mav.setViewName(urlValidacion);
 
         return mav;
+    }
+
+    @RequestMapping(value = "saveResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void saveResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String strConceptos="";
+        String idAlicuota="";
+        Integer cantConceptos=0;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            strConceptos = jsonpObject.get("strConceptos").toString();
+            idAlicuota = jsonpObject.get("idAlicuota").getAsString();
+            cantConceptos = jsonpObject.get("cantConceptos").getAsInt();
+            AlicuotaRegistro alicuota =  generacionAlicuotaService.getAliquotById(idAlicuota);
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            //se obtiene datos de los conceptos a registrar
+
+            JsonObject jObjectTomasMx = new Gson().fromJson(strConceptos, JsonObject.class);
+            for(int i = 0; i< cantConceptos;i++) {
+                String concepto = jObjectTomasMx.get(String.valueOf(i)).toString();
+                JsonObject jsconceptoObject = new Gson().fromJson(concepto, JsonObject.class);
+                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaById(jsconceptoObject.get("idConcepto").getAsInt());
+                String valor = jsconceptoObject.get("valor").getAsString();
+                DetalleResultado detalleResultado = new DetalleResultado();
+                detalleResultado.setFechahRegistro(new Timestamp(new Date().getTime()));
+                detalleResultado.setValor(valor);
+                detalleResultado.setConcepto(conceptoTmp);
+                detalleResultado.setAlicuotaRegistro(alicuota);
+                detalleResultado.setUsuarioRegistro(usuario);
+                if (detalleResultado.getValor()!=null && !detalleResultado.getValor().isEmpty()){
+                    resultadosService.addDetalleResultado(detalleResultado);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.send.receipt.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idAlicuota",idAlicuota);
+            map.put("strConceptos",strConceptos);
+            map.put("mensaje",resultado);
+            map.put("cantConceptos",cantConceptos.toString());
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
     }
 }

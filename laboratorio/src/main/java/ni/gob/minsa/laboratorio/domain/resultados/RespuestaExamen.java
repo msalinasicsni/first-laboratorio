@@ -14,8 +14,8 @@ import java.sql.Timestamp;
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "conceptos", schema = "laboratorio")
-public class Conceptos implements Serializable {
+@Table(name = "respuesta_examen", schema = "laboratorio")
+public class RespuestaExamen implements Serializable {
 
     Integer idConcepto;
     String nombre;

@@ -88,7 +88,7 @@ var IncomeResult = function () {
                     }
             });
             <!-- formulario de recepción en laboratorio -->
-            $('#receiptOrdersLab-form').validate({
+            $('#addResult-form').validate({
                 // Rules for form validation
                 rules: {
                     codResultado: {required : true},
@@ -99,15 +99,7 @@ var IncomeResult = function () {
                         error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
-                    //guardarRecepcionLab();
-                    $.smallBox({
-                        title: "Resultado registrado exitosamente" ,
-                        content: $("#smallBox_content").val(),
-                        color: "#739E73",
-                        iconSmall: "fa fa-success",
-                        timeout: 4000
-                    });
-                    setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},2000);
+                    guardarResultado();
                 }
             });
 
@@ -141,7 +133,6 @@ var IncomeResult = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var actionUrl = parametros.sActionUrl+dataToLoad[i].idAlicuota;
-                            console.log(actionUrl);
                             table1.fnAddData(
                                 [dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara, dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx ,dataToLoad[i].fechaInicioSintomas,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
@@ -186,7 +177,7 @@ var IncomeResult = function () {
                                 botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConcepto+'><i class="fa fa-times"></i></a>';
                             }
                             table2.fnAddData(
-                                [dataToLoad[i].nombre,dataToLoad[i].tipoDato.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo
+                                [dataToLoad[i].nombre,dataToLoad[i].tipoDato.tipo.codigo,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo
                                     ]);
                         }
 
@@ -231,95 +222,134 @@ var IncomeResult = function () {
                 });
             }
 
+            function guardarResultado() {
+                bloquearUI(parametros.blockMess);
+                var objResultado = {};
+                var objDetalle = {};
+                var cantConceptos = 0;
+                $.getJSON(parametros.sConceptosUrl, {
+                    idExamen: $("#idExamen").val() ,
+                    ajax : 'false'
+                }, function(dataToLoad) {
+                    var len = Object.keys(dataToLoad).length;
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            var idControlConcepto;
+                            var valorControlConcepto;
+                            switch (dataToLoad[i].tipoDato.tipo.codigo) {
+                                case 'TPDATO|LOG':
+                                    console.log('logico');
+                                    idControlConcepto = dataToLoad[i].idConcepto;
+                                    //console.log(idControlConcepto);
+                                    valorControlConcepto = $('#'+idControlConcepto).is(':checked');
+                                    //console.log(valorControlConcepto);
+                                    break;
+                                case 'TPDATO|LIST':
+                                    console.log('lista');
+                                    idControlConcepto = dataToLoad[i].idConcepto;
+                                    //console.log(idControlConcepto);
+                                    valorControlConcepto = $('#'+idControlConcepto).find('option:selected').val();
+                                    //console.log(valorControlConcepto);
+                                    break;
+                                case 'TPDATO|TXT':
+                                    console.log('texto');
+                                    idControlConcepto = dataToLoad[i].idConcepto;
+                                    //console.log(idControlConcepto);
+                                    valorControlConcepto = $('#'+idControlConcepto).val();
+                                    //console.log(valorControlConcepto);
+                                    break;
+                                case 'TPDATO|NMRO':
+                                    console.log('numero');
+                                    idControlConcepto = dataToLoad[i].idConcepto;
+                                    //console.log(idControlConcepto);
+                                    valorControlConcepto = $('#'+idControlConcepto).val();
+                                    //console.log(valorControlConcepto);
+                                    break;
+                                default:
+                                    console.log('concepto sin tipo');
+                                    break;
+
+                            }
+                            console.log(idControlConcepto);
+                            console.log(valorControlConcepto);
+                            var objConcepto = {};
+                            objConcepto["idConcepto"] = idControlConcepto;
+                            objConcepto["valor"]=valorControlConcepto;
+                            console.log(objConcepto);
+                            objDetalle[i] = objConcepto;
+                            cantConceptos ++;
+                        }
+                        objResultado["idAlicuota"] = $("#idAlicuota").val();
+                        objResultado["strConceptos"] = objDetalle;
+                        objResultado["mensaje"] = '';
+                        objResultado["cantConceptos"] = cantConceptos;
+                        console.log(objDetalle);
+                        $.ajax(
+                            {
+                                url: parametros.sSaveResult,
+                                type: 'POST',
+                                dataType: 'json',
+                                data: JSON.stringify(objResultado),
+                                contentType: 'application/json',
+                                mimeType: 'application/json',
+                                success: function (data) {
+                                    if (data.mensaje.length > 0){
+                                        $.smallBox({
+                                            title: data.mensaje ,
+                                            content: $("#smallBox_content").val(),
+                                            color: "#C46A69",
+                                            iconSmall: "fa fa-warning",
+                                            timeout: 4000
+                                        });
+                                    }else{
+                                        var msg = $("#msg_result_added").val();
+                                        $.smallBox({
+                                            title: msg ,
+                                            content: $("#smallBox_content").val(),
+                                            color: "#739E73",
+                                            iconSmall: "fa fa-success",
+                                            timeout: 4000
+                                        });
+                                        limpiarDatosRecepcion();
+                                        setTimeout(function () {window.location.href = parametros.sAlicuotasUrl},3000);
+                                    }
+                                    desbloquearUI();
+                                },
+                                error: function (data, status, er) {
+                                    desbloquearUI();
+                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                }
+                            });
+                    }else{
+                        desbloquearUI();
+                        $.smallBox({
+                            title: $("#msg_no_results_found").val() ,
+                            content: $("#smallBox_content").val(),
+                            color: "#C46A69",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
+
+                }).fail(function(er) {
+                    desbloquearUI();
+                    alert( "error "+er );
+                });
+
+            }
             jQuery.validator.addClassRules("requiredConcept", {
                 required: true
             });
 
-            getConcepts();
-
             $("#all-orders").click(function() {
                 getAlicuotas(true);
             });
-
-            <!-- para guardar recepción en laboratorio -->
-            function guardarRecepcionLab() {
-                bloquearUI(parametros.blockMess);
-                var ordenesObj = {};
-                ordenesObj['mensaje'] = '';
-                ordenesObj['idRecepcion']=$("#idRecepcion").val();
-                ordenesObj['calidadMx'] = $('#codCalidadMx option:selected').val();
-                ordenesObj['causaRechazo'] = $('#causaRechazo').val();
-                $.ajax(
-                    {
-                        url: parametros.sAddReceiptUrl,
-                        type: 'POST',
-                        dataType: 'json',
-                        data: JSON.stringify(ordenesObj),
-                        contentType: 'application/json',
-                        mimeType: 'application/json',
-                        success: function (data) {
-                            if (data.mensaje.length > 0){
-                                $.smallBox({
-                                    title: data.mensaje ,
-                                    content: $("#smallBox_content").val(),
-                                    color: "#C46A69",
-                                    iconSmall: "fa fa-warning",
-                                    timeout: 4000
-                                });
-                            }else{
-                                var msg = $("#msg_receipt_added").val();
-                                $.smallBox({
-                                    title: msg ,
-                                    content: $("#smallBox_content").val(),
-                                    color: "#739E73",
-                                    iconSmall: "fa fa-success",
-                                    timeout: 4000
-                                });
-                                limpiarDatosRecepcion();
-                                setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},2000);
-                            }
-                            desbloquearUI();
-                        },
-                        error: function (data, status, er) {
-                            desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
-                        }
-                    });
-
-            }
 
             function limpiarDatosRecepcion(){
                 //$("#txtNombreTransporta").val('');
                 //$("#txtTemperatura").val('');
                 //$("#codLaboratorioProce").val('').change();
             }
-
-            <!-- al seleccionar SILAIS -->
-            $('#codSilais').change(function(){
-                bloquearUI(parametros.blockMess);
-                if ($(this).val().length > 0) {
-                    $.getJSON(parametros.sUnidadesUrl, {
-                        codSilais: $(this).val(),
-                        ajax: 'true'
-                    }, function (data) {
-                        var html = null;
-                        var len = data.length;
-                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
-                        for (var i = 0; i < len; i++) {
-                            html += '<option value="' + data[i].codigo + '">'
-                                + data[i].nombre
-                                + '</option>';
-                            // html += '</option>';
-                        }
-                        $('#codUnidadSalud').html(html);
-                    })
-                }else{
-                    var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
-                    $('#codUnidadSalud').html(html);
-                }
-                $('#codUnidadSalud').val('').change();
-                desbloquearUI();
-            });
 
             //sólo para demo, no funcional
             <!--al seleccionar calidad de la muestra -->
