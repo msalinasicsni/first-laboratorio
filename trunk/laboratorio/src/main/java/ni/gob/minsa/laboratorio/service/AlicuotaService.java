@@ -1,13 +1,13 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Junction;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +41,7 @@ public class AlicuotaService {
         return (Alicuota)q.uniqueResult();
     }
 
-    public List<AlicuotaRegistro> getAlicutoasByFiltro(FiltroMx filtro){
+    public List<AlicuotaRegistro> getAlicuotasByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
         Criteria crit = session.createCriteria(AlicuotaRegistro.class, "alicuotaReg");
@@ -111,7 +111,9 @@ public class AlicuotaService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
-
+        crit.add( Subqueries.propertyNotIn("idAlicuota", DetachedCriteria.forClass(DetalleResultado.class)
+                .createAlias("alicuotaRegistro","resultado").add(Restrictions.eq("pasivo",false))
+                .setProjection(Property.forName("resultado.idAlicuota"))));
         return crit.list();
     }
 }

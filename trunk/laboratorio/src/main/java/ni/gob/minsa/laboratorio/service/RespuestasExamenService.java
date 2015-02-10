@@ -1,17 +1,10 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
-import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.Conceptos;
-import ni.gob.minsa.laboratorio.domain.resultados.TipoDato;
-import org.apache.commons.codec.language.Soundex;
-import org.hibernate.Criteria;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Junction;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,16 +17,16 @@ import java.util.List;
  * Created by FIRSTICT on 12/10/2014.
  * V1.0
  */
-@Service("conceptosService")
+@Service("respuestasExamenService")
 @Transactional
-public class ConceptosService {
+public class RespuestasExamenService {
 
-    private Logger logger = LoggerFactory.getLogger(ConceptosService.class);
+    private Logger logger = LoggerFactory.getLogger(RespuestasExamenService.class);
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
 
-    public ConceptosService(){}
+    public RespuestasExamenService(){}
 
     /**
      * Agrega una Registro de Recepción de muestra
@@ -41,7 +34,7 @@ public class ConceptosService {
      * @param dto Objeto a agregar
      * @throws Exception
      */
-    public void addConcept(Conceptos dto) throws Exception {
+    public void addResponse(RespuestaExamen dto) throws Exception {
         //String idMaestro;
         try {
             if (dto != null) {
@@ -50,9 +43,9 @@ public class ConceptosService {
                 session.save(dto);
             }
             else
-                throw new Exception("Objeto Concepto es NULL");
+                throw new Exception("Objeto Respuesta es NULL");
         }catch (Exception ex){
-            logger.error("Error al agregar Concepto",ex);
+            logger.error("Error al agregar Respuesta",ex);
             throw ex;
         }
     }
@@ -63,22 +56,22 @@ public class ConceptosService {
      * @param dto Objeto a actualizar
      * @throws Exception
      */
-    public void updateConcept(Conceptos dto) throws Exception {
+    public void updateResponse(RespuestaExamen dto) throws Exception {
         try {
             if (dto != null) {
                 Session session = sessionFactory.getCurrentSession();
                 session.update(dto);
             }
             else
-                throw new Exception("Objeto Concepto es NULL");
+                throw new Exception("Objeto Respuesta es NULL");
         }catch (Exception ex){
-            logger.error("Error al actualizar Concepto",ex);
+            logger.error("Error al actualizar Respuesta",ex);
             throw ex;
         }
     }
 
-    public List<Conceptos> getConceptosByExamen(Integer idExamen){
-        String query = "from Conceptos as a where a.idExamen.idExamen = :idExamen order by orden asc";
+    public List<RespuestaExamen> getRespuestasByExamen(Integer idExamen){
+        String query = "from RespuestaExamen as a where a.idExamen.idExamen = :idExamen order by orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -86,8 +79,8 @@ public class ConceptosService {
         return q.list();
     }
 
-    public List<Conceptos> getConceptosActivosByExamen(Integer idExamen){
-        String query = "from Conceptos as a where a.idExamen.idExamen = :idExamen and pasivo = false order by orden asc";
+    public List<RespuestaExamen> getRespuestasActivasByExamen(Integer idExamen){
+        String query = "from RespuestaExamen as a where a.idExamen.idExamen = :idExamen and pasivo = false order by orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -95,17 +88,17 @@ public class ConceptosService {
         return q.list();
     }
 
-    public Conceptos getConceptoById(Integer idConcepto){
-        String query = "from Conceptos as a where idConcepto =:idConcepto";
+    public RespuestaExamen getRespuestaById(Integer idConcepto){
+        String query = "from RespuestaExamen as a where idConcepto =:idConcepto";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idConcepto", idConcepto);
-        return (Conceptos)q.uniqueResult();
+        return (RespuestaExamen)q.uniqueResult();
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdExamen(Integer idExamen) throws Exception {
-        String query = "Select a from Catalogo_Lista as a inner join a.idTipoDato tdl , Conceptos as c inner join c.tipoDato tdc " +
+        String query = "Select a from Catalogo_Lista as a inner join a.idTipoDato tdl , RespuestaExamen as c inner join c.tipoDato tdc " +
                 "where a.pasivo = false and tdl.idTipoDato = tdc.idTipoDato and c.idExamen.idExamen =:idExamen" +
                 " order by  a.valor";
         Session session = sessionFactory.getCurrentSession();
@@ -114,5 +107,4 @@ public class ConceptosService {
 
         return q.list();
     }
-
 }

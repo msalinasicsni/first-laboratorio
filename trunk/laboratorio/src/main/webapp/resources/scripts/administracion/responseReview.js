@@ -229,7 +229,6 @@ var Conceptos = function () {
             }
 
             function getConcept(idConcepto) {
-                //console.log("getConcept "+idConcepto);
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sConceptoUrl, {
                     idConcepto: idConcepto ,

@@ -32,7 +32,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/searchConcepts" htmlEscape="true "/>"><spring:message code="menu.admin.concept" /></a></li>
+                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/searchConcepts" htmlEscape="true "/>"><spring:message code="menu.admin.respuestas" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -47,9 +47,9 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-group"></i> 
-							<spring:message code="lbl.concepts.title" />
+							<spring:message code="lbl.response.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.concepts.search.subtitle" />
+							<spring:message code="lbl.response.search.subtitle" />
 						</span>
 					</h1>
 				</div>
@@ -249,14 +249,14 @@
 	<script src="${jqueryBlockUi}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/administracion/concepts.js" var="concepto" />
+	<spring:url value="/resources/scripts/administracion/responseReview.js" var="concepto" />
 	<script src="${concepto}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="dxUrl" value="/api/v1/getDiagnosticosNoti"/>
-    <c:url var="sCreateConceptUrl" value="/administracion/conceptos/create/"/>
-    <c:url var="sBuscarExamenes" value="/administracion/conceptos/getExamenes"/>
+    <c:url var="sCreateConceptUrl" value="/administracion/respuestas/create/"/>
+    <c:url var="sBuscarExamenes" value="/administracion/respuestas/getExamenes"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
