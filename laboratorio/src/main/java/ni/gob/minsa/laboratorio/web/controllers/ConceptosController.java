@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.TipoDato;
+import ni.gob.minsa.laboratorio.domain.resultados.Concepto;
 import ni.gob.minsa.laboratorio.domain.resultados.TipoDatoCatalogo;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -34,10 +34,10 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("tipoDato")
-public class TipoDatoController {
+@RequestMapping("conceptos")
+public class ConceptosController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TipoDatoController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConceptosController.class);
 
     @Resource(name = "seguridadService")
     private SeguridadService seguridadService;
@@ -69,8 +69,8 @@ public class TipoDatoController {
     @Resource(name= "alicuotaService")
     private AlicuotaService alicuotaService;
 
-    @Resource(name="tipoDatoService")
-    private TipoDatoService tipoDatoService;
+    @Resource(name="conceptoService")
+    private ConceptoService conceptoService;
 
     @Autowired
     MessageSource messageSource;
@@ -78,7 +78,7 @@ public class TipoDatoController {
 
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initForm(HttpServletRequest request) throws Exception {
-        logger.debug("Cargando Tipos de Datos");
+        logger.debug("Cargando Conceptos");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -91,11 +91,11 @@ public class TipoDatoController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            List<TipoDato> dataTypeList =  getDataTypes();
+            List<Concepto> conceptsList =  getConcepts();
             List<TipoDatoCatalogo> dataTypeCat = catalogoService.getTipoDatoCatalogo();
-            mav.addObject("dataTypeList",dataTypeList);
+            mav.addObject("conceptsList",conceptsList);
             mav.addObject("dataTypeCat",dataTypeCat);
-            mav.setViewName("administracion/dataTypeEnter");
+            mav.setViewName("administracion/conceptsEnter");
         }else
             mav.setViewName(urlValidacion);
 
@@ -103,22 +103,22 @@ public class TipoDatoController {
     }
 
     //Cargar lista de Tipos de Datos
-    @RequestMapping(value = "getDataTypes", method = RequestMethod.GET,  produces = "application/json")
-    public @ResponseBody List<TipoDato> getDataTypes() throws Exception {
+    @RequestMapping(value = "getConcepts", method = RequestMethod.GET,  produces = "application/json")
+    public @ResponseBody List<Concepto> getConcepts() throws Exception {
         logger.info("Obteniendo los tipos de Datos");
 
-        List<TipoDato> dataTypeList = null;
-        dataTypeList = tipoDatoService.getDataTypeList();
-        return dataTypeList;
+        List<Concepto> conceptsList = null;
+        conceptsList = conceptoService.getConceptsList();
+        return conceptsList;
     }
 
-    @RequestMapping(value = "addUpdateDataType", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    protected void addUpdateDataType(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @RequestMapping(value = "addUpdateConcept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void addUpdateConcept(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json = "";
         String resultado = "";
         String nombre = "";
         String tipo = "";
-        Integer idTipoDato = null;
+        Integer idConcepto = null;
         String pasivo = "";
 
         try {
@@ -134,8 +134,8 @@ public class TipoDatoController {
                 pasivo = jsonpObject.get("pasivo").getAsString();
             }
 
-            if(!jsonpObject.get("idTipoDato").getAsString().isEmpty() ){
-                idTipoDato = jsonpObject.get("idTipoDato").getAsInt();
+            if(!jsonpObject.get("idConcepto").getAsString().isEmpty() ){
+                idConcepto = jsonpObject.get("idConcepto").getAsInt();
             }
 
             long idUsuario = seguridadService.obtenerIdUsuario(request);
@@ -143,34 +143,34 @@ public class TipoDatoController {
 
 
             //se obtiene el tipo de dato segun id
-            TipoDato dataType;
-            if(idTipoDato != null){
-             dataType = tipoDatoService.getDataTypeById(idTipoDato);
+            Concepto concept;
+            if(idConcepto != null){
+             concept = conceptoService.getConceptById(idConcepto);
 
                 if(!pasivo.isEmpty()){
-                    dataType.setPasivo(true);
+                    concept.setPasivo(true);
 
                 }else{
-                    dataType.setPasivo(false);
+                    concept.setPasivo(false);
                 }
 
             }else{
-             dataType = new TipoDato();
-             dataType.setFechahRegistro(new Timestamp(new Date().getTime()));
-             dataType.setUsuarioRegistro(usuario);
+                concept = new Concepto();
+                concept.setFechahRegistro(new Timestamp(new Date().getTime()));
+                concept.setUsuarioRegistro(usuario);
             }
 
             if(!nombre.isEmpty()){
-                dataType.setNombre(nombre);
+                concept.setNombre(nombre);
             }
 
            if(!tipo.isEmpty()){
-               // se obtiene catalago de Tipo lista por el codigo
+               // se obtiene catalago de Concepto por el codigo
                TipoDatoCatalogo cat = catalogoService.getTipoDatoCatalogo(tipo);
-               dataType.setTipo(cat);
+               concept.setTipo(cat);
            }
 
-            tipoDatoService.addOrUpdateDataType(dataType);
+            conceptoService.addOrUpdateConcept( concept);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -183,7 +183,7 @@ public class TipoDatoController {
             map.put("nombre", nombre);
             map.put("mensaje", resultado);
             map.put("tipo", tipo);
-            map.put("idTipoDato", "");
+            map.put("idConcepto", "");
             map.put("pasivo", "");
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
@@ -193,11 +193,11 @@ public class TipoDatoController {
 
     //Cargar lista de Tipos de Datos
     @RequestMapping(value = "getValuesCat", method = RequestMethod.GET,  produces = "application/json")
-    public @ResponseBody List<Catalogo_Lista> getValuesCat(@RequestParam(value = "idTipoDato", required = true) Integer idTipoDato) throws Exception {
+    public @ResponseBody List<Catalogo_Lista> getValuesCat(@RequestParam(value = "idConcepto", required = true) Integer idConcepto) throws Exception {
         logger.info("Obteniendo los valores de la lista");
 
         List<Catalogo_Lista> valuesList = null;
-        valuesList = tipoDatoService.getValuesByIdTipoDato(idTipoDato);
+        valuesList = conceptoService.getValuesByIdConcepto(idConcepto);
         return valuesList;
     }
 
@@ -207,7 +207,7 @@ public class TipoDatoController {
         String resultado = "";
         String valor = "";
         String pasivo = "";
-        Integer idTipoDato = null;
+        Integer idConcepto = null;
         Integer idCatalogoLista = null;
 
         try {
@@ -223,8 +223,8 @@ public class TipoDatoController {
                 pasivo = jsonpObject.get("pasivo").getAsString();
             }
 
-            if(!jsonpObject.get("idTipoDato").getAsString().isEmpty() ){
-                idTipoDato = jsonpObject.get("idTipoDato").getAsInt();
+            if(!jsonpObject.get("idConcepto").getAsString().isEmpty() ){
+                idConcepto = jsonpObject.get("idConcepto").getAsInt();
             }
 
             if(!jsonpObject.get("idCatalogoLista").getAsString().isEmpty() ){
@@ -236,10 +236,10 @@ public class TipoDatoController {
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
 
 
-            //se obtiene el tipo de dato segun id
+            //se obtiene el concepto segun id
             Catalogo_Lista value;
             if(idCatalogoLista != null){
-                value = tipoDatoService.getCatalogoListaById(idCatalogoLista);
+                value = conceptoService.getCatalogoListaById(idCatalogoLista);
                if(!pasivo.isEmpty()){
                    value.setPasivo(true);
 
@@ -250,8 +250,8 @@ public class TipoDatoController {
             }else{
 
                 value = new Catalogo_Lista();
-                TipoDato tipoDato = tipoDatoService.getDataTypeById(idTipoDato);
-                value.setIdTipoDato(tipoDato);
+                Concepto concepto = conceptoService.getConceptById(idConcepto);
+                value.setIdConcepto(concepto);
                 value.setFechaHRegistro(new Timestamp(new Date().getTime()));
                 value.setUsarioRegistro(usuario);
 
@@ -261,7 +261,7 @@ public class TipoDatoController {
             }
 
 
-            tipoDatoService.addOrUpdateValue(value);
+            conceptoService.addOrUpdateValue(value);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -275,7 +275,7 @@ public class TipoDatoController {
             map.put("mensaje", resultado);
             map.put("idCatalogoLista", "");
             map.put("pasivo", pasivo);
-            map.put("idTipoDato", String.valueOf(idTipoDato));
+            map.put("idConcepto", String.valueOf(idConcepto));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

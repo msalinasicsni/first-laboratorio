@@ -2,11 +2,11 @@
  * Created by souyen-ics on 02-03-15.
  */
 
-var DataTypes  = function () {
+var Concepts  = function () {
 
     return {
         init: function (parametros) {
-            getDataTypes();
+            getConcepts();
 
             function blockUI(){
                 var loc = window.location;
@@ -34,7 +34,7 @@ var DataTypes  = function () {
                 tablet : 1024,
                 phone : 480
             };
-            var dataTypesTable = $('#datatypes-records').dataTable({
+            var conceptsTable = $('#concepts-records').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
                     "t"+
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
@@ -43,7 +43,7 @@ var DataTypes  = function () {
                 "columns": [
                     null, null,
                     {
-                        "className":      'editDataType',
+                        "className":      'editConcept',
                         "orderable":      false
                     },
                     {
@@ -52,7 +52,7 @@ var DataTypes  = function () {
                     },
 
                     {
-                        "className":      'overrideDataType',
+                        "className":      'overrideConcept',
                         "orderable":      false
                     }
                 ],
@@ -60,7 +60,7 @@ var DataTypes  = function () {
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
-                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#datatypes-records'), breakpointDefinition);
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#concepts-records'), breakpointDefinition);
                     }
                 },
                 "rowCallback" : function(nRow) {
@@ -74,15 +74,15 @@ var DataTypes  = function () {
                 fnDrawCallback : function() {
 
 
-                    $('.editDataType')
-                        .off("click", editDTHandler)
-                        .on("click", editDTHandler);
+                    $('.editConcept')
+                        .off("click", editCHandler)
+                        .on("click", editCHandler);
                     $('.addList')
                         .off("click", addListHandler)
                         .on("click", addListHandler);
-                    $('.overrideDataType')
-                        .off("click", overrideDTHandler)
-                        .on("click", overrideDTHandler);
+                    $('.overrideConcept')
+                        .off("click", overrideCHandler)
+                        .on("click", overrideCHandler);
 
                 }
 
@@ -142,30 +142,30 @@ var DataTypes  = function () {
                 var data = $(this.innerHTML).data('id');
                 var detalle = data.split(",");
                 $('#idCatalogoLista').val(detalle[0]);
-                $('#idTipoD').val(detalle[1]);
+                $('#idC').val(detalle[1]);
                 $('#valor').val(detalle[2]);
 
             }
 
-            function overrideDTHandler(){
-                var idTipoDato = $(this.innerHTML).data('id');
-                overrideDataType(idTipoDato)
+            function overrideCHandler(){
+                var idConcepto = $(this.innerHTML).data('id');
+                overrideConcept(idConcepto)
 
 
             }
 
-            function editDTHandler(){
+            function editCHandler(){
                 var data =  $(this.innerHTML).data('id');
                 var detalle = data.split(",");
-
-                $('#idTipoDato').val(detalle[0]);
+                console.log(detalle);
+                $('#idConcepto').val(detalle[0]);
                 $('#nombre').val(detalle[1]);
                 $('#tipo').val(detalle[2]).change();
-                showModalDataType();
+                showModalConcept();
             }
 
 
-            function showModalDataType(){
+            function showModalConcept(){
                 $("#myModal").modal({
                     show: true
                 });
@@ -179,41 +179,41 @@ var DataTypes  = function () {
 
             function addListHandler(){
                 var data =  $(this.innerHTML).data('id');
-                $('#idTipoD').val(data);
+                $('#idC').val(data);
                 getValues(data);
                 showModalValues();
 
             }
 
-            function getDataTypes() {
-                $.getJSON(parametros.getDataTypes, {
+            function getConcepts() {
+                $.getJSON(parametros.getConcepts, {
                     ajax: 'true'
                 }, function (data) {
-                    dataTypesTable.fnClearTable();
+                    conceptsTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEditDT = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idTipoDato+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
+                        var btnEditC = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
                             ' > <i class="fa fa-edit"></i>' ;
 
-                        var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id='+data[i].idTipoDato+' ' +
+                        var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id='+data[i].idConcepto+' ' +
                             '> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-default btn-xs " data-id='+data[i].idTipoDato+' ' +
+                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-default btn-xs " data-id='+data[i].idConcepto+' ' +
                             '> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnOverrideDT = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idTipoDato+' ' +
+                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idConcepto+' ' +
                             '> <i class="fa fa-times"></i>';
 
 
                         if(data[i].tipo.valor == "Lista"){
-                            dataTypesTable.fnAddData(
-                                [data[i].nombre, data[i].tipo.valor,btnEditDT , btnAddList , btnOverrideDT ]);
+                            conceptsTable.fnAddData(
+                                [data[i].nombre, data[i].tipo.valor,btnEditC , btnAddList , btnOverrideC ]);
                         }else{
-                            dataTypesTable.fnAddData(
-                                [data[i].nombre, data[i].tipo.valor, btnEditDT, btnAddListDisabled  ,  btnOverrideDT ]);
+                            conceptsTable.fnAddData(
+                                [data[i].nombre, data[i].tipo.valor, btnEditC, btnAddListDisabled  ,  btnOverrideC ]);
                         }
 
                     }
@@ -222,7 +222,7 @@ var DataTypes  = function () {
 
 
             <!-- Validacion formulario de generacion de alicuotas -->
-            var $validator = $("#dataType-form").validate({
+            var $validator = $("#concepts-form").validate({
                 // Rules for form validation
                 rules: {
                     tipo: {required : true},
@@ -235,32 +235,32 @@ var DataTypes  = function () {
             });
 
             $('#btnAdd').click(function() {
-                var $validarModal = $("#dataType-form").valid();
+                var $validarModal = $("#concepts-form").valid();
                 if (!$validarModal) {
                     $validator.focusInvalid();
                     return false;
                 } else {
-                    addUpdateDataType();
+                    addUpdateConcept();
 
                 }
             });
 
 
 
-            function addUpdateDataType() {
+            function addUpdateConcept() {
                 blockUI(parametros.blockMess);
-                var dataTypeObj = {};
-                dataTypeObj['mensaje'] = '';
-                dataTypeObj['nombre'] = $('#nombre').val();
-                dataTypeObj['tipo'] = $('#tipo').val();
-                dataTypeObj['idTipoDato'] = $('#idTipoDato').val();
-                dataTypeObj['pasivo'] = '';
+                var conceptObj = {};
+                conceptObj['mensaje'] = '';
+                conceptObj['nombre'] = $('#nombre').val();
+                conceptObj['tipo'] = $('#tipo').val();
+                conceptObj['idConcepto'] = $('#idConcepto').val();
+                conceptObj['pasivo'] = '';
                 $.ajax(
                     {
                         url: parametros.addUpdateUrl,
                         type: 'POST',
                         dataType: 'json',
-                        data: JSON.stringify(dataTypeObj),
+                        data: JSON.stringify(conceptObj),
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
@@ -274,7 +274,7 @@ var DataTypes  = function () {
                                 });
                             } else {
 
-                              getDataTypes();
+                              getConcepts();
                                 var msg = $("#msjSuccessful").val();
                                 $.smallBox({
                                     title: msg,
@@ -283,8 +283,8 @@ var DataTypes  = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
-                                dataTypeObj['tipo'] = $('#tipo').val('').change();
-                                dataTypeObj['nombre'] = $('#nombre').val('');
+                                conceptObj['tipo'] = $('#tipo').val('').change();
+                                conceptObj['nombre'] = $('#nombre').val('');
                             }
                             unBlockUI();
                         },
@@ -322,15 +322,15 @@ var DataTypes  = function () {
                 }
             });
 
-            function getValues(idTipoDato) {
+            function getValues(idConcepto) {
                 $.getJSON(parametros.getValues, {
-                    idTipoDato: idTipoDato,
+                    idConcepto: idConcepto,
                     ajax: 'true'
                 }, function (data) {
                     valuesTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idCatalogoLista+ ","+ data[i].idTipoDato.idTipoDato +"," +data[i].valor+' ' +
+                        var btnEdit = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+' ' +
                                     ' > <i class="fa fa-edit"></i>' ;
 
                         var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idCatalogoLista+ ' ' +
@@ -351,7 +351,7 @@ var DataTypes  = function () {
                 valueObj['mensaje'] = '';
                 valueObj['pasivo']='';
                 valueObj['valor'] = $('#valor').val();
-                valueObj['idTipoDato'] = $('#idTipoD').val();
+                valueObj['idConcepto'] = $('#idC').val();
                 valueObj['idCatalogoLista'] = $('#idCatalogoLista').val();
                 $.ajax(
                     {
@@ -372,7 +372,7 @@ var DataTypes  = function () {
                                 });
                             } else {
 
-                              getValues( valueObj['idTipoDato']);
+                              getValues( valueObj['idConcepto']);
                                 var msg = $("#msjSuccessful1").val();
                                 $.smallBox({
                                     title: msg,
@@ -398,7 +398,7 @@ var DataTypes  = function () {
                 valueObj['mensaje'] = '';
                 valueObj['pasivo']= 'true';
                 valueObj['valor'] = '';
-                valueObj['idTipoDato'] = $('#idTipoD').val();
+                valueObj['idConcepto'] = $('#idC').val();
                 valueObj['idCatalogoLista'] = idCatalogoLista;
                 blockUI(parametros.blockMess);
                 $.ajax(
@@ -419,7 +419,7 @@ var DataTypes  = function () {
                                     timeout: 4000
                                 });
                             }else{
-                                getValues(data.idTipoDato);
+                                getValues(data.idConcepto);
                                 var msg = $("#msg_value_cancel").val();
                                 $.smallBox({
                                     title: msg ,
@@ -438,20 +438,20 @@ var DataTypes  = function () {
                     });
             }
 
-            function overrideDataType(idTipoDato) {
-                var dataTypeObj = {};
-                dataTypeObj['mensaje'] = '';
-                dataTypeObj['nombre'] = $('#nombre').val();
-                dataTypeObj['tipo'] = $('#tipo').val();
-                dataTypeObj['idTipoDato'] = $('#idTipoDato').val();
-                dataTypeObj['pasivo'] = 'true';
+            function overrideConcept(idConcepto) {
+                var conceptObj = {};
+                conceptObj['mensaje'] = '';
+                conceptObj['nombre'] = $('#nombre').val();
+                conceptObj['tipo'] = $('#tipo').val();
+                conceptObj['idConcepto'] = $('#idConcepto').val();
+                conceptObj['pasivo'] = 'true';
                 blockUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.addUpdateUrl,
                         type: 'POST',
                         dataType: 'json',
-                        data: JSON.stringify(dataTypeObj),
+                        data: JSON.stringify(conceptObj),
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
@@ -464,8 +464,8 @@ var DataTypes  = function () {
                                     timeout: 4000
                                 });
                             }else{
-                               getDataTypes();
-                                var msg = $("#msg_dataType_cancel").val();
+                               getConcepts();
+                                var msg = $("#msg_conc_cancel").val();
                                 $.smallBox({
                                     title: msg ,
                                     content: $("#disappear").val(),

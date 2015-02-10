@@ -1,6 +1,5 @@
 package ni.gob.minsa.laboratorio.domain.resultados;
 
-import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.LazyCollection;
@@ -20,7 +19,7 @@ public class Catalogo_Lista implements Serializable {
 
    Integer idCatalogoLista;
    String valor;
-   TipoDato idTipoDato;
+   Concepto idConcepto;
    boolean pasivo;
    Usuarios usarioRegistro;
    Timestamp fechaHRegistro;
@@ -48,14 +47,14 @@ public class Catalogo_Lista implements Serializable {
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)
-    @JoinColumn(name="ID_TIPO_DATO", referencedColumnName = "ID_TIPO_DATO", nullable = false)
-    @ForeignKey(name = "IDTIPOD_FK")
-    public TipoDato getIdTipoDato() {
-        return idTipoDato;
+    @JoinColumn(name="ID_CONCEPTO", referencedColumnName = "ID_CONCEPTO", nullable = false)
+    @ForeignKey(name = "IDCONCEPTO_FK")
+    public Concepto getIdConcepto() {
+        return idConcepto;
     }
 
-    public void setIdTipoDato(TipoDato idTipoDato) {
-        this.idTipoDato = idTipoDato;
+    public void setIdConcepto(Concepto idConcepto) {
+        this.idConcepto = idConcepto;
     }
 
     @Basic

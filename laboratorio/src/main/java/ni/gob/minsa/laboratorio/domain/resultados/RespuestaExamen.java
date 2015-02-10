@@ -17,10 +17,10 @@ import java.sql.Timestamp;
 @Table(name = "respuesta_examen", schema = "laboratorio")
 public class RespuestaExamen implements Serializable {
 
-    Integer idConcepto;
+    Integer idRespuesta;
     String nombre;
     CatalogoExamenes idExamen;
-    TipoDato tipoDato;
+    Concepto concepto;
     Integer orden;
     boolean requerido;
     boolean pasivo;
@@ -29,16 +29,15 @@ public class RespuestaExamen implements Serializable {
     Usuarios usuarioRegistro;
     Timestamp fechahRegistro;
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
-    @Column(name = "ID_CONCEPTO", nullable = false, insertable = true, updatable = false)
-    public Integer getIdConcepto() {
-        return idConcepto;
+    @Column(name = "ID_RESPUESTA", nullable = false, insertable = true, updatable = false)
+    public Integer getIdRespuesta() {
+        return idRespuesta;
     }
 
-    public void setIdConcepto(Integer idConcepto) {
-        this.idConcepto = idConcepto;
+    public void setIdRespuesta(Integer idRespuesta) {
+        this.idRespuesta = idRespuesta;
     }
 
     @Basic
@@ -65,14 +64,14 @@ public class RespuestaExamen implements Serializable {
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)
-    @JoinColumn(name = "TIPODATO", referencedColumnName = "ID_TIPO_DATO", nullable = false)
-    @ForeignKey(name = "TIPODATO_FK")
-    public TipoDato getTipoDato() {
-        return tipoDato;
+    @JoinColumn(name = "ID_CONCEPTO", referencedColumnName = "ID_CONCEPTO", nullable = false)
+    @ForeignKey(name = "CONCEPT_FK")
+    public Concepto getConcepto() {
+        return concepto;
     }
 
-    public void setTipoDato(TipoDato tipoDato) {
-        this.tipoDato = tipoDato;
+    public void setConcepto(Concepto concepto) {
+        this.concepto = concepto;
     }
 
     @Basic
