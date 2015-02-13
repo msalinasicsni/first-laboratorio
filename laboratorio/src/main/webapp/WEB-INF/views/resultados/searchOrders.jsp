@@ -341,10 +341,10 @@
 
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
-	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+	    	$("li.resultado").addClass("open");
+	    	$("li.ingresoResultado").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.ingresoResultado").parents("ul").slideDown(200);
 	    	}
         });
 	</script>

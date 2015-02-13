@@ -456,9 +456,9 @@
 			Conceptos.init(parametros);
             $("#divNumerico").hide();
 	    	$("li.administracion").addClass("open");
-	    	$("li.conceptos").addClass("active");
+	    	$("li.respuesta").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.conceptos").parents("ul").slideDown(200);
+	    		$("li.respuesta").parents("ul").slideDown(200);
 	    	}
             handleInputMasks();
 

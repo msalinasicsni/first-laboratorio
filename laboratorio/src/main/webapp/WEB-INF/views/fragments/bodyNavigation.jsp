@@ -91,7 +91,7 @@
                     <li class="concepto">
                         <a href="<spring:url value="/conceptos/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.concept" /></a>
                     </li>
-                    <li class="conceptos">
+                    <li class="respuesta">
                         <a href="<spring:url value="/administracion/respuestas/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.respuestas" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.respuestas" /></a>
                     </li>
                 </ul>
