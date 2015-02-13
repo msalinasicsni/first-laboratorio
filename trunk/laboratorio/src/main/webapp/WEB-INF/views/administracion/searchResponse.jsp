@@ -270,9 +270,9 @@
             Conceptos.init(parametros);
 
             $("li.administracion").addClass("open");
-	    	$("li.conceptos").addClass("active");
+	    	$("li.respuesta").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.conceptos").parents("ul").slideDown(200);
+	    		$("li.respuesta").parents("ul").slideDown(200);
 	    	}
         });
 	</script>
