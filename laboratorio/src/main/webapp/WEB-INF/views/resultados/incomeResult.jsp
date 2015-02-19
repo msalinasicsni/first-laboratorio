@@ -12,6 +12,9 @@
         textarea {
             resize: none;
         }
+        .alert {
+            margin-bottom: 0px;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -108,6 +111,7 @@
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_result_added" type="hidden" value="<spring:message code="msg.result.successfully.added"/>"/>
+                                    <input id="msg_result_override" type="hidden" value="<spring:message code="msg.result.successfully.canceled"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <form id="addResult-form" class="smart-form" autocomplete="off">
                                         <fieldset>
@@ -284,7 +288,7 @@
                                                     <div class="">
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <input class="form-control" type="text" disabled id="codSilais" name="codSilais" value="${ordenExamen.solicitudDx.idTomaMx.idNotificacion.codSilaisAtencion.nombre}" placeholder=" <spring:message code="lbl.silais" />">
+                                                            <input class="form-control" type="text" disabled id="codSilais" name="codSilais" value="${ordenExamen.solicitudDx.idTomaMx.idNotificacion.codSilaisAtencion.nombre}"  placeholder=" <spring:message code="lbl.silais" />">
                                                             <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.silais"/>
                                                             </b>
                                                         </label>
@@ -309,145 +313,16 @@
                                                 <spring:message code="lbl.header.result.orders.form" />
                                             </header>
                                             <br>
-                                            <c:forEach items="${respuestasList}" var="respuesta">
-                                                <c:choose>
-                                                    <c:when test="${respuesta.concepto.tipo.codigo=='TPDATO|LIST'}">
-                                                        <div class="row">
-                                                            <section class="col col-sm-12 col-md-6 col-lg-6">
-                                                                <label class="text-left txt-color-blue font-md">
-                                                                    <c:if test="${respuesta.requerido}">
-                                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>
-                                                                    </c:if>
-                                                                    ${respuesta.nombre} </label>
-                                                                <div class="input-group">
-                                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                                    <c:choose>
-                                                                        <c:when test="${respuesta.requerido}">
-                                                                            <select id="${respuesta.idRespuesta}" name="${respuesta.idRespuesta}" class="select2 requiredConcept">
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <select id="${respuesta.idRespuesta}" name="${respuesta.idRespuesta}" class="select2">
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                                        <c:forEach items="${valoresListas}" var="valor">
-                                                                            <c:if test="${respuesta.concepto.idConcepto==valor.idConcepto.idConcepto}">
-                                                                                    <option value="${valor.idCatalogoLista}">${valor.valor}</option>
-                                                                            </c:if>
-                                                                        </c:forEach>
-                                                                    </select>
-                                                                </div>
-                                                            </section>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:when test="${respuesta.concepto.tipo.codigo=='TPDATO|NMRO'}">
-                                                        <div class="row">
-                                                            <section class="col col-sm-6 col-md-6 col-lg-6">
-                                                                <label class="text-left txt-color-blue font-md">
-                                                                    <c:if test="${respuesta.requerido}">
-                                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>
-                                                                    </c:if>
-                                                                        ${respuesta.nombre}
-                                                                </label>
-                                                                <div class="">
-                                                                    <label class="input">
-                                                                        <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                                                        <c:choose>
-                                                                            <c:when test="${respuesta.requerido}">
-                                                                                <input class="form-control decimal requiredConcept" type="text" name="${respuesta.idRespuesta}" id="${respuesta.idRespuesta}" placeholder="${respuesta.nombre}"/>
-                                                                            </c:when>
-                                                                            <c:otherwise>
-                                                                                <input class="form-control decimal" type="text" name="${respuesta.idRespuesta}" id="${respuesta.idRespuesta}" placeholder="${respuesta.nombre}"/>
-                                                                            </c:otherwise>
-                                                                        </c:choose>
-                                                                        <b class="tooltip tooltip-bottom-right"> <i
-                                                                                class="fa fa-warning txt-color-pink"></i> ${respuesta.nombre}
-                                                                        </b>
-                                                                    </label>
-                                                                </div>
-                                                            </section>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:when test="${respuesta.concepto.tipo.codigo=='TPDATO|LOG'}">
-                                                        <div class="row">
-                                                            <section class="col col-sm-4 col-md-3 col-lg-3">
-                                                                <label class="text-left txt-color-blue font-md">
-                                                                    ${respuesta.nombre}
-                                                                </label>
-                                                                <label class="checkbox">
-                                                                    <input type="checkbox" name="${respuesta.idRespuesta}" id="${respuesta.idRespuesta}">
-                                                                    <i></i>
-                                                                </label>
-                                                            </section>
-                                                        </div>
-                                                    </c:when>
-                                                    <c:otherwise> <!-- Es tipo Texto -->
-                                                        <div class="row">
-                                                            <section class="col col-sm-12 col-md-6 col-lg-6">
-                                                                <label class="text-left txt-color-blue font-md">
-                                                                    <c:if test="${respuesta.requerido}">
-                                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>
-                                                                    </c:if>
-                                                                    ${respuesta.nombre}
-                                                                </label>
-                                                                <div class="">
-                                                                    <label class="input">
-                                                                        <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                                        <c:choose>
-                                                                            <c:when test="${respuesta.requerido}">
-                                                                                <input class="form-control requiredConcept" type="text" id="${respuesta.idRespuesta}" name="${respuesta.idRespuesta}" value="" placeholder="${respuesta.nombre}">
-                                                                            </c:when>
-                                                                            <c:otherwise>
-                                                                                <input class="form-control" type="text" id="${respuesta.idRespuesta}" name="${respuesta.idRespuesta}" value="" placeholder="${respuesta.nombre}">
-                                                                            </c:otherwise>
-                                                                        </c:choose>
-                                                                        <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> ${respuesta.nombre}
-                                                                        </b>
-                                                                    </label>
-                                                                </div>
-                                                            </section>
-                                                        </div>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </c:forEach>
-                                            <!--<div class="row">
-                                                <section class="col col-sm-12 col-md-6 col-lg-6">
-                                                    <label class="text-left txt-color-blue font-md">
-                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i> <spring:message code="lbl.result" /> </label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                        <select id="codResultado" name="codResultado"
-                                                                class="select2">
-                                                            <option value=""><spring:message code="lbl.select" />...</option>
-                                                            <option value="1">Positivo</option>
-                                                            <option value="2">Negativo</option>
-                                                            <option value="3">Descartado</option>
-                                                        </select>
-                                                    </div>
-                                                </section>
-                                                <div id="divSerotipo" class="col col-sm-12 col-md-6 col-lg-6">
-                                                    <label class="text-left txt-color-blue font-md">
-                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i> Serotipo</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                        <select id="codSerotipo" name="codSerotipo"
-                                                                class="select2">
-                                                            <option value=""><spring:message code="lbl.select" />...</option>
-                                                            <option value="1">1</option>
-                                                            <option value="2">2</option>
-                                                            <option value="3">3</option>
-                                                            <option value="4">4</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>-->
-                                        </fieldset>
+                                            <div id="pruebaResultado">
+                                            </div>
+                                         </fieldset>
                                         <footer>
                                             <input id="val_yes" type="hidden" value="<spring:message code="lbl.yes"/>"/>
                                             <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
                                             <input id="idExamen" type="hidden" value="${ordenExamen.codExamen.idExamen}"/>
                                             <input id="idOrdenExamen" type="hidden" value="${ordenExamen.idOrdenExamen}"/>
-                                            <button type="submit" id="receipt-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                                            <button type="button" id="override-result" class="btn btn-danger btn-lg pull-right header-btn"><i class="fa fa-times"></i> <spring:message code="act.override" /></button>
+                                            <button type="submit" id="save-result" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
                                         </footer>
                                     </form>
                                 </div>
@@ -470,6 +345,59 @@
 				<!-- end row -->
 			</section>
 			<!-- end widget grid -->
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <!--<h4 class="modal-title">
+                    <spring:message code="lbl.response.header.modal.add" />
+                </h4>-->
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-font"></i>
+                                    <spring:message code="lbl.result.header.modal.override" />
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="modal-body"> <!--  no-padding -->
+                            <form id="override-result-form" class="smart-form" novalidate="novalidate">
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.nullified" /> </label>
+                                            <div class="">
+                                                <label class="textarea">
+                                                    <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                    <textarea class="form-control" rows="3" name="causaAnulacion" id="causaAnulacion"
+                                                              placeholder="<spring:message code="lbl.nullified" />"></textarea>
+                                                    <b class="tooltip tooltip-bottom-right"> <i
+                                                            class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.nullified"/>
+                                                    </b>
+                                                </label>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" class="btn btn-primary" id="btnAceptarAnulacion">
+                                        <spring:message code="act.ok" />
+                                    </button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        <spring:message code="act.cancel" />
+                                    </button>
+
+                                </footer>
+
+                            </form>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
 		</div>
 		<!-- END MAIN CONTENT -->
 	</div>
@@ -519,8 +447,11 @@
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sConceptosUrl" value="/administracion/respuestas/getRespuestasActivasExamen"/>
+    <c:url var="sListasUrl" value="/resultados/getCatalogosListaConceptoByIdExamen"/>
+    <c:url var="sDetResultadosUrl" value="/resultados/getDetallesResultadoByExamen"/>
     <c:url var="sAlicuotasUrl" value="/resultados/init"/>
     <c:url var="sSaveResult" value="/resultados/saveResult"/>
+    <c:url var="sOverrideResult" value="/resultados/overrideResult"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -530,17 +461,20 @@
                 blockMess: "${blockMess}",
                 sConceptosUrl: "${sConceptosUrl}",
                 sAlicuotasUrl : "${sAlicuotasUrl}",
-                sSaveResult : "${sSaveResult}"
+                sSaveResult : "${sSaveResult}",
+                sListasUrl : "${sListasUrl}",
+                sEsIngreso : 'true',
+                sDetResultadosUrl : "${sDetResultadosUrl}",
+                sOverrideResult : "${sOverrideResult}"
             };
-			IncomeResult.init(parametros);
+            IncomeResult.init(parametros);
             handleInputMasks();
-            $("#divSerotipo").hide();
-	    	$("li.samples").addClass("open");
-	    	$("li.recepcion").addClass("active");
+            $("li.resultado").addClass("open");
+	    	$("li.ingresoResultado").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.recepcion").parents("ul").slideDown(200);
+	    		$("li.ingresoResultado").parents("ul").slideDown(200);
 	    	}
-            $('#codCalidadMx').change();
+            //$('#codCalidadMx').change();
         });
 	</script>
 	<!-- END JAVASCRIPTS -->

@@ -87,7 +87,7 @@ var IncomeResult = function () {
                         getAlicuotas(false)
                     }
             });
-            <!-- formulario de recepción en laboratorio -->
+            <!-- formulario de registro y edición de resultado-->
             $('#addResult-form').validate({
                 // Rules for form validation
                 rules: {
@@ -100,6 +100,21 @@ var IncomeResult = function () {
                 },
                 submitHandler: function (form) {
                     guardarResultado();
+                }
+            });
+
+            //formulario de anulación de resultado
+            $('#override-result-form').validate({
+                // Rules for form validation
+                rules: {
+                    causaAnulacion: {required : true}
+                },
+                // Do not change code below
+                errorPlacement : function(error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    anularResultado();
                 }
             });
 
@@ -331,6 +346,247 @@ var IncomeResult = function () {
                     $('#txtCodUnicoMx').val('');
                 }
             });
+
+            function fillRespuestasExamen(){
+                bloquearUI(parametros.blockMess);
+                var valoresListas = {};
+                var detaResultados = {};
+                var lenListas = 0;
+                var lenDetRes = 0;
+                //primero se obtienen los valores de las listas asociadas a las respuestas del examen
+                $.getJSON(parametros.sListasUrl, {
+                    idExamen: $("#idExamen").val() ,
+                    ajax : 'false'
+                }, function(dataToLoad) {
+                    lenListas = Object.keys(dataToLoad).length;
+                    valoresListas = dataToLoad;
+
+                }).fail(function(er) {
+                    desbloquearUI();
+                    alert( "error "+er );
+                });
+                //se obtienen los detalles de las respuestas contestadas de la orden de exámen
+                $.getJSON(parametros.sDetResultadosUrl, {
+                    idOrdenExamen: $("#idOrdenExamen").val() ,
+                    ajax : 'false'
+                }, function(data) {
+                    lenDetRes = data.length;
+                    detaResultados = data;
+                    var divResultado= $("#pruebaResultado");
+                    divResultado.html("");
+                    //obteniendo las respuestas configuradas para el examen
+                    $.getJSON(parametros.sConceptosUrl, {
+                        idExamen: $("#idExamen").val() ,
+                        ajax : 'false'
+                    }, function(dataToLoad) {
+                        var contenidoControl='';
+                        var len = Object.keys(dataToLoad).length;
+                        if (len > 0) {
+                            for (var i = 0; i < len; i++) {
+                                var idControlRespuesta;
+
+                                //se busca si existe valor registrado para la respuesta
+                                var valor = '';
+                                if(lenDetRes > 0){
+                                    for (var j = 0; j < lenDetRes; j++) {
+                                        if (detaResultados[j].respuesta.concepto.idConcepto==dataToLoad[i].concepto.idConcepto){
+                                            valor = detaResultados[j].valor;
+                                            console.log('se encontró valor: '+valor);
+                                            break;
+                                        }
+                                    }
+                                }
+                                switch (dataToLoad[i].concepto.tipo.codigo) {
+                                    case 'TPDATO|LOG':
+                                        console.log('logico');
+                                        idControlRespuesta = dataToLoad[i].idRespuesta;
+                                        contenidoControl ='<div class="row">'+
+                                            '<section class="col col-sm-4 col-md-3 col-lg-3">'+
+                                            '<label class="text-left txt-color-blue font-md">'+
+                                            dataToLoad[i].nombre +
+                                            '</label>'+
+                                            '<label class="checkbox">';
+                                        if(lenDetRes <= 0) {
+                                            contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '">';
+                                        }else{
+                                            if (valor=='true'){
+                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" checked>';
+                                            }else{
+                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '">';
+                                            }
+                                        }
+                                        contenidoControl = contenidoControl + '<i></i>'+
+                                            '</label>'+
+                                            '</section>'+
+                                            '</div>';
+                                        divResultado.append(contenidoControl);
+                                        break;
+                                    case 'TPDATO|LIST':
+                                        console.log('lista');
+                                        idControlRespuesta = dataToLoad[i].idRespuesta;
+                                        contenidoControl =  '<div class="row"><section class="col col-sm-12 col-md-6 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                        if (dataToLoad[i].requerido) {
+                                            contenidoControl = contenidoControl +'<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                        }
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre +'</label>'+
+                                            '<div class="input-group">'+
+                                            '<span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>';
+
+                                        //si la respuesta es requerida
+                                        if (dataToLoad[i].requerido) {
+                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="requiredConcept" style="width: 100%;">';
+                                        }
+                                        else{
+                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="" style="width: 100%;">';
+                                        }
+                                        contenidoControl = contenidoControl + '<option value="">...</option>';
+                                        for (var ii = 0; ii < lenListas; ii++) {
+                                            if (valoresListas[ii].idConcepto.idConcepto==dataToLoad[i].concepto.idConcepto){
+                                                console.log(valoresListas[ii].idCatalogoLista +" == "+ valor);
+                                                if (valoresListas[ii].idCatalogoLista == valor){
+                                                    contenidoControl = contenidoControl + '<option  value="'+valoresListas[ii].idCatalogoLista+'" selected >'+valoresListas[ii].valor+'</option>';
+                                                }else{
+                                                    contenidoControl = contenidoControl + '<option  value="'+valoresListas[ii].idCatalogoLista+'">'+valoresListas[ii].valor+'</option>';
+                                                }
+                                             }
+                                        }
+                                        contenidoControl = contenidoControl +'</select></div></section></div>';
+                                        divResultado.append(contenidoControl);
+                                        $("#"+idControlRespuesta).select2();
+                                        break;
+                                    case 'TPDATO|TXT':
+                                        console.log('texto');
+                                        idControlRespuesta = dataToLoad[i].idRespuesta;
+                                        contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                        if (dataToLoad[i].requerido){
+                                            contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                        }
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre+'</label>' +
+                                            '<div class="">'+
+                                            '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>';
+                                        if (dataToLoad[i].requerido){
+                                            contenidoControl = contenidoControl + '<input class="form-control requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                        }else{
+                                            contenidoControl = contenidoControl + '<input class="form-control" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                        }
+
+                                        contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
+                                            '</div></section></div>';
+                                        divResultado.append(contenidoControl);
+                                        break;
+                                    case 'TPDATO|NMRO':
+                                        console.log('numero');
+                                        idControlRespuesta = dataToLoad[i].idRespuesta;
+                                        contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                        if (dataToLoad[i].requerido){
+                                            contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                        }
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre+'</label>' +
+                                            '<div class="">'+
+                                            '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>';
+                                        if (dataToLoad[i].requerido){
+                                            contenidoControl = contenidoControl + '<input class="form-control decimal requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                        }else{
+                                            contenidoControl = contenidoControl + '<input class="form-control decimal" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                        }
+
+                                        contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
+                                            '</div></section></div>';
+                                        divResultado.append(contenidoControl);
+                                        $("#"+idControlRespuesta).inputmask("decimal",{
+                                            allowMinus: false,
+                                            radixPoint: ".",
+                                            digits: 2
+                                        });
+                                        break;
+                                    default:
+                                        console.log('respuesta sin concepto');
+                                        break;
+
+                                }
+                            }
+                            desbloquearUI();
+                        }else{
+                            desbloquearUI();
+                            $.smallBox({
+                                title: $("#msg_no_results_found").val() ,
+                                content: $("#smallBox_content").val(),
+                                color: "#C46A69",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        }
+
+                    }).fail(function(er) {
+                        desbloquearUI();
+                        alert( "error "+er );
+                    });
+
+                }).fail(function(er) {
+                    desbloquearUI();
+                    alert( "error "+er );
+                });
+            }
+
+            if (parametros.sEsIngreso=='true') {
+                fillRespuestasExamen();
+            }
+
+            function showModalOverride(){
+                $("#myModal").modal({
+                    show: true
+                });
+            }
+
+            $("#override-result").click(function(){
+                $("#causaAnulacion").val("");
+                showModalOverride();
+            });
+
+
+            function anularResultado(){
+                var objResultado = {};
+                objResultado["idOrdenExamen"] = $("#idOrdenExamen").val();
+                objResultado["causaAnulacion"] = $("#causaAnulacion").val();
+                objResultado["mensaje"] = '';
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.sOverrideResult,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(objResultado),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                var msg = $("#msg_result_override").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                                $("#causaAnulacion").val("");
+                                fillRespuestasExamen();
+                            }
+                            desbloquearUI();
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
         }
     };
 

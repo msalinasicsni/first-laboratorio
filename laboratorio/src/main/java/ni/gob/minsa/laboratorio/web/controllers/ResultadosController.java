@@ -123,15 +123,11 @@ public class ResultadosController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrdenExamen);
-            List<RespuestaExamen> respuestaExamenList = respuestasExamenService.getRespuestasActivasByExamen(ordenExamen.getCodExamen().getIdExamen());
-            List<Catalogo_Lista> listas = respuestasExamenService.getCatalogoListaConceptoByIdExamen(ordenExamen.getCodExamen().getIdExamen());
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
             mav.addObject("ordenExamen",ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
-            mav.addObject("respuestasList", respuestaExamenList);
-            mav.addObject("valoresListas",listas);
             mav.setViewName("resultados/incomeResult");
         }else
             mav.setViewName(urlValidacion);
@@ -264,6 +260,20 @@ public class ResultadosController {
         return mav;
     }
 
+    @RequestMapping(value = "getCatalogosListaConceptoByIdExamen", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<Catalogo_Lista> getCatalogoListaConceptoByIdExamen(@RequestParam(value = "idExamen", required = true) String idExamen) throws Exception {
+        logger.info("Obteniendo los valores para los conceptos tipo lista asociados a las respueta del examen");
+        return respuestasExamenService.getCatalogoListaConceptoByIdExamen(Integer.valueOf(idExamen));
+    }
+
+    @RequestMapping(value = "getDetallesResultadoByExamen", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<DetalleResultado> getDetallesResultadoByExamen(@RequestParam(value = "idOrdenExamen", required = true) String idOrdenExamen) throws Exception {
+        logger.info("Se obtienen los detalles de resultados activos para la orden");
+        return resultadosService.getDetallesResultadoActivosByExamen(idOrdenExamen);
+    }
+
     @RequestMapping(value = "ver", method = RequestMethod.GET)
     public ModelAndView verResultado(HttpServletRequest request) throws Exception {
         logger.debug("ver resultado demo");
@@ -310,7 +320,8 @@ public class ResultadosController {
             for(int i = 0; i< cantRespuestas;i++) {
                 String respuesta = jObjectRespuestas.get(String.valueOf(i)).toString();
                 JsonObject jsRespuestaObject = new Gson().fromJson(respuesta, JsonObject.class);
-                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaById(jsRespuestaObject.get("idRespuesta").getAsInt());
+                Integer idRespuesta = jsRespuestaObject.get("idRespuesta").getAsInt();
+                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaById(idRespuesta);
                 String valor = jsRespuestaObject.get("valor").getAsString();
                 DetalleResultado detalleResultado = new DetalleResultado();
                 detalleResultado.setFechahRegistro(new Timestamp(new Date().getTime()));
@@ -318,8 +329,14 @@ public class ResultadosController {
                 detalleResultado.setRespuesta(conceptoTmp);
                 detalleResultado.setExamen(ordenExamen);
                 detalleResultado.setUsuarioRegistro(usuario);
-                if (detalleResultado.getValor()!=null && !detalleResultado.getValor().isEmpty()){
-                    resultadosService.addDetalleResultado(detalleResultado);
+                DetalleResultado resultadoRegistrado = resultadosService.getDetalleResultadoByOrdenExamanAndRespuesta(idOrdenExamen,idRespuesta);
+                if (resultadoRegistrado!=null){
+                    detalleResultado.setIdDetalle(resultadoRegistrado.getIdDetalle());
+                    resultadosService.updateDetalleResultado(detalleResultado);
+                }else {
+                    if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty()) {
+                        resultadosService.addDetalleResultado(detalleResultado);
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -334,6 +351,49 @@ public class ResultadosController {
             map.put("strRespuestas",strRespuestas);
             map.put("mensaje",resultado);
             map.put("cantRespuestas",cantRespuestas.toString());
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "overrideResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void overrideResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String idOrdenExamen="";
+        String causaAnulacion = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+            causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
+            OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            //se obtiene datos de los conceptos a registrar
+            List<DetalleResultado> detalleResultadosAct = resultadosService.getDetallesResultadoActivosByExamen(idOrdenExamen);
+            for(DetalleResultado detalleResultado : detalleResultadosAct) {
+                detalleResultado.setFechahAnulacion(new Timestamp(new Date().getTime()));
+                detalleResultado.setExamen(ordenExamen);
+                detalleResultado.setUsuarioAnulacion(usuario);
+                detalleResultado.setRazonAnulacion(causaAnulacion);
+                detalleResultado.setPasivo(true);
+                resultadosService.updateDetalleResultado(detalleResultado);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.result.error.added",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idOrdenExamen",idOrdenExamen);
+            map.put("causaAnulacion",causaAnulacion);
+            map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
