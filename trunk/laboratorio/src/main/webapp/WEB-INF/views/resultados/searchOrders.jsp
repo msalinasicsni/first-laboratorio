@@ -335,7 +335,8 @@
                 sOrdersUrl : "${ordersUrl}",
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
-                sActionUrl : "${sCreateReceiptUrl}"
+                sActionUrl : "${sCreateReceiptUrl}",
+                sEsIngreso : 'false'
             };
             IncomeResult.init(parametros);
 

@@ -88,4 +88,44 @@ public class ResultadosService {
         q.setString("idDetalle", idDetalle);
         return  (DetalleResultado)q.uniqueResult();
     }
+
+    /**
+     * Obtiene una lista de detalles de resultados registrados para el la orden de examen indicada
+     * @param idOrdenExamen id de la orden a recuperar resultados
+     * @return List<DetalleResultado>
+     */
+    public List<DetalleResultado> getDetallesResultadoByExamen(String idOrdenExamen){
+        String query = "select a from DetalleResultado as a inner join a.examen as r where r.idOrdenExamen = :idOrdenExamen ";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idOrdenExamen", idOrdenExamen);
+        return  q.list();
+    }
+
+    public List<DetalleResultado> getDetallesResultadoActivosByExamen(String idOrdenExamen){
+        String query = "select a from DetalleResultado as a inner join a.examen as r where a.pasivo = false and r.idOrdenExamen = :idOrdenExamen ";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idOrdenExamen", idOrdenExamen);
+        return  q.list();
+    }
+
+    /**
+     * Verifica si existe registrado un resultado para la respuesta y orden de examen indicado, siempre y cuando el registro este activo (pasivo = false)
+     * @param idOrdenExamen orden a verificar
+     * @param idRespuesta respuesta a verificar
+     * @return DetalleResultado
+     */
+    public DetalleResultado getDetalleResultadoByOrdenExamanAndRespuesta(String idOrdenExamen, int idRespuesta){
+        String query = "Select a from DetalleResultado as a inner join a.examen as ex inner join a.respuesta as re " +
+                "where ex.idOrdenExamen = :idOrdenExamen and re.idRespuesta = :idRespuesta and a.pasivo = false ";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idOrdenExamen", idOrdenExamen);
+        q.setParameter("idRespuesta", idRespuesta);
+        return  (DetalleResultado)q.uniqueResult();
+    }
 }
