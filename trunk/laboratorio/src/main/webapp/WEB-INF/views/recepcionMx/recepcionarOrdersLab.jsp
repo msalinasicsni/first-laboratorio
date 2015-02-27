@@ -24,6 +24,12 @@
         .modal .modal-dialog {
             width: 60%;
         }
+        .cancelar {
+            padding-left: 0;
+            padding-right: 10px;
+            text-align: center;
+            width: 5%;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -318,8 +324,9 @@
                                                         <tr>
                                                             <th data-class="expand"><spring:message code="lbl.receipt.test"/></th>
                                                             <th data-hide="phone"><spring:message code="lbl.receipt.pcr.area"/></th>
-                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
-                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.name"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
                                                             <th><spring:message code="act.cancel"/></th>
                                                         </tr>
                                                         </thead>
@@ -397,6 +404,7 @@
                                             <input id="idTipoMx" type="hidden" value="${recepcionMx.tomaMx.codTipoMx.idTipoMx}"/>
                                             <input id="codTipoNoti" type="hidden" value="${recepcionMx.tomaMx.idNotificacion.codTipoNotificacion.codigo}"/>
                                             <input id="idTomaMx" type="hidden" value="${recepcionMx.tomaMx.idTomaMx}"/>
+                                            <input id="esEstudio" type="hidden" value="${esEstudio}"/>
                                             <button type="submit" id="receipt-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-check"></i> <spring:message code="act.receipt" /></button>
                                         </footer>
                                     </form>
@@ -436,19 +444,38 @@
             <form id="AgregarExamen-form" class="smart-form" novalidate="novalidate">
             <fieldset>
             <div class="row">
-                <section class="col col-sm-12 col-md-5 col-lg-5">
-                    <label class="text-left txt-color-blue font-md">
-                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.type" />
-                    </label>
-                    <div class="input-group">
-    		        <span class="input-group-addon">
-                        <i class="fa fa-location-arrow fa-fw"></i>
-			        </span>
-                        <select  class="select2" id="codDX" name="codDX" >
-                            <option value=""><spring:message code="lbl.select" />...</option>
-                        </select>
-                    </div>
-                </section>
+                <c:choose>
+                    <c:when test="${esEstudio}">
+                        <section class="col col-sm-12 col-md-5 col-lg-5">
+                            <label class="text-left txt-color-blue font-md">
+                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.study.type" />
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-location-arrow fa-fw"></i>
+                                </span>
+                                <select  class="select2" id="codEstudio" name="codEstudio" >
+                                    <option value=""><spring:message code="lbl.select" />...</option>
+                                </select>
+                            </div>
+                        </section>
+                    </c:when>
+                    <c:otherwise>
+                        <section class="col col-sm-12 col-md-5 col-lg-5">
+                            <label class="text-left txt-color-blue font-md">
+                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.type" />
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-location-arrow fa-fw"></i>
+                                </span>
+                                <select  class="select2" id="codDX" name="codDX" >
+                                    <option value=""><spring:message code="lbl.select" />...</option>
+                                </select>
+                            </div>
+                        </section>
+                    </c:otherwise>
+                </c:choose>
                 <section class="col col-sm-12 col-md-7 col-lg-7">
                     <label class="text-left txt-color-blue font-md">
                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.test" />
@@ -531,6 +558,8 @@
     <c:url var="sgetOrdenesExamenUrl" value="/recepcionMx/getOrdenesExamen"/>
     <c:url var="sDxURL" value="/api/v1/getDiagnosticos"/>
     <c:url var="sExamenesURL" value="/api/v1/getExamenes"/>
+    <c:url var="sEstudiosURL" value="/api/v1/getEstudios"/>
+    <c:url var="sExamenesEstURL" value="/api/v1/getExamenesEstudio"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -544,7 +573,9 @@
                 sAnularExamenUrl : "${sAnularExamenUrl}",
                 sDxURL : "${sDxURL}",
                 sExamenesURL : "${sExamenesURL}",
-                sAgregarOrdenExamenUrl : "${sAgregarOrdenExamenUrl}"
+                sAgregarOrdenExamenUrl : "${sAgregarOrdenExamenUrl}",
+                sEstudiosURL : "${sEstudiosURL}",
+                sExamenesEstURL : "${sExamenesEstURL}"
             };
 			ReceiptOrders.init(parametros);
 	    	$("li.laboratorio").addClass("open");

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,11 +96,23 @@ public class OrdenExamenMxService {
         return q.list();
     }
 
+    /**
+     * Obtiene las ordenes de examen no anuladas para la muestra. Una toma no puede tener de dx y de estudios, es uno u otro.
+     * @param idTomaMx id de la toma a consultar
+     * @return List<OrdenExamen>
+     */
     public List<OrdenExamen> getOrdenesExamenNoAnuladasByIdMx(String idTomaMx){
         Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.idTomaMx =:idTomaMx and oe.anulado = false ");
         q.setParameter("idTomaMx",idTomaMx);
-        return q.list();
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx where mx.idTomaMx =:idTomaMx and oe.anulado = false ");
+        q2.setParameter("idTomaMx",idTomaMx);
+        ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
     }
 
     public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdDxIdExamen(String idTomaMx, int idDx, int idExamen){
@@ -112,7 +125,7 @@ public class OrdenExamenMxService {
         return q.list();
     }
 
-    public List<OrdenExamen> getOrdenesExamenByFiltro(FiltroMx filtro){
+    public List<OrdenExamen> getOrdenesExamenDxByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
         Criteria crit = session.createCriteria(OrdenExamen.class, "ordenEx");
@@ -186,5 +199,91 @@ public class OrdenExamenMxService {
                 .createAlias("alicuotaRegistro", "resultado").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("resultado.idAlicuota"))));*/
         return crit.list();
+    }
+
+    public List<OrdenExamen> getOrdenesExamenEstudioByFiltro(FiltroMx filtro){
+        Session session = sessionFactory.getCurrentSession();
+        Soundex varSoundex = new Soundex();
+        Criteria crit = session.createCriteria(OrdenExamen.class, "ordenEx");
+        crit.createAlias("ordenEx.solicitudEstudio","solicitudEstudio");
+        crit.createAlias("solicitudEstudio.idTomaMx","tomaMx");
+        crit.createAlias("tomaMx.estadoMx","estado");
+        crit.createAlias("tomaMx.idNotificacion", "notifi");
+        //siempre se tomam las muestras que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("tomaMx.anulada", false))
+        );
+        //siempre se tomam las ordenes que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("ordenEx.anulado", false))
+        );
+        //y las ordenes en estado según filtro
+        if (filtro.getCodEstado()!=null) {
+            crit.add(Restrictions.and(
+                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+        }
+        // se filtra por nombre y apellido persona
+        if (filtro.getNombreApellido()!=null) {
+            crit.createAlias("notifi.persona", "person");
+            String[] partes = filtro.getNombreApellido().split(" ");
+            String[] partesSnd = filtro.getNombreApellido().split(" ");
+            for (int i = 0; i < partes.length; i++) {
+                try {
+                    partesSnd[i] = varSoundex.encode(partes[i]);
+                } catch (IllegalArgumentException e) {
+                    partesSnd[i] = "0000";
+                    e.printStackTrace();
+                }
+            }
+            for (int i = 0; i < partes.length; i++) {
+                Junction conditionGroup = Restrictions.disjunction();
+                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
+                crit.add(conditionGroup);
+            }
+        }
+        //se filtra por SILAIS
+        if (filtro.getCodSilais()!=null){
+            crit.createAlias("notifi.codSilaisAtencion","silais");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("silais.codigo", Long.valueOf(filtro.getCodSilais())))
+            );
+        }
+        //se filtra por unidad de salud
+        if (filtro.getCodUnidadSalud()!=null){
+            crit.createAlias("notifi.codUnidadAtencion","unidadS");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
+            );
+        }
+        //Se filtra por rango de fecha de toma de muestra
+        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("tomaMx.fechaRegistro", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+        }
+        // se filtra por tipo de muestra
+        if (filtro.getCodTipoMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
+            );
+        }
+        /*crit.add( Subqueries.propertyNotIn("idAlicuota", DetachedCriteria.forClass(DetalleResultado.class)
+                .createAlias("alicuotaRegistro", "resultado").add(Restrictions.eq("pasivo", false))
+                .setProjection(Property.forName("resultado.idAlicuota"))));*/
+        return crit.list();
+    }
+
+    public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdEstIdExamen(String idTomaMx, int idEstudio, int idExamen){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as sdx inner join sdx.idTomaMx as mx where mx.idTomaMx =:idTomaMx " +
+                "and sdx.tipoEstudio.idEstudio = :idEstudio and oe.codExamen.idExamen = :idExamen and oe.anulado = false ");
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("idEstudio",idEstudio);
+        q.setParameter("idExamen",idExamen);
+        return q.list();
     }
 }

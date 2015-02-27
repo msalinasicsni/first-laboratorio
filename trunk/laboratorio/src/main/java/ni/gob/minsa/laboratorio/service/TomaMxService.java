@@ -211,4 +211,41 @@ public class TomaMxService {
         q.setParameter("idDx", idDx);
         return (Catalogo_Dx)q.uniqueResult();
     }
+
+/****************************************************************
+ * MUESTRAS DE ESTUDIOS
+******************************************************************/
+    public List<DaSolicitudEstudio> getSolicitudesEstudioByIdTomaMx(String idTomaMx){
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+    /**
+     *Retorna una lista de estudios segun tipoMx y tipo Notificacion
+     * @param codTipoMx código del tipo de Mx
+     * @param codTipoNoti código del tipo Notificacion
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti) throws Exception {
+        String query = "select est from Estudio_TipoMx_TipoNoti est " +
+                "where est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codTipoMx", codTipoMx);
+        q.setString("codTipoNoti", codTipoNoti);
+        return q.list();
+    }
+
+    public DaSolicitudEstudio getSolicitudesEstudioByMxDx(String idTomaMx,  Integer idEstudio){
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx " +
+                "and tipoEstudio.idEstudio= :idEstudio ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("idEstudio",idEstudio);
+        return (DaSolicitudEstudio)q.uniqueResult();
+    }
 }

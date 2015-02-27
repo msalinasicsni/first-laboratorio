@@ -71,4 +71,12 @@ public class ExamenesService {
         List<Object[]> examenes= (List<Object[]>)q.list();
         return examenes;
     }
+
+    public List<CatalogoExamenes> getExamenesByIdEstudio(int idEstudio){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select ex from Examen_Estudio as eex inner join eex.examen as ex inner join eex.estudio as dx " +
+                "where dx.idEstudio = :idEstudio");
+        q.setParameter("idEstudio",idEstudio);
+        return q.list();
+    }
 }

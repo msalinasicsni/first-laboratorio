@@ -453,7 +453,7 @@
                 sFormConcept : "SI",
                 sTipoDatoUrl : "${sTipoDatoUrl}"
             };
-			Conceptos.init(parametros);
+            Responses.init(parametros);
             $("#divNumerico").hide();
 	    	$("li.administracion").addClass("open");
 	    	$("li.respuesta").addClass("active");

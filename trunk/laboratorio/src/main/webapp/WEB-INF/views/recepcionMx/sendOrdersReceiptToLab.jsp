@@ -21,6 +21,9 @@
         tr.shown td.details-control {
             background: url("${minus}") no-repeat center center;
         }
+        tr.active {
+            color: #3276B1!important;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -126,8 +129,9 @@
                                     <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                     <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                     <input id="msg_send_receipt_succes" type="hidden" value="<spring:message code="msg.receipt.successfully.sending"/>"/>
-                                    <input id="text_dx" type="hidden" value="<spring:message code="lbl.receipt.send.dx"/>"/>
-                                    <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.receipt.send.dx.date"/>"/>
+                                    <input id="text_request" type="hidden" value="<spring:message code="lbl.send.request"/>"/>
+                                    <input id="text_request_date" type="hidden" value="<spring:message code="lbl.send.request.date"/>"/>
+                                    <input id="text_request_type" type="hidden" value="<spring:message code="lbl.send.request.type"/>"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -278,7 +282,7 @@
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
-                                            <th><spring:message code="lbl.dx"/></th>
+                                            <th><spring:message code="lbl.request"/></th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -382,10 +386,10 @@
 
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
-	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+	    	$("li.recepcion").addClass("open");
+	    	$("li.sendReceipt").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.sendReceipt").parents("ul").slideDown(200);
 	    	}
         });
 	</script>

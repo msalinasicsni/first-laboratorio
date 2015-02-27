@@ -23,6 +23,7 @@ public class OrdenExamen {
     private CatalogoExamenes codExamen;
     private Usuarios usarioRegistro;
     private boolean anulado;
+    private DaSolicitudEstudio solicitudEstudio;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -36,7 +37,7 @@ public class OrdenExamen {
         this.idOrdenExamen = idOrdenExamen;
     }
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "ID_SOLICITUD_DX", referencedColumnName = "ID_SOLICITUD_DX")
     @ForeignKey(name = "SOLICITUD_DX_EX_FK")
     public DaSolicitudDx getSolicitudDx() {
@@ -87,5 +88,16 @@ public class OrdenExamen {
 
     public void setAnulado(boolean anulado) {
         this.anulado = anulado;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "ID_SOLICITUD_EST", referencedColumnName = "ID_SOLICITUD_EST")
+    @ForeignKey(name = "SOLICITUD_EST_EX_FK")
+    public DaSolicitudEstudio getSolicitudEstudio() {
+        return solicitudEstudio;
+    }
+
+    public void setSolicitudEstudio(DaSolicitudEstudio solicitudEstudio) {
+        this.solicitudEstudio = solicitudEstudio;
     }
 }
