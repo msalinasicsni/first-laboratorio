@@ -23,7 +23,6 @@ public class RecepcionMx {
     Timestamp fechaHoraRecepcion;
     TipoRecepcionMx tipoRecepcionMx;
     Usuarios usuarioRecepcion;
-    TipoEstudio tipoEstudio;
     TecnicaxLaboratorio tecnicaxLaboratorio;
     TipoTubo tipoTubo;
     CalidadMx calidadMx;
@@ -86,17 +85,6 @@ public class RecepcionMx {
 
     public void setTomaMx(DaTomaMx tomaMx) {
         this.tomaMx = tomaMx;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
-    @JoinColumn(name = "COD_TIPO_EST", referencedColumnName = "CODIGO")
-    @ForeignKey(name = "RECEPCION_ESTUDIO_FK")
-    public TipoEstudio getTipoEstudio() {
-        return tipoEstudio;
-    }
-
-    public void setTipoEstudio(TipoEstudio tipoEstudio) {
-        this.tipoEstudio = tipoEstudio;
     }
 
     @ManyToOne(optional = true)

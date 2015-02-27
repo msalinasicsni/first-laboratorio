@@ -337,10 +337,10 @@
 
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
-	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+	    	$("li.laboratorio").addClass("open");
+	    	$("li.receiptLab").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.receiptLab").parents("ul").slideDown(200);
 	    	}
         });
 	</script>

@@ -5,6 +5,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
+import ni.gob.minsa.laboratorio.domain.muestra.Estudio_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.poblacion.Sectores;
@@ -213,7 +214,7 @@ public class expose {
     public
     @ResponseBody
     List<Dx_TipoMx_TipoNoti> getDiagnosticos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
-        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        logger.info("Obteniendo los dx por tipo mx en JSON");
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Dx_TipoMx_TipoNoti>();
         dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti);
         return dxTipoMxTipoNotis;
@@ -223,7 +224,7 @@ public class expose {
     public
     @ResponseBody
     List<CatalogoExamenes> getExamenes(@RequestParam(value = "idDx", required = true) int idDx) throws Exception {
-        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        logger.info("Obteniendo los examenes por dx en JSON");
         List<CatalogoExamenes> catalogoExamenesList = new ArrayList<CatalogoExamenes>();
         catalogoExamenesList = examenesService.getExamenesByIdDx(idDx);
         return catalogoExamenesList;
@@ -233,10 +234,30 @@ public class expose {
     public
     @ResponseBody
     List<Catalogo_Dx> getDiagnosticosByNoti(@RequestParam(value = "codTipoNoti", required = true) String codTipoNoti) throws Exception {
-        logger.info("Obteniendo los sectores por unidad de salud en JSON");
+        logger.info("Obteniendo los dx por tipo notificación en JSON");
         List<Catalogo_Dx> dxTipoMxTipoNotis = new ArrayList<Catalogo_Dx>();
         dxTipoMxTipoNotis = tomaMxService.getDxsByTipoNoti(codTipoNoti);
         return dxTipoMxTipoNotis;
+    }
+
+    @RequestMapping(value = "getEstudios", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<Estudio_TipoMx_TipoNoti> getEstudios(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
+        logger.info("Obteniendo los estudios por mx y tipo de notitificación en JSON");
+        List<Estudio_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Estudio_TipoMx_TipoNoti>();
+        dxTipoMxTipoNotis = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti);
+        return dxTipoMxTipoNotis;
+    }
+
+    @RequestMapping(value = "getExamenesEstudio", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<CatalogoExamenes> getExamenesEstudio(@RequestParam(value = "idEstudio", required = true) int idEstudio) throws Exception {
+        logger.info("Obteniendo los examenes por estudio en JSON");
+        List<CatalogoExamenes> catalogoExamenesList = new ArrayList<CatalogoExamenes>();
+        catalogoExamenesList = examenesService.getExamenesByIdEstudio(idEstudio);
+        return catalogoExamenesList;
     }
 
 }

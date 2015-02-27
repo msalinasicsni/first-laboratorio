@@ -111,7 +111,7 @@
                                     <form id="search-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
-                                            <section class="col col-sm-12 col-md-12 col-lg-4">
+                                            <section class="col col-sm-12 col-md-12 col-lg-6">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.test.name" />
                                                 </label>
@@ -120,7 +120,7 @@
                                                     <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.test.name"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-4">
+                                            <section class="col col-sm-6 col-md-6 col-lg-6">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.notification.type" /> </label>
                                                 <div class="input-group">
@@ -133,7 +133,7 @@
                                                         </c:forEach>
                                                     </select>
                                                 </div>
-                                            </section>
+                                            <!--</section>
                                                 <section class="col col-sm-6 col-md-4 col-lg-4">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.dx.type" /> </label>
@@ -144,7 +144,7 @@
                                                             <option value=""><spring:message code="lbl.select" />...</option>
                                                         </select>
                                                     </div>
-                                                </section>
+                                                </section>-->
                                         </div>
                                         </fieldset>
                                         <footer>
@@ -267,7 +267,7 @@
                 sBuscarExamenes : "${sBuscarExamenes}",
                 sFormConcept : "NO"
             };
-            Conceptos.init(parametros);
+            Responses.init(parametros);
 
             $("li.administracion").addClass("open");
 	    	$("li.respuesta").addClass("active");

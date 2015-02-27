@@ -290,19 +290,36 @@
                                                     <table id="dx_list" class="table table-striped table-bordered table-hover" width="100%">
                                                         <thead>
                                                         <tr>
-                                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
-                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.solic.datetime"/></th>
-                                                            <th data-hide="phone"><spring:message code="lbl.receipt.pcr.area"/></th>
+                                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.name"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.solic.area.prc"/></th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <c:forEach items="${dxList}" var="record">
-                                                            <tr>
-                                                                <td><c:out value="${record.codDx.nombre}" /></td>
-                                                                <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
-                                                                <td><c:out value="${record.codDx.area.nombre}" /></td>
-                                                            </tr>
-                                                            </c:forEach>
+                                                        <c:choose>
+                                                            <c:when test="${not empty dxList}">
+                                                                <c:forEach items="${dxList}" var="record">
+                                                                    <tr>
+                                                                        <td>DX</td>
+                                                                        <td><c:out value="${record.codDx.nombre}" /></td>
+                                                                        <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
+                                                                        <td><c:out value="${record.codDx.area.nombre}" /></td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <c:forEach items="${estudiosList}" var="record">
+                                                                    <tr>
+                                                                        <td>Estudio</td>
+                                                                        <td><c:out value="${record.tipoEstudio.nombre}" /></td>
+                                                                        <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
+                                                                        <td><c:out value="${record.tipoEstudio.area.nombre}" /></td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:otherwise>
+                                                        </c:choose>
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -460,10 +477,10 @@
                 sPrintUrl : "${sPrintUrl}"
             };
 			ReceiptOrders.init(parametros);
-	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+	    	$("li.recepcion").addClass("open");
+	    	$("li.receipt").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.receipt").parents("ul").slideDown(200);
 	    	}
             $('#dvCausa').hide();
         });

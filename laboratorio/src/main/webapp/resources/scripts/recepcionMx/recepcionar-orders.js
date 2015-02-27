@@ -55,6 +55,13 @@ var ReceiptOrders = function () {
                 "ordering": false,
                 "searching": false,
                 "lengthChange": false,
+                "columns": [
+                    null,null,null,null,null,
+                    {
+                        "className": 'cancelar',
+                        "orderable": false
+                    }
+                ],
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -236,7 +243,7 @@ var ReceiptOrders = function () {
                     var len = Object.keys(response).length;
                     for (var i = 0; i < len; i++) {
                         table2.fnAddData(
-                            [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].nombreDx, response[i].fechaSolicitudDx,
+                            [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud,
                                     '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id='+response[i].idOrdenExamen+'><i class="fa fa-times"></i></a>']);
 
                     }
@@ -417,7 +424,9 @@ var ReceiptOrders = function () {
                 var ordenExamenObj = {};
                 ordenExamenObj['idTomaMx'] = $("#idTomaMx").val();
                 ordenExamenObj['idDiagnostico'] = $('#codDX').find('option:selected').val();
+                ordenExamenObj['idEstudio'] = $('#codEstudio').find('option:selected').val();
                 ordenExamenObj['idExamen'] = $('#codExamen').find('option:selected').val();
+                ordenExamenObj['esEstudio'] = $('#esEstudio').val();
                 ordenExamenObj['mensaje'] = '';
                 blockUI();
                 $.ajax(
@@ -509,7 +518,11 @@ var ReceiptOrders = function () {
             });
 
             $("#btnAddTest").click(function(){
-                getDiagnosticos($("#idTipoMx").val(),$("#codTipoNoti").val());
+                if ($("#esEstudio").val()=='true'){
+                    getEstudios($("#idTipoMx").val(), $("#codTipoNoti").val());
+                }else{
+                    getDiagnosticos($("#idTipoMx").val(), $("#codTipoNoti").val());
+                }
                 $("#myModal").modal({
                     show: true
                 });
@@ -532,12 +545,55 @@ var ReceiptOrders = function () {
                     $('#codDX').html(html);
                 });
             }
+            <!-- cargar estudios -->
+            function getEstudios(idTipoMx, codTipoNoti) {
+                $.getJSON(parametros.sEstudiosURL, {
+                    codMx: idTipoMx, tipoNoti : codTipoNoti,
+                    ajax: 'true'
+                }, function (data) {
+                    var html = null;
+                    var len = data.length;
+                    html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + data[i].estudio.idEstudio + '">'
+                            + data[i].estudio.nombre
+                            + '</option>';
+                    }
+                    $('#codEstudio').html(html);
+                });
+            }
+
 
             <!-- Al seleccionar diagnóstico-->
             $('#codDX').change(function () {
                 if ($(this).val().length > 0){
                     $.getJSON(parametros.sExamenesURL, {
                         idDx: $(this).val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].idExamen + '">'
+                                + data[i].nombre
+                                + '</option>';
+                            html += '</option>';
+                        }
+                        $('#codExamen').html(html);
+                    });
+                }else {
+                    var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    $('#codExamen').html(html);
+                }
+                $('#codExamen').val('').change();
+            });
+
+            <!-- Al seleccionar estudio-->
+            $('#codEstudio').change(function () {
+                if ($(this).val().length > 0){
+                    $.getJSON(parametros.sExamenesEstURL, {
+                        idEstudio: $(this).val(),
                         ajax: 'true'
                     }, function (data) {
                         var html = null;

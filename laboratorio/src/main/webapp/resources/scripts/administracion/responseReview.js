@@ -1,4 +1,4 @@
-var Conceptos = function () {
+var Responses = function () {
     var bloquearUI = function(mensaje){
         var loc = window.location;
         var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
@@ -153,7 +153,7 @@ var Conceptos = function () {
                     pNombreEx = '';
                 }else {
                     pTipoNoti = $('#codTipoNoti option:selected').val();
-                    pIdDx = $('#codTipoDx option:selected').val();
+                    pIdDx = ''; //$('#codTipoDx option:selected').val();
                     pNombreEx = $("#nombreExamen").val();
                 }
                 bloquearUI(parametros.blockMess);

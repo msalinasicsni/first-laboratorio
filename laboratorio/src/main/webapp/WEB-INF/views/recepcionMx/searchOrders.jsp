@@ -329,10 +329,10 @@
 
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
-	    	$("li.samples").addClass("open");
-	    	$("li.envioOrdenMx").addClass("active");
+	    	$("li.recepcion").addClass("open");
+	    	$("li.receipt").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.envioOrdenMx").parents("ul").slideDown(200);
+	    		$("li.receipt").parents("ul").slideDown(200);
 	    	}
         });
 	</script>

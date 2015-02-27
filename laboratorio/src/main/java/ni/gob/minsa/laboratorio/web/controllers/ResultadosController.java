@@ -124,8 +124,13 @@ public class ResultadosController {
         if (urlValidacion.isEmpty()) {
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrdenExamen);
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
-            mav.addObject("ordenExamen",ordenExamen);
+            Date fechaInicioSintomas = null;
+            if (ordenExamen.getSolicitudDx()!=null) {
+              fechaInicioSintomas =  tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            }else {
+                fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            }
+            mav.addObject("ordenExamen", ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
             mav.setViewName("resultados/incomeResult");
@@ -139,7 +144,8 @@ public class ResultadosController {
     public @ResponseBody  String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
-        List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenByFiltro(filtroMx);
+        List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenDxByFiltro(filtroMx);
+        ordenExamenList.addAll(ordenExamenMxService.getOrdenesExamenEstudioByFiltro(filtroMx));
         return ordenesExamenToJson(ordenExamenList);
     }
 
@@ -196,37 +202,69 @@ public class ResultadosController {
         for(OrdenExamen orden : ordenesExamen){
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", orden.getIdOrdenExamen());
-            map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
-            map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoUnicoMx());
-            map.put("fechaHoraOrden",DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("examen", orden.getCodExamen().getNombre());
-            map.put("fechaHoraDx",DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
-            map.put("fechaTomaMx",DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            map.put("tipoMuestra", orden.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
-            //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
-            if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
-            else
-                map.put("fechaInicioSintomas"," ");
-            //Si hay persona
-            if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona()!=null){
-                /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
-                nombreCompleto = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-            }else{
-                map.put("persona"," ");
-            }
+            map.put("fechaHoraOrden", DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
 
+            if (orden.getSolicitudDx()!=null) {
+                map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+                map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoUnicoMx());
+                map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
+                map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                map.put("tipoMuestra", orden.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
+                //Si hay fecha de inicio de sintomas se muestra
+                Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                if (fechaInicioSintomas != null)
+                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                else
+                    map.put("fechaInicioSintomas", " ");
+                //Si hay persona
+                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                    /// se obtiene el nombre de la persona asociada a la ficha
+                    String nombreCompleto = "";
+                    nombreCompleto = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    map.put("persona", nombreCompleto);
+                } else {
+                    map.put("persona", " ");
+                }
+            }
+            else{
+                map.put("idTomaMx", orden.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
+                map.put("codigoUnicoMx", orden.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx());
+                map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("tipoDx", orden.getSolicitudEstudio().getTipoEstudio().getNombre());
+                map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("codSilais", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                map.put("codUnidadSalud", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                map.put("tipoMuestra", orden.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
+                //Si hay fecha de inicio de sintomas se muestra
+                Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                if (fechaInicioSintomas != null)
+                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                else
+                    map.put("fechaInicioSintomas", " ");
+                //Si hay persona
+                if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                    /// se obtiene el nombre de la persona asociada a la ficha
+                    String nombreCompleto = "";
+                    nombreCompleto = orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                    if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                    if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    map.put("persona", nombreCompleto);
+                } else {
+                    map.put("persona", " ");
+                }
+            }
             mapResponse.put(indice, map);
             indice ++;
         }
@@ -386,7 +424,7 @@ public class ResultadosController {
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("msg.result.error.added",null,null);
+            resultado =  messageSource.getMessage("msg.result.error.canceled",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {

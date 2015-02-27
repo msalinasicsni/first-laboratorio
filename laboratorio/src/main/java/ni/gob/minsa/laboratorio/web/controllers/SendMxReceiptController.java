@@ -222,9 +222,35 @@ public class SendMxReceiptController {
             }else{
                 map.put("persona"," ");
             }
-
-            //se arma estructura de diagnósticos
+            //se arma estructura de diagnósticos o estudios
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcion.getTomaMx().getIdTomaMx());
+            Map<Integer, Object> mapSolicitudesList = new HashMap<Integer, Object>();
+            Map<String, String> mapSolicitud = new HashMap<String, String>();
+            if (solicitudDxList.size()>0) {
+                int subIndice=0;
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
+                    mapSolicitud.put("tipo", "Dx");
+                    mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    subIndice++;
+                    mapSolicitudesList.put(subIndice, mapSolicitud);
+                }
+                map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
+            }else{
+                List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
+                int subIndice=0;
+                for (DaSolicitudEstudio solicitudEstudio : solicitudEstudios) {
+                    mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
+                    mapSolicitud.put("tipo", "Estudio");
+                    mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    subIndice++;
+                    mapSolicitudesList.put(subIndice, mapSolicitud);
+                    mapSolicitud = new HashMap<String, String>();
+                }
+                map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
+            }
+            //se arma estructura de diagnósticos
+            /*List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcion.getTomaMx().getIdTomaMx());
             Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
             Map<String, String> mapDx = new HashMap<String, String>();
             int subIndice=0;
@@ -234,7 +260,7 @@ public class SendMxReceiptController {
                 subIndice++;
             }
             mapDxList.put(subIndice,mapDx);
-            map.put("diagnosticos", new Gson().toJson(mapDxList));
+            map.put("diagnosticos", new Gson().toJson(mapDxList));*/
 
             mapResponse.put(indice, map);
             indice ++;

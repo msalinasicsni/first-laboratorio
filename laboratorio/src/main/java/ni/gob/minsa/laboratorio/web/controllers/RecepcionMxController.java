@@ -185,6 +185,7 @@ public class RecepcionMxController {
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<Unidades> unidades = null;
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(tomaMx.getIdTomaMx());
+            List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
             Date fechaInicioSintomas = null;
             if (tomaMx.getIdNotificacion()!=null) {
                 unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
@@ -207,6 +208,7 @@ public class RecepcionMxController {
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
             mav.addObject("inadecuada",html);
             mav.addObject("dxList",solicitudDxList);
+            mav.addObject("estudiosList",solicitudEstudioList);
             mav.setViewName("recepcionMx/recepcionarOrders");
         }else
             mav.setViewName(urlValidacion);
@@ -248,7 +250,11 @@ public class RecepcionMxController {
             List<Examen_Dx> examenesList = null;
             List<OrdenExamen> ordenExamenList;
             Date fechaInicioSintomas = null;
+            boolean esEstudio = false;
             if (recepcionMx!=null) {
+                //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
+                esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
+
                 unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
                 ordenExamenList = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
@@ -284,6 +290,7 @@ public class RecepcionMxController {
                 }else{
                     mav.addObject("examenesList",ordenExamenList);
                 }
+                mav.addObject("esEstudio",esEstudio);
             }
 
             mav.addObject("recepcionMx",recepcionMx);
@@ -363,10 +370,14 @@ public class RecepcionMxController {
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
             //Se obtiene estado recepcionado
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCP");
-            TipoRecepcionMx tipoRecepcionMx = catalogosService.getTipoRecepcionMx("TPRECPMX|VRT");
+
             //se obtiene tomaMx de examen a recepcionar
             DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
 
+            TipoRecepcionMx tipoRecepcionMx = null;
+            //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
+            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size()>0;
+            catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
 
             recepcionMx.setUsuarioRecepcion(usuario);
@@ -581,39 +592,18 @@ public class RecepcionMxController {
     protected void agregarOrdenExamen(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
-        String idTomaMx = "";
-        int idDiagnostico = 0;
-        int idExamen = 0;
+        boolean esEstudio=false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
-            idTomaMx = jsonpObject.get("idTomaMx").getAsString();
-            idDiagnostico = jsonpObject.get("idDiagnostico").getAsInt();
-            idExamen = jsonpObject.get("idExamen").getAsInt();
-            //se valida si existe una orden activa para la muestra, el diagnóstico y el examen
-            List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, idDiagnostico, idExamen);
-            if (ordenExamenList!=null && ordenExamenList.size()>0) {
-                resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
-            }else{
-                CatalogoExamenes examen = examenesService.getExamenesById(idExamen);
-                long idUsuario = seguridadService.obtenerIdUsuario(request);
-                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
-                OrdenExamen ordenExamen = new OrdenExamen();
-                DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
-                ordenExamen.setSolicitudDx(solicitudDx);
-                ordenExamen.setCodExamen(examen);
-                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                ordenExamen.setUsarioRegistro(usuario);
-                try {
-                    ordenExamenMxService.addOrdenExamen(ordenExamen);
-                } catch (Exception ex) {
-                    resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
-                    resultado = resultado + ". \n " + ex.getMessage();
-                    ex.printStackTrace();
-                }
-            }
+            esEstudio = jsonpObject.get("esEstudio").getAsBoolean();
+            if(esEstudio)
+                resultado = agregarOrdenExamenEstudio(jsonpObject,request);
+            else
+                resultado = agregarOrdenExamenVigRut(jsonpObject,request);
+
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
@@ -621,16 +611,82 @@ public class RecepcionMxController {
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
-            UnicodeEscaper escaper     = UnicodeEscaper.above(127);
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idTomaMx",idTomaMx);
-            map.put("idDiagnostico", String.valueOf(idDiagnostico));
-            map.put("idExamen", String.valueOf(idExamen));
-            map.put("mensaje",escaper.translate(resultado));
+            map.put("idTomaMx","tmp");
+            map.put("idDiagnostico", "tmp");
+            map.put("idExamen", "tmp");
+            map.put("esEstudio",String.valueOf(esEstudio));
+            map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
+    }
+
+    private String agregarOrdenExamenVigRut(JsonObject jsonpObject, HttpServletRequest request) throws Exception {
+        String resultado = "";
+        String idTomaMx = "";
+        int idDiagnostico = 0;
+        int idExamen = 0;
+        idTomaMx = jsonpObject.get("idTomaMx").getAsString();
+        idDiagnostico = jsonpObject.get("idDiagnostico").getAsInt();
+        idExamen = jsonpObject.get("idExamen").getAsInt();
+        //se valida si existe una orden activa para la muestra, el diagnóstico y el examen
+        List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, idDiagnostico, idExamen);
+        if (ordenExamenList!=null && ordenExamenList.size()>0) {
+            resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
+        }else{
+            CatalogoExamenes examen = examenesService.getExamenesById(idExamen);
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            OrdenExamen ordenExamen = new OrdenExamen();
+            DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
+            ordenExamen.setSolicitudDx(solicitudDx);
+            ordenExamen.setCodExamen(examen);
+            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+            ordenExamen.setUsarioRegistro(usuario);
+            try {
+                ordenExamenMxService.addOrdenExamen(ordenExamen);
+            } catch (Exception ex) {
+                resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
+                resultado = resultado + ". \n " + ex.getMessage();
+                ex.printStackTrace();
+            }
+        }
+        return resultado;
+    }
+
+    private String agregarOrdenExamenEstudio(JsonObject jsonpObject, HttpServletRequest request) throws Exception {
+        String resultado = "";
+        String idTomaMx = "";
+        int idEstudio = 0;
+        int idExamen = 0;
+        idTomaMx = jsonpObject.get("idTomaMx").getAsString();
+        idEstudio = jsonpObject.get("idEstudio").getAsInt();
+        idExamen = jsonpObject.get("idExamen").getAsInt();
+        //se valida si existe una orden activa para la muestra, el diagnóstico y el examen
+        List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdEstIdExamen(idTomaMx, idEstudio, idExamen);
+        if (ordenExamenList!=null && ordenExamenList.size()>0) {
+            resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
+        }else{
+            CatalogoExamenes examen = examenesService.getExamenesById(idExamen);
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            OrdenExamen ordenExamen = new OrdenExamen();
+            DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudesEstudioByMxDx(idTomaMx, idEstudio);
+            ordenExamen.setSolicitudEstudio(solicitudEstudio);
+            ordenExamen.setCodExamen(examen);
+            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+            ordenExamen.setUsarioRegistro(usuario);
+            try {
+                ordenExamenMxService.addOrdenExamen(ordenExamen);
+            } catch (Exception ex) {
+                resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
+                resultado = resultado + ". \n " + ex.getMessage();
+                ex.printStackTrace();
+            }
+        }
+        return resultado;
     }
 
     /**
@@ -750,13 +806,25 @@ public class RecepcionMxController {
         Integer indice=0;
         for(OrdenExamen ordenExamen : ordenesExamenList){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
-            map.put("idOrdenExamen",ordenExamen.getIdOrdenExamen());
-            map.put("nombreExamen",ordenExamen.getCodExamen().getNombre());
-            map.put("nombreDx",ordenExamen.getSolicitudDx().getCodDx().getNombre());
-            map.put("nombreAreaPrc",ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
-            map.put("fechaSolicitudDx",DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
-            mapResponse.put(indice, map);
+            if (ordenExamen.getSolicitudDx()!=null) {
+                map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+                map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
+                map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
+                map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
+                map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("tipo","Dx");
+                mapResponse.put(indice, map);
+            }else{
+                map.put("idTomaMx", ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
+                map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
+                map.put("nombreSolic", ordenExamen.getSolicitudEstudio().getTipoEstudio().getNombre());
+                map.put("nombreAreaPrc", ordenExamen.getSolicitudEstudio().getTipoEstudio().getArea().getNombre());
+                map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("tipo","Estudio");
+                mapResponse.put(indice, map);
+            }
             indice ++;
         }
         jsonResponse = new Gson().toJson(mapResponse);

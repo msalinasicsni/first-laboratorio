@@ -102,12 +102,13 @@ var SendOrdersReceipt = function () {
                 var diagnosticos = $(texto).val();
                 var json =JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:50px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td></tr>';
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
+                    '<tr><td style="font-weight: bold">'+$('#text_request').val()+'</td><td style="font-weight: bold">'+$('#text_request_date').val()+'</td><td style="font-weight: bold">'+$('#text_request_type').val()+'</td></tr>';
                 for (var i = 1; i <= len; i++) {
                     childTable =childTable +
-                        '<tr></tr><td>'+json[i].nombre+'</td>'+
-                        '<td>'+json[i].fechaSolicitud+'</td></tr>';
+                        '<tr><td>'+json[i].nombre+'</td>'+
+                        '<td>'+json[i].fechaSolicitud+'</td>' +
+                        '<td>'+json[i].tipo+'</td></tr>';
                 }
                 childTable = childTable + '</table>';
                 return childTable;
@@ -180,10 +181,7 @@ var SendOrdersReceipt = function () {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona," <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>"]);
-                            /*table1.fnAddData(
-                                [dataToLoad[i].areaProcesa+" <input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].tipoExamen,dataToLoad[i].fechaRecepcion,dataToLoad[i].fechaHoraOrden, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona]);*/
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona," <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
                         }
                     }else{
                         $.smallBox({
