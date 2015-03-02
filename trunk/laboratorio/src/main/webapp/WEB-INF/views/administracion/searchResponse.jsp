@@ -111,35 +111,46 @@
                                     <form id="search-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
-                                            <section class="col col-sm-12 col-md-12 col-lg-6">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.test.name" />
-                                                </label>
-                                                <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                    <input type="text" id="nombreExamen" name="nombreExamen" placeholder="<spring:message code="lbl.test.name"/>">
-                                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.test.name"/></b>
-                                                </label>
-                                            </section>
-                                            <section class="col col-sm-6 col-md-6 col-lg-6">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.notification.type" /> </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codTipoNoti" name="codTipoNoti"
-                                                            class="select2">
-                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                        <c:forEach items="${notificaciones}" var="tipoNoti">
-                                                            <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
-                                                        </c:forEach>
-                                                    </select>
-                                                </div>
-                                            <!--</section>
-                                                <section class="col col-sm-6 col-md-4 col-lg-4">
+                                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.test.name" />
+                                                    </label>
+                                                    <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
+                                                        <input type="text" id="nombreExamen" name="nombreExamen" placeholder="<spring:message code="lbl.test.name"/>">
+                                                        <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.test.name"/></b>
+                                                    </label>
+                                                </section>
+                                                <!--<section class="col col-sm-6 col-md-6 col-lg-2">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.notification.type" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codTipoNoti" name="codTipoNoti"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${notificaciones}" var="tipoNoti">
+                                                                <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </div>
+                                                </section>
+                                                <section class="col col-sm-6 col-md-3 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.dx.type" /> </label>
                                                     <div class="input-group">
                                                         <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
                                                         <select id="codTipoDx" name="codTipoDx"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                        </select>
+                                                    </div>
+                                                </section>
+                                                <section class="col col-sm-6 col-md-3 col-lg-3">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.study.type" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codTipoEstudio" name="codTipoDx"
                                                                 class="select2">
                                                             <option value=""><spring:message code="lbl.select" />...</option>
                                                         </select>
@@ -182,8 +193,9 @@
                                         <thead>
                                         <tr>
                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
+                                            <!--<th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.dx.type"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>-->
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
                                             <th></th>
                                         </tr>
@@ -255,13 +267,15 @@
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="dxUrl" value="/api/v1/getDiagnosticosNoti"/>
+    <c:url var="estudiosUrl" value="/api/v1/getEstudiosNoti"/>
     <c:url var="sCreateConceptUrl" value="/administracion/respuestas/create/"/>
     <c:url var="sBuscarExamenes" value="/administracion/respuestas/getExamenes"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
 			var parametros = {sPersonUrl: "${sPersonUrl}",
-                dxUrl : "${dxUrl}",
+                sDxUrl : "${dxUrl}",
+                sEstudiosUrl : "${estudiosUrl}",
                 blockMess: "${blockMess}",
                 sActionUrl : "${sCreateConceptUrl}",
                 sBuscarExamenes : "${sBuscarExamenes}",

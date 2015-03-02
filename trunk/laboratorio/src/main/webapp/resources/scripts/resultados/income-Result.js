@@ -372,7 +372,7 @@ var IncomeResult = function () {
                 }, function(data) {
                     lenDetRes = data.length;
                     detaResultados = data;
-                    var divResultado= $("#pruebaResultado");
+                    var divResultado= $("#resultados");
                     divResultado.html("");
                     //obteniendo las respuestas configuradas para el examen
                     $.getJSON(parametros.sConceptosUrl, {
@@ -384,7 +384,17 @@ var IncomeResult = function () {
                         if (len > 0) {
                             for (var i = 0; i < len; i++) {
                                 var idControlRespuesta;
-
+                                var descripcionRespuesta = '';
+                                if(dataToLoad[i].descripcion!=null){
+                                    descripcionRespuesta =dataToLoad[i].descripcion;
+                                }
+                                var seccionDescripcion = '<section class="col col-sm-4 col-md-6 col-lg-6">'+
+                                    '<label class="text-left txt-color-blue font-md">'+
+                                    '</label>' +
+                                    '<div class="note font-sm">' +
+                                    '<strong>'+descripcionRespuesta + '</strong>'+
+                                    '</div>'+
+                                    '</section>';
                                 //se busca si existe valor registrado para la respuesta
                                 var valor = '';
                                 if(lenDetRes > 0){
@@ -401,7 +411,7 @@ var IncomeResult = function () {
                                         console.log('logico');
                                         idControlRespuesta = dataToLoad[i].idRespuesta;
                                         contenidoControl ='<div class="row">'+
-                                            '<section class="col col-sm-4 col-md-3 col-lg-3">'+
+                                            '<section class="col col-sm-4 col-md-6 col-lg-6">'+
                                             '<label class="text-left txt-color-blue font-md">'+
                                             dataToLoad[i].nombre +
                                             '</label>'+
@@ -418,6 +428,7 @@ var IncomeResult = function () {
                                         contenidoControl = contenidoControl + '<i></i>'+
                                             '</label>'+
                                             '</section>'+
+                                            seccionDescripcion +
                                             '</div>';
                                         divResultado.append(contenidoControl);
                                         break;
@@ -450,7 +461,9 @@ var IncomeResult = function () {
                                                 }
                                              }
                                         }
-                                        contenidoControl = contenidoControl +'</select></div></section></div>';
+                                        contenidoControl = contenidoControl +'</select></div></section>' +
+                                            seccionDescripcion +
+                                            '</div>';
                                         divResultado.append(contenidoControl);
                                         $("#"+idControlRespuesta).select2();
                                         break;
@@ -471,7 +484,9 @@ var IncomeResult = function () {
                                         }
 
                                         contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
-                                            '</div></section></div>';
+                                            '</div></section>' +
+                                            seccionDescripcion +
+                                            '</div>';
                                         divResultado.append(contenidoControl);
                                         break;
                                     case 'TPDATO|NMRO':
@@ -491,7 +506,9 @@ var IncomeResult = function () {
                                         }
 
                                         contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
-                                            '</div></section></div>';
+                                            '</div></section>' +
+                                            seccionDescripcion +
+                                            '</div>';
                                         divResultado.append(contenidoControl);
                                         $("#"+idControlRespuesta).inputmask("decimal",{
                                             allowMinus: false,

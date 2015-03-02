@@ -56,7 +56,8 @@ public class ExamenesService {
 
     public List<Object[]> getExamenesByFiltro(String idDx, String codTipoNoti, String nombreExamen){
         Session session = sessionFactory.getCurrentSession();
-        StringBuilder sQuery = new StringBuilder("select ex.idExamen, dx.idDiagnostico, noti.codigo, ex.nombre, noti.valor, dx.nombre, are.nombre from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx inner join ex.area as are, " +
+        StringBuilder sQuery = new StringBuilder("select ex.idExamen, dx.idDiagnostico, noti.codigo, ex.nombre, noti.valor, dx.nombre, are.nombre " +
+                "from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx inner join ex.area as are, " +
                 "Dx_TipoMx_TipoNoti dxmxnt inner join dxmxnt.tipoMx_tipoNotificacion.tipoNotificacion noti " +
                 "where edx.diagnostico.idDiagnostico = dxmxnt.diagnostico.idDiagnostico ");
         if (!idDx.isEmpty()) sQuery.append(" and dx.idDiagnostico = :idDx");
@@ -69,6 +70,18 @@ public class ExamenesService {
         if (!codTipoNoti.isEmpty()) q.setParameter("codTipoNoti",codTipoNoti);
 
         List<Object[]> examenes= (List<Object[]>)q.list();
+        return examenes;
+    }
+
+    public List<CatalogoExamenes> getExamenesByFiltro(String nombreExamen){
+        Session session = sessionFactory.getCurrentSession();
+        StringBuilder sQuery = new StringBuilder("select ex " +
+                "from CatalogoExamenes as ex");
+        if (!nombreExamen.isEmpty()) sQuery.append(" where lower(ex.nombre) like '%").append(nombreExamen.toLowerCase()).append("%'");
+
+        Query q = session.createQuery(sQuery.toString());
+
+        List<CatalogoExamenes> examenes= q.list();
         return examenes;
     }
 

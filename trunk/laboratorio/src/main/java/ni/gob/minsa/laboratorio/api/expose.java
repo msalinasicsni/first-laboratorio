@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.muestra.Estudio_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
@@ -258,6 +259,16 @@ public class expose {
         List<CatalogoExamenes> catalogoExamenesList = new ArrayList<CatalogoExamenes>();
         catalogoExamenesList = examenesService.getExamenesByIdEstudio(idEstudio);
         return catalogoExamenesList;
+    }
+
+    @RequestMapping(value = "getEstudiosNoti", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<Catalogo_Estudio> getEstudiosByNoti(@RequestParam(value = "codTipoNoti", required = true) String codTipoNoti) throws Exception {
+        logger.info("Obteniendo los estudios por tipo notificación en JSON");
+        List<Catalogo_Estudio> estTipoMxTipoNotis = new ArrayList<Catalogo_Estudio>();
+        estTipoMxTipoNotis = tomaMxService.getEstudiossByTipoNoti(codTipoNoti);
+        return estTipoMxTipoNotis;
     }
 
 }
