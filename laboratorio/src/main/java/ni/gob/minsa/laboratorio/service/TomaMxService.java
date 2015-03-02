@@ -248,4 +248,13 @@ public class TomaMxService {
         q.setParameter("idEstudio",idEstudio);
         return (DaSolicitudEstudio)q.uniqueResult();
     }
+
+    public List<Catalogo_Estudio> getEstudiossByTipoNoti(String tipoNoti) throws Exception {
+        String query = "select dx from Estudio_TipoMx_TipoNoti dxrel inner join dxrel.estudio dx " +
+                "where dxrel.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("tipoNoti", tipoNoti);
+        return q.list();
+    }
 }

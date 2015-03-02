@@ -77,9 +77,6 @@
                     <li class="ingresoResultado">
                         <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="menu.result.income" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="menu.result.income" /></a>
                     </li>
-                </ul>
-
-                <ul>
                     <li class="approveResult">
                         <a href="<spring:url value="/resultados/aprobacion/init" htmlEscape="true "/>" title="<spring:message code="menu.approval.results" />"><i class="fa fa-lg fa-fw fa-check-circle"></i> <spring:message code="menu.approval.results" /></a>
                     </li>

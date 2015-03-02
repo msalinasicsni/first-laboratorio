@@ -136,16 +136,15 @@
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.response.found"/>"/>
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
-                                    <input id="msg_concept_cancel" type="hidden" value="<spring:message code="msg.response.successfully.cancel"/>"/>
-                                    <input id="msg_concept_added" type="hidden" value="<spring:message code="msg.response.successfully.added"/>"/>
-                                    <input id="msg_concept_updated" type="hidden" value="<spring:message code="msg.response.successfully.updated"/>"/>
-                                    <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
+                                    <input id="msg_response_cancel" type="hidden" value="<spring:message code="msg.response.successfully.cancel"/>"/>
+                                    <input id="msg_response_added" type="hidden" value="<spring:message code="msg.response.successfully.added"/>"/>
+                                    <input id="msg_response_updated" type="hidden" value="<spring:message code="msg.response.successfully.updated"/>"/>
                                     <input id="val_yes" type="hidden" value="<spring:message code="lbl.yes"/>"/>
                                     <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
                                     <form id="dataexamen-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
-                                                <section class="col col-sm-6 col-md-3 col-lg-3">
+                                                <section class="col col-sm-6 col-md-6 col-lg-8">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.test.name"/>
                                                     </label>
@@ -156,7 +155,7 @@
                                                         </label>
                                                     </div>
                                                 </section>
-                                                <section class="col col-sm-6 col-md-3 col-lg-3">
+                                                <!--<section class="col col-sm-6 col-md-3 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.notification.type"/>
                                                     </label>
@@ -177,8 +176,8 @@
                                                             <input class="form-control" type="text" disabled name="nobreDx" id="nobreDx" value="${diagnostico.nombre}" placeholder=" <spring:message code="lbl.dx.type" />" />
                                                         </label>
                                                     </div>
-                                                </section>
-                                                <section class="col col-sm-6 col-md-3 col-lg-3">
+                                                </section>-->
+                                                <section class="col col-sm-6 col-md-6 col-lg-4">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.receipt.pcr.area"/>
                                                     </label>
@@ -198,8 +197,8 @@
                                                 <spring:message code="act.add.response"/>
                                             </button>
                                             <input id="idExamen" type="hidden" value="${examen.idExamen}"/>
-                                            <input id="idDx" type="hidden" value="${diagnostico.idDiagnostico}"/>
-                                            <input id="codTipoNoti" type="hidden" value="${tipoNotificacion.codigo}"/>
+                                            <!--<input id="idDx" type="hidden" value="${diagnostico.idDiagnostico}"/>
+                                            <input id="codTipoNoti" type="hidden" value="${tipoNotificacion.codigo}"/>-->
                                         </footer>
                                     </form>
                                 </div>
@@ -234,6 +233,7 @@
                                             <th data-hide="phone"><spring:message code="lbl.response.pasive"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.response.minvalue"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.response.maxvalue"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.response.description"/></th>
                                             <th><spring:message code="act.override"/></th>
                                             <th><spring:message code="act.edit"/></th>
                                         </tr>
@@ -277,7 +277,7 @@
                 </div>
             </div>
             <div class="modal-body"> <!--  no-padding -->
-            <form id="concepto-form" class="smart-form" novalidate="novalidate">
+            <form id="respuesta-form" class="smart-form" novalidate="novalidate">
             <fieldset>
                 <div class="row">
                     <input id="idRespuestaEdit" type="hidden" value=""/>
@@ -289,7 +289,8 @@
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                <input class="form-control" type="text" name="nombreConcepto" id="nombreConcepto" placeholder=" <spring:message code="lbl.response.name" />"/>
+                                <input class="form-control" type="text" name="nombreRespuesta" id="nombreRespuesta"
+                                       placeholder=" <spring:message code="lbl.response.name" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
                                         class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.name"/>
                                 </b>
@@ -321,7 +322,8 @@
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                <input class="form-control entero" type="text" name="ordenConcepto" id="ordenConcepto" placeholder=" <spring:message code="lbl.response.order" />"/>
+                                <input class="form-control entero" type="text" name="ordenRespuesta" id="ordenRespuesta"
+                                       placeholder=" <spring:message code="lbl.response.order" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
                                         class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.order"/>
                                 </b>
@@ -355,7 +357,8 @@
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                <input class="form-control entero" type="text" name="minimoConcepto" id="minimoConcepto" placeholder=" <spring:message code="lbl.response.minvalue" />"/>
+                                <input class="form-control entero" type="text" name="minimoRespuesta" id="minimoRespuesta"
+                                       placeholder=" <spring:message code="lbl.response.minvalue" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
                                         class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.minvalue"/>
                                 </b>
@@ -369,7 +372,8 @@
                         <div class="">
                             <label class="input">
                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                <input class="form-control entero" type="text" name="maximoConcepto" id="maximoConcepto" placeholder=" <spring:message code="lbl.response.maxvalue" />"/>
+                                <input class="form-control entero" type="text" name="maximoRespuesta" id="maximoRespuesta"
+                                       placeholder=" <spring:message code="lbl.response.maxvalue" />"/>
                                 <b class="tooltip tooltip-bottom-right"> <i
                                         class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.maxvalue"/>
                                 </b>
@@ -377,9 +381,26 @@
                         </div>
                     </section>
                 </div>
+                <div class="row">
+                    <section class="col col-sm-12 col-md-12 col-lg-12">
+                        <label class="text-left txt-color-blue font-md">
+                            <spring:message code="lbl.response.description"/>
+                        </label>
+                        <div class="">
+                            <label class="textarea">
+                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                <textarea class="form-control" rows="3" name="descRespuesta" id="descRespuesta"
+                                          placeholder="<spring:message code="lbl.response.description" />"></textarea>
+                                <b class="tooltip tooltip-bottom-right"> <i
+                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.description"/>
+                                </b>
+                            </label>
+                        </div>
+                    </section>
+                </div>
             </fieldset>
             <footer>
-                <button type="submit" class="btn btn-primary" id="btnAgregarExamen">
+                <button type="submit" class="btn btn-primary" id="btnAgregarRespuesta">
                     <spring:message code="act.save" />
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
@@ -438,8 +459,8 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="sConceptosUrl" value="/administracion/respuestas/getRespuetasExamen"/>
-    <c:url var="sConceptoUrl" value="/administracion/respuestas/getRespuestaById"/>
+    <c:url var="sRespuestasUrl" value="/administracion/respuestas/getRespuetasExamen"/>
+    <c:url var="sRespuestaUrl" value="/administracion/respuestas/getRespuestaById"/>
     <c:url var="sActionUrl" value="/administracion/respuestas/agregarActualizarRespuesta"/>
     <c:url var="sTipoDatoUrl" value="/administracion/respuestas/getTipoDato"/>
     <script type="text/javascript">
@@ -447,8 +468,8 @@
 			pageSetUp();
 			var parametros = {sPersonUrl: "${sPersonUrl}",
                 blockMess: "${blockMess}",
-                sConceptosUrl : "${sConceptosUrl}",
-                sConceptoUrl : "${sConceptoUrl}",
+                sRespuestasUrl : "${sRespuestasUrl}",
+                sRespuestaUrl : "${sRespuestaUrl}",
                 sActionUrl : "${sActionUrl}",
                 sFormConcept : "SI",
                 sTipoDatoUrl : "${sTipoDatoUrl}"

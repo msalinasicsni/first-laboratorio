@@ -392,7 +392,7 @@
                                                 <spring:message code="lbl.header.result.orders.form" />
                                             </header>
                                             <br>
-                                            <div id="pruebaResultado">
+                                            <div id="resultados">
                                             </div>
                                          </fieldset>
                                         <footer>
@@ -525,7 +525,7 @@
     <c:url var="ordersUrl" value="/resultados/searchOrders"/>
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-    <c:url var="sConceptosUrl" value="/administracion/respuestas/getRespuestasActivasExamen"/>
+    <c:url var="sRespuestasUrl" value="/administracion/respuestas/getRespuestasActivasExamen"/>
     <c:url var="sListasUrl" value="/resultados/getCatalogosListaConceptoByIdExamen"/>
     <c:url var="sDetResultadosUrl" value="/resultados/getDetallesResultadoByExamen"/>
     <c:url var="sAlicuotasUrl" value="/resultados/init"/>
@@ -538,7 +538,7 @@
                 sOrdersUrl : "${ordersUrl}",
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
-                sConceptosUrl: "${sConceptosUrl}",
+                sConceptosUrl: "${sRespuestasUrl}",
                 sAlicuotasUrl : "${sAlicuotasUrl}",
                 sSaveResult : "${sSaveResult}",
                 sListasUrl : "${sListasUrl}",

@@ -53,7 +53,7 @@ var Responses = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth" : true,
                 "columns": [
-                    null,null,null,null,null,null,null,
+                    null,null,null,null,null,null,null,null,
                     {
                         "className":      'anularConcepto',
                         "orderable":      false
@@ -97,9 +97,8 @@ var Responses = function () {
 
             function editarHandler(){
                 var id = $(this.innerHTML).data('id');
-                console.log(id);
                 $("#idRespuestaEdit").val(id);
-                getConcept(id);
+                getResponse(id);
                 showModalConcept();
             }
             jQuery.validator.addClassRules("valPrueba", {
@@ -108,7 +107,7 @@ var Responses = function () {
             });
 
             if (parametros.sFormConcept == 'SI'){
-                getConcepts();
+                getResponses();
             }
             $('#search-form').validate({
     			// Rules for form validation
@@ -125,7 +124,7 @@ var Responses = function () {
                     }
             });
 
-            $('#concepto-form').validate({
+            $('#respuesta-form').validate({
                 // Rules for form validation
                 rules: {
                     nombreConcepto : {required:true},
@@ -152,7 +151,7 @@ var Responses = function () {
                     pIdDx = '';
                     pNombreEx = '';
                 }else {
-                    pTipoNoti = $('#codTipoNoti option:selected').val();
+                    pTipoNoti = ''; //$('#codTipoNoti option:selected').val();
                     pIdDx = ''; //$('#codTipoDx option:selected').val();
                     pNombreEx = $("#nombreExamen").val();
                 }
@@ -165,9 +164,10 @@ var Responses = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idExamen+","+dataToLoad[i].idDx+","+dataToLoad[i].codNoti;
+                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idExamen; //+","+dataToLoad[i].idDx+","+dataToLoad[i].codNoti;
                             table1.fnAddData(
-                                [dataToLoad[i].nombreExamen,dataToLoad[i].nombreNoti,dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a>']);
+                                [dataToLoad[i].nombreExamen//,dataToLoad[i].nombreNoti,dataToLoad[i].nombreDx,''
+                                , dataToLoad[i].nombreArea, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a>']);
                         }
                     }else{
                         $.smallBox({
@@ -186,9 +186,9 @@ var Responses = function () {
 				});
             }
 
-            function getConcepts() {
+            function getResponses() {
                 bloquearUI(parametros.blockMess);
-                $.getJSON(parametros.sConceptosUrl, {
+                $.getJSON(parametros.sRespuestasUrl, {
                     idExamen: $("#idExamen").val() ,
                     ajax : 'true'
                 }, function(dataToLoad) {
@@ -209,7 +209,7 @@ var Responses = function () {
                                 botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
                             }
                             table2.fnAddData(
-                                [dataToLoad[i].nombre,dataToLoad[i].concepto.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo,
+                                [dataToLoad[i].nombre,dataToLoad[i].concepto.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo,dataToLoad[i].descripcion,
                                         botonEditar,
                                         '<a data-toggle="modal" class="btn btn-default btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-edit"></i></a>']);
                         }
@@ -229,21 +229,22 @@ var Responses = function () {
                     });
             }
 
-            function getConcept(idConcepto) {
+            function getResponse(idRespuesta) {
                 bloquearUI(parametros.blockMess);
-                $.getJSON(parametros.sConceptoUrl, {
-                    idConcepto: idConcepto ,
+                $.getJSON(parametros.sRespuestaUrl, {
+                    idRespuesta: idRespuesta ,
                     ajax : 'true'
                 }, function(dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         $("#codConcepto").val(dataToLoad.concepto.idConcepto).change();
-                        $("#nombreConcepto").val(dataToLoad.nombre);
-                        $("#ordenConcepto").val(dataToLoad.orden);
+                        $("#nombreRespuesta").val(dataToLoad.nombre);
+                        $("#ordenRespuesta").val(dataToLoad.orden);
                         $("#checkbox-required").attr('checked', dataToLoad.requerido);
                         $("#checkbox-pasive").attr('checked', dataToLoad.pasivo);
-                        $("#minimoConcepto").val(dataToLoad.minimo);
-                        $("#maximoConcepto").val(dataToLoad.maximo);
+                        $("#minimoRespuesta").val(dataToLoad.minimo);
+                        $("#maximoRespuesta").val(dataToLoad.maximo);
+                        $("#descRespuesta").val(dataToLoad.descripcion);
                     }else{
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
@@ -270,14 +271,15 @@ var Responses = function () {
                 var respuestaObj = {};
                 respuestaObj['idRespuesta']=$("#idRespuestaEdit").val();
                 respuestaObj['idExamen']=$("#idExamen").val();
-                respuestaObj['nombre']=$("#nombreConcepto").val();
+                respuestaObj['nombre']=$("#nombreRespuesta").val();
                 respuestaObj['concepto']=$('#codConcepto').find('option:selected').val();
-                respuestaObj['orden']=$("#ordenConcepto").val();
+                respuestaObj['orden']=$("#ordenRespuesta").val();
                 respuestaObj['requerido']=($('#checkbox-required').is(':checked'));
                 respuestaObj['pasivo']=($('#checkbox-pasive').is(':checked'));
-                respuestaObj['minimo']=$("#minimoConcepto").val();
-                respuestaObj['maximo']=$("#maximoConcepto").val();
-                jsonObj['concepto'] = respuestaObj;
+                respuestaObj['minimo']=$("#minimoRespuesta").val();
+                respuestaObj['maximo']=$("#maximoRespuesta").val();
+                respuestaObj['descRespuesta'] = $("#descRespuesta").val();
+                jsonObj['respuesta'] = respuestaObj;
                 jsonObj['mensaje'] = '';
                 bloquearUI(parametros.blockMess);
                 $.ajax(
@@ -298,14 +300,14 @@ var Responses = function () {
                                     timeout: 4000
                                 });
                             }else{
-                                getConcepts();
+                                getResponses();
                                 var msg;
                                 //si es guardar limpiar el formulario
                                 if ($("#idRespuestaEdit").val().length <= 0){
-                                    limpiarDatosConcepto();
-                                    msg = $("#msg_concept_added").val();
+                                    limpiarDatosRespuesta();
+                                    msg = $("#msg_response_added").val();
                                 }else{
-                                    msg = $("#msg_concept_updated").val();
+                                    msg = $("#msg_response_updated").val();
                                 }
 
 
@@ -330,10 +332,10 @@ var Responses = function () {
 
             function anularRespuesta(idRespuesta) {
                 var anulacionObj = {};
-                var conceptoObj = {};
-                conceptoObj['idRespuesta']=idRespuesta;
-                conceptoObj['pasivo']='true';
-                anulacionObj['concepto'] = conceptoObj;
+                var respuestaObj = {};
+                respuestaObj['idRespuesta']=idRespuesta;
+                respuestaObj['pasivo']='true';
+                anulacionObj['respuesta'] = respuestaObj;
                 anulacionObj['mensaje'] = '';
                 bloquearUI(parametros.blockMess);
                 $.ajax(
@@ -354,8 +356,8 @@ var Responses = function () {
                                     timeout: 4000
                                 });
                             }else{
-                                getConcepts();
-                                var msg = $("#msg_concept_cancel").val();
+                                getResponses();
+                                var msg = $("#msg_response_cancel").val();
                                 $.smallBox({
                                     title: msg ,
                                     content: $("#smallBox_content").val(),
@@ -373,11 +375,12 @@ var Responses = function () {
                     });
             }
 
-            function limpiarDatosConcepto(){
-                $("#nombreConcepto").val('');
-                $("#ordenConcepto").val('');
-                $("#minimoConcepto").val('');
-                $("#maximoConcepto").val('');
+            function limpiarDatosRespuesta(){
+                $("#nombreRespuesta").val('');
+                $("#ordenRespuesta").val('');
+                $("#minimoRespuesta").val('');
+                $("#maximoRespuesta").val('');
+                $("#descRespuesta").val('');
                 $("#checkbox-required").attr('checked', false);
                 $("#checkbox-pasive").attr('checked', false);
                 $("#codConcepto").val("").change();
@@ -391,13 +394,13 @@ var Responses = function () {
 
             $("#btnAddConcept").click(function(){
                 $("#idRespuestaEdit").val('');
-                limpiarDatosConcepto();
+                limpiarDatosRespuesta();
                 showModalConcept();
             });
 
             $('#codConcepto').change(function() {
-                $("#minimoConcepto").val("");
-                $("#maximoConcepto").val("");
+                $("#minimoRespuesta").val("");
+                $("#maximoRespuesta").val("");
                 $("#divNumerico").hide();
                 if ($(this).val().length > 0) {
                     bloquearUI(parametros.blockMess);
@@ -421,6 +424,56 @@ var Responses = function () {
                     });
                 }
             });
+
+            /*$('#codTipoNoti').change(function() {
+                bloquearUI(parametros.blockMess);
+                var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                if ($(this).val().length > 0) {
+                    $.getJSON(parametros.sDxUrl, {
+                        codTipoNoti: $(this).val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].idDiagnostico + '">'
+                                + data[i].nombre
+                                + '</option>';
+                            // html += '</option>';
+                        }
+                        $('#codTipoDx').html(html);
+                    })
+                }else{
+                    $('#codTipoDx').html(html);
+                }
+                $('#codTipoDx').val('').change();
+                //estudios
+                if ($(this).val().length > 0) {
+                    $.getJSON(parametros.sEstudiosUrl, {
+                        codTipoNoti: $(this).val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].idEstudio + '">'
+                                + data[i].nombre
+                                + '</option>';
+                            // html += '</option>';
+                        }
+                        $('#codTipoEstudio').html(html);
+                    })
+                }else{
+
+                    $('#codTipoEstudio').html(html);
+                }
+                $('#codTipoEstudio').val('').change();
+
+
+                desbloquearUI();
+            });*/
         }
     };
 

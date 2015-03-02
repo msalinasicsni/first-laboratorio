@@ -102,7 +102,8 @@ public class RespuestasExamenController {
     @RequestMapping(value = "getExamenes", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String getOrdenesExamen(@RequestParam(value = "codTipoNoti", required = true) String codTipoNoti, @RequestParam(value = "idDx", required = true) String idDx, @RequestParam(value = "nombreExamen", required = true) String nombreExamen) throws Exception {
-        List<Object[]> objectsExamen = examenesService.getExamenesByFiltro(idDx, codTipoNoti, nombreExamen);
+        //List<Object[]> objectsExamen = examenesService.getExamenesByFiltro(idDx, codTipoNoti, nombreExamen);
+        List<CatalogoExamenes> objectsExamen = examenesService.getExamenesByFiltro(nombreExamen);
         return ExamenesToJson(objectsExamen);
     }
 
@@ -122,18 +123,18 @@ public class RespuestasExamenController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             String[] arParametros = strParametros.split(",");
-            if (arParametros.length == 3) {//tienen que venir los 3 parámetros
+            //if (arParametros.length == 3) {//tienen que venir los 3 parámetros
                 CatalogoExamenes examen = examenesService.getExamenesById(Integer.valueOf(arParametros[0]));
-                Catalogo_Dx diagnostico = tomaMxService.getDxsById(Integer.valueOf(arParametros[1]));
-                TipoNotificacion tipoNotificacion = catalogoService.getTipoNotificacion(arParametros[2]);
+                //Catalogo_Dx diagnostico = tomaMxService.getDxsById(Integer.valueOf(arParametros[1]));
+                //TipoNotificacion tipoNotificacion = catalogoService.getTipoNotificacion(arParametros[2]);
                 List<Concepto> conceptsList = conceptoService.getConceptsList();
                 Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
                 mav.addObject("examen", examen);
-                mav.addObject("tipoNotificacion", tipoNotificacion);
-                mav.addObject("diagnostico", diagnostico);
+                //mav.addObject("tipoNotificacion", tipoNotificacion);
+                //mav.addObject("diagnostico", diagnostico);
                 mav.addObject("conceptsList",conceptsList);
                 mav.addObject("codigoDatoNumerico",parametro.getValor());
-            }
+            //}
 
             mav.setViewName("administracion/createResponse");
         }else
@@ -167,33 +168,33 @@ public class RespuestasExamenController {
     protected void agregarActualizarRespuesta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
-        String strConcepto="";
+        String strRespuesta="";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
-            strConcepto = jsonpObject.get("concepto").toString();
+            strRespuesta = jsonpObject.get("respuesta").toString();
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
-            RespuestaExamen concepto = jsonToRespuesta(strConcepto);
-            concepto.setUsuarioRegistro(usuario);
+            RespuestaExamen respuesta = jsonToRespuesta(strRespuesta);
+            respuesta.setUsuarioRegistro(usuario);
             //si tiene id de concepto entonces se debe actualizar, sino se agrega
-            if (concepto.getIdRespuesta()!=null)
-                respuestasExamenService.updateResponse(concepto);
+            if (respuesta.getIdRespuesta()!=null)
+                respuestasExamenService.updateResponse(respuesta);
             else
-                respuestasExamenService.addResponse(concepto);
+                respuestasExamenService.addResponse(respuesta);
 
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
+            resultado =  messageSource.getMessage("msg.response.override.error",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
             Map<String, String> map = new HashMap<String, String>();
-            map.put("concepto",strConcepto);
+            map.put("concepto",strRespuesta);
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
@@ -204,12 +205,12 @@ public class RespuestasExamenController {
     @RequestMapping(value = "getRespuestaById", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    RespuestaExamen getRespuestaById(@RequestParam(value = "idConcepto", required = true) Integer idConcepto) throws Exception {
+    RespuestaExamen getRespuestaById(@RequestParam(value = "idRespuesta", required = true) Integer idRespuesta) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        return respuestasExamenService.getRespuestaById(idConcepto);
+        return respuestasExamenService.getRespuestaById(idRespuesta);
     }
 
-    private String ExamenesToJson(List<Object[]> objectsExamen){
+    private String objExamenesToJson(List<Object[]> objectsExamen){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -222,6 +223,24 @@ public class RespuestasExamenController {
             map.put("nombreNoti",(String)examen[4]);
             map.put("nombreDx",(String)examen[5]);
             map.put("nombreArea",(String)examen[6]);
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+    private String ExamenesToJson(List<CatalogoExamenes> objectsExamen){
+        String jsonResponse="";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice=0;
+        for(CatalogoExamenes examen: objectsExamen) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idExamen",String.valueOf(examen.getIdExamen()));
+            map.put("nombreExamen",examen.getNombre());
+            map.put("nombreArea",examen.getArea().getNombre());
             mapResponse.put(indice, map);
             indice ++;
         }
@@ -258,6 +277,9 @@ public class RespuestasExamenController {
             respuestaExamen.setMinimo(jsonpObject.get("minimo").getAsInt());
         if (jsonpObject.get("maximo")!=null && !jsonpObject.get("maximo").getAsString().isEmpty())
             respuestaExamen.setMaximo(jsonpObject.get("maximo").getAsInt());
+        if (jsonpObject.get("descRespuesta")!=null && !jsonpObject.get("descRespuesta").getAsString().isEmpty())
+            respuestaExamen.setDescripcion(jsonpObject.get("descRespuesta").getAsString());
+
         respuestaExamen.setFechahRegistro(new Timestamp(new Date().getTime()));
         return  respuestaExamen;
     }

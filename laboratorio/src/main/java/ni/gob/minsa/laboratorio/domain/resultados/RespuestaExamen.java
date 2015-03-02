@@ -28,6 +28,7 @@ public class RespuestaExamen implements Serializable {
     Integer maximo;
     Usuarios usuarioRegistro;
     Timestamp fechahRegistro;
+    String descripcion;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -143,5 +144,15 @@ public class RespuestaExamen implements Serializable {
 
     public void setFechahRegistro(Timestamp fechahRegistro) {
         this.fechahRegistro = fechahRegistro;
+    }
+
+    @Basic
+    @Column(name = "DESCRIPCION", nullable = true, insertable = true, updatable = true, length = 500)
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 }
