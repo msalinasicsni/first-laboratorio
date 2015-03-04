@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -73,8 +75,9 @@ public class ExamenesService {
         return examenes;
     }
 
-    public List<CatalogoExamenes> getExamenesByFiltro(String nombreExamen){
+    public List<CatalogoExamenes> getExamenesByFiltro(String nombreExamen) throws UnsupportedEncodingException{
         Session session = sessionFactory.getCurrentSession();
+        nombreExamen = URLDecoder.decode(nombreExamen, "utf-8");
         StringBuilder sQuery = new StringBuilder("select ex " +
                 "from CatalogoExamenes as ex");
         if (!nombreExamen.isEmpty()) sQuery.append(" where lower(ex.nombre) like '%").append(nombreExamen.toLowerCase()).append("%'");
