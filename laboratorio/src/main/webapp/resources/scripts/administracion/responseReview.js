@@ -157,7 +157,7 @@ var Responses = function () {
                 }
                 bloquearUI(parametros.blockMess);
     			$.getJSON(parametros.sBuscarExamenes, {
-                    codTipoNoti: pTipoNoti , idDx : pIdDx, nombreExamen : pNombreEx,
+                    codTipoNoti: pTipoNoti , idDx : pIdDx, nombreExamen : encodeURI(pNombreEx),
     				ajax : 'true'
     			}, function(dataToLoad) {
                     table1.fnClearTable();
