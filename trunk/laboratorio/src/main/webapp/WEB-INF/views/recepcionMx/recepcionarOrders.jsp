@@ -281,7 +281,7 @@
                                             <div>
                                                 <header>
                                                     <label class="text-left txt-color-blue" style="font-weight: bold">
-                                                        <spring:message code="lbl.header.receipt.dx" />
+                                                        <spring:message code="lbl.header.receipt.solic" />
                                                     </label>
                                                 </header>
                                                 <br/>
@@ -301,7 +301,7 @@
                                                             <c:when test="${not empty dxList}">
                                                                 <c:forEach items="${dxList}" var="record">
                                                                     <tr>
-                                                                        <td>DX</td>
+                                                                        <td><spring:message code="lbl.rutine" /></td>
                                                                         <td><c:out value="${record.codDx.nombre}" /></td>
                                                                         <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
                                                                         <td><c:out value="${record.codDx.area.nombre}" /></td>
@@ -311,7 +311,7 @@
                                                             <c:otherwise>
                                                                 <c:forEach items="${estudiosList}" var="record">
                                                                     <tr>
-                                                                        <td>Estudio</td>
+                                                                        <td><spring:message code="lbl.study" /></td>
                                                                         <td><c:out value="${record.tipoEstudio.nombre}" /></td>
                                                                         <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
                                                                         <td><c:out value="${record.tipoEstudio.area.nombre}" /></td>

@@ -377,7 +377,7 @@ public class RecepcionMxController {
             TipoRecepcionMx tipoRecepcionMx = null;
             //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
             boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size()>0;
-           tipoRecepcionMx =  catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
+            tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
 
             recepcionMx.setUsuarioRecepcion(usuario);
@@ -813,7 +813,7 @@ public class RecepcionMxController {
                 map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
                 map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
                 map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                map.put("tipo","Dx");
+                map.put("tipo","Rutina");
                 mapResponse.put(indice, map);
             }else{
                 map.put("idTomaMx", ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());

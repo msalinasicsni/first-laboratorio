@@ -5,5 +5,6 @@
 
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<import resource="appServlet/hibernate-context.xml" />
+    <import resource="appServlet/security-context.xml" />
 
 </beans>

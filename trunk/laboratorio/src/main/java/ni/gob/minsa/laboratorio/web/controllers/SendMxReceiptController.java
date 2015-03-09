@@ -230,7 +230,7 @@ public class SendMxReceiptController {
                 int subIndice=0;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
-                    mapSolicitud.put("tipo", "Dx");
+                    mapSolicitud.put("tipo", "Rutina");
                     mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     subIndice++;
                     mapSolicitudesList.put(subIndice, mapSolicitud);
