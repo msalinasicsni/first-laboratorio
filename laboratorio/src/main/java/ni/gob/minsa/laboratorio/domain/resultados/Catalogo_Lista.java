@@ -36,7 +36,7 @@ public class Catalogo_Lista implements Serializable {
     }
 
     @Basic
-    @Column(name= "NOMBRE", nullable = false, insertable = true, updatable = true, length = 50)
+    @Column(name= "VALOR", nullable = false, insertable = true, updatable = true, length = 50)
     public String getValor() {
         return valor;
     }

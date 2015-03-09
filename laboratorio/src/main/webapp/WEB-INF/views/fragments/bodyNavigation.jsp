@@ -77,8 +77,9 @@
                     <li class="ingresoResultado">
                         <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="menu.result.income" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="menu.result.income" /></a>
                     </li>
-                    <li class="approveResult">
-                        <a href="<spring:url value="/resultados/aprobacion/init" htmlEscape="true "/>" title="<spring:message code="menu.approval.results" />"><i class="fa fa-lg fa-fw fa-check-circle"></i> <spring:message code="menu.approval.results" /></a>
+
+                    <li class="enterFinalResult">
+                        <a href="<spring:url value="/resultadoFinal/init" htmlEscape="true "/>" title="<spring:message code="menu.enter.final.result" />"><i class="fa fa-lg fa-fw fa-file-text-o"></i> <spring:message code="menu.enter.final.result" /></a>
                     </li>
                 </ul>
             </li>
@@ -90,6 +91,9 @@
                     </li>
                     <li class="respuesta">
                         <a href="<spring:url value="/administracion/respuestas/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.respuestas" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.respuestas" /></a>
+                    </li>
+                    <li class="respuestaDx">
+                        <a href="<spring:url value="/administracion/respuestasDx/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.diagnostic.aswers" />"><i class="fa fa-lg fa-fw fa-list-alt "></i> <spring:message code="menu.admin.diagnostic.aswers" /></a>
                     </li>
                 </ul>
             </li>
