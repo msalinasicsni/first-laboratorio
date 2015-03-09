@@ -34,7 +34,7 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("conceptos")
+@RequestMapping("administracion/conceptos")
 public class ConceptosController {
 
     private static final Logger logger = LoggerFactory.getLogger(ConceptosController.class);

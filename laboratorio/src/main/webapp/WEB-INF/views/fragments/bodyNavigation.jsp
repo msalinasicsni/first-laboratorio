@@ -1,12 +1,13 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!-- Left panel : Navigation area -->
 <!-- Note: This width of the aside area can be adjusted through LESS variables -->
 <%@ page import="ni.gob.minsa.laboratorio.service.SeguridadService" %>
 <%
-    SeguridadService seguridadService = new SeguridadService();
-    boolean seguridadHabilitada = seguridadService.seguridadHabilitada();
+    //SeguridadService seguridadService = new SeguridadService();
+    //boolean seguridadHabilitada = seguridadService.seguridadHabilitada();
 %>
 <aside id="left-panel">
     <!-- User info -->
@@ -16,11 +17,12 @@
 		<a href="javascript:void(0);" id="show-shortcut" data-action="toggleShortcut">
             <img src="${user}" alt="<spring:message code="lbl.user" />" class="online" />
 			<span>
-            <%if (seguridadHabilitada) {%>
-				<%=seguridadService.obtenerNombreUsuario(request)%>
-            <% } else { %>
-                <spring:message code="lbl.user" />
-            <% } %>
+            <%//if (seguridadHabilitada) {%>
+				<%//=seguridadService.obtenerNombreUsuario(request)%>
+            <% //} else { %>
+                <!--<spring:message code="lbl.user" />-->
+                <sec:authentication property="principal.username" />
+            <!--<%// } %>-->
 			</span>
             <i class="fa fa-angle-down"></i>
         </a>
@@ -40,9 +42,9 @@
         -->
 
         <ul>
-            <%if (seguridadHabilitada) {%>
-            <%=seguridadService.obtenerMenu(request)%>
-            <% } else { %>
+            <%//if (seguridadHabilitada) {%>
+            <%//=seguridadService.obtenerMenu(request)%>
+            <% //} else { %>
             <li class="home">
                 <a href="<spring:url value="/" htmlEscape="true "/>" title="<spring:message code="menu.home" />"><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent"><spring:message code="menu.home" /></span></a>
             </li>
@@ -87,7 +89,7 @@
                 <a href="#" title="<spring:message code="menu.administration" />"><i class="fa fa-lg fa-fw fa-cogs"></i> <span class="menu-item-parent"><spring:message code="menu.administration" /></span></a>
                 <ul>
                     <li class="concepto">
-                        <a href="<spring:url value="/conceptos/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.concept" /></a>
+                        <a href="<spring:url value="/administracion/conceptos/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.concept" /></a>
                     </li>
                     <li class="respuesta">
                         <a href="<spring:url value="/administracion/respuestas/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.respuestas" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.respuestas" /></a>
@@ -100,7 +102,7 @@
             <li>
                 <a href="<spring:url value="/logout" htmlEscape="true "/>"> <i class="fa fa-lg fa-fw fa-sign-out"></i> <span class="menu-item-parent"><spring:message code="menu.logout" /></span></a>
             </li>
-            <% } %>
+            <%// } %>
         </ul>
 
     </nav>

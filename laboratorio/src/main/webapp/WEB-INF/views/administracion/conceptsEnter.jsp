@@ -364,10 +364,10 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="getConcepts" value="/conceptos/getConcepts"/>
-<c:url var="addUpdateUrl" value="/conceptos/addUpdateConcept"/>
-<c:url var="getValues" value="/conceptos/getValuesCat"/>
-<c:url var="addUpdateValue" value="/conceptos/addUpdateValue"/>
+<c:url var="getConcepts" value="/administracion/conceptos/getConcepts"/>
+<c:url var="addUpdateUrl" value="/administracion/conceptos/addUpdateConcept"/>
+<c:url var="getValues" value="/administracion/conceptos/getValuesCat"/>
+<c:url var="addUpdateValue" value="/administracion/conceptos/addUpdateValue"/>
 
 <script type="text/javascript">
     $(document).ready(function() {
