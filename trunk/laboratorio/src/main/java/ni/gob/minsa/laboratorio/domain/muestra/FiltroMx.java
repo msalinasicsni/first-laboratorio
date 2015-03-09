@@ -20,6 +20,7 @@ public class FiltroMx {
     Date fechaFinRecepLab;
     Boolean incluirMxInadecuada;
     String codigoUnicoMx;
+    String dx;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -120,4 +121,8 @@ public class FiltroMx {
     public void setCodigoUnicoMx(String codigoUnicoMx) {
         this.codigoUnicoMx = codigoUnicoMx;
     }
+
+    public String getDx() { return dx; }
+
+    public void setDx(String dx) { this.dx = dx; }
 }

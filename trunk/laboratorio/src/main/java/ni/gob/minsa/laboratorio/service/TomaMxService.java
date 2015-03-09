@@ -171,6 +171,13 @@ public class TomaMxService {
         return (DaSolicitudDx)q.uniqueResult();
     }
 
+    public DaSolicitudDx getSolicitudDxByIdSolicitud(String idSolicitud){
+        String query = "from DaSolicitudDx where idSolicitudDx = :idSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idSolicitud",idSolicitud);
+        return (DaSolicitudDx)q.uniqueResult();
+    }
+
     /**
      *Retorna una lista de dx segun tipoMx y tipo Notificacion
      * @param codMx tipo de Mx

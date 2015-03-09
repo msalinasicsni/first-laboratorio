@@ -382,6 +382,7 @@ var Concepts  = function () {
                                     timeout: 4000
                                 });
                                 valueObj['valor'] = $('#valor').val('');
+                                valueObj['idCatalogoLista'] = $('#idCatalogoLista').val('');
                             }
                             unBlockUI();
                         },

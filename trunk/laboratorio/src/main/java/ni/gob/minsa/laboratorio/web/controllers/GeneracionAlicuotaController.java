@@ -158,8 +158,10 @@ public class GeneracionAlicuotaController {
                 mapDx.put("nombre",solicitudDx.getCodDx().getNombre());
                 mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                 subIndice++;
+                mapDxList.put(subIndice,mapDx);
+                mapDx = new HashMap<String, String>();
             }
-            mapDxList.put(subIndice,mapDx);
+
             map.put("diagnosticos", new Gson().toJson(mapDxList));
 
             mapResponse.put(indice, map);

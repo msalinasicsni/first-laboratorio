@@ -3,26 +3,6 @@
  */
 
 var ReceiptLabOrders = function () {
-    var bloquearUI = function(mensaje){
-        var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
-        var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
-        $.blockUI({ message: mess,
-            css: {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: '#000',
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: .5,
-                color: '#fff'
-            }
-        });
-    };
-
-    var desbloquearUI = function() {
-        setTimeout($.unblockUI, 500);
-    };
     return {
         //main function to initiate the module
         init: function (parametros) {
@@ -232,7 +212,7 @@ var ReceiptLabOrders = function () {
                     iniciado = false;
                     //codigo = $.trim($('#codigo').val());
                     console.log('consulta con tiempo');
-                    getMxs(false);
+                    getOrders(false);
 
                 }
             }
@@ -248,7 +228,7 @@ var ReceiptLabOrders = function () {
                     iniciado = false;
                     event.preventDefault();
                     //codigo = $.trim($(this).val());
-                    getMxs(false);
+                    getOrders(false);
                     $('#txtCodUnicoMx').val('');
                 }
             });

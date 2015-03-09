@@ -377,7 +377,7 @@ public class RecepcionMxController {
             TipoRecepcionMx tipoRecepcionMx = null;
             //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
             boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size()>0;
-            catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
+           tipoRecepcionMx =  catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
 
             recepcionMx.setUsuarioRecepcion(usuario);
