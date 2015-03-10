@@ -315,6 +315,21 @@
             <version>3.2.0.RELEASE</version>
         </dependency>
         <!-- End Spring Security -->
+        <dependency>
+            <groupId>minsa</groupId>
+            <artifactId>sis-minsa</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>minsa</groupId>
+            <artifactId>sis-persona-cliente</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>minsa</groupId>
+            <artifactId>sis-portal-cliente</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 	</dependencies>
 	<repositories>
 		<!-- For testing against latest Spring snapshots -->
