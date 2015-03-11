@@ -294,7 +294,7 @@ public class TomaMxService {
         return q.list();
     }
 
-    public DaSolicitudEstudio getSolicitudesEstudioByMxDx(String idTomaMx,  Integer idEstudio){
+    public DaSolicitudEstudio getSolicitudesEstudioByMxEst(String idTomaMx, Integer idEstudio){
         String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx " +
                 "and tipoEstudio.idEstudio= :idEstudio ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);

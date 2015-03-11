@@ -302,6 +302,99 @@ var ReceiptOrders = function () {
                 getMxs(true);
             });
 
+            $("#receipt-mxs").click(function() {
+                var oTT = TableTools.fnGetInstance('orders_result');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                if (len > 0) {
+                    $.SmartMessageBox({
+                        title: $("#msg_confirm_title").val(),
+                        content: $("#msg_confirm_content").val(),
+                        buttons: '['+opcSi+']['+opcNo+']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            var urlImpresion ='';
+                            bloquearUI(parametros.blockMess);
+                            alert("recepción");
+                            var idRecepciones = {};
+                            //el input hidden debe estar siempre en la primera columna
+                            for (var i = 0; i < len; i++) {
+                                var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                var input = texto.substring(texto.lastIndexOf("<"),texto.length);
+                                idRecepciones[i]=$(input).val();
+                            }
+                            console.log(idRecepciones);
+                            var muestrasObj = {};
+                            muestrasObj['strMuestras'] = idRecepciones;
+                            muestrasObj['mensaje'] = '';
+                            muestrasObj['cantMuestras']=len;
+                            muestrasObj['cantMxProc'] = '';
+                            muestrasObj['codigosUnicosMx'] = '';
+                            $.ajax(
+                                {
+                                    url: parametros.sCreateReceiptMassUrl,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: JSON.stringify(muestrasObj),
+                                    contentType: 'application/json',
+                                    mimeType: 'application/json',
+                                    async:false,
+                                    success: function (data) {
+                                        if (data.mensaje.length > 0){
+                                            $.smallBox({
+                                                title: data.mensaje ,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#C46A69",
+                                                iconSmall: "fa fa-warning",
+                                                timeout: 4000
+                                            });
+                                        }else{
+                                            var msg = $("#msg_reception_lab_success").val();
+                                            msg = msg.replace(/\{0\}/,data.cantMxProc);
+                                            $.smallBox({
+                                                title: msg ,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#739E73",
+                                                iconSmall: "fa fa-success",
+                                                timeout: 4000
+                                            });
+                                            var loc = window.location;
+                                            urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+data.codigosUnicosMx;
+                                            getMxs(false);
+                                        }
+                                        desbloquearUI();
+                                    },
+                                    error: function (data, status, er) {
+                                        desbloquearUI();
+                                        alert("error: " + data + " status: " + status + " er:" + er);
+                                    }
+                                });
+                            imprimir(urlImpresion);
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msg_reception_cancel").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                color: "#C46A69",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 4000
+                            });
+                        }
+
+                    });
+                }else{
+                    $.smallBox({
+                        title : $("#msg_select_receipt").val(),
+                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                        color : "#C46A69",
+                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                        timeout : 4000
+                    });
+                }
+            });
+
             $("#recep-orders-lab").click(function() {
                 var oTT = TableTools.fnGetInstance('orders_result');
                 var aSelectedTrs = oTT.fnGetSelected();
@@ -316,7 +409,6 @@ var ReceiptOrders = function () {
                     }, function (ButtonPressed) {
                         if (ButtonPressed === opcSi) {
                             bloquearUI(parametros.blockMess);
-                            alert("recepción");
                             var idRecepciones = {};
                             //el input hidden debe estar siempre en la primera columna
                             for (var i = 0; i < len; i++) {

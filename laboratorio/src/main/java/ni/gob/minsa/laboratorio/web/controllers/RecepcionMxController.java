@@ -669,8 +669,92 @@ public class RecepcionMxController {
         }
     }
 
+    @RequestMapping(value = "recepcionMasivaGral", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void recepcionMasivaGeneral(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        String json;
+        String resultado = "";
+        String strMuestras="";
+        String codigosUnicosMx="";
+        Integer cantMuestras = 0;
+        Integer cantMxProc = 0;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            strMuestras = jsonpObject.get("strMuestras").toString();
+            cantMuestras = jsonpObject.get("cantMuestras").getAsInt();
+
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
+            //Se obtiene estado recepcionado
+            EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCP");
+            //se obtienen muestras a recepcionar
+            JsonObject jObjectRecepciones = new Gson().fromJson(strMuestras, JsonObject.class);
+            for(int i = 0; i< cantMuestras;i++) {
+                String idRecepcion = "";
+                String codigoUnicoMx = "";
+                String idTomaMx = jObjectRecepciones.get(String.valueOf(i)).getAsString();
+                //se obtiene tomaMx a recepcionar
+                DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
+                TipoRecepcionMx tipoRecepcionMx;
+                //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
+                boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
+                tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio ? "TPRECPMX|VRT" : "TPRECPMX|EST"));
+                RecepcionMx recepcionMx = new RecepcionMx();
+
+                recepcionMx.setUsuarioRecepcion(usuario);
+                recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                recepcionMx.setTipoMxCk(true);
+                recepcionMx.setCantidadTubosCk(true);
+                recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
+                recepcionMx.setTomaMx(tomaMx);
+                try {
+                    idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+                } catch (Exception ex) {
+                    resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
+                    resultado = resultado + ". \n " + ex.getMessage();
+                    ex.printStackTrace();
+                }
+                if (!idRecepcion.isEmpty()) {
+                    //se tiene que actualizar la tomaMx
+                    tomaMx.setEstadoMx(estadoMx);
+                    try {
+                        tomaMxService.updateTomaMx(tomaMx);
+                        cantMxProc++;
+                        if(cantMxProc==1)
+                            codigosUnicosMx = tomaMx.getCodigoUnicoMx();
+                        else
+                            codigosUnicosMx += ","+ tomaMx.getCodigoUnicoMx();
+                    } catch (Exception ex) {
+                        resultado = messageSource.getMessage("msg.update.order.error", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
+                        ex.printStackTrace();
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("strMuestras",strMuestras);
+            map.put("mensaje",resultado);
+            map.put("cantMuestras", cantMuestras.toString());
+            map.put("cantMxProc", cantMxProc.toString());
+            map.put("codigosUnicosMx",codigosUnicosMx);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
     @RequestMapping(value = "recepcionMasivaLab", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    protected void receptionMassLaboratory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void recepcionMasivaLaboratorio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
         String strRecepciones="";
@@ -832,7 +916,7 @@ public class RecepcionMxController {
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("msg.send.receipt.error",null,null);
+            resultado =  messageSource.getMessage("msg.receipt.error",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
@@ -897,7 +981,7 @@ public class RecepcionMxController {
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
             OrdenExamen ordenExamen = new OrdenExamen();
-            DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudesEstudioByMxDx(idTomaMx, idEstudio);
+            DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudesEstudioByMxEst(idTomaMx, idEstudio);
             ordenExamen.setSolicitudEstudio(solicitudEstudio);
             ordenExamen.setCodExamen(examen);
             ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
