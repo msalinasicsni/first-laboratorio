@@ -244,10 +244,10 @@ public class expose {
     @RequestMapping(value = "getEstudios", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<Estudio_TipoMx_TipoNoti> getEstudios(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
+    List<Estudio_TipoMx_TipoNoti> getEstudios(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti, @RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
         logger.info("Obteniendo los estudios por mx y tipo de notitificación en JSON");
         List<Estudio_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Estudio_TipoMx_TipoNoti>();
-        dxTipoMxTipoNotis = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti);
+        dxTipoMxTipoNotis = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti,idTomaMx);
         return dxTipoMxTipoNotis;
     }
 

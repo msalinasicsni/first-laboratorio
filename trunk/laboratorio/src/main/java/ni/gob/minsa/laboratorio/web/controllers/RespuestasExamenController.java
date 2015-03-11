@@ -3,7 +3,6 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
@@ -124,7 +123,7 @@ public class RespuestasExamenController {
         if (urlValidacion.isEmpty()) {
             String[] arParametros = strParametros.split(",");
             //if (arParametros.length == 3) {//tienen que venir los 3 parámetros
-                CatalogoExamenes examen = examenesService.getExamenesById(Integer.valueOf(arParametros[0]));
+                CatalogoExamenes examen = examenesService.getExamenById(Integer.valueOf(arParametros[0]));
                 //Catalogo_Dx diagnostico = tomaMxService.getDxsById(Integer.valueOf(arParametros[1]));
                 //TipoNotificacion tipoNotificacion = catalogoService.getTipoNotificacion(arParametros[2]);
                 List<Concepto> conceptsList = conceptoService.getConceptsList();
@@ -258,7 +257,7 @@ public class RespuestasExamenController {
             respuestaExamen = respuestasExamenService.getRespuestaById(jsonpObject.get("idRespuesta").getAsInt());
         }
         if (jsonpObject.get("idExamen")!=null && !jsonpObject.get("idExamen").getAsString().isEmpty()) {
-            CatalogoExamenes examen = examenesService.getExamenesById(jsonpObject.get("idExamen").getAsInt());
+            CatalogoExamenes examen = examenesService.getExamenById(jsonpObject.get("idExamen").getAsInt());
             respuestaExamen.setIdExamen(examen);
         }
         if (jsonpObject.get("nombre")!=null && !jsonpObject.get("nombre").getAsString().isEmpty())

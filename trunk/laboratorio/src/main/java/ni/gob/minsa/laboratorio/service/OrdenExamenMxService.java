@@ -84,9 +84,15 @@ public class OrdenExamenMxService {
 
     public List<OrdenExamen> getOrdenesExamenByIdMx(String idTomaMx){
         Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.idTomaMx =:idTomaMx ");
         q.setParameter("idTomaMx",idTomaMx);
-        return q.list();
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx where mx.idTomaMx =:idTomaMx and oe.anulado = false ");
+        q2.setParameter("idTomaMx",idTomaMx);
+        ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
     }
 
     public List<OrdenExamen> getOrdenesExamenNoAnuladasByCodigoUnico(String codigoUnico){
@@ -117,7 +123,8 @@ public class OrdenExamenMxService {
 
     public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdDxIdExamen(String idTomaMx, int idDx, int idExamen){
         Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx where mx.idTomaMx =:idTomaMx " +
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx " +
+                "where mx.idTomaMx =:idTomaMx " +
                 "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and oe.anulado = false ");
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idDx",idDx);

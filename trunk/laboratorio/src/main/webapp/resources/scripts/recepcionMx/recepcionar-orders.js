@@ -28,8 +28,11 @@ var ReceiptOrders = function () {
 				tablet : 1024,
 				phone : 480
 			};
+            var text_selected_all = $("#text_selected_all").val();
+            var text_selected_none = $("#text_selected_none").val();
 			var table1 = $('#orders_result').dataTable({
 				"sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "T"+
 					"t"+
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true,
@@ -44,7 +47,12 @@ var ReceiptOrders = function () {
 				},
 				"drawCallback" : function(oSettings) {
 					responsiveHelper_dt_basic.respond();
-				}
+				},
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                }
 			});
             var table2;
             if ($("esEstudio").val()=='true') {
@@ -202,28 +210,28 @@ var ReceiptOrders = function () {
             }
 
             function getMxs(showAll) {
-                var encuestaFiltros = {};
+                var mxFiltros = {};
                 if (showAll){
-                    encuestaFiltros['nombreApellido'] = '';
-                    encuestaFiltros['fechaInicioTomaMx'] = '';
-                    encuestaFiltros['fechaFinTomaMx'] = '';
-                    encuestaFiltros['codSilais'] = '';
-                    encuestaFiltros['codUnidadSalud'] = '';
-                    encuestaFiltros['codTipoMx'] = '';
-                    encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
+                    mxFiltros['nombreApellido'] = '';
+                    mxFiltros['fechaInicioTomaMx'] = '';
+                    mxFiltros['fechaFinTomaMx'] = '';
+                    mxFiltros['codSilais'] = '';
+                    mxFiltros['codUnidadSalud'] = '';
+                    mxFiltros['codTipoMx'] = '';
+                    mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                 }else {
-                    encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    encuestaFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    encuestaFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
-                    encuestaFiltros['codSilais'] = $('#codSilais option:selected').val();
-                    encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
-                    encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
-                    encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
-                    encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
+                    mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
+                    mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
+                    mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
+                    mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
+                    mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
+                    mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
-                    strFilter: JSON.stringify(encuestaFiltros),
+                    strFilter: JSON.stringify(mxFiltros),
     				ajax : 'true'
     			}, function(dataToLoad) {
                     table1.fnClearTable();
@@ -238,7 +246,7 @@ var ReceiptOrders = function () {
                             }
                             var actionUrl = parametros.sActionUrl+idLoad;
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx,dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
+                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+idLoad+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
@@ -246,7 +254,7 @@ var ReceiptOrders = function () {
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
                             content: $("#smallBox_content").val(),
-                            color: "#C46A69",
+                            color: "#C79121",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });
@@ -289,6 +297,94 @@ var ReceiptOrders = function () {
             $("#all-orders").click(function() {
                 getMxs(true);
             });
+
+            $("#recep-orders-lab").click(function() {
+                var oTT = TableTools.fnGetInstance('orders_result');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                if (len > 0) {
+                    $.SmartMessageBox({
+                        title: $("#msg_confirm_title").val(),
+                        content: $("#msg_confirm_content").val(),
+                        buttons: '['+opcSi+']['+opcNo+']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            bloquearUI(parametros.blockMess);
+                            alert("recepción");
+                            var idRecepciones = {};
+                            //el input hidden debe estar siempre en la primera columna
+                            for (var i = 0; i < len; i++) {
+                                var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                var input = texto.substring(texto.lastIndexOf("<"),texto.length);
+                                idRecepciones[i]=$(input).val();
+                            }
+                            console.log(idRecepciones);
+                            var recepcionesObj = {};
+                            recepcionesObj['strRecepciones'] = idRecepciones;
+                            recepcionesObj['mensaje'] = '';
+                            recepcionesObj['cantRecepciones']=len;
+                            recepcionesObj['cantRecepProc'] = '';
+                            $.ajax(
+                                {
+                                    url: parametros.sCreateReceiptMassUrl,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: JSON.stringify(recepcionesObj),
+                                    contentType: 'application/json',
+                                    mimeType: 'application/json',
+                                    success: function (data) {
+                                        if (data.mensaje.length > 0){
+                                            $.smallBox({
+                                                title: data.mensaje ,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#C46A69",
+                                                iconSmall: "fa fa-warning",
+                                                timeout: 4000
+                                            });
+                                        }else{
+                                            var msg = $("#msg_reception_lab_success").val();
+                                            msg = msg.replace(/\{0\}/,data.cantRecepProc);
+                                            $.smallBox({
+                                                title: msg ,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#739E73",
+                                                iconSmall: "fa fa-success",
+                                                timeout: 4000
+                                            });
+                                            getMxs(false);
+                                        }
+                                        desbloquearUI();
+                                    },
+                                    error: function (data, status, er) {
+                                        desbloquearUI();
+                                        alert("error: " + data + " status: " + status + " er:" + er);
+                                    }
+                                });
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msg_reception_cancel").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                color: "#C46A69",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 4000
+                            });
+                        }
+
+                    });
+                }else{
+                    $.smallBox({
+                        title : $("#msg_select_receipt").val(),
+                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                        color : "#C46A69",
+                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                        timeout : 4000
+                    });
+                }
+            });
+
 
             <!-- para guardar recepción general -->
             function guardarRecepcion() {
@@ -574,7 +670,7 @@ var ReceiptOrders = function () {
             <!-- cargar estudios -->
             function getEstudios(idTipoMx, codTipoNoti) {
                 $.getJSON(parametros.sEstudiosURL, {
-                    codMx: idTipoMx, tipoNoti : codTipoNoti,
+                    codMx: idTipoMx, tipoNoti : codTipoNoti, idTomaMx : $("#idTomaMx").val(),
                     ajax: 'true'
                 }, function (data) {
                     var html = null;
@@ -588,7 +684,6 @@ var ReceiptOrders = function () {
                     $('#codEstudio').html(html);
                 });
             }
-
 
             <!-- Al seleccionar diagnóstico-->
             $('#codDX').change(function () {
