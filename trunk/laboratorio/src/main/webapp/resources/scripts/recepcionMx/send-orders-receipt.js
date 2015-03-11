@@ -160,6 +160,8 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['codSilais'] = '';
                     encuestaFiltros['codUnidadSalud'] = '';
                     encuestaFiltros['codTipoMx'] = '';
+                    encuestaFiltros['codTipoSolicitud'] = '';
+                    encuestaFiltros['nombreSolicitud'] = '';
                 }else {
                     encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     encuestaFiltros['fechaInicioRecep'] = $('#fechaInicioRecep').val();
@@ -169,6 +171,8 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     encuestaFiltros['idArea'] = $('#codAreaProcesa option:selected').val();
                     encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    encuestaFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    encuestaFiltros['nombreSolicitud'] = $('#nombreSoli').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {

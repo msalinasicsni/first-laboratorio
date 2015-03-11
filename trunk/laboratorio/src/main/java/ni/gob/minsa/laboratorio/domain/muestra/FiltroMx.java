@@ -21,6 +21,8 @@ public class FiltroMx {
     Boolean incluirMxInadecuada;
     String codigoUnicoMx;
     String dx;
+    String codTipoSolicitud;
+    String nombreSolicitud;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -125,4 +127,12 @@ public class FiltroMx {
     public String getDx() { return dx; }
 
     public void setDx(String dx) { this.dx = dx; }
+
+    public String getCodTipoSolicitud() { return codTipoSolicitud; }
+
+    public void setCodTipoSolicitud(String codTipoSolicitud) { this.codTipoSolicitud = codTipoSolicitud; }
+
+    public String getNombreSolicitud() { return nombreSolicitud; }
+
+    public void setNombreSolicitud(String nombreSolicitud) { this.nombreSolicitud = nombreSolicitud; }
 }
