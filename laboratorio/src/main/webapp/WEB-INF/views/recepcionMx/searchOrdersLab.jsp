@@ -12,6 +12,9 @@
         textarea {
             resize: none;
         }
+        tr.active {
+            color: #3276B1!important;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -109,6 +112,15 @@
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                                     <input id="txtEsLaboratorio" type="hidden" value="true"/>
+                                    <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
+                                    <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
+                                    <input id="msg_select_receipt" type="hidden" value="<spring:message code="msg.select.receipt"/>"/>
+                                    <input id="msg_reception_cancel" type="hidden" value="<spring:message code="msg.reception.lab.massive.canceled"/>"/>
+                                    <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                    <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.reception.lab.confirm.content"/>"/>
+                                    <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                                    <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                                    <input id="msg_reception_lab_success" type="hidden" value="<spring:message code="msg.reception.lab.successfully"/>"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -245,6 +257,11 @@
                                         </tr>
                                         </thead>
                                     </table>
+                                    <form id="sendOrders-form" class="smart-form" autocomplete="off">
+                                        <footer>
+                                            <button type="button" id="recep-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-send"></i> <spring:message code="act.receipt.selected" /></button>
+                                        </footer>
+                                    </form>
                                 </div>
                                 <!-- end widget content -->
                             </div>
@@ -285,6 +302,7 @@
     <script src="${dataTablesBootstrap}"></script>
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
+    <!-- Table Tools Path-->
     <spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
     <!-- jQuery Selecte2 Input -->
     <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
@@ -324,6 +342,7 @@
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sCreateReceiptUrl" value="/recepcionMx/createLab/"/>
+    <c:url var="sCreateReceiptMassUrl" value="/recepcionMx/recepcionMasivaLab"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -331,7 +350,9 @@
                 sOrdersUrl : "${ordersUrl}",
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
-                sActionUrl : "${sCreateReceiptUrl}"
+                sActionUrl : "${sCreateReceiptUrl}",
+                sTableToolsPath : "${tabletools}",
+                sCreateReceiptMassUrl : "${sCreateReceiptMassUrl}"
             };
 			ReceiptOrders.init(parametros);
 

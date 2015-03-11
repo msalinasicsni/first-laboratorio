@@ -17,6 +17,7 @@ public class Catalogo_Estudio {
     private String nombre;
     private boolean pasivo;
     private Area area;
+    private String codigo;
 
     @Id
     @Column(name = "ID_ESTUDIO", nullable = false, insertable = true, updatable = true, length = 10)
@@ -57,5 +58,15 @@ public class Catalogo_Estudio {
 
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    @Basic
+    @Column(name = "CODIGO", nullable = true, insertable = true, updatable = true, length = 16)
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 }

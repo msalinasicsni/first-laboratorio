@@ -253,39 +253,85 @@ public class RecepcionMxController {
             boolean esEstudio = false;
             if (recepcionMx!=null) {
                 //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
-                esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
+                List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+                esEstudio = solicitudEstudioList.size()>0;
 
                 unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
                 ordenExamenList = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
+                long idUsuario = seguridadService.obtenerIdUsuario(request);
+                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
                 if (ordenExamenList==null || ordenExamenList.size()<=0) {
-                    //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
-                    Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
-                    if (pTipoNoti != null) {
-                        //se obtienen los id de los examenes por defecto
-                        Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
-                        if (pExamenesDefecto != null)
-                            examenesList = examenesService.getExamenesByIds(pExamenesDefecto.getValor());
-                        if (examenesList != null) {
-                            //se registran los examenes por defecto
-                            for (Examen_Dx examenTmp : examenesList) {
-                                OrdenExamen ordenExamen = new OrdenExamen();
-                                DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(recepcionMx.getTomaMx().getIdTomaMx(), examenTmp.getDiagnostico().getIdDiagnostico());
-                                long idUsuario = seguridadService.obtenerIdUsuario(request);
-                                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
-                                ordenExamen.setSolicitudDx(solicitudDx);
-                                ordenExamen.setCodExamen(examenTmp.getExamen());
-                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                ordenExamen.setUsarioRegistro(usuario);
-                                try {
-                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                }catch (Exception ex){
-                                    ex.printStackTrace();
+                    if (!esEstudio) {
+                        //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
+                        Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                        if (pTipoNoti != null) {
+                            //se obtienen los id de los examenes por defecto
+                            Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
+                            if (pExamenesDefecto != null)
+                                examenesList = examenesService.getExamenesDxByIdsExamenes(pExamenesDefecto.getValor());
+                            if (examenesList != null) {
+                                //se registran los examenes por defecto
+                                for (Examen_Dx examenTmp : examenesList) {
+                                    OrdenExamen ordenExamen = new OrdenExamen();
+                                    DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(recepcionMx.getTomaMx().getIdTomaMx(), examenTmp.getDiagnostico().getIdDiagnostico());
+                                    ordenExamen.setSolicitudDx(solicitudDx);
+                                    ordenExamen.setCodExamen(examenTmp.getExamen());
+                                    ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                    ordenExamen.setUsarioRegistro(usuario);
+                                    try {
+                                        ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                        logger.error("Error al agregar orden de examen", ex);
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        if (solicitudEstudioList.size()>0) {
+                            //procesar examenes default para cada estudio
+                            for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
+                                String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
+                                //nombre parámetro que contiene los examenes que se deben aplicar para cada estudio puede estar configurado de 3 maneras:
+                                //cod_estudio+cod_categ+gravedad
+                                //cod_estudio+gravedad
+                                //cod_estudio
+                                String gravedad = null;
+                                String codUnicoMx = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
+                                if (codUnicoMx.contains("."))
+                                    gravedad = codUnicoMx.substring(codUnicoMx.lastIndexOf(".") + 1);
+
+                                if (solicitudEstudio.getIdTomaMx().getCategoriaMx() != null) {
+                                    nombreParametroExam += "_" + solicitudEstudio.getIdTomaMx().getCategoriaMx().getCodigo();
+                                    if (gravedad != null)
+                                        nombreParametroExam += "_" + gravedad;
+                                } else {
+                                    if (gravedad != null)
+                                        nombreParametroExam += "_" + gravedad;
+                                }
+
+                                Parametro examenesEstudio = parametrosService.getParametroByName(nombreParametroExam);
+                                if (examenesEstudio != null) {
+                                    List<CatalogoExamenes> examenesEstList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
+                                    for (CatalogoExamenes examen : examenesEstList) {
+                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                        ordenExamen.setCodExamen(examen);
+                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                        ordenExamen.setUsarioRegistro(usuario);
+                                        try {
+                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            logger.error("Error al agregar orden de examen", ex);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    List<OrdenExamen> ordenExamenListNew = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
+                    List<OrdenExamen> ordenExamenListNew = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
                     mav.addObject("examenesList",ordenExamenListNew);
                 }else{
                     mav.addObject("examenesList",ordenExamenList);
@@ -623,6 +669,184 @@ public class RecepcionMxController {
         }
     }
 
+    @RequestMapping(value = "recepcionMasivaLab", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void receptionMassLaboratory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String strRecepciones="";
+        Integer cantRecepciones = 0;
+        Integer cantRecepProc = 0;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            strRecepciones = jsonpObject.get("strRecepciones").toString();
+            cantRecepciones = jsonpObject.get("cantRecepciones").getAsInt();
+
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            //Se obtiene estado recepcionado en laboratorio
+            EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCLAB");
+            //se obtiene calidad de la muestra
+            CalidadMx calidadMx = catalogosService.getCalidadMx("CALIDMX|ADC");
+            //se obtienen recepciones a recepcionar en lab
+            JsonObject jObjectRecepciones = new Gson().fromJson(strRecepciones, JsonObject.class);
+            for(int i = 0; i< cantRecepciones;i++) {
+                String idRecepcion = jObjectRecepciones.get(String.valueOf(i)).getAsString();
+                RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(idRecepcion);
+                //se setean valores a actualizar
+                recepcionMx.setUsuarioRecepcionLab(usuario);
+                recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
+                recepcionMx.setCalidadMx(calidadMx);
+                recepcionMx.setCausaRechazo(null);
+                boolean procesarRecepcion = false;
+                try {
+                    //se procesan las ordenes de examen
+                    //boolean tieneOrdenesAnuladas = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
+                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcionMx.getTomaMx().getIdTomaMx());
+                    if (solicitudDxList!=null && solicitudDxList.size()> 0){
+                        //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
+                        Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                        if (pTipoNoti != null) {
+                            for(DaSolicitudDx solicitudDx : solicitudDxList) {
+                                List<Examen_Dx> examenesList = null;
+                                //se obtienen los id de los examenes por defecto
+                                Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
+                                if (pExamenesDefecto != null)
+                                    examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor());
+                                if (examenesList != null) {
+                                    //se registran los examenes por defecto
+                                    for (Examen_Dx examenTmp : examenesList) {
+                                        //sólo se agrega la oorden si aún no tiene registrada orden de examen, misma toma, mismo dx, mismo examen y no está anulado
+                                        if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudDx.getCodDx().getIdDiagnostico(), examenTmp.getExamen().getIdExamen()).size() <= 0) {
+                                            OrdenExamen ordenExamen = new OrdenExamen();
+                                            ordenExamen.setSolicitudDx(solicitudDx);
+                                            ordenExamen.setCodExamen(examenTmp.getExamen());
+                                            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                            ordenExamen.setUsarioRegistro(usuario);
+                                            try {
+                                                ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepción
+                                            } catch (Exception ex) {
+                                                ex.printStackTrace();
+                                                logger.error("Error al agregar orden de examen", ex);
+                                            }
+                                        }else{//si ya esta registrada una orden válida, entonces se puede procesar
+                                            procesarRecepcion = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+                    if (solicitudEstudioList!=null && solicitudEstudioList.size()>0){
+                        //procesar examenes default para cada estudio
+                        for(DaSolicitudEstudio solicitudEstudio:solicitudEstudioList){
+                            String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
+                            //nombre parámetro que contiene los examenes que se deben aplicar para cada estudio puede estar configurado de 3 maneras:
+                            //cod_estudio+cod_categ+gravedad
+                            //cod_estudio+gravedad
+                            //cod_estudio
+                            String gravedad = null;
+                            String codUnicoMx = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
+                            if (codUnicoMx.contains("."))
+                                gravedad = codUnicoMx.substring(codUnicoMx.lastIndexOf(".")+1);
+
+                            if (solicitudEstudio.getIdTomaMx().getCategoriaMx()!=null){
+                                nombreParametroExam += "_"+solicitudEstudio.getIdTomaMx().getCategoriaMx().getCodigo();
+                                if (gravedad!=null)
+                                    nombreParametroExam+= "_"+gravedad;
+                            }else{
+                                if (gravedad!=null)
+                                    nombreParametroExam+= "_"+gravedad;
+                            }
+
+                            Parametro examenesEstudio = parametrosService.getParametroByName(nombreParametroExam);
+                            if (examenesEstudio!=null){
+                                List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
+                                for(CatalogoExamenes examen : examenesList){
+                                    //sólo se agrega la oorden si aún no tiene registrada orden de examen, misma toma, mismo estudio, mismo examen y no está anulado
+                                    if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdEstIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudEstudio.getTipoEstudio().getIdEstudio(), examen.getIdExamen()).size() <= 0) {
+                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                        ordenExamen.setCodExamen(examen);
+                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                        ordenExamen.setUsarioRegistro(usuario);
+                                        try {
+                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                            procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepción
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            logger.error("Error al agregar orden de examen", ex);
+                                        }
+                                    }else{//si ya esta registrada una orden válida, entonces se puede procesar
+                                        procesarRecepcion = true;
+                                    }
+                                }
+                            }else { // se consulta si hay configuración sólo por codigo de estudio
+                                examenesEstudio = parametrosService.getParametroByName(solicitudEstudio.getTipoEstudio().getCodigo());
+                                if (examenesEstudio!=null){
+                                    List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
+                                    for(CatalogoExamenes examen : examenesList){
+                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                        ordenExamen.setCodExamen(examen);
+                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                        ordenExamen.setUsarioRegistro(usuario);
+                                        try {
+                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                            procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepción
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            logger.error("Error al agregar orden de examen", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (procesarRecepcion)
+                        recepcionMxService.updateRecepcionMx(recepcionMx);
+                }catch (Exception ex){
+                    resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
+                    resultado=resultado+". \n "+ex.getMessage();
+                    ex.printStackTrace();
+                }
+                if (!idRecepcion.isEmpty() && procesarRecepcion) {
+                    //se tiene que actualizar la tomaMx
+                    DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
+                    tomaMx.setEstadoMx(estadoMx);
+                    try {
+                        tomaMxService.updateTomaMx(tomaMx);
+                        cantRecepProc++;
+                    }catch (Exception ex){
+                        resultado = messageSource.getMessage("msg.update.order.error",null,null);
+                        resultado=resultado+". \n "+ex.getMessage();
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.send.receipt.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("strRecepciones",strRecepciones);
+            map.put("mensaje",resultado);
+            map.put("cantRecepciones",cantRecepciones.toString());
+            map.put("cantRecepProc",cantRecepProc.toString());
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
     private String agregarOrdenExamenVigRut(JsonObject jsonpObject, HttpServletRequest request) throws Exception {
         String resultado = "";
         String idTomaMx = "";
@@ -636,7 +860,7 @@ public class RecepcionMxController {
         if (ordenExamenList!=null && ordenExamenList.size()>0) {
             resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
         }else{
-            CatalogoExamenes examen = examenesService.getExamenesById(idExamen);
+            CatalogoExamenes examen = examenesService.getExamenById(idExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
             OrdenExamen ordenExamen = new OrdenExamen();
@@ -669,7 +893,7 @@ public class RecepcionMxController {
         if (ordenExamenList!=null && ordenExamenList.size()>0) {
             resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
         }else{
-            CatalogoExamenes examen = examenesService.getExamenesById(idExamen);
+            CatalogoExamenes examen = examenesService.getExamenById(idExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
             OrdenExamen ordenExamen = new OrdenExamen();

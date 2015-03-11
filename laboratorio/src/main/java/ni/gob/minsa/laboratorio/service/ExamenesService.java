@@ -29,7 +29,7 @@ public class ExamenesService {
      * @param idExamen
      * @return
      */
-    public CatalogoExamenes getExamenesById(int idExamen){
+    public CatalogoExamenes getExamenById(int idExamen){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("from CatalogoExamenes where idExamen =:idExamen");
         q.setInteger("idExamen", idExamen);
@@ -41,18 +41,50 @@ public class ExamenesService {
      * @param idExamenes id de los examenes a filtrar, separados por coma Ejm: 1,2,3
      * @return List<Examen_Dx>
      */
-    public List<Examen_Dx> getExamenesByIds(String idExamenes){
+    public List<Examen_Dx> getExamenesDxByIdsExamenes(String idExamenes){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select edx from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
                 " where ex.idExamen in("+ idExamenes +")");
         return q.list();
     }
 
+    /**
+     * Obtiene lista de examenes asociados a un dx específico
+     * @param idDx id del diagnóstico a filtrar
+     * @return List<CatalogoExamenes>
+     */
     public List<CatalogoExamenes> getExamenesByIdDx(int idDx){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select ex from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
                 "where dx.idDiagnostico = :idDx");
         q.setParameter("idDx",idDx);
+        return q.list();
+    }
+
+    /**
+     * Obtiene una lista de examenes asociados a un dx específico, y además tiene que estar en un rango determinado de ids de examenes
+     * @param idDx id del diagnóstico a filtrar
+     * @param idExamenes String con los ids de los examenes a filtrar, separados por coma Ejm: 1,2,3
+     * @return List<Examen_Dx>
+     */
+    public List<Examen_Dx> getExamenesByIdDxAndIdsEx(int idDx, String idExamenes){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select edx from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
+                "where dx.idDiagnostico = :idDx "+
+                " and ex.idExamen in("+ idExamenes +")");
+        q.setParameter("idDx",idDx);
+        return q.list();
+    }
+
+    /**
+     * Obtiene una lista de examenes según ids de examenes enviados
+     * @param idExamenes id de los examenes a filtrar, separados por coma Ejm: 1,2,3
+     * @return List<CatalogoExamenes>
+     */
+    public List<CatalogoExamenes> getExamenesByIdsExamenes(String idExamenes){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("from CatalogoExamenes as ex" +
+                " where ex.idExamen in("+ idExamenes +")");
         return q.list();
     }
 
