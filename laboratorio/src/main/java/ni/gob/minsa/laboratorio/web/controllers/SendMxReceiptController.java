@@ -288,6 +288,8 @@ public class SendMxReceiptController {
         String codTipoMx = null;
         String idAreaProcesa = null;
         String codigoUnicoMx=null;
+        String codTipoSolicitud = null;
+        String nombreSolicitud = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -305,6 +307,10 @@ public class SendMxReceiptController {
             idAreaProcesa = jObjectFiltro.get("idArea").getAsString();
         if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
             codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
+        if (jObjectFiltro.get("codTipoSolicitud") != null && !jObjectFiltro.get("codTipoSolicitud").getAsString().isEmpty())
+            codTipoSolicitud = jObjectFiltro.get("codTipoSolicitud").getAsString();
+        if (jObjectFiltro.get("nombreSolicitud") != null && !jObjectFiltro.get("nombreSolicitud").getAsString().isEmpty())
+            nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -313,6 +319,8 @@ public class SendMxReceiptController {
         filtroMx.setNombreApellido(nombreApellido);
         filtroMx.setCodTipoMx(codTipoMx);
         filtroMx.setIdAreaProcesa(idAreaProcesa);
+        filtroMx.setCodTipoSolicitud(codTipoSolicitud);
+        filtroMx.setNombreSolicitud(nombreSolicitud);
         filtroMx.setCodEstado("ESTDMX|RCP"); // sólo las recepcionadas
         filtroMx.setIncluirMxInadecuada(true);
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);

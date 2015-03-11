@@ -1076,6 +1076,8 @@ public class RecepcionMxController {
         String codTipoMx = null;
         String esLab = null;
         String codigoUnicoMx = null;
+        String codTipoSolicitud = null;
+        String nombreSolicitud = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -1097,6 +1099,10 @@ public class RecepcionMxController {
             esLab = jObjectFiltro.get("esLab").getAsString();
         if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
             codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
+        if (jObjectFiltro.get("codTipoSolicitud") != null && !jObjectFiltro.get("codTipoSolicitud").getAsString().isEmpty())
+            codTipoSolicitud = jObjectFiltro.get("codTipoSolicitud").getAsString();
+        if (jObjectFiltro.get("nombreSolicitud") != null && !jObjectFiltro.get("nombreSolicitud").getAsString().isEmpty())
+            nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -1106,6 +1112,8 @@ public class RecepcionMxController {
         filtroMx.setFechaFinRecep(fechaFinRecep);
         filtroMx.setNombreApellido(nombreApellido);
         filtroMx.setCodTipoMx(codTipoMx);
+        filtroMx.setCodTipoSolicitud(codTipoSolicitud);
+        filtroMx.setNombreSolicitud(nombreSolicitud);
         if (!Boolean.valueOf(esLab)) { //es recepción general
             filtroMx.setCodEstado("ESTDMX|ENV"); // sólo las enviadas
         } else { //es recepción en laboratorio

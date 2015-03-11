@@ -301,7 +301,7 @@
                                                             <c:when test="${not empty dxList}">
                                                                 <c:forEach items="${dxList}" var="record">
                                                                     <tr>
-                                                                        <td><spring:message code="lbl.rutine" /></td>
+                                                                        <td><spring:message code="lbl.routine" /></td>
                                                                         <td><c:out value="${record.codDx.nombre}" /></td>
                                                                         <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
                                                                         <td><c:out value="${record.codDx.area.nombre}" /></td>

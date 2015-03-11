@@ -219,6 +219,8 @@ var ReceiptOrders = function () {
                     mxFiltros['codUnidadSalud'] = '';
                     mxFiltros['codTipoMx'] = '';
                     mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
+                    mxFiltros['codTipoSolicitud'] = '';
+                    mxFiltros['nombreSolicitud'] = '';
                 }else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
@@ -228,6 +230,8 @@ var ReceiptOrders = function () {
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
                     mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                     mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    mxFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {

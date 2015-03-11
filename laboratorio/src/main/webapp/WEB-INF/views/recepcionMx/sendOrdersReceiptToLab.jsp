@@ -144,7 +144,7 @@
                                                     <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.receipt.name"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-2">
+                                            <section class="col col-sm-6 col-md-4 col-lg-3">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.receipt.start.date" />
                                                 </label>
@@ -156,7 +156,7 @@
                                                     <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-2">
+                                            <section class="col col-sm-6 col-md-4 col-lg-3">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.receipt.end.date" />
                                                 </label>
@@ -168,20 +168,7 @@
                                                     <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
                                                 </label>
                                             </section>
-                                            <section class="col col-sm-6 col-md-4 col-lg-3">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.sample.type" /> </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codTipoMx" name="codTipoMx"
-                                                            class="select2">
-                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                        <c:forEach items="${tipoMuestra}" var="tipoMuestra">
-                                                            <option value="${tipoMuestra.idTipoMx}">${tipoMuestra.nombre}</option>
-                                                        </c:forEach>
-                                                    </select>
-                                                </div>
-                                            </section>
+
                                         </div>
                                         <div class="row">
                                             <section class="col col-sm-12 col-md-5 col-lg-3">
@@ -224,6 +211,48 @@
                                                 </div>
                                             </section>
                                         </div>
+
+
+                                            <div class="row">
+                                                <section class="col col-sm-6 col-md-4 col-lg-5">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.sample.type" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codTipoMx" name="codTipoMx"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${tipoMuestra}" var="tipoMuestra">
+                                                                <option value="${tipoMuestra.idTipoMx}">${tipoMuestra.nombre}</option>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </div>
+                                                </section>
+
+                                                <section class="col col-sm-12 col-md-7 col-lg-3">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.request.type" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="tipo" name="tipo"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <option value="Estudio"><spring:message code="lbl.study" /></option>
+                                                            <option value="Rutina"><spring:message code="lbl.routine" /></option>
+                                                        </select>
+                                                    </div>
+                                                </section>
+
+                                                <section class="col col-sm-12 col-md-12 col-lg-4">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.request.name" />
+                                                    </label>
+                                                    <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
+                                                        <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.request.name"/>">
+                                                        <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
+                                                    </label>
+                                                </section>
+                                            </div>
                                             <div class="row">
                                                 <section class="col col-sm-12 col-md-6 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
