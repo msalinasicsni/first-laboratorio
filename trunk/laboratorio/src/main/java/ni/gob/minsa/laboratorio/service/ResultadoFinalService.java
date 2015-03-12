@@ -169,12 +169,13 @@ public class ResultadoFinalService {
     public List<DetalleResultadoFinal> getDetResActivosBySolicitud(String idSolicitud){
         List<DetalleResultadoFinal> resultadoFinals = new ArrayList<DetalleResultadoFinal>();
         Session session = sessionFactory.getCurrentSession();
-        String query = "select a from DetalleResultadoFinal as a inner join a.solicitud as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud ";
+        String query = "select a from DetalleResultadoFinal as a inner join a.solicitudDx as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud ";
         Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
         resultadoFinals = q.list();
         String query2 = "select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud ";
         Query q2 = session.createQuery(query2);
-        q.setParameter("idSolicitud", idSolicitud);
+        q2.setParameter("idSolicitud", idSolicitud);
         resultadoFinals.addAll(q2.list());
         return  resultadoFinals;
     }
@@ -186,7 +187,7 @@ public class ResultadoFinalService {
      * @return DetalleResultadoFinal
      */
     public DetalleResultadoFinal getDetResBySolicitudAndRespuesta(String idSolicitud, int idRespuesta){
-        String query = "Select a from DetalleResultadoFinal as a inner join a.solicitud as ex inner join a.respuesta as re " +
+        String query = "Select a from DetalleResultadoFinal as a inner join a.solicitudDx as ex inner join a.respuesta as re " +
                 "where ex.idSolicitudDx = :idSolicitud and re.idRespuesta = :idRespuesta and a.pasivo = false ";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);

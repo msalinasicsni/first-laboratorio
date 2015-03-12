@@ -2,7 +2,6 @@ package ni.gob.minsa.laboratorio.domain.resultados;
 
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
-import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
@@ -22,7 +21,7 @@ public class DetalleResultadoFinal implements Serializable{
 
     String idDetalle;
     String valor;
-    DaSolicitudDx solicitud;
+    DaSolicitudDx solicitudDx;
     RespuestaDx respuesta;
     Usuarios usuarioRegistro;
     Timestamp fechahRegistro;
@@ -92,11 +91,11 @@ public class DetalleResultadoFinal implements Serializable{
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = true)
-    @JoinColumn(name = "SOLICITUD", referencedColumnName = "ID_SOLICITUD_DX", nullable = true)
+    @JoinColumn(name = "SOLICITUD_DX", referencedColumnName = "ID_SOLICITUD_DX", nullable = true)
     @ForeignKey(name = "SOLI_FK")
-    public DaSolicitudDx getSolicitud() { return solicitud; }
+    public DaSolicitudDx getSolicitudDx() { return solicitudDx; }
 
-    public void setSolicitud(DaSolicitudDx solicitud) { this.solicitud = solicitud; }
+    public void setSolicitudDx(DaSolicitudDx solicitud) { this.solicitudDx = solicitud; }
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)
