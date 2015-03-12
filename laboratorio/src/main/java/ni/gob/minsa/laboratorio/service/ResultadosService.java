@@ -52,7 +52,7 @@ public class ResultadosService {
                 throw new Exception("Objeto DetalleResultado es NULL");
         }catch (Exception ex){
             logger.error("Error al agregar DetalleResultado",ex);
-            throw ex;
+            throw new Exception(ex);
         }
         return idMaestro;
     }
@@ -73,7 +73,7 @@ public class ResultadosService {
                 throw new Exception("Objeto DetalleResultado es NULL");
         }catch (Exception ex){
             logger.error("Error al actualizar DetalleResultado",ex);
-            throw ex;
+            throw new Exception(ex);
         }
     }
 

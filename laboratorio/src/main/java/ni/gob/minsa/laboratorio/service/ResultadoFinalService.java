@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -166,11 +167,16 @@ public class ResultadoFinalService {
     }
 
     public List<DetalleResultadoFinal> getDetResActivosBySolicitud(String idSolicitud){
-        String query = "select a from DetalleResultadoFinal as a inner join a.solicitud as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud ";
+        List<DetalleResultadoFinal> resultadoFinals = new ArrayList<DetalleResultadoFinal>();
         Session session = sessionFactory.getCurrentSession();
+        String query = "select a from DetalleResultadoFinal as a inner join a.solicitud as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud ";
         Query q = session.createQuery(query);
+        resultadoFinals = q.list();
+        String query2 = "select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud ";
+        Query q2 = session.createQuery(query2);
         q.setParameter("idSolicitud", idSolicitud);
-        return  q.list();
+        resultadoFinals.addAll(q2.list());
+        return  resultadoFinals;
     }
 
     /**

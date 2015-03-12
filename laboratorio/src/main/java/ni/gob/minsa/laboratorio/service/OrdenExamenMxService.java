@@ -86,7 +86,7 @@ public class OrdenExamenMxService {
         q.setParameter("idTomaMx",idTomaMx);
         ordenExamenList = q.list();
         //se toman las que son de estudio
-        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx where mx.idTomaMx =:idTomaMx and oe.anulado = false ");
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx where mx.idTomaMx =:idTomaMx ");
         q2.setParameter("idTomaMx",idTomaMx);
         ordenExamenList.addAll(q2.list());
         return ordenExamenList;

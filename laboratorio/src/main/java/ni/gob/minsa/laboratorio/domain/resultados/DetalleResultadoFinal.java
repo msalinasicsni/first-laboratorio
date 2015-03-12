@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.domain.resultados;
 
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
+import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
 import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
@@ -29,6 +30,7 @@ public class DetalleResultadoFinal implements Serializable{
     String razonAnulacion;
     Usuarios usuarioAnulacion;
     Timestamp fechahAnulacion;
+    DaSolicitudEstudio solicitudEstudio;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -89,8 +91,8 @@ public class DetalleResultadoFinal implements Serializable{
     public void setRazonAnulacion(String razonAnulacion) { this.razonAnulacion = razonAnulacion; }
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "SOLICITUD", referencedColumnName = "ID_SOLICITUD_DX", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "SOLICITUD", referencedColumnName = "ID_SOLICITUD_DX", nullable = true)
     @ForeignKey(name = "SOLI_FK")
     public DaSolicitudDx getSolicitud() { return solicitud; }
 
@@ -124,5 +126,17 @@ public class DetalleResultadoFinal implements Serializable{
 
     public void setUsuarioAnulacion(Usuarios usuarioAnulacion) {
         this.usuarioAnulacion = usuarioAnulacion;
+    }
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "SOLICITUD_EST", referencedColumnName = "ID_SOLICITUD_EST", nullable = true)
+    @ForeignKey(name = "RF_SOLI_EST_FK")
+    public DaSolicitudEstudio getSolicitudEstudio() {
+        return solicitudEstudio;
+    }
+
+    public void setSolicitudEstudio(DaSolicitudEstudio solicitudEstudio) {
+        this.solicitudEstudio = solicitudEstudio;
     }
 }
