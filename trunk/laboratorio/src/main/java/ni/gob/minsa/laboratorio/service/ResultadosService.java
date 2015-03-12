@@ -1,15 +1,17 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
+import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Junction;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -89,6 +91,7 @@ public class ResultadosService {
         return  (DetalleResultado)q.uniqueResult();
     }
 
+
     /**
      * Obtiene una lista de detalles de resultados registrados para el la orden de examen indicada
      * @param idOrdenExamen id de la orden a recuperar resultados
@@ -128,4 +131,23 @@ public class ResultadosService {
         q.setParameter("idRespuesta", idRespuesta);
         return  (DetalleResultado)q.uniqueResult();
     }
+
+    /**
+     * Verifica si existe registrado un resultado para el tipo de concepto texto de la respuesta y orden de examen indicado, siempre y cuando el registro este activo (pasivo = false)
+     * @param idOrdenExamen orden a verificar
+     * @param tipo respuesta a verificar
+     * @return DetalleResultado
+     */
+    public DetalleResultado getDetalleResultadoByOrdenExamenAndTipoC(String idOrdenExamen, String tipo){
+        String query = "Select a from DetalleResultado as a inner join a.examen as ex inner join a.respuesta as re " +
+                "inner join re.concepto as c " +
+                "where ex.idOrdenExamen = :idOrdenExamen and c.tipo.codigo = :tipo and a.pasivo = false ";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idOrdenExamen", idOrdenExamen);
+        q.setParameter("tipo", tipo);
+        return  (DetalleResultado)q.uniqueResult();
+    }
+
+
 }

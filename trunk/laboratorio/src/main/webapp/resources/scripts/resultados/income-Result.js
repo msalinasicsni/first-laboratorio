@@ -119,28 +119,35 @@ var IncomeResult = function () {
             });
 
             function getAlicuotas(showAll) {
-                var encuestaFiltros = {};
+                var filtros = {};
                 if (showAll){
-                    encuestaFiltros['nombreApellido'] = '';
-                    encuestaFiltros['fechaInicioTomaMx'] = '';
-                    encuestaFiltros['fechaFinTomaMx'] = '';
-                    encuestaFiltros['codSilais'] = '';
-                    encuestaFiltros['codUnidadSalud'] = '';
-                    encuestaFiltros['codTipoMx'] = '';
-                    encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
+                    filtros['nombreApellido'] = '';
+                    filtros['fechaInicioTomaMx'] = '';
+                    filtros['fechaFinTomaMx'] = '';
+                    filtros['codSilais'] = '';
+                    filtros['codUnidadSalud'] = '';
+                    filtros['codTipoMx'] = '';
+                    filtros['esLab'] =  $('#txtEsLaboratorio').val();
+                    filtros['codTipoSolicitud'] = '';
+                    filtros['nombreSolicitud'] = $('#nombreSoli').val();
+                    filtros['examenResultado'] = '';
                 }else {
-                    encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    encuestaFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    encuestaFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
-                    encuestaFiltros['codSilais'] = $('#codSilais option:selected').val();
-                    encuestaFiltros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
-                    encuestaFiltros['codTipoMx'] = $('#codTipoMx option:selected').val();
-                    encuestaFiltros['esLab'] =  $('#txtEsLaboratorio').val();
-                    encuestaFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    filtros['nombreApellido'] = $('#txtfiltroNombre').val();
+                    filtros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
+                    filtros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    filtros['codSilais'] = $('#codSilais option:selected').val();
+                    filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
+                    filtros['codTipoMx'] = $('#codTipoMx option:selected').val();
+                    filtros['esLab'] =  $('#txtEsLaboratorio').val();
+                    filtros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    filtros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    filtros['nombreSolicitud'] = $('#nombreSoli').val();
+                    filtros['examenResultado'] = $('#testWRes option:selected').val();
+
                 }
                 bloquearUI(parametros.blockMess);
     			$.getJSON(parametros.sOrdersUrl, {
-                    strFilter: JSON.stringify(encuestaFiltros),
+                    strFilter: JSON.stringify(filtros),
     				ajax : 'true'
     			}, function(dataToLoad) {
                     table1.fnClearTable();
@@ -149,8 +156,8 @@ var IncomeResult = function () {
                         for (var i = 0; i < len; i++) {
                             var actionUrl = parametros.sActionUrl+dataToLoad[i].idOrdenExamen;
                             table1.fnAddData(
-                                [/*dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara,*/ dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx ,dataToLoad[i].fechaInicioSintomas,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                [/*dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara,*/ dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden,dataToLoad[i].tipoDx,dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx,dataToLoad[i].fechaInicioSintomas,
+                                   dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].resultadoExamen, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     }else{
                         $.smallBox({
@@ -230,6 +237,7 @@ var IncomeResult = function () {
                         objResultado["strRespuestas"] = objDetalle;
                         objResultado["mensaje"] = '';
                         objResultado["cantRespuestas"] = cantRespuestas;
+                        objResultado["examenAgregado"] = '';
                         console.log(objDetalle);
                         $.ajax(
                             {
@@ -249,6 +257,8 @@ var IncomeResult = function () {
                                             timeout: 4000
                                         });
                                     }else{
+
+
                                         var msg = $("#msg_result_added").val();
                                         $.smallBox({
                                             title: msg ,
@@ -257,6 +267,18 @@ var IncomeResult = function () {
                                             iconSmall: "fa fa-success",
                                             timeout: 4000
                                         });
+
+                                        if(data.examenAgregado == "true"){
+                                            var msg = $("#msg_test_added").val();
+                                            $.smallBox({
+                                                title: msg ,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#739E73",
+                                                iconSmall: "fa fa-success",
+                                                timeout: 4000
+                                            });
+                                        }
+
                                         limpiarDatosRecepcion();
                                         setTimeout(function () {window.location.href = parametros.sAlicuotasUrl},3000);
                                     }

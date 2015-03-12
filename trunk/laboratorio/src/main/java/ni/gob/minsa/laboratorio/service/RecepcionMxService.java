@@ -206,7 +206,7 @@ public class RecepcionMxService {
         if (filtro.getNombreSolicitud() != null) {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
-                    crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    crit.add(Subqueries.propertyIn("solicitudtomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")

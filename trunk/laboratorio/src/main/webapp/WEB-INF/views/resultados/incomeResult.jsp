@@ -111,6 +111,8 @@
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_result_added" type="hidden" value="<spring:message code="msg.result.successfully.added"/>"/>
+                                    <input id="msg_test_added" type="hidden" value="<spring:message code="msg.testVA.successfully.added"/>"/>
+
                                     <input id="msg_result_override" type="hidden" value="<spring:message code="msg.result.successfully.canceled"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <form id="addResult-form" class="smart-form" autocomplete="off">

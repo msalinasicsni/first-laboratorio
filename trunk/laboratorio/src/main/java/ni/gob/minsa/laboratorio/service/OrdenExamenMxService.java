@@ -1,9 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.muestra.AlicuotaRegistro;
-import ni.gob.minsa.laboratorio.domain.muestra.DaTomaMx;
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
-import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
+import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
@@ -202,6 +199,69 @@ public class OrdenExamenMxService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
+
+        //se filtra por tipo de solicitud
+        if(filtro.getCodTipoSolicitud()!=null){
+            if(filtro.getCodTipoSolicitud().equals("Estudio")){
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }else{
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }
+
+        }
+
+        //nombre solicitud
+        if (filtro.getNombreSolicitud() != null) {
+            if (filtro.getCodTipoSolicitud() != null) {
+                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
+                    crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .createAlias("tipoEstudio", "estudio")
+                            .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+                } else {
+                    crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .createAlias("codDx", "dx")
+                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+                }
+            } else {
+
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("tipoEstudio", "estudio")
+                        .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))))
+                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .createAlias("codDx", "dx")
+                                .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                                .createAlias("idTomaMx", "toma")
+                                .setProjection(Property.forName("toma.idTomaMx"))));
+
+                crit.add(conditGroup);
+            }
+
+        }
+
+        //filtro examen con resultado
+        if(filtro.getExamenResultado() != null){
+            if (filtro.getExamenResultado().equals("Si")){
+                crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "ex")
+                        .setProjection(Property.forName("ex.idOrdenExamen"))));
+            } else{
+                crit.add(Subqueries.propertyNotIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "ex")
+                        .setProjection(Property.forName("ex.idOrdenExamen"))));
+            }
+        }
+
         /*crit.add( Subqueries.propertyNotIn("idAlicuota", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("alicuotaRegistro", "resultado").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("resultado.idAlicuota"))));*/
@@ -278,6 +338,57 @@ public class OrdenExamenMxService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
+
+        //nombre solicitud
+        if (filtro.getNombreSolicitud() != null) {
+            if (filtro.getCodTipoSolicitud() != null) {
+                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
+                    crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .createAlias("tipoEstudio", "estudio")
+                            .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+                } else {
+                    crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .createAlias("codDx", "dx")
+                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .createAlias("idTomaMx", "tom")
+                            .setProjection(Property.forName("tom.idTomaMx"))));
+                }
+            } else {
+
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("tipoEstudio", "estudio")
+                        .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))))
+                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .createAlias("codDx", "dx")
+                                .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                                .createAlias("idTomaMx", "toma")
+                                .setProjection(Property.forName("toma.idTomaMx"))));
+
+                crit.add(conditGroup);
+            }
+
+           }
+
+        //filtro examen con resultado
+        if(filtro.getExamenResultado() != null){
+            if (filtro.getExamenResultado().equals("Si")){
+                crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "ex")
+                        .setProjection(Property.forName("ex.idOrdenExamen"))));
+            } else{
+                crit.add(Subqueries.propertyNotIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "ex")
+                        .setProjection(Property.forName("ex.idOrdenExamen"))));
+            }
+        }
+
+
+
         /*crit.add( Subqueries.propertyNotIn("idAlicuota", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("alicuotaRegistro", "resultado").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("resultado.idAlicuota"))));*/
