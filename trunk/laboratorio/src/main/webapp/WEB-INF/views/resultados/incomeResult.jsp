@@ -115,6 +115,12 @@
 
                                     <input id="msg_result_override" type="hidden" value="<spring:message code="msg.result.successfully.canceled"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
+                                    <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                                    <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                                    <input id="msg_result_final_cancel" type="hidden" value="<spring:message code="msg.final.result.cancel"/>"/>
+                                    <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                    <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.final.result.confirm.content"/>"/>
+                                    <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                                     <form id="addResult-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
@@ -402,6 +408,17 @@
                                             <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
                                             <input id="idExamen" type="hidden" value="${ordenExamen.codExamen.idExamen}"/>
                                             <input id="idOrdenExamen" type="hidden" value="${ordenExamen.idOrdenExamen}"/>
+                                            <c:choose>
+                                                <c:when test="${not empty ordenExamen.solicitudDx}">
+                                                    <input id="idSolicitud" type="hidden" value="${ordenExamen.solicitudDx.idSolicitudDx}"/>
+                                                </c:when>
+                                                <c:when test="${not empty ordenExamen.solicitudEstudio}">
+                                                    <input id="idSolicitud" type="hidden" value="${ordenExamen.solicitudEstudio.idSolicitudEstudio}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <input id="idSolicitud" type="hidden" value="0"/>
+                                                </c:otherwise>
+                                            </c:choose>
                                             <button type="button" id="override-result" class="btn btn-danger btn-lg pull-right header-btn"><i class="fa fa-times"></i> <spring:message code="act.override" /></button>
                                             <button type="submit" id="save-result" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
                                         </footer>
@@ -471,9 +488,7 @@
                                     <button type="button" class="btn btn-default" data-dismiss="modal">
                                         <spring:message code="act.cancel" />
                                     </button>
-
                                 </footer>
-
                             </form>
                         </div>
                     </div><!-- /.modal-content -->
@@ -530,9 +545,10 @@
     <c:url var="sRespuestasUrl" value="/administracion/respuestas/getRespuestasActivasExamen"/>
     <c:url var="sListasUrl" value="/resultados/getCatalogosListaConceptoByIdExamen"/>
     <c:url var="sDetResultadosUrl" value="/resultados/getDetallesResultadoByExamen"/>
-    <c:url var="sAlicuotasUrl" value="/resultados/init"/>
+    <c:url var="sResultadosUrl" value="/resultados/init"/>
     <c:url var="sSaveResult" value="/resultados/saveResult"/>
     <c:url var="sOverrideResult" value="/resultados/overrideResult"/>
+    <c:url var="sSaveFinalResult" value="/resultadoFinal/saveFinalResult" />
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -541,12 +557,13 @@
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
                 sConceptosUrl: "${sRespuestasUrl}",
-                sAlicuotasUrl : "${sAlicuotasUrl}",
+                sResultadosUrl : "${sResultadosUrl}",
                 sSaveResult : "${sSaveResult}",
                 sListasUrl : "${sListasUrl}",
                 sEsIngreso : 'true',
                 sDetResultadosUrl : "${sDetResultadosUrl}",
-                sOverrideResult : "${sOverrideResult}"
+                sOverrideResult : "${sOverrideResult}",
+                sSaveFinalResult : "${sSaveFinalResult}"
             };
             IncomeResult.init(parametros);
             handleInputMasks();

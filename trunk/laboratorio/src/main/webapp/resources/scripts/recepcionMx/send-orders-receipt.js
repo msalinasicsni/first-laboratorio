@@ -266,8 +266,7 @@ var SendOrdersReceipt = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
-                                            limpiarDatosRecepcion();
-                                            setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},2000);
+                                            getOrders(false);
                                         }
                                         desbloquearUI();
                                     },

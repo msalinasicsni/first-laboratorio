@@ -129,7 +129,7 @@ var IncomeResult = function () {
                     filtros['codTipoMx'] = '';
                     filtros['esLab'] =  $('#txtEsLaboratorio').val();
                     filtros['codTipoSolicitud'] = '';
-                    filtros['nombreSolicitud'] = $('#nombreSoli').val();
+                    filtros['nombreSolicitud'] = '';
                     filtros['examenResultado'] = '';
                 }else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
@@ -192,44 +192,28 @@ var IncomeResult = function () {
                             var valorControlRespuesta;
                             switch (dataToLoad[i].concepto.tipo.codigo) {
                                 case 'TPDATO|LOG':
-                                    console.log('logico');
                                     idControlRespuesta = dataToLoad[i].idRespuesta;
-                                    //console.log(idControlRespuesta);
                                     valorControlRespuesta = $('#'+idControlRespuesta).is(':checked');
-                                    //console.log(valorControlRespuesta);
                                     break;
                                 case 'TPDATO|LIST':
-                                    console.log('lista');
                                     idControlRespuesta = dataToLoad[i].idRespuesta;
-                                    //console.log(idControlRespuesta);
                                     valorControlRespuesta = $('#'+idControlRespuesta).find('option:selected').val();
-                                    //console.log(valorControlRespuesta);
                                     break;
                                 case 'TPDATO|TXT':
-                                    console.log('texto');
                                     idControlRespuesta = dataToLoad[i].idRespuesta;
-                                    //console.log(idControlRespuesta);
                                     valorControlRespuesta = $('#'+idControlRespuesta).val();
-                                    //console.log(valorControlRespuesta);
                                     break;
                                 case 'TPDATO|NMRO':
-                                    console.log('numero');
                                     idControlRespuesta = dataToLoad[i].idRespuesta;
-                                    //console.log(idControlRespuesta);
                                     valorControlRespuesta = $('#'+idControlRespuesta).val();
-                                    //console.log(valorControlRespuesta);
                                     break;
                                 default:
                                     console.log('respuesta sin concepto');
                                     break;
-
                             }
-                            console.log(idControlRespuesta);
-                            console.log(valorControlRespuesta);
                             var objConcepto = {};
                             objConcepto["idRespuesta"] = idControlRespuesta;
                             objConcepto["valor"]=valorControlRespuesta;
-                            console.log(objConcepto);
                             objDetalle[i] = objConcepto;
                             cantRespuestas ++;
                         }
@@ -237,8 +221,15 @@ var IncomeResult = function () {
                         objResultado["strRespuestas"] = objDetalle;
                         objResultado["mensaje"] = '';
                         objResultado["cantRespuestas"] = cantRespuestas;
+                        objResultado["solicitarResFinal"] = '';
                         objResultado["examenAgregado"] = '';
                         console.log(objDetalle);
+                        var objResultadoFinal = {};
+                        objResultadoFinal["idSolicitud"] = $("#idSolicitud").val();
+                        objResultadoFinal["strRespuestas"] = objDetalle;
+                        objResultadoFinal["mensaje"] = '';
+                        objResultadoFinal["cantRespuestas"] = cantRespuestas;
+                        
                         $.ajax(
                             {
                                 url: parametros.sSaveResult,
@@ -247,6 +238,7 @@ var IncomeResult = function () {
                                 data: JSON.stringify(objResultado),
                                 contentType: 'application/json',
                                 mimeType: 'application/json',
+                                async: false,
                                 success: function (data) {
                                     if (data.mensaje.length > 0){
                                         $.smallBox({
@@ -257,8 +249,6 @@ var IncomeResult = function () {
                                             timeout: 4000
                                         });
                                     }else{
-
-
                                         var msg = $("#msg_result_added").val();
                                         $.smallBox({
                                             title: msg ,
@@ -281,6 +271,13 @@ var IncomeResult = function () {
 
                                         limpiarDatosRecepcion();
                                         setTimeout(function () {window.location.href = parametros.sAlicuotasUrl},3000);
+                                        console.log("data.solicitarResFinal: "+data.solicitarResFinal);
+                                        if (data.solicitarResFinal == 'true'){
+                                            solicitarResultadoFinal(objResultadoFinal);
+                                        }else{
+                                            limpiarDatosRecepcion();
+                                            setTimeout(function () {window.location.href = parametros.sResultadosUrl},3000);
+                                        }
                                     }
                                     desbloquearUI();
                                 },
@@ -313,6 +310,70 @@ var IncomeResult = function () {
             $("#all-orders").click(function() {
                 getAlicuotas(true);
             });
+
+
+            function solicitarResultadoFinal (objResultadoFinal){
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                desbloquearUI();
+                $.SmartMessageBox({
+                    title: $("#msg_confirm_title").val(),
+                    content: $("#msg_confirm_content").val(),
+                    buttons: '['+opcSi+']['+opcNo+']'
+                }, function (ButtonPressed) {
+                    if (ButtonPressed === opcSi) {
+                        bloquearUI(parametros.blockMess);
+                        $.ajax(
+                            {
+                                url: parametros.sSaveFinalResult,
+                                type: 'POST',
+                                dataType: 'json',
+                                data: JSON.stringify(objResultadoFinal),
+                                contentType: 'application/json',
+                                mimeType: 'application/json',
+                                async: false,
+                                success: function (data) {
+                                    if (data.mensaje.length > 0){
+                                        $.smallBox({
+                                            title: data.mensaje ,
+                                            content: $("#smallBox_content").val(),
+                                            color: "#C46A69",
+                                            iconSmall: "fa fa-warning",
+                                            timeout: 4000
+                                        });
+                                    }else{
+                                        var msg = $("#msg_result_added").val();
+                                        $.smallBox({
+                                            title: msg ,
+                                            content: $("#smallBox_content").val(),
+                                            color: "#739E73",
+                                            iconSmall: "fa fa-success",
+                                            timeout: 4000
+                                        });
+                                        desbloquearUI();
+                                        limpiarDatosRecepcion();
+                                        setTimeout(function () {window.location.href = parametros.sResultadosUrl},3000);
+                                    }
+                                },
+                                error: function (data, status, er) {
+                                    desbloquearUI();
+                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                }
+                            });
+                    }
+                    if (ButtonPressed === opcNo) {
+                        desbloquearUI();
+                        $.smallBox({
+                            title: $("#msg_result_final_cancel").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                            color: "#C46A69",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 4000
+                        });
+
+                    }
+                });
+            }
 
             function limpiarDatosRecepcion(){
                 //$("#txtNombreTransporta").val('');
@@ -423,14 +484,12 @@ var IncomeResult = function () {
                                     for (var j = 0; j < lenDetRes; j++) {
                                         if (detaResultados[j].respuesta.concepto.idConcepto==dataToLoad[i].concepto.idConcepto){
                                             valor = detaResultados[j].valor;
-                                            console.log('se encontró valor: '+valor);
                                             break;
                                         }
                                     }
                                 }
                                 switch (dataToLoad[i].concepto.tipo.codigo) {
                                     case 'TPDATO|LOG':
-                                        console.log('logico');
                                         idControlRespuesta = dataToLoad[i].idRespuesta;
                                         contenidoControl ='<div class="row">'+
                                             '<section class="col col-sm-4 col-md-6 col-lg-6">'+
@@ -455,7 +514,6 @@ var IncomeResult = function () {
                                         divResultado.append(contenidoControl);
                                         break;
                                     case 'TPDATO|LIST':
-                                        console.log('lista');
                                         idControlRespuesta = dataToLoad[i].idRespuesta;
                                         contenidoControl =  '<div class="row"><section class="col col-sm-12 col-md-6 col-lg-6"><label class="text-left txt-color-blue font-md">';
                                         if (dataToLoad[i].requerido) {
@@ -475,7 +533,6 @@ var IncomeResult = function () {
                                         contenidoControl = contenidoControl + '<option value="">...</option>';
                                         for (var ii = 0; ii < lenListas; ii++) {
                                             if (valoresListas[ii].idConcepto.idConcepto==dataToLoad[i].concepto.idConcepto){
-                                                console.log(valoresListas[ii].idCatalogoLista +" == "+ valor);
                                                 if (valoresListas[ii].idCatalogoLista == valor){
                                                     contenidoControl = contenidoControl + '<option  value="'+valoresListas[ii].idCatalogoLista+'" selected >'+valoresListas[ii].valor+'</option>';
                                                 }else{
@@ -490,7 +547,6 @@ var IncomeResult = function () {
                                         $("#"+idControlRespuesta).select2();
                                         break;
                                     case 'TPDATO|TXT':
-                                        console.log('texto');
                                         idControlRespuesta = dataToLoad[i].idRespuesta;
                                         contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
                                         if (dataToLoad[i].requerido){
@@ -512,7 +568,6 @@ var IncomeResult = function () {
                                         divResultado.append(contenidoControl);
                                         break;
                                     case 'TPDATO|NMRO':
-                                        console.log('numero');
                                         idControlRespuesta = dataToLoad[i].idRespuesta;
                                         contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
                                         if (dataToLoad[i].requerido){

@@ -81,6 +81,10 @@ public class ResultadosController {
     private ExamenesService examenesService;
 
     @Autowired
+    @Resource(name = "resultadoFinalService")
+    private ResultadoFinalService resultadoFinalService;
+
+    @Autowired
     MessageSource messageSource;
 
     @Autowired
@@ -372,9 +376,11 @@ public class ResultadosController {
         String idOrdenExamen="";
         Integer cantRespuestas=0;
         boolean examenAgregado= false;
+        Boolean solicitarResFinal = false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
+            Boolean validarResultadoFinal = false;
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             strRespuestas = jsonpObject.get("strRespuestas").toString();
@@ -414,7 +420,26 @@ public class ResultadosController {
                         }
                     }
                 }
+                validarResultadoFinal = true;
             }
+
+            //se valida si la muestra sólo tiene una orden de examen.. para enviar confirmación si desesa registrar el resultado como resultado final
+            if (validarResultadoFinal) {
+                String idTomaMx = "";
+                String idSolicitud = "";
+                if (ordenExamen.getSolicitudDx() != null) {
+                    idTomaMx = ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx();
+                    idSolicitud = ordenExamen.getSolicitudDx().getIdSolicitudDx();
+                }
+                if (ordenExamen.getSolicitudEstudio() != null){
+                    idTomaMx = ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx();
+                    idSolicitud = ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
+                }
+                //sólo si aún no tiene resultado final
+                if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
+                    solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1;
+            }
+
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
@@ -428,6 +453,7 @@ public class ResultadosController {
             map.put("mensaje",resultado);
             map.put("examenAgregado", String.valueOf(examenAgregado));
             map.put("cantRespuestas",cantRespuestas.toString());
+            map.put("solicitarResFinal",String.valueOf(solicitarResFinal));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
