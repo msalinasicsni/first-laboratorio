@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -74,6 +76,9 @@ public class ResultadosController {
     @Autowired
     @Qualifier(value = "resultadosService")
     private ResultadosService resultadosService;
+
+    @Resource(name = "examenesService")
+    private ExamenesService examenesService;
 
     @Autowired
     MessageSource messageSource;
@@ -161,6 +166,9 @@ public class ResultadosController {
         String codUnidadSalud = null;
         String codTipoMx = null;
         String codigoUnicoMx = null;
+        String codTipoSolicitud = null;
+        String nombreSolicitud = null;
+        String examenResultado = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -180,6 +188,13 @@ public class ResultadosController {
             codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
         if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
             codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
+        if (jObjectFiltro.get("codTipoSolicitud") != null && !jObjectFiltro.get("codTipoSolicitud").getAsString().isEmpty())
+            codTipoSolicitud = jObjectFiltro.get("codTipoSolicitud").getAsString();
+        if (jObjectFiltro.get("nombreSolicitud") != null && !jObjectFiltro.get("nombreSolicitud").getAsString().isEmpty())
+            nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
+        if (jObjectFiltro.get("examenResultado") != null && !jObjectFiltro.get("examenResultado").getAsString().isEmpty())
+            examenResultado = jObjectFiltro.get("examenResultado").getAsString();
+
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -189,8 +204,11 @@ public class ResultadosController {
         filtroMx.setFechaFinRecep(fechaFinRecep);
         filtroMx.setNombreApellido(nombreApellido);
         filtroMx.setCodTipoMx(codTipoMx);
+        filtroMx.setCodTipoSolicitud(codTipoSolicitud);
+        filtroMx.setNombreSolicitud(nombreSolicitud);
         filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las recepcionadas en laboratorio
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
+        filtroMx.setExamenResultado(examenResultado);
 
         return filtroMx;
     }
@@ -234,16 +252,22 @@ public class ResultadosController {
                 } else {
                     map.put("persona", " ");
                 }
+
+                if(!resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen()).isEmpty()){
+                    map.put("resultadoExamen", "Si");
+                }else{
+                    map.put("resultadoExamen", "No");
+                }
             }
             else{
                 map.put("idTomaMx", orden.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
                 map.put("codigoUnicoMx", orden.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx());
                 map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("tipoDx", orden.getSolicitudEstudio().getTipoEstudio().getNombre());
-                map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-                map.put("codSilais", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+              //  map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+               // map.put("codSilais", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
                 map.put("codUnidadSalud", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-                map.put("tipoMuestra", orden.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
+              //  map.put("tipoMuestra", orden.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
                 //Si hay fecha de inicio de sintomas se muestra
                 Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getIdNotificacion());
                 if (fechaInicioSintomas != null)
@@ -263,6 +287,12 @@ public class ResultadosController {
                     map.put("persona", nombreCompleto);
                 } else {
                     map.put("persona", " ");
+                }
+
+                if(!resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen()).isEmpty()){
+                    map.put("resultadoExamen", "Si");
+                }else{
+                    map.put("resultadoExamen", "No");
                 }
             }
             mapResponse.put(indice, map);
@@ -341,6 +371,7 @@ public class ResultadosController {
         String strRespuestas="";
         String idOrdenExamen="";
         Integer cantRespuestas=0;
+        boolean examenAgregado= false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -371,9 +402,16 @@ public class ResultadosController {
                 if (resultadoRegistrado!=null){
                     detalleResultado.setIdDetalle(resultadoRegistrado.getIdDetalle());
                     resultadosService.updateDetalleResultado(detalleResultado);
+                  if(addTestVA(request, ordenExamen) ){
+                      examenAgregado = true;
+                  }
+
                 }else {
                     if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty()) {
                         resultadosService.addDetalleResultado(detalleResultado);
+                        if(addTestVA(request, ordenExamen) ){
+                            examenAgregado = true;
+                        }
                     }
                 }
             }
@@ -388,6 +426,7 @@ public class ResultadosController {
             map.put("idOrdenExamen",idOrdenExamen);
             map.put("strRespuestas",strRespuestas);
             map.put("mensaje",resultado);
+            map.put("examenAgregado", String.valueOf(examenAgregado));
             map.put("cantRespuestas",cantRespuestas.toString());
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
@@ -436,5 +475,90 @@ public class ResultadosController {
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
+    }
+
+    protected boolean addTestVA(HttpServletRequest request, OrdenExamen orden) throws Exception {
+        boolean examenAgregado = false;
+        String gravedad = null;
+
+        //si es un estudio
+        if (orden.getSolicitudEstudio() != null) {
+            //Comprobar si el examen es de Estudio de Cohorte
+            if (orden.getSolicitudEstudio().getTipoEstudio().getIdEstudio().equals(1)) {
+                //si es categoria aguda
+                String codigo = orden.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx();
+                if (codigo.contains("."))
+                    gravedad = codigo.substring(codigo.lastIndexOf(".") + 1);
+                if (gravedad != null) {
+                    if (gravedad.equals("1")) {
+                        //si es dengue PCR
+                        if (orden.getCodExamen().getNombre().equals("Dengue PCR")) {
+                            //validar q no exista la orden de examen de Aislamiento Viral de Dengue
+                            if(ordenExamenMxService.getOrdExamenNoAnulByIdMxIdEstIdExamen(orden.getSolicitudEstudio().getIdTomaMx().getIdTomaMx(), orden.getSolicitudEstudio().getTipoEstudio().getIdEstudio(), 239).size() <= 0){
+                                //Buscar los resultados por el idOrdenExamen
+                                List<DetalleResultado> resultado = resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen());
+                                long idUsuario = seguridadService.obtenerIdUsuario(request);
+                                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+                                for (DetalleResultado res : resultado) {
+                                    Integer dias = DateUtil.CalcularDiferenciaDiasFechas(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), new Date());
+                                    //en caso de ser la respuesta tipo texto buscar texto positivo
+                                    if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                                        if (res.getValor().toLowerCase().equals("positivo")) {
+                                            //si la mx es menor a tres dias realizar examen aislamiento viral
+                                            if (dias <= 3) {
+                                                //agregar el examen aislamiento viral
+                                                OrdenExamen ordenExamen = new OrdenExamen();
+                                                ordenExamen.setSolicitudEstudio(orden.getSolicitudEstudio());
+                                                CatalogoExamenes examen = examenesService.getExamenById(239);
+                                                ordenExamen.setCodExamen(examen);
+                                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                ordenExamen.setUsarioRegistro(usuario);
+                                                try {
+                                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                    examenAgregado = true;
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                    logger.error("Error al agregar orden de examen", ex);
+                                                }
+                                            }
+                                        }
+
+                                    } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                        Integer idLista = Integer.valueOf(res.getValor());
+                                        Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                                        if (valor.getValor().toLowerCase().equals("positivo")) {
+                                            if (dias <= 3) {
+                                                //agregar examen aislamiento viral
+                                                OrdenExamen ordenExamen = new OrdenExamen();
+                                                ordenExamen.setSolicitudEstudio(orden.getSolicitudEstudio());
+                                                CatalogoExamenes examen = examenesService.getExamenById(239);
+                                                ordenExamen.setCodExamen(examen);
+                                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                ordenExamen.setUsarioRegistro(usuario);
+                                                try {
+                                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                    examenAgregado = true;
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                    logger.error("Error al agregar orden de examen", ex);
+                                                }
+                                            }
+                                        }
+
+
+                                    }
+
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        return examenAgregado;
     }
 }

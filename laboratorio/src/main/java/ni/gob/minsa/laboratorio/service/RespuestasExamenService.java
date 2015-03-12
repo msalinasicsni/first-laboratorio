@@ -107,4 +107,12 @@ public class RespuestasExamenService {
 
         return q.list();
     }
+
+    public Catalogo_Lista getCatalogoListaConceptoByIdLista(Integer idLista) throws Exception {
+        String query = "Select c from Catalogo_Lista as c where c.pasivo = false and c.idCatalogoLista =:idLista";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idLista",idLista);
+        return (Catalogo_Lista) q.uniqueResult();
+    }
 }

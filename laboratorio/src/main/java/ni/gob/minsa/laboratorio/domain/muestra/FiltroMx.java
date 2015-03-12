@@ -23,6 +23,7 @@ public class FiltroMx {
     String dx;
     String codTipoSolicitud;
     String nombreSolicitud;
+    String examenResultado;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -135,4 +136,8 @@ public class FiltroMx {
     public String getNombreSolicitud() { return nombreSolicitud; }
 
     public void setNombreSolicitud(String nombreSolicitud) { this.nombreSolicitud = nombreSolicitud; }
+
+    public String getExamenResultado() { return examenResultado; }
+
+    public void setExamenResultado(String examenResultado) { this.examenResultado = examenResultado; }
 }
