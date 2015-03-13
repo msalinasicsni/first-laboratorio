@@ -149,5 +149,12 @@ public class ResultadosService {
         return  (DetalleResultado)q.uniqueResult();
     }
 
+    public List<DetalleResultado> getDetallesResultadoFinalActivosByExamen(String idOrdenExamen){
+        String query = "select a from DetalleResultado as a inner join a.examen as r where a.pasivo = false and a.RFinal = true and r.idOrdenExamen = :idOrdenExamen ";
 
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idOrdenExamen", idOrdenExamen);
+        return  q.list();
+    }
 }

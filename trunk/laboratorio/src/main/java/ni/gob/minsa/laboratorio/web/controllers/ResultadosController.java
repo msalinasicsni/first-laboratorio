@@ -134,14 +134,26 @@ public class ResultadosController {
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(strIdOrdenExamen);
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             Date fechaInicioSintomas = null;
+            String idTomaMx = "";
+            String idSolicitud = "";
+            boolean solicitarResFinal = false;
             if (ordenExamen.getSolicitudDx()!=null) {
               fechaInicioSintomas =  tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                idTomaMx = ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx();
+                idSolicitud = ordenExamen.getSolicitudDx().getIdSolicitudDx();
             }else {
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                idTomaMx = ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx();
+                idSolicitud = ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
             }
+            //sólo si aún no tiene resultado final
+            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0 && resultadosService.getDetallesResultadoFinalActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0)
+                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1;
+
             mav.addObject("ordenExamen", ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
+            mav.addObject("solicitarResFinal",solicitarResFinal);
             mav.setViewName("resultados/incomeResult");
         }else
             mav.setViewName(urlValidacion);
@@ -376,16 +388,17 @@ public class ResultadosController {
         String idOrdenExamen="";
         Integer cantRespuestas=0;
         boolean examenAgregado= false;
-        Boolean solicitarResFinal = false;
+        String esResFinal="";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
-            Boolean validarResultadoFinal = false;
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             strRespuestas = jsonpObject.get("strRespuestas").toString();
             idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
             cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
+            esResFinal = jsonpObject.get("esResFinal").getAsString();
+
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
@@ -404,9 +417,16 @@ public class ResultadosController {
                 detalleResultado.setRespuesta(conceptoTmp);
                 detalleResultado.setExamen(ordenExamen);
                 detalleResultado.setUsuarioRegistro(usuario);
+                if(esResFinal.equalsIgnoreCase("SI")){
+                    detalleResultado.setRFinal(true);
+                }else if (esResFinal.equalsIgnoreCase("NO")){
+                    detalleResultado.setRFinal(false);
+                }
                 DetalleResultado resultadoRegistrado = resultadosService.getDetalleResultadoByOrdenExamanAndRespuesta(idOrdenExamen,idRespuesta);
                 if (resultadoRegistrado!=null){
                     detalleResultado.setIdDetalle(resultadoRegistrado.getIdDetalle());
+                    if(esResFinal.equalsIgnoreCase("NP"))//si no se pregunto por examen final, entonces no actualizar valor
+                        detalleResultado.setRFinal(resultadoRegistrado.isRFinal());
                     resultadosService.updateDetalleResultado(detalleResultado);
                   if(addTestVA(request, ordenExamen) ){
                       examenAgregado = true;
@@ -420,26 +440,7 @@ public class ResultadosController {
                         }
                     }
                 }
-                validarResultadoFinal = true;
             }
-
-            //se valida si la muestra sólo tiene una orden de examen.. para enviar confirmación si desesa registrar el resultado como resultado final
-            if (validarResultadoFinal) {
-                String idTomaMx = "";
-                String idSolicitud = "";
-                if (ordenExamen.getSolicitudDx() != null) {
-                    idTomaMx = ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx();
-                    idSolicitud = ordenExamen.getSolicitudDx().getIdSolicitudDx();
-                }
-                if (ordenExamen.getSolicitudEstudio() != null){
-                    idTomaMx = ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx();
-                    idSolicitud = ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
-                }
-                //sólo si aún no tiene resultado final
-                if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
-                    solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1;
-            }
-
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
@@ -453,7 +454,7 @@ public class ResultadosController {
             map.put("mensaje",resultado);
             map.put("examenAgregado", String.valueOf(examenAgregado));
             map.put("cantRespuestas",cantRespuestas.toString());
-            map.put("solicitarResFinal",String.valueOf(solicitarResFinal));
+            map.put("esResFinal",esResFinal);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

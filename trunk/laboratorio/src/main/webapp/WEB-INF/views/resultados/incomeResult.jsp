@@ -121,6 +121,7 @@
                                     <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
                                     <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.final.result.confirm.content"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
+                                    <input id="solicitar_resultado" type="hidden" value="${solicitarResFinal}"/>
                                     <form id="addResult-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                             <div class="row">
@@ -562,8 +563,7 @@
                 sListasUrl : "${sListasUrl}",
                 sEsIngreso : 'true',
                 sDetResultadosUrl : "${sDetResultadosUrl}",
-                sOverrideResult : "${sOverrideResult}",
-                sSaveFinalResult : "${sSaveFinalResult}"
+                sOverrideResult : "${sOverrideResult}"
             };
             IncomeResult.init(parametros);
             handleInputMasks();
