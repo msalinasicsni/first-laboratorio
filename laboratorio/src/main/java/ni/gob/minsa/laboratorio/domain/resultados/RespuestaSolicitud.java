@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.domain.resultados;
 
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.LazyCollection;
@@ -14,12 +15,13 @@ import java.sql.Timestamp;
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "respuesta_dx", schema = "laboratorio")
-public class RespuestaDx implements Serializable{
+@Table(name = "respuesta_solicitud", schema = "laboratorio")
+public class RespuestaSolicitud implements Serializable{
 
     Integer idRespuesta;
     String nombre;
     Catalogo_Dx diagnostico;
+    Catalogo_Estudio estudio;
     Concepto concepto;
     Integer orden;
     boolean requerido;
@@ -54,13 +56,20 @@ public class RespuestaDx implements Serializable{
 
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "DIAGNOSTICO", referencedColumnName = "ID_DIAGNOSTICO", nullable = false)
     @ForeignKey(name = "ID_DX_FK")
     public Catalogo_Dx getDiagnostico() { return diagnostico; }
 
     public void setDiagnostico(Catalogo_Dx diagnostico) { this.diagnostico = diagnostico; }
 
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "ESTUDIO", referencedColumnName = "ID_ESTUDIO", nullable = false)
+    @ForeignKey(name = "ID_EST_FK")
+    public Catalogo_Estudio getEstudio() { return estudio; }
+
+    public void setEstudio(Catalogo_Estudio estudio) { this.estudio = estudio; }
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)

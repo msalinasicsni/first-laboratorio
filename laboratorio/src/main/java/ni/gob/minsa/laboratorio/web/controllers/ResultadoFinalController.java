@@ -8,7 +8,7 @@ import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
-import ni.gob.minsa.laboratorio.domain.resultados.RespuestaDx;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -326,7 +326,7 @@ public class ResultadoFinalController {
                 String respuesta = jObjectRespuestas.get(String.valueOf(i)).toString();
                 JsonObject jsRespuestaObject = new Gson().fromJson(respuesta, JsonObject.class);
                 Integer idRespuesta = jsRespuestaObject.get("idRespuesta").getAsInt();
-                RespuestaDx conceptoTmp =  respuestasDxService.getRespuestaDxById(idRespuesta);
+                RespuestaSolicitud conceptoTmp =  respuestasDxService.getRespuestaDxById(idRespuesta);
                 String valor = jsRespuestaObject.get("valor").getAsString();
                 DetalleResultadoFinal detResFinal = new DetalleResultadoFinal();
                 detResFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
