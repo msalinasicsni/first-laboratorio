@@ -332,7 +332,7 @@ public class ResultadoFinalController {
                 detResFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
                 detResFinal.setValor(valor);
                 detResFinal.setRespuesta(conceptoTmp);
-                detResFinal.setSolicitud(solicitud);
+                detResFinal.setSolicitudDx(solicitud);
                 detResFinal.setUsuarioRegistro(usuario);
                 DetalleResultadoFinal resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuesta(idSolicitud,idRespuesta);
                 if (resFinalRegistrado!=null){
@@ -383,7 +383,7 @@ public class ResultadoFinalController {
             List<DetalleResultadoFinal> detResFinalActivos =  resultadoFinalService.getDetResActivosBySolicitud(idSolicitud);
             for(DetalleResultadoFinal detResFinal : detResFinalActivos) {
                 detResFinal.setFechahAnulacion(new Timestamp(new Date().getTime()));
-                detResFinal.setSolicitud(soli);
+                detResFinal.setSolicitudDx(soli);
                 detResFinal.setUsuarioAnulacion(usuario);
                 detResFinal.setRazonAnulacion(causaAnulacion);
                 detResFinal.setPasivo(true);
