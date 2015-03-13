@@ -2,7 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.RespuestaDx;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -44,8 +44,8 @@ public class RespuestasDxService {
         return dxs;
     }
 
-    public List<RespuestaDx> getRespuestasByDx(Integer idDx){
-        String query = "from RespuestaDx as a where a.diagnostico.idDiagnostico = :idDx order by orden asc";
+    public List<RespuestaSolicitud> getRespuestasByDx(Integer idDx){
+        String query = "from RespuestaSolicitud as a where a.diagnostico.idDiagnostico = :idDx order by orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -53,12 +53,12 @@ public class RespuestasDxService {
         return q.list();
     }
 
-    public RespuestaDx getRespuestaDxById(Integer idRespuesta){
-        String query = "from RespuestaDx as a where idRespuesta =:idRespuesta";
+    public RespuestaSolicitud getRespuestaDxById(Integer idRespuesta){
+        String query = "from RespuestaSolicitud as a where idRespuesta =:idRespuesta";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idRespuesta", idRespuesta);
-        return (RespuestaDx)q.uniqueResult();
+        return (RespuestaSolicitud)q.uniqueResult();
     }
 
     /**
@@ -66,7 +66,7 @@ public class RespuestasDxService {
      * @param dto Objeto a actualizar
      * @throws Exception
      */
-    public void saveOrUpdateResponse(RespuestaDx dto) throws Exception {
+    public void saveOrUpdateResponse(RespuestaSolicitud dto) throws Exception {
         try {
             if (dto != null) {
                 Session session = sessionFactory.getCurrentSession();
@@ -81,7 +81,7 @@ public class RespuestasDxService {
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdDx(Integer idDx) throws Exception {
-        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaDx as r inner join r.concepto tdc " +
+        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaSolicitud as r inner join r.concepto tdc " +
                 "where a.pasivo = false and tdl.idConcepto = tdc.idConcepto and r.diagnostico.idDiagnostico =:idDx" +
                 " order by  a.valor";
         Session session = sessionFactory.getCurrentSession();
@@ -90,8 +90,8 @@ public class RespuestasDxService {
         return q.list();
     }
 
-    public List<RespuestaDx> getRespuestasActivasByDx(Integer idDx){
-        String query = "from RespuestaDx as a where a.diagnostico.idDiagnostico = :idDx and pasivo = false order by orden asc";
+    public List<RespuestaSolicitud> getRespuestasActivasByDx(Integer idDx){
+        String query = "from RespuestaSolicitud as a where a.diagnostico.idDiagnostico = :idDx and pasivo = false order by orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);

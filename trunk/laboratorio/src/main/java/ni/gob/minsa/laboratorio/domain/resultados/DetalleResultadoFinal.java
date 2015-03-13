@@ -22,7 +22,8 @@ public class DetalleResultadoFinal implements Serializable{
     String idDetalle;
     String valor;
     DaSolicitudDx solicitudDx;
-    RespuestaDx respuesta;
+    RespuestaSolicitud respuesta;
+    RespuestaExamen respuestaExamen;
     Usuarios usuarioRegistro;
     Timestamp fechahRegistro;
     boolean pasivo;
@@ -30,6 +31,7 @@ public class DetalleResultadoFinal implements Serializable{
     Usuarios usuarioAnulacion;
     Timestamp fechahAnulacion;
     DaSolicitudEstudio solicitudEstudio;
+
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -98,12 +100,25 @@ public class DetalleResultadoFinal implements Serializable{
     public void setSolicitudDx(DaSolicitudDx solicitud) { this.solicitudDx = solicitud; }
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "RESPUESTA", referencedColumnName = "ID_RESPUESTA", nullable = false)
     @ForeignKey(name = "RESP_FK")
-    public RespuestaDx getRespuesta() { return respuesta; }
+    public RespuestaSolicitud getRespuesta() { return respuesta; }
 
-    public void setRespuesta(RespuestaDx respuesta) { this.respuesta = respuesta; }
+    public void setRespuesta(RespuestaSolicitud respuesta) { this.respuesta = respuesta; }
+
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "RESPUESTA_EXAMEN", referencedColumnName = "ID_RESPUESTA", nullable = false)
+    @ForeignKey(name = "RESPEX_FK")
+    public RespuestaExamen getRespuestaExamen() {
+        return respuestaExamen;
+    }
+
+    public void setRespuestaExamen(RespuestaExamen respuestaExamen) {
+        this.respuestaExamen = respuestaExamen;
+    }
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "USUARIO_ID")
