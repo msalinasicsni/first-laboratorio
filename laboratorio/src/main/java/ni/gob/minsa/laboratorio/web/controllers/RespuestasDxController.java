@@ -7,14 +7,13 @@ import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Concepto;
-import ni.gob.minsa.laboratorio.domain.resultados.RespuestaDx;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -149,7 +148,7 @@ public class RespuestasDxController {
     @RequestMapping(value = "getRespuestasDx", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<RespuestaDx> getRespuestasDx(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
+    List<RespuestaSolicitud> getRespuestasDx(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
         logger.info("Obteniendo las respuestas de un diagnostico en JSON");
         return respuestasDxService.getRespuestasByDx(Integer.valueOf(idDx));
     }
@@ -157,7 +156,7 @@ public class RespuestasDxController {
     @RequestMapping(value = "getRespuestaDxById", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    RespuestaDx getRespuestaById(@RequestParam(value = "idRespuesta", required = true) Integer idRespuesta) throws Exception {
+    RespuestaSolicitud getRespuestaById(@RequestParam(value = "idRespuesta", required = true) Integer idRespuesta) throws Exception {
         logger.info("Obteniendo respuesta dx en JSON");
         return respuestasDxService.getRespuestaDxById(idRespuesta);
     }
@@ -175,7 +174,7 @@ public class RespuestasDxController {
             strRespuesta = jsonpObject.get("respuesta").toString();
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
-            RespuestaDx respuesta = jsonToRespuesta(strRespuesta);
+            RespuestaSolicitud respuesta = jsonToRespuesta(strRespuesta);
             respuesta.setUsuarioRegistro(usuario);
             respuestasDxService.saveOrUpdateResponse(respuesta);
 
@@ -196,8 +195,8 @@ public class RespuestasDxController {
     }
 
 
-    private RespuestaDx jsonToRespuesta(String jsonRespuesta) throws Exception {
-        RespuestaDx respuestaDx = new RespuestaDx();
+    private RespuestaSolicitud jsonToRespuesta(String jsonRespuesta) throws Exception {
+        RespuestaSolicitud respuestaDx = new RespuestaSolicitud();
         JsonObject jsonpObject = new Gson().fromJson(jsonRespuesta, JsonObject.class);
         //si hay idConcepto se obtiene registro para actualizar, luego si vienen los demas datos se actualizan
         if (jsonpObject.get("idRespuesta")!=null && !jsonpObject.get("idRespuesta").getAsString().isEmpty()) {
@@ -239,7 +238,7 @@ public class RespuestasDxController {
 
     @RequestMapping(value = "getRespuestasActivasDx", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<RespuestaDx> getRespuestasActivasDx(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
+    List<RespuestaSolicitud> getRespuestasActivasDx(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
         logger.info("Obteniendo las respuestas activas de dx en JSON");
         return respuestasDxService.getRespuestasActivasByDx(Integer.valueOf(idDx));
     }
