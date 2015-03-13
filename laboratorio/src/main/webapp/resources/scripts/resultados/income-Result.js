@@ -221,71 +221,37 @@ var IncomeResult = function () {
                         objResultado["strRespuestas"] = objDetalle;
                         objResultado["mensaje"] = '';
                         objResultado["cantRespuestas"] = cantRespuestas;
-                        objResultado["solicitarResFinal"] = '';
                         objResultado["examenAgregado"] = '';
-                        console.log(objDetalle);
-                        var objResultadoFinal = {};
-                        objResultadoFinal["idSolicitud"] = $("#idSolicitud").val();
-                        objResultadoFinal["strRespuestas"] = objDetalle;
-                        objResultadoFinal["mensaje"] = '';
-                        objResultadoFinal["cantRespuestas"] = cantRespuestas;
-                        
-                        $.ajax(
-                            {
-                                url: parametros.sSaveResult,
-                                type: 'POST',
-                                dataType: 'json',
-                                data: JSON.stringify(objResultado),
-                                contentType: 'application/json',
-                                mimeType: 'application/json',
-                                async: false,
-                                success: function (data) {
-                                    if (data.mensaje.length > 0){
-                                        $.smallBox({
-                                            title: data.mensaje ,
-                                            content: $("#smallBox_content").val(),
-                                            color: "#C46A69",
-                                            iconSmall: "fa fa-warning",
-                                            timeout: 4000
-                                        });
-                                    }else{
-                                        var msg = $("#msg_result_added").val();
-                                        $.smallBox({
-                                            title: msg ,
-                                            content: $("#smallBox_content").val(),
-                                            color: "#739E73",
-                                            iconSmall: "fa fa-success",
-                                            timeout: 4000
-                                        });
-
-                                        if(data.examenAgregado == "true"){
-                                            var msg = $("#msg_test_added").val();
-                                            $.smallBox({
-                                                title: msg ,
-                                                content: $("#smallBox_content").val(),
-                                                color: "#739E73",
-                                                iconSmall: "fa fa-success",
-                                                timeout: 4000
-                                            });
-                                        }
-
-                                        limpiarDatosRecepcion();
-                                        setTimeout(function () {window.location.href = parametros.sAlicuotasUrl},3000);
-                                        console.log("data.solicitarResFinal: "+data.solicitarResFinal);
-                                        if (data.solicitarResFinal == 'true'){
-                                            solicitarResultadoFinal(objResultadoFinal);
-                                        }else{
-                                            limpiarDatosRecepcion();
-                                            setTimeout(function () {window.location.href = parametros.sResultadosUrl},3000);
-                                        }
-                                    }
-                                    desbloquearUI();
-                                },
-                                error: function (data, status, er) {
-                                    desbloquearUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                        if ($("#solicitar_resultado").val()=='true'){
+                            desbloquearUI();
+                            var opcSi = $("#confirm_msg_opc_yes").val();
+                            var opcNo = $("#confirm_msg_opc_no").val();
+                            $.SmartMessageBox({
+                                title: $("#msg_confirm_title").val(),
+                                content: $("#msg_confirm_content").val(),
+                                buttons: '['+opcSi+']['+opcNo+']'
+                            }, function (ButtonPressed) {
+                                if (ButtonPressed === opcSi) {
+                                    objResultado["esResFinal"] = 'SI';
+                                    ajaxGuardarResultado(objResultado);
                                 }
-                            });
+                                if (ButtonPressed === opcNo) {
+                                    objResultado["esResFinal"] = 'NO';
+                                    $.smallBox({
+                                        title: $("#msg_result_final_cancel").val(),
+                                        content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                        color: "#3276B1",
+                                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                        timeout: 3000
+                                    });
+                                    ajaxGuardarResultado(objResultado);
+                                }
+                        });
+                        }else{
+                            objResultado["esResFinal"] = 'NP'; //no se preguntó
+                            ajaxGuardarResultado(objResultado);
+                        }
+                        bloquearUI(parametros.blockMess);
                     }else{
                         desbloquearUI();
                         $.smallBox({
@@ -311,68 +277,56 @@ var IncomeResult = function () {
                 getAlicuotas(true);
             });
 
+            function ajaxGuardarResultado(objResultado){
+                $.ajax(
+                    {
+                        url: parametros.sSaveResult,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(objResultado),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        async: false,
+                        success: function (data) {
+                            desbloquearUI();
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else{
+                                desbloquearUI();
+                                var msg = $("#msg_result_added").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
 
-            function solicitarResultadoFinal (objResultadoFinal){
-                var opcSi = $("#confirm_msg_opc_yes").val();
-                var opcNo = $("#confirm_msg_opc_no").val();
-                desbloquearUI();
-                $.SmartMessageBox({
-                    title: $("#msg_confirm_title").val(),
-                    content: $("#msg_confirm_content").val(),
-                    buttons: '['+opcSi+']['+opcNo+']'
-                }, function (ButtonPressed) {
-                    if (ButtonPressed === opcSi) {
-                        bloquearUI(parametros.blockMess);
-                        $.ajax(
-                            {
-                                url: parametros.sSaveFinalResult,
-                                type: 'POST',
-                                dataType: 'json',
-                                data: JSON.stringify(objResultadoFinal),
-                                contentType: 'application/json',
-                                mimeType: 'application/json',
-                                async: false,
-                                success: function (data) {
-                                    if (data.mensaje.length > 0){
-                                        $.smallBox({
-                                            title: data.mensaje ,
-                                            content: $("#smallBox_content").val(),
-                                            color: "#C46A69",
-                                            iconSmall: "fa fa-warning",
-                                            timeout: 4000
-                                        });
-                                    }else{
-                                        var msg = $("#msg_result_added").val();
-                                        $.smallBox({
-                                            title: msg ,
-                                            content: $("#smallBox_content").val(),
-                                            color: "#739E73",
-                                            iconSmall: "fa fa-success",
-                                            timeout: 4000
-                                        });
-                                        desbloquearUI();
-                                        limpiarDatosRecepcion();
-                                        setTimeout(function () {window.location.href = parametros.sResultadosUrl},3000);
-                                    }
-                                },
-                                error: function (data, status, er) {
-                                    desbloquearUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                if(data.examenAgregado == "true"){
+                                    msg = $("#msg_test_added").val();
+                                    $.smallBox({
+                                        title: msg ,
+                                        content: $("#smallBox_content").val(),
+                                        color: "#739E73",
+                                        iconSmall: "fa fa-success",
+                                        timeout: 4000
+                                    });
                                 }
-                            });
-                    }
-                    if (ButtonPressed === opcNo) {
-                        desbloquearUI();
-                        $.smallBox({
-                            title: $("#msg_result_final_cancel").val(),
-                            content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                            color: "#C46A69",
-                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
-                            timeout: 4000
-                        });
-
-                    }
-                });
+                                limpiarDatosRecepcion();
+                                setTimeout(function () {window.location.href = parametros.sResultadosUrl},3000);
+                            }
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
             }
 
             function limpiarDatosRecepcion(){
@@ -653,6 +607,7 @@ var IncomeResult = function () {
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
+                            desbloquearUI();
                             if (data.mensaje.length > 0){
                                 $.smallBox({
                                     title: data.mensaje ,
@@ -673,7 +628,6 @@ var IncomeResult = function () {
                                 $("#causaAnulacion").val("");
                                 fillRespuestasExamen();
                             }
-                            desbloquearUI();
                         },
                         error: function (data, status, er) {
                             desbloquearUI();
