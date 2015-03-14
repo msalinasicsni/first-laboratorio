@@ -197,6 +197,32 @@ public class ResultadoFinalService {
     }
 
     /**
+     * Verifica si existe registrado un resultado para la respuesta y dx indicado, siempre y cuando el registro este activo
+     * @param idSolicitud solicitud a verificar
+     * @param idRespuesta respuesta a verificar
+     * @return DetalleResultadoFinal
+     */
+    public DetalleResultadoFinal getDetResBySolicitudAndRespuestaExa(String idSolicitud, int idRespuesta){
+        DetalleResultadoFinal resultadoFinal;
+        Session session = sessionFactory.getCurrentSession();
+        String query = "Select a from DetalleResultadoFinal as a inner join a.solicitudDx as ex inner join a.respuestaExamen as re " +
+                "where ex.idSolicitudDx = :idSolicitud and re.idRespuesta = :idRespuesta and a.pasivo = false ";
+        Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
+        q.setParameter("idRespuesta", idRespuesta);
+        resultadoFinal = (DetalleResultadoFinal)q.uniqueResult();
+        if (resultadoFinal==null) {
+            String query2 = "Select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as ex inner join a.respuestaExamen as re " +
+                    "where ex.idSolicitudEstudio = :idSolicitud and re.idRespuesta = :idRespuesta and a.pasivo = false ";
+            Query q2 = session.createQuery(query2);
+            q2.setParameter("idSolicitud", idSolicitud);
+            q2.setParameter("idRespuesta", idRespuesta);
+            resultadoFinal = (DetalleResultadoFinal)q2.uniqueResult();
+        }
+        return  resultadoFinal;
+    }
+
+    /**
      * Actualiza un Registro de detalle de resultado final
      *
      * @param dto Objeto a agregar o actualizar

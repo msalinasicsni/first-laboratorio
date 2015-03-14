@@ -28,7 +28,6 @@ public class DetalleResultado implements Serializable {
     String razonAnulacion;
     Usuarios usuarioAnulacion;
     Timestamp fechahAnulacion;
-    boolean rFinal;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -136,15 +135,5 @@ public class DetalleResultado implements Serializable {
 
     public void setUsuarioAnulacion(Usuarios usuarioAnulacion) {
         this.usuarioAnulacion = usuarioAnulacion;
-    }
-
-    @Basic
-    @Column(name = "FINAL", nullable = true, insertable = true, updatable = true)
-    public boolean isRFinal() {
-        return rFinal;
-    }
-
-    public void setRFinal(boolean esFinal) {
-        this.rFinal = esFinal;
     }
 }
