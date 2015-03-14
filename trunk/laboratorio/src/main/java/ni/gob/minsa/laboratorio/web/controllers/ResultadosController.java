@@ -7,6 +7,7 @@ import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.service.*;
@@ -147,8 +148,9 @@ public class ResultadosController {
                 idSolicitud = ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
             }
             //sólo si aún no tiene resultado final
-            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0 && resultadosService.getDetallesResultadoFinalActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0)
-                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1;
+            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
+                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
+                        && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0; //y no tiene resultados el examen
 
             mav.addObject("ordenExamen", ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
@@ -417,26 +419,23 @@ public class ResultadosController {
                 detalleResultado.setRespuesta(conceptoTmp);
                 detalleResultado.setExamen(ordenExamen);
                 detalleResultado.setUsuarioRegistro(usuario);
-                if(esResFinal.equalsIgnoreCase("SI")){
-                    detalleResultado.setRFinal(true);
-                }else if (esResFinal.equalsIgnoreCase("NO")){
-                    detalleResultado.setRFinal(false);
-                }
+
                 DetalleResultado resultadoRegistrado = resultadosService.getDetalleResultadoByOrdenExamanAndRespuesta(idOrdenExamen,idRespuesta);
                 if (resultadoRegistrado!=null){
                     detalleResultado.setIdDetalle(resultadoRegistrado.getIdDetalle());
-                    if(esResFinal.equalsIgnoreCase("NP"))//si no se pregunto por examen final, entonces no actualizar valor
-                        detalleResultado.setRFinal(resultadoRegistrado.isRFinal());
                     resultadosService.updateDetalleResultado(detalleResultado);
                   if(addTestVA(request, ordenExamen) ){
                       examenAgregado = true;
                   }
-
+                    guardarResultadoFinal(detalleResultado,ordenExamen,true);
                 }else {
                     if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty()) {
                         resultadosService.addDetalleResultado(detalleResultado);
                         if(addTestVA(request, ordenExamen) ){
                             examenAgregado = true;
+                        }
+                        if(esResFinal.equalsIgnoreCase("SI")){
+                            guardarResultadoFinal(detalleResultado,ordenExamen,false);
                         }
                     }
                 }
@@ -461,12 +460,46 @@ public class ResultadosController {
         }
     }
 
+    private void guardarResultadoFinal(DetalleResultado detalleResultado, OrdenExamen ordenExamen, boolean esUpdate) throws Exception {
+        try {
+            String idSolicitud="";
+            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+            resultadoFinal.setValor(detalleResultado.getValor());
+            resultadoFinal.setRespuestaExamen(detalleResultado.getRespuesta());
+            if (ordenExamen.getSolicitudDx()!=null){
+                resultadoFinal.setSolicitudDx(ordenExamen.getSolicitudDx());
+                idSolicitud = ordenExamen.getSolicitudDx().getIdSolicitudDx();
+            }
+            if (ordenExamen.getSolicitudEstudio()!=null) {
+                resultadoFinal.setSolicitudEstudio(ordenExamen.getSolicitudEstudio());
+                idSolicitud =ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
+            }
+            resultadoFinal.setUsuarioRegistro(detalleResultado.getUsuarioRegistro());
+            DetalleResultadoFinal resFinalRegistrado = null;
+            //si es un update del detalle resultado se valida si la solicitud tiene la misma respuesta final para actualizarla
+            if (esUpdate) resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuestaExa(idSolicitud, detalleResultado.getRespuesta().getIdRespuesta());
+            if (resFinalRegistrado != null) {
+                resultadoFinal.setIdDetalle(resFinalRegistrado.getIdDetalle());
+                resultadoFinalService.updateDetResFinal(resultadoFinal);
+            } else {
+                if (resultadoFinal.getValor() != null && !resultadoFinal.getValor().isEmpty() && !esUpdate) {
+                    resultadoFinalService.saveDetResFinal(resultadoFinal);
+                }
+            }
+        }catch (Exception ex)
+        {
+            throw new Exception(ex);
+        }
+    }
+
     @RequestMapping(value = "overrideResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void overrideResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
         String idOrdenExamen="";
         String causaAnulacion = "";
+        boolean solicitarResFinal = false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -477,6 +510,17 @@ public class ResultadosController {
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+
+            String idTomaMx = "";
+            String idSolicitud = "";
+            if (ordenExamen.getSolicitudDx()!=null) {
+                idTomaMx = ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx();
+                idSolicitud = ordenExamen.getSolicitudDx().getIdSolicitudDx();
+            }else {
+                idTomaMx = ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx();
+                idSolicitud = ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
+            }
+
             //se obtiene datos de los conceptos a registrar
             List<DetalleResultado> detalleResultadosAct = resultadosService.getDetallesResultadoActivosByExamen(idOrdenExamen);
             for(DetalleResultado detalleResultado : detalleResultadosAct) {
@@ -486,7 +530,22 @@ public class ResultadosController {
                 detalleResultado.setRazonAnulacion(causaAnulacion);
                 detalleResultado.setPasivo(true);
                 resultadosService.updateDetalleResultado(detalleResultado);
+                //se valida si la solicitud tiene la misma respuesta final para anularla
+                DetalleResultadoFinal resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuestaExa(idSolicitud, detalleResultado.getRespuesta().getIdRespuesta());
+                if (resFinalRegistrado != null) {
+                    resFinalRegistrado.setRazonAnulacion(detalleResultado.getRazonAnulacion());
+                    resFinalRegistrado.setFechahAnulacion(detalleResultado.getFechahAnulacion());
+                    resFinalRegistrado.setUsuarioAnulacion(detalleResultado.getUsuarioAnulacion());
+                    resFinalRegistrado.setPasivo(true);
+                    resultadoFinalService.updateDetResFinal(resFinalRegistrado);
+                }
             }
+
+            //se determina si luego de anular la respuesta del examen, se debe solicitar resultado final al ingresar nuevo resultado
+            //sólo si aún no tiene resultado final
+            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
+                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
+                        && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0; //y no tiene resultados el examen
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
@@ -498,6 +557,7 @@ public class ResultadosController {
             map.put("idOrdenExamen",idOrdenExamen);
             map.put("causaAnulacion",causaAnulacion);
             map.put("mensaje",resultado);
+            map.put("solicitarResFinal",String.valueOf(solicitarResFinal));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

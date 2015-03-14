@@ -586,6 +586,10 @@ var IncomeResult = function () {
                 });
             }
 
+            function hideModalOverride(){
+                $('#myModal').modal('hide');
+            }
+
             $("#override-result").click(function(){
                 $("#causaAnulacion").val("");
                 showModalOverride();
@@ -597,6 +601,7 @@ var IncomeResult = function () {
                 objResultado["idOrdenExamen"] = $("#idOrdenExamen").val();
                 objResultado["causaAnulacion"] = $("#causaAnulacion").val();
                 objResultado["mensaje"] = '';
+                objResultado["solicitarResFinal"] = '';
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
@@ -618,6 +623,7 @@ var IncomeResult = function () {
                                 });
                             }else{
                                 var msg = $("#msg_result_override").val();
+                                $("#solicitar_resultado").val(data.solicitarResFinal);
                                 $.smallBox({
                                     title: msg ,
                                     content: $("#smallBox_content").val(),
@@ -627,6 +633,7 @@ var IncomeResult = function () {
                                 });
                                 $("#causaAnulacion").val("");
                                 fillRespuestasExamen();
+                                hideModalOverride();
                             }
                         },
                         error: function (data, status, er) {
