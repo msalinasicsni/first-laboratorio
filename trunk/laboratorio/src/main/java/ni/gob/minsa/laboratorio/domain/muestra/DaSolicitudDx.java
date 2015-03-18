@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by souyen-ics on 11-20-14.
@@ -19,7 +20,9 @@ public class DaSolicitudDx {
     private Timestamp fechaHSolicitud;
     private Catalogo_Dx codDx;
     private Usuarios usarioRegistro;
-
+    private Date fechaAprobacion;
+    private Usuarios usuarioAprobacion;
+    private Boolean aprobada;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -76,5 +79,36 @@ public class DaSolicitudDx {
 
     public void setUsarioRegistro(Usuarios usarioRegistro) {
         this.usarioRegistro = usarioRegistro;
+    }
+
+    @Basic
+    @Column(name = "FECHA_APROBACION", nullable = true, insertable = true, updatable = true)
+    public Date getFechaAprobacion() {
+        return fechaAprobacion;
+    }
+
+    public void setFechaAprobacion(Date fechaAprobacion) {
+        this.fechaAprobacion = fechaAprobacion;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "USUARIO_APROBACION", referencedColumnName = "USUARIO_ID")
+    @ForeignKey(name = "USUARIO_APROBACION_FK")
+    public Usuarios getUsuarioAprobacion() {
+        return usuarioAprobacion;
+    }
+
+    public void setUsuarioAprobacion(Usuarios usuarioAprobacion) {
+        this.usuarioAprobacion = usuarioAprobacion;
+    }
+
+    @Basic
+    @Column(name = "APROBADA", nullable = true, insertable = true, updatable = true)
+    public Boolean getAprobada() {
+        return aprobada;
+    }
+
+    public void setAprobada(Boolean aprobada) {
+        this.aprobada = aprobada;
     }
 }

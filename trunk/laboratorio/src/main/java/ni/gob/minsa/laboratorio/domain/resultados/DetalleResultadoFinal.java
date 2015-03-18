@@ -101,7 +101,7 @@ public class DetalleResultadoFinal implements Serializable{
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = true)
-    @JoinColumn(name = "RESPUESTA", referencedColumnName = "ID_RESPUESTA", nullable = false)
+    @JoinColumn(name = "RESPUESTA", referencedColumnName = "ID_RESPUESTA", nullable = true)
     @ForeignKey(name = "RESP_FK")
     public RespuestaSolicitud getRespuesta() { return respuesta; }
 
