@@ -79,9 +79,11 @@
                     <li class="ingresoResultado">
                         <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="menu.result.income" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="menu.result.income" /></a>
                     </li>
-
                     <li class="enterFinalResult">
                         <a href="<spring:url value="/resultadoFinal/init" htmlEscape="true "/>" title="<spring:message code="menu.enter.final.result" />"><i class="fa fa-lg fa-fw fa-file-text-o"></i> <spring:message code="menu.enter.final.result" /></a>
+                    </li>
+                    <li class="approveResult">
+                        <a href="<spring:url value="/aprobacion/init" htmlEscape="true "/>" title="<spring:message code="menu.approval.results" />"><i class="fa fa-lg fa-fw fa-check-circle"></i> <spring:message code="menu.approval.results" /></a>
                     </li>
                 </ul>
             </li>

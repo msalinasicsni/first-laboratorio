@@ -12,15 +12,17 @@
     <http auto-config="true">
         <!-- Restrict URLs based on role -->
         <intercept-url pattern="/login*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
-        <intercept-url pattern="/logoutSuccess*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/logout" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/resources/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/usuarios/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/recepcionMx/init" access="ROLE_RECEPCION" />
-        <intercept-url pattern="/sendMxReceipt/*" access="ROLE_RECEPCION" />
+        <intercept-url pattern="/sendMxReceipt/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/recepcionMx/initLab" access="ROLE_ADMIN,ROLE_LAB" />
-        <intercept-url pattern="/generacionAlicuota/*" access="ROLE_ADMIN,ROLE_LAB" />
-        <intercept-url pattern="/resultados/*" access="ROLE_ADMIN,ROLE_RES" />
-        <intercept-url pattern="/administracion/*" access="ROLE_ADMIN" />
+        <intercept-url pattern="/recepcionMx/createLab/*" access="ROLE_ADMIN,ROLE_LAB" />
+        <intercept-url pattern="/generacionAlicuota/**" access="ROLE_ADMIN,ROLE_LAB" />
+        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_RES" />
+        <intercept-url pattern="/aprobacion/**" access="ROLE_ADMIN,ROLE_RES" />
+        <intercept-url pattern="/administracion/**" access="ROLE_ADMIN" />
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->
         <intercept-url pattern="/" access="ROLE_ADMIN,ROLE_USER" />

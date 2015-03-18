@@ -250,8 +250,8 @@ public class OrdenExamenMxService {
         }
 
         //filtro examen con resultado
-        if(filtro.getExamenResultado() != null){
-            if (filtro.getExamenResultado().equals("Si")){
+        if(filtro.getResultado() != null){
+            if (filtro.getResultado().equals("Si")){
                 crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
                         .createAlias("examen", "ex")
                         .setProjection(Property.forName("ex.idOrdenExamen"))));
@@ -375,8 +375,8 @@ public class OrdenExamenMxService {
            }
 
         //filtro examen con resultado
-        if(filtro.getExamenResultado() != null){
-            if (filtro.getExamenResultado().equals("Si")){
+        if(filtro.getResultado() != null){
+            if (filtro.getResultado().equals("Si")){
                 crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
                         .createAlias("examen", "ex")
                         .setProjection(Property.forName("ex.idOrdenExamen"))));
@@ -403,5 +403,19 @@ public class OrdenExamenMxService {
         q.setParameter("idEstudio",idEstudio);
         q.setParameter("idExamen",idExamen);
         return q.list();
+    }
+
+    public List<OrdenExamen> getOrdenesExamenNoAnuladasByIdSolicitud(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx where sdx.idSolicitudDx =:idSolicitud and oe.anulado = false ");
+        q.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false ");
+        q2.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
     }
 }

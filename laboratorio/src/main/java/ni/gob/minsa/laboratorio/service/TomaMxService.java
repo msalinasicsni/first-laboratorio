@@ -262,6 +262,15 @@ public class TomaMxService {
         return (Catalogo_Dx)q.uniqueResult();
     }
 
+    /**
+     * actualizar solicitud de diagnostico o rutina
+     * @param solicitud objeto a actualizar
+     */
+    public void updateSolicitudDx(DaSolicitudDx solicitud) {
+        Session session = sessionFactory.getCurrentSession();
+        session.update(solicitud);
+    }
+
 /****************************************************************
  * MUESTRAS DE ESTUDIOS
 ******************************************************************/
@@ -310,5 +319,21 @@ public class TomaMxService {
         Query q = session.createQuery(query);
         q.setString("tipoNoti", tipoNoti);
         return q.list();
+    }
+
+    public DaSolicitudEstudio getSolicitudEstByIdSolicitud(String idSolicitud){
+        String query = "from DaSolicitudEstudio where idSolicitudEstudio = :idSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idSolicitud",idSolicitud);
+        return (DaSolicitudEstudio)q.uniqueResult();
+    }
+
+    /**
+     * actualizar solicitud de estudio
+     * @param solicitud objeto a actualizar
+     */
+    public void updateSolicitudEstudio(DaSolicitudEstudio solicitud) {
+        Session session = sessionFactory.getCurrentSession();
+        session.update(solicitud);
     }
 }
