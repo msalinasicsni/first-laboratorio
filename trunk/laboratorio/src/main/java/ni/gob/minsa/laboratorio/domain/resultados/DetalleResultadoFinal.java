@@ -110,7 +110,7 @@ public class DetalleResultadoFinal implements Serializable{
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = true)
-    @JoinColumn(name = "RESPUESTA_EXAMEN", referencedColumnName = "ID_RESPUESTA", nullable = false)
+    @JoinColumn(name = "RESPUESTA_EXAMEN", referencedColumnName = "ID_RESPUESTA", nullable = true)
     @ForeignKey(name = "RESPEX_FK")
     public RespuestaExamen getRespuestaExamen() {
         return respuestaExamen;

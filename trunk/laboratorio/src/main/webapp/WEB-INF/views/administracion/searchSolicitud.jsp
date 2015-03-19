@@ -39,7 +39,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/respuestasDx/init" htmlEscape="true "/>"><spring:message code="menu.admin.diagnostic.aswers" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/respuestasDx/init" htmlEscape="true "/>"><spring:message code="menu.admin.request.aswers" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -54,7 +54,7 @@
             <h1 class="page-title txt-color-blueDark">
                 <!-- PAGE HEADER -->
                 <i class="fa-fw fa fa-list-alt"></i>
-                <spring:message code="menu.admin.diagnostic.aswers" />
+                <spring:message code="menu.admin.request.aswers" />
 						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.diagnostic.search" />
 						</span>
@@ -118,14 +118,28 @@
                             <form id="search-form" class="smart-form" autocomplete="off">
                                 <fieldset>
                                     <div class="row">
-                                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                                        <section class="col col-sm-12 col-md-7 col-lg-3">
                                             <label class="text-left txt-color-blue font-md">
-                                                <spring:message code="lbl.diagnostic.name"/>
+                                                <spring:message code="lbl.request.type" /> </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                <select id="tipo" name="tipo"
+                                                        class="select2">
+                                                    <option value=""><spring:message code="lbl.select" />...</option>
+                                                    <option value="Estudio"><spring:message code="lbl.study" /></option>
+                                                    <option value="Rutina"><spring:message code="lbl.routine" /></option>
+                                                </select>
+                                            </div>
+                                        </section>
+
+                                        <section class="col col-sm-12 col-md-12 col-lg-5">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <spring:message code="lbl.desc.request"/>
                                             </label>
                                             <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i
                                                     class="icon-append fa fa-sort-alpha-asc"></i>
-                                                <input type="text" id="nombreDx" name="nombreDx"
-                                                       placeholder="<spring:message code="lbl.diagnostic.name"/>">
+                                                <input type="text" id="nombre" name="nombre"
+                                                       placeholder="<spring:message code="lbl.name"/>">
                                                 <b class="tooltip tooltip-bottom-right"><i
                                                         class="fa fa-warning txt-color-pink"></i><spring:message
                                                         code="msg.enter.diagnostic.name"/></b>
@@ -134,8 +148,8 @@
                                     </div>
                                 </fieldset>
                                 <footer>
-                                    <button type="submit" id="search-dx" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
-                                    <button type="button" id="all-dx" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
+                                    <button type="submit" id="search-request" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
+                                    <button type="button" id="all-request" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
                                 </footer>
                             </form>
                         </div>
@@ -167,7 +181,7 @@
                             <table id="records_dx" class="table table-striped table-bordered table-hover" width="100%">
                                 <thead>
                                 <tr>
-                                    <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.diagnostic.name"/></th>
+                                    <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.desc.request"/></th>
                                     <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
                                     <th></th>
                                 </tr>
@@ -233,12 +247,12 @@
 <script src="${jqueryBlockUi}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/administracion/dxAnswers.js" var="answersDx" />
+<spring:url value="/resources/scripts/administracion/requestAnswers.js" var="answersDx" />
 <script src="${answersDx}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="sCreateConceptUrl" value="/administracion/respuestasDx/create/"/>
-<c:url var="searchDxUrl" value="/administracion/respuestasDx/getDx"/>
+<c:url var="sCreateConceptUrl" value="/administracion/respuestasSolicitud/create/"/>
+<c:url var="searchDxUrl" value="/administracion/respuestasSolicitud/getDx"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
@@ -251,9 +265,9 @@
         DxAnswers.init(parametros);
 
         $("li.administracion").addClass("open");
-        $("li.respuestaDx").addClass("active");
+        $("li.respuestaSolicitud").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.respuestaDx").parents("ul").slideDown(200);
+            $("li.respuestaSolicitud").parents("ul").slideDown(200);
         }
     });
 </script>

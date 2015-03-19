@@ -165,7 +165,7 @@ public class ResultadosController {
 
     @RequestMapping(value = "searchOrders", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody  String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
+        logger.info("Obteniendo las ordenes de examen pendientes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenDxByFiltro(filtroMx);
         ordenExamenList.addAll(ordenExamenMxService.getOrdenesExamenEstudioByFiltro(filtroMx));
@@ -226,7 +226,7 @@ public class ResultadosController {
         filtroMx.setNombreSolicitud(nombreSolicitud);
         filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las recepcionadas en laboratorio
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
-        filtroMx.setExamenResultado(examenResultado);
+        filtroMx.setResultado(examenResultado);
 
         return filtroMx;
     }

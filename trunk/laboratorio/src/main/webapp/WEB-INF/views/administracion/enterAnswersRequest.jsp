@@ -66,7 +66,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/createConcepts" htmlEscape="true "/>"><spring:message code="menu.admin.respuestas" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>"><spring:message code="menu.admin.request.aswers" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -81,7 +81,7 @@
         <h1 class="page-title txt-color-blueDark">
             <!-- PAGE HEADER -->
             <i class="fa-fw fa fa-group"></i>
-            <spring:message code="menu.admin.diagnostic.aswers" />
+            <spring:message code="menu.admin.request.aswers" />
 						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.response.create.subtitle" />
 						</span>
@@ -127,7 +127,7 @@
             <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
                 <header>
                     <span class="widget-icon"> <i class="fa fa-th"></i> </span>
-                    <h2><spring:message code="lbl.response.widgettitle.dx" /> </h2>
+                    <h2><spring:message code="lbl.response.widgettitle.request" /> </h2>
                 </header>
                 <!-- widget div-->
                 <div>
@@ -150,15 +150,15 @@
                         <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
                         <form id="dataDx-form" class="smart-form" autocomplete="off">
                             <fieldset>
-                                <div class="row">
+                                <div hidden="hidden" id="dRutina" class="row">
                                     <section class="col col-sm-6 col-md-6 col-lg-8">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.diagnostic.name"/>
+                                            <spring:message code="lbl.desc.request"/>
                                         </label>
-                                        <div class="">
+                                        <div>
                                             <label class="input">
                                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                <input class="form-control" type="text" disabled id="nombreDx" name="nombreDx" value="${dx.nombre}" placeholder=" <spring:message code="lbl.diagnostic.name" />">
+                                                <input class="form-control" type="text" disabled id="nombreDx" name="nombreDx" value="${dx.nombre}" placeholder=" <spring:message code="lbl.desc.request" />">
                                             </label>
                                         </div>
                                     </section>
@@ -167,10 +167,36 @@
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.receipt.pcr.area"/>
                                         </label>
-                                        <div class="">
+                                        <div>
                                             <label class="input">
                                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
                                                 <input class="form-control" type="text" disabled name="nombreArea" id="nombreArea" value="${dx.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />"/>
+                                            </label>
+                                        </div>
+                                    </section>
+                                </div>
+
+                                <div hidden="hidden" id="dEstudio" class="row">
+                                    <section class="col col-sm-6 col-md-6 col-lg-8">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <spring:message code="lbl.desc.request"/>
+                                        </label>
+                                        <div>
+                                            <label class="input">
+                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                <input class="form-control" type="text" disabled id="nombreEstudio" name="nombreEstudio" value="${estudio.nombre}" placeholder=" <spring:message code="lbl.desc.request" />">
+                                            </label>
+                                        </div>
+                                    </section>
+
+                                    <section class="col col-sm-6 col-md-6 col-lg-4">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <spring:message code="lbl.receipt.pcr.area"/>
+                                        </label>
+                                        <div>
+                                            <label class="input">
+                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                <input class="form-control" type="text" disabled name="nombreAreaE" id="nombreAreaE" value="${estudio.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />"/>
                                             </label>
                                         </div>
                                     </section>
@@ -183,7 +209,7 @@
                                     <spring:message code="act.add.response"/>
                                 </button>
                                 <input id="idDx" type="hidden" value="${dx.idDiagnostico}"/>
-
+                                <input id="idEstudio" type="hidden" value="${estudio.idEstudio}"/>
                             </footer>
                         </form>
                     </div>
@@ -437,24 +463,24 @@
 <script src="${jqueryInputMask}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/administracion/dxAnswers.js" var="dxAnswers" />
+<spring:url value="/resources/scripts/administracion/requestAnswers.js" var="dxAnswers" />
 <script src="${dxAnswers}"></script>
 <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <spring:url value="/personas/search" var="sPersonUrl"/>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="sRespuestasUrl" value="/administracion/respuestasDx/getRespuestasDx"/>
-<c:url var="sRespuestaUrl" value="/administracion/respuestasDx/getRespuestaDxById"/>
-<c:url var="sActionUrl" value="/administracion/respuestasDx/agregarActualizarRespuesta"/>
-<c:url var="sTipoDatoUrl" value="/administracion/respuestasDx/getTipoDato"/>
+<c:url var="sRespuestasUrl" value="/administracion/respuestasSolicitud/getRespuestasSolicitud"/>
+<c:url var="sRespuestaUrl" value="/administracion/respuestasSolicitud/getRespuestaDxById"/>
+<c:url var="actionUrl" value="/administracion/respuestasSolicitud/agregarActualizarRespuesta"/>
+<c:url var="sTipoDatoUrl" value="/administracion/respuestasSolicitud/getTipoDato"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
         var parametros = {blockMess: "${blockMess}",
             sRespuestasUrl : "${sRespuestasUrl}",
             sRespuestaUrl : "${sRespuestaUrl}",
-            sActionUrl : "${sActionUrl}",
+            actionUrl : "${actionUrl}",
             sFormConcept : "SI",
             sTipoDatoUrl : "${sTipoDatoUrl}"
         };

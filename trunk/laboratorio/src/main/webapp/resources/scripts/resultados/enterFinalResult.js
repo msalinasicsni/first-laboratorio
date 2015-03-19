@@ -63,20 +63,22 @@ var enterFinalResult = function(){
             getExams();
 
             function getExams() {
-               var idSolicitud = $('#idSolicitud').val();
-                blockUI();
+
+               blockUI();
                 $.getJSON(parametros.searchUrl, {
-                    idSolicitud: idSolicitud,
+                    idSolicitudE: $("#idSolicitudE").val(),
+                    idSolicitudD:  $("#idSolicitud").val(),
                     ajax : 'true'
                 }, function(dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            console.log(dataToLoad[i].resultado);
-                              table1.fnAddData(
-                                [dataToLoad[i].fechaSolicitud,dataToLoad[i].nombreSolicitud,dataToLoad[i].codigoUnicoMx,
-                                    dataToLoad[i].tipoMx, dataToLoad[i].tipoNotificacion, dataToLoad[i].NombreExamen, dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].resultado+"'/>"]);
+
+                                table1.fnAddData(
+                                    [dataToLoad[i].fechaSolicitud,dataToLoad[i].nombreSolicitud,dataToLoad[i].codigoUnicoMx,
+                                        dataToLoad[i].tipoMx, dataToLoad[i].tipoNotificacion, dataToLoad[i].NombreExamen, dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].resultado+"'/>"]);
+
                         }
                     }else{
                         $.smallBox({
@@ -139,30 +141,47 @@ var enterFinalResult = function(){
                 var detaResultados = {};
                 var lenListas = 0;
                 var lenDetRes = 0;
-                //primero se obtienen los valores de las listas asociadas a las respuestas del dx
-                $.getJSON(parametros.listasUrl, {
-                    idDx: $("#idDx").val() ,
-                    ajax : 'false'
-                }, function(dataToLoad) {
-                    lenListas = Object.keys(dataToLoad).length;
-                    valoresListas = dataToLoad;
+                var idDx = $("#idDx").val();
+                var idEstudio = $('#idEstudio').val();
+                var idSolicitud = null;
+                var idSoliDx = $("#idSolicitud").val();
+                var idSoliE = $("#idSolicitudE").val();
+                if(idSoliDx != null){
+                    idSolicitud = idSoliDx;
+                }else{
+                    idSolicitud = idSoliE;
+                }
 
-                }).fail(function(er) {
-                    unBlockUI();
-                    alert( "error "+er );
-                });
+                //primero se obtienen los valores de las listas asociadas a las respuestas del dx o estudio
+
+                    $.getJSON(parametros.listasUrl, {
+                        idDx: idDx ,
+                        idEstudio: idEstudio,
+                        ajax : 'false'
+                    }, function(dataToLoad) {
+                        lenListas = Object.keys(dataToLoad).length;
+                        valoresListas = dataToLoad;
+
+                    }).fail(function(er) {
+                        unBlockUI();
+                        alert( "error "+er );
+                    });
+
                 //se obtienen los detalles de las respuestas contestadas de la solicitud
                 $.getJSON(parametros.detResultadosUrl, {
-                    idSolicitud: $("#idSolicitud").val(),
+                    idSolicitud: idSolicitud,
                     ajax : 'false'
                 }, function(data) {
                     lenDetRes = data.length;
                     detaResultados = data;
                     var divResultado= $("#resultados");
                     divResultado.html("");
-                    //obteniendo las respuestas configuradas para el dx
+                    //obteniendo las respuestas configuradas para el dx o estudio
+
+
                     $.getJSON(parametros.conceptosUrl, {
                         idDx: $("#idDx").val() ,
+                        idEstudio: $('#idEstudio').val(),
                         ajax : 'false'
                     }, function(dataToLoad) {
                         var contenidoControl='';
@@ -218,7 +237,7 @@ var enterFinalResult = function(){
                                         divResultado.append(contenidoControl);
                                         break;
                                     case 'TPDATO|LIST':
-                                        console.log('lista');
+
                                         idControlRespuesta = dataToLoad[i].idRespuesta;
                                         contenidoControl =  '<div class="row"><section class="col col-sm-12 col-md-6 col-lg-6"><label class="text-left txt-color-blue font-md">';
                                         if (dataToLoad[i].requerido) {
@@ -302,7 +321,6 @@ var enterFinalResult = function(){
                                         });
                                         break;
                                     default:
-                                        console.log('respuesta sin concepto');
                                         break;
 
                                 }
@@ -311,8 +329,8 @@ var enterFinalResult = function(){
                         }else{
                             unBlockUI();
                             $.smallBox({
-                                title: $("#msg_no_results_found").val() ,
-                                content: $("#smallBox_content").val(),
+                                title: $("#study_not_answers").val() ,
+                                content: $("#disappear").val(),
                                 color: "#C46A69",
                                 iconSmall: "fa fa-warning",
                                 timeout: 4000
@@ -343,6 +361,7 @@ var enterFinalResult = function(){
                 var cantRespuestas = 0;
                 $.getJSON(parametros.conceptosUrl, {
                     idDx: $("#idDx").val() ,
+                    idEstudio: $('#idEstudio').val(),
                     ajax : 'false'
                 }, function(dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
@@ -378,11 +397,17 @@ var enterFinalResult = function(){
                             objDetalle[i] = objConcepto;
                             cantRespuestas ++;
                         }
-                        objResultado["idSolicitud"] = $("#idSolicitud").val();
+                        var idSoliDx = $("#idSolicitud").val();
+                        var idSoliE = $("#idSolicitudE").val();
+                        if(idSoliDx != ""){
+                            objResultado["idSolicitud"] = idSoliDx;
+                        }else{
+                            objResultado["idSolicitud"] = idSoliE;
+                        }
+
                         objResultado["strRespuestas"] = objDetalle;
                         objResultado["mensaje"] = '';
                         objResultado["cantRespuestas"] = cantRespuestas;
-                        console.log(objDetalle);
                         $.ajax(
                             {
                                 url: parametros.saveFinalResult,
@@ -395,7 +420,7 @@ var enterFinalResult = function(){
                                     if (data.mensaje.length > 0){
                                         $.smallBox({
                                             title: data.mensaje ,
-                                            content: $("#smallBox_content").val(),
+                                            content: $("#disappear").val(),
                                             color: "#C46A69",
                                             iconSmall: "fa fa-warning",
                                             timeout: 4000
@@ -404,7 +429,7 @@ var enterFinalResult = function(){
                                         var msg = $("#msg_result_added").val();
                                         $.smallBox({
                                             title: msg ,
-                                            content: $("#smallBox_content").val(),
+                                            content: $("#disappear").val(),
                                             color: "#739E73",
                                             iconSmall: "fa fa-success",
                                             timeout: 4000
@@ -421,7 +446,7 @@ var enterFinalResult = function(){
                         unBlockUI();
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
-                            content: $("#smallBox_content").val(),
+                            content: $("#disappear").val(),
                             color: "#C46A69",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
@@ -482,7 +507,13 @@ var enterFinalResult = function(){
 
             function anularResultado(){
                 var objResultado = {};
-                objResultado["idSolicitud"] = $("#idSolicitud").val();
+                var idSoliDx = $("#idSolicitud").val();
+                var idSoliE = $("#idSolicitudE").val();
+                if(idSoliDx != ""){
+                    objResultado["idSolicitud"] = idSoliDx;
+                }else{
+                    objResultado["idSolicitud"] = idSoliE;
+                }
                 objResultado["causaAnulacion"] = $("#causaAnulacion").val();
                 objResultado["mensaje"] = '';
                 blockUI(parametros.blockMess);
@@ -498,7 +529,7 @@ var enterFinalResult = function(){
                             if (data.mensaje.length > 0){
                                 $.smallBox({
                                     title: data.mensaje ,
-                                    content: $("#smallBox_content").val(),
+                                    content: $("#disappear").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",
                                     timeout: 4000
@@ -507,7 +538,7 @@ var enterFinalResult = function(){
                                 var msg = $("#msg_result_override").val();
                                 $.smallBox({
                                     title: msg ,
-                                    content: $("#smallBox_content").val(),
+                                    content: $("#disappear").val(),
                                     color: "#739E73",
                                     iconSmall: "fa fa-success",
                                     timeout: 4000

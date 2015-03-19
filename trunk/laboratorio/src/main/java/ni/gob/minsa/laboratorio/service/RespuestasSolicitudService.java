@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import org.hibernate.Query;
@@ -19,16 +20,16 @@ import java.util.List;
 /**
  * Created by souyen-ics.
  */
-@Service("respuestasDxService")
+@Service("respuestasSolicitudService")
 @Transactional
-public class RespuestasDxService {
+public class RespuestasSolicitudService {
 
-    private Logger logger = LoggerFactory.getLogger(RespuestasDxService.class);
+    private Logger logger = LoggerFactory.getLogger(RespuestasSolicitudService.class);
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
 
-    public RespuestasDxService() {
+    public RespuestasSolicitudService() {
     }
 
     public List<Catalogo_Dx> getDxByFiltro(String nombreDx) throws UnsupportedEncodingException {
@@ -44,12 +45,33 @@ public class RespuestasDxService {
         return dxs;
     }
 
+    public List<Catalogo_Estudio> getEstudioByFiltro(String nombre) throws UnsupportedEncodingException {
+        Session session = sessionFactory.getCurrentSession();
+        nombre = URLDecoder.decode(nombre, "utf-8");
+        StringBuilder sQuery = new StringBuilder("select e " +
+                "from Catalogo_Estudio as e");
+        if (!nombre.isEmpty()) sQuery.append(" where lower(e.nombre) like '%").append(nombre.toLowerCase()).append("%'");
+
+        Query q = session.createQuery(sQuery.toString());
+
+        List<Catalogo_Estudio> estudios= q.list();
+        return estudios;
+    }
+
     public List<RespuestaSolicitud> getRespuestasByDx(Integer idDx){
         String query = "from RespuestaSolicitud as a where a.diagnostico.idDiagnostico = :idDx order by orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idDx", idDx);
+        return q.list();
+    }
+
+    public List<RespuestaSolicitud> getRespuestasByEstudio(Integer id){
+        String query = "from RespuestaSolicitud as a where a.estudio.idEstudio = :id order by orden asc";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("id", id);
         return q.list();
     }
 
@@ -90,12 +112,31 @@ public class RespuestasDxService {
         return q.list();
     }
 
+    public List<Catalogo_Lista> getCatalogoListaConceptoByIdEstudio(Integer idEstudio) throws Exception {
+        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaSolicitud as r inner join r.concepto tdc " +
+                "where a.pasivo = false and tdl.idConcepto = tdc.idConcepto and r.estudio.idEstudio =:idEstudio" +
+                " order by  a.valor";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idEstudio",idEstudio);
+        return q.list();
+    }
+
     public List<RespuestaSolicitud> getRespuestasActivasByDx(Integer idDx){
         String query = "from RespuestaSolicitud as a where a.diagnostico.idDiagnostico = :idDx and pasivo = false order by orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idDx", idDx);
+        return q.list();
+    }
+
+    public List<RespuestaSolicitud> getRespuestasActivasByEstudio(Integer idEstudio){
+        String query = "from RespuestaSolicitud as a where a.estudio.idEstudio = :idEstudio and pasivo = false order by orden asc";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idEstudio", idEstudio);
         return q.list();
     }
 }

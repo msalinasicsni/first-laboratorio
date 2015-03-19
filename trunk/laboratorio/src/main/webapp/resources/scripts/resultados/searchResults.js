@@ -143,6 +143,9 @@ var finalResult = function(){
                     filtros['codSilais'] = '';
                     filtros['codUnidadSalud'] = '';
                     filtros['codTipoMx'] = '';
+                    filtros['codTipoSolicitud'] = '';
+                    filtros['nombreSolicitud'] = '';
+                    filtros['resultado'] = '';
 
                 }else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
@@ -152,6 +155,9 @@ var finalResult = function(){
                     filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     filtros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     filtros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    filtros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    filtros['nombreSolicitud'] = $('#nombreSoli').val();
+                    filtros['resultado'] = $('#wRes option:selected').val();
 
                 }
                blockUI();
@@ -166,7 +172,7 @@ var finalResult = function(){
                             var actionUrl = parametros.actionUrl + dataToLoad[i].idSolicitud;
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].diagnostico, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].diagnostico, dataToLoad[i].resultadoS, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
                     }else{

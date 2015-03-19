@@ -245,7 +245,7 @@
 
                                                 <section class="col col-sm-12 col-md-12 col-lg-4">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.request.name" />
+                                                        <spring:message code="lbl.desc.request" />
                                                     </label>
                                                     <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
                                                         <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.request.name"/>">
