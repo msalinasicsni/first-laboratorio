@@ -141,7 +141,7 @@ var IncomeResult = function () {
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
                             content: $("#smallBox_content").val(),
-                            color: "#C46A69",
+                            color: "#C79121",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });
@@ -235,7 +235,7 @@ var IncomeResult = function () {
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
                             content: $("#smallBox_content").val(),
-                            color: "#C46A69",
+                            color: "#C79121",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });
@@ -537,7 +537,7 @@ var IncomeResult = function () {
                             $.smallBox({
                                 title: $("#msg_no_results_found").val() ,
                                 content: $("#smallBox_content").val(),
-                                color: "#C46A69",
+                                color: "#C79121",
                                 iconSmall: "fa fa-warning",
                                 timeout: 4000
                             });
