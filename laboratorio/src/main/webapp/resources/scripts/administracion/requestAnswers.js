@@ -60,6 +60,8 @@ var DxAnswers = function(){
             $('#search-form').validate({
                 // Rules for form validation
                 rules: {
+                    tipo : {required:true}
+
                 },
                 // Do not change code below
                 errorPlacement : function(error, element) {
@@ -68,32 +70,38 @@ var DxAnswers = function(){
                 submitHandler: function (form) {
                     table1.fnClearTable();
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                    getDx(false)
+                 getDx(false)
                 }
             });
 
-            $("#all-dx").click(function() {
+            $("#all-request").click(function() {
                 getDx(true);
             });
 
 
             function getDx(showAll) {
-                var pNombreDx;
-                if (showAll) {
-                    pNombreDx = '';
+                var pNombre;
+                var pTipo;
+
+                   if (showAll) {
+                    pTipo = '';
+                    pNombre = '';
                 } else {
-                    pNombreDx = $("#nombreDx").val();
+                    pTipo = $('#tipo option:selected').val();
+                    pNombre = $('#nombre').val();
                 }
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.searchDxUrl, {
-                    nombreDx: encodeURI(pNombreDx),
+                    nombre: encodeURI(pNombre),
+                    tipo: pTipo,
                     ajax: 'true'
                 }, function (dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl + dataToLoad[i].idDx;
+                            var actionUrl = parametros.sActionUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
+
                             table1.fnAddData(
                                 [dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a>']);
                         }
@@ -117,6 +125,14 @@ var DxAnswers = function(){
             /****************************************************************
              * Respuestas
              ******************************************************************/
+              var idDx = $('#idDx').val();
+              var idEstudio = $('#idEstudio').val();
+                if(idDx != null){
+                    $('#dRutina').show();
+                }else{
+                    $('#dEstudio').show();
+                }
+
             var table2 = $('#concepts_list').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
                     "t"+
@@ -205,7 +221,8 @@ var DxAnswers = function(){
             function getResponses() {
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sRespuestasUrl, {
-                    idDx: $("#idDx").val() ,
+                    idDx: $('#idDx').val() ,
+                    idEstudio : $('#idEstudio').val(),
                     ajax : 'true'
                 }, function(dataToLoad) {
                     table2.fnClearTable();
@@ -283,7 +300,8 @@ var DxAnswers = function(){
                 var jsonObj = {};
                 var respuestaObj = {};
                 respuestaObj['idRespuesta']=$("#idRespuestaEdit").val();
-                respuestaObj['idDx']=$("#idDx").val();
+                respuestaObj['idDx']=$('#idDx').val();
+                respuestaObj['idEstudio']=$('#idEstudio').val();
                 respuestaObj['nombre']=$("#nombreRespuesta").val();
                 respuestaObj['concepto']=$('#codConcepto').find('option:selected').val();
                 respuestaObj['orden']=$("#ordenRespuesta").val();
@@ -297,7 +315,7 @@ var DxAnswers = function(){
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
-                        url: parametros.sActionUrl,
+                        url: parametros.actionUrl,
                         type: 'POST',
                         dataType: 'json',
                         data: JSON.stringify(jsonObj),
@@ -353,7 +371,7 @@ var DxAnswers = function(){
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
-                        url: parametros.sActionUrl,
+                        url: parametros.actionUrl,
                         type: 'POST',
                         dataType: 'json',
                         data: JSON.stringify(anulacionObj),

@@ -208,7 +208,7 @@
 
                                                 <section class="col col-sm-12 col-md-12 col-lg-4">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.request.name" />
+                                                        <spring:message code="lbl.desc.request" />
                                                     </label>
                                                     <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
                                                         <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.request.name"/>">
@@ -230,7 +230,7 @@
 
                                                 <section class="col col-sm-12 col-md-7 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.test.withResult" /> </label>
+                                                        <spring:message code="lbl.with.result" /> </label>
                                                     <div class="input-group">
                                                         <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
                                                         <select id="testWRes" name="testWRes"
@@ -283,7 +283,7 @@
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.ticket.for"/></th>-->
                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.order.dateTime"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.name"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.desc.request"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.unique.code.mx.short"/></th>
                                             <%--<th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>--%>
@@ -292,7 +292,7 @@
                                             <%--<th data-hide="phone"><spring:message code="lbl.silais"/></th>--%>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.test.withResult"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.with.result"/></th>
 
                                             <th></th>
                                         </tr>

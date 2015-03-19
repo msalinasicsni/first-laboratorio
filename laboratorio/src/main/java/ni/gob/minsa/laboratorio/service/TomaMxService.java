@@ -221,6 +221,13 @@ public class TomaMxService {
         return (DaSolicitudDx)q.uniqueResult();
     }
 
+    public DaSolicitudEstudio getEstudioByIdSolicitud(String idSolicitud){
+        String query = "from DaSolicitudEstudio where idSolicitudEstudio = :idSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idSolicitud",idSolicitud);
+        return (DaSolicitudEstudio)q.uniqueResult();
+    }
+
     /**
      *Retorna una lista de dx segun tipoMx y tipo Notificacion
      * @param codMx tipo de Mx
@@ -260,6 +267,14 @@ public class TomaMxService {
         Query q = session.createQuery(query);
         q.setParameter("idDx", idDx);
         return (Catalogo_Dx)q.uniqueResult();
+    }
+
+    public Catalogo_Estudio getEstudioById(Integer idEstudio) throws Exception {
+        String query = "from Catalogo_Estudio where idEstudio= :idEstudio" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idEstudio", idEstudio);
+        return (Catalogo_Estudio)q.uniqueResult();
     }
 
     /**

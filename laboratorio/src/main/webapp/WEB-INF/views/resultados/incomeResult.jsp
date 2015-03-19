@@ -52,7 +52,7 @@
 						<i class="fa-fw fa fa-group"></i> 
 							<spring:message code="lbl.result.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.result.income.subtitle" />
+							<spring:message code="lbl.exam.result.subtitle" />
 						</span>
 					</h1>
 				</div>
@@ -287,7 +287,7 @@
                                             <div class="row">
                                                 <section class="col col-sm-12 col-md-6 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.solic.name"/>
+                                                        <spring:message code="lbl.desc.request"/>
                                                     </label>
                                                     <div class="">
                                                         <label class="input">

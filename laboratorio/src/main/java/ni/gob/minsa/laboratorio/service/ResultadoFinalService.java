@@ -118,6 +118,7 @@ public class ResultadoFinalService {
             );
         }
 
+        // filtro examenes con resultado
         crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
@@ -152,7 +153,11 @@ public class ResultadoFinalService {
 
         }
 
-        //filtro estudio con resultado
+         //ordenar por fecha
+        crit.addOrder(Order.desc("fechaHSolicitud"));
+
+
+        //filtro dx con resultado
         if(filtro.getResultado() != null){
             if (filtro.getResultado().equals("Si")){
                 crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
@@ -164,6 +169,7 @@ public class ResultadoFinalService {
                         .setProjection(Property.forName("dx.idSolicitudDx"))));
             }
         }
+
 
         return crit.list();
     }
@@ -250,7 +256,7 @@ public class ResultadoFinalService {
                             Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
             );
         }
-        // filtro examenes con resultado
+        // examenes con resultado
         crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("examen.solicitudEstudio.idSolicitudEstudio"))));
@@ -285,17 +291,19 @@ public class ResultadoFinalService {
 
 
         }
+        //ordenar por fecha
+        crit.addOrder(Order.desc("fechaHSolicitud"));
 
         //filtro estudio con resultado
         if(filtro.getResultado() != null){
             if (filtro.getResultado().equals("Si")){
                 crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                        .createAlias("solicitudEstudio", "est")
-                        .setProjection(Property.forName("dx.idSolicitudEstudio"))));
+                        .createAlias("solicitudEstudio", "estudio")
+                        .setProjection(Property.forName("estudio.idSolicitudEstudio"))));
             } else{
                 crit.add(Subqueries.propertyNotIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                        .createAlias("solicitudEstudio", "est")
-                        .setProjection(Property.forName("est.idSolicitudEstudio"))));
+                        .createAlias("solicitudEstudio", "estudio")
+                        .setProjection(Property.forName("estudio.idSolicitudEstudio"))));
             }
         }
 
@@ -341,12 +349,7 @@ public class ResultadoFinalService {
         return q.list();
     }
 
-    public Integer getExamsRecords(String idSolicitud){
-        String query  = " select count(*) from OrdenExamen as o where o.solicitudEstudio = :idSolicitud";
-        Query q = sessionFactory.getCurrentSession().createQuery(query);
-        q.setParameter("idSolicitud",idSolicitud);
-        return (Integer) q.uniqueResult();
-    }
+
 
     /**
      * Obtiene un catalogo lista según el id indicado
@@ -361,6 +364,7 @@ public class ResultadoFinalService {
         return  (Catalogo_Lista)q.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     public List<DetalleResultadoFinal> getDetResActivosBySolicitud(String idSolicitud){
         List<DetalleResultadoFinal> resultadoFinals = new ArrayList<DetalleResultadoFinal>();
         Session session = sessionFactory.getCurrentSession();

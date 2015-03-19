@@ -129,6 +129,9 @@
                         <input id="msg_result_override" type="hidden" value="<spring:message code="msg.result.successfully.canceled"/>"/>
                         <input id="text_value" type="hidden" value="<spring:message code="lbl.result.value"/>"/>
                         <input id="text_date" type="hidden" value="<spring:message code="lbl.result.date"/>"/>
+                        <input id="study_not_answers" type="hidden" value="<spring:message code="msg.study.not.answers.found"/>"/>
+                        <input hidden="hidden" id="rutina" value="${rutina}"/>
+                        <input hidden="hidden" id="estudio" value="${estudio}"/>
 
                         <table id="records_exa" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>
@@ -140,7 +143,7 @@
                                 <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
                                 <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.test.name"/></th>
                                 <th data-class="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
-                                <th data-class="phone"><i class="fa fa-fw fa-file-text-o  text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.exam.result."/></th>
+                                <th data-class="phone"><i class="fa fa-fw fa-file-text-o  text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.exam.result"/></th>
 
                             </tr>
                             </thead>
@@ -184,8 +187,10 @@
                         <footer>
                             <input id="val_yes" type="hidden" value="<spring:message code="lbl.yes"/>"/>
                             <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
-                            <input id="idDx" type="hidden" value="${solicitud.codDx.idDiagnostico}"/>
-                            <input id="idSolicitud" type="hidden" value="${solicitud.idSolicitudDx}"/>
+                            <input id="idDx" type="hidden" value="${rutina.codDx.idDiagnostico}"/>
+                            <input id="idSolicitud" type="hidden" value="${rutina.idSolicitudDx}"/>
+                            <input id="idSolicitudE" type="hidden" value="${estudio.idSolicitudEstudio}"/>
+                            <input id="idEstudio" type="hidden" value="${estudio.tipoEstudio.idEstudio}"/>
                             <button type="button" id="override-result" class="btn btn-danger btn-lg pull-right header-btn"><i class="fa fa-times"></i> <spring:message code="act.override" /></button>
                             <button type="submit" id="save-result" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
                         </footer>
@@ -318,9 +323,9 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="searchUrl" value="/resultadoFinal/searchExams"/>
-<c:url var="listasUrl" value="/resultadoFinal/getCatalogosListaConceptoByidDx"/>
+<c:url var="listasUrl" value="/resultadoFinal/getCatalogosListaConcepto"/>}
 <c:url var="detResultadosUrl" value="/resultadoFinal/getDetResFinalBySolicitud"/>
-<c:url var="conceptosUrl" value="/administracion/respuestasDx/getRespuestasActivasDx"/>
+<c:url var="conceptosUrl" value="/administracion/respuestasSolicitud/getRespuestasActivas"/>
 <c:url var="saveFinalResult" value="/resultadoFinal/saveFinalResult"/>
 <c:url var="overrideUrl" value="/resultadoFinal/overrideResult"/>
 
@@ -337,6 +342,7 @@
                           esIngreso : 'true',
                           saveFinalResult: "${saveFinalResult}",
                           overrideUrl: "${overrideUrl}"
+
         };
         enterFinalResult.init(parametros);
 

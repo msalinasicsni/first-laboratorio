@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
@@ -37,18 +38,18 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("administracion/respuestasDx")
-public class RespuestasDxController {
+@RequestMapping("administracion/respuestasSolicitud")
+public class RespuestasSolicitudController {
 
-    private static final Logger logger = LoggerFactory.getLogger(RespuestasDxController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RespuestasSolicitudController.class);
     @Resource(name = "seguridadService")
     private SeguridadService seguridadService;
 
     @Resource(name = "usuarioService")
     private UsuarioService usuarioService;
 
-    @Resource(name = "respuestasDxService")
-    private RespuestasDxService respuestasDxService;
+    @Resource(name = "respuestasSolicitudService")
+    private RespuestasSolicitudService respuestasSolicitudService;
 
     @Resource(name = "tomaMxService")
     private TomaMxService tomaMxService;
@@ -83,7 +84,7 @@ public class RespuestasDxController {
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
             mav.addObject("notificaciones", notificacionList);
-            mav.setViewName("administracion/searchDx");
+            mav.setViewName("administracion/searchSolicitud");
         }else
             mav.setViewName(urlValidacion);
 
@@ -92,23 +93,76 @@ public class RespuestasDxController {
 
     @RequestMapping(value = "getDx", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    String getOrdenesExamen(@RequestParam(value = "nombreDx", required = true) String nombreDx) throws Exception {
-        List<Catalogo_Dx> objectsDx = respuestasDxService.getDxByFiltro(nombreDx);
-        return DxToJson(objectsDx);
+    String getOrdenesExamen(@RequestParam(value = "tipo", required = false) String tipo, @RequestParam(value = "nombre", required = false) String nombre) throws Exception {
+        List<Catalogo_Dx> records = null;
+        List<Catalogo_Estudio> recordsE = null;
+
+        if(!tipo.isEmpty()){
+            if(tipo.equals("Rutina")){
+                records = respuestasSolicitudService.getDxByFiltro(nombre);
+            }else{
+                recordsE = respuestasSolicitudService.getEstudioByFiltro(nombre);
+            }
+        }else{
+            records = respuestasSolicitudService.getDxByFiltro(nombre);
+            recordsE = respuestasSolicitudService.getEstudioByFiltro(nombre);
+        }
+
+
+        return DxToJson(records, recordsE);
     }
 
-    private String DxToJson(List<Catalogo_Dx> objectsDx){
+    private String DxToJson(List<Catalogo_Dx> objectsDx, List<Catalogo_Estudio> objectsE ){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-        for(Catalogo_Dx dx: objectsDx) {
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("idDx",String.valueOf(dx.getIdDiagnostico()));
-            map.put("nombreDx",dx.getNombre());
-            map.put("nombreArea",dx.getArea().getNombre());
-            mapResponse.put(indice, map);
-            indice ++;
+
+        if(objectsDx != null  && objectsE != null){
+            for(Catalogo_Dx dx: objectsDx) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("idDx",String.valueOf(dx.getIdDiagnostico()));
+                map.put("nombreDx",dx.getNombre());
+                map.put("nombreArea",dx.getArea().getNombre());
+                map.put("tipoSolicitud", "Rutina");
+                mapResponse.put(indice, map);
+                indice ++;
+            }
+
+            for(Catalogo_Estudio est: objectsE) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("idDx",String.valueOf(est.getIdEstudio()));
+                map.put("nombreDx",est.getNombre());
+                map.put("nombreArea",est.getArea().getNombre());
+                map.put("tipoSolicitud", "Estudio");
+                mapResponse.put(indice, map);
+                indice ++;
+            }
         }
+        if(objectsDx != null && objectsE == null){
+            for(Catalogo_Dx dx: objectsDx) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("idDx",String.valueOf(dx.getIdDiagnostico()));
+                map.put("nombreDx",dx.getNombre());
+                map.put("nombreArea",dx.getArea().getNombre());
+                map.put("tipoSolicitud", "Rutina");
+                mapResponse.put(indice, map);
+                indice ++;
+            }
+        }
+
+        if(objectsE != null && objectsDx == null){
+            for(Catalogo_Estudio est: objectsE) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("idDx",String.valueOf(est.getIdEstudio()));
+                map.put("nombreDx",est.getNombre());
+                map.put("nombreArea",est.getArea().getNombre());
+                map.put("tipoSolicitud", "Estudio");
+                mapResponse.put(indice, map);
+                indice ++;
+            }
+        }
+
+
         jsonResponse = new Gson().toJson(mapResponse);
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
@@ -118,7 +172,7 @@ public class RespuestasDxController {
 
     @RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
     public ModelAndView createResponseForm(HttpServletRequest request, @PathVariable("strParametros") String strParametros) throws Exception {
-        logger.debug("inicializar pantalla de creación de respuestas para dx");
+        logger.debug("inicializar pantalla de creación de respuestas para dx o estudio");
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -131,26 +185,46 @@ public class RespuestasDxController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
+            Catalogo_Dx dx = null;
+            Catalogo_Estudio estudio = null;
             String[] arParametros = strParametros.split(",");
-            Catalogo_Dx dx = tomaMxService.getDxsById(Integer.valueOf(arParametros[0]));
+
+            if(arParametros[1] != null){
+                if(arParametros[1].equals("Rutina")){
+                    dx = tomaMxService.getDxsById(Integer.valueOf(arParametros[0]));
+                }else{
+                    estudio = tomaMxService.getEstudioById(Integer.valueOf(arParametros[0]));
+                }
+            }
+
             List<Concepto> conceptsList = conceptoService.getConceptsList();
             Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
             mav.addObject("dx", dx);
+            mav.addObject("estudio", estudio);
             mav.addObject("conceptsList",conceptsList);
             mav.addObject("codigoDatoNumerico",parametro.getValor());
-            mav.setViewName("administracion/enterDxAnswers");
+            mav.setViewName("administracion/enterAnswersRequest");
         }else
             mav.setViewName(urlValidacion);
 
         return mav;
     }
 
-    @RequestMapping(value = "getRespuestasDx", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getRespuestasSolicitud", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<RespuestaSolicitud> getRespuestasDx(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
-        logger.info("Obteniendo las respuestas de un diagnostico en JSON");
-        return respuestasDxService.getRespuestasByDx(Integer.valueOf(idDx));
+    List<RespuestaSolicitud> getRespuestasSolicitud(@RequestParam(value = "idDx", required = false) String idDx, @RequestParam(value = "idEstudio", required = false) String idEstudio ) throws Exception {
+        logger.info("Obteniendo las respuestas de un diagnostico o estudio en json en JSON");
+        List<RespuestaSolicitud> respuestas = null;
+
+        if(!idDx.equals("") || !idEstudio.equals(""))
+            if(!idDx.equals("")){
+            respuestas = respuestasSolicitudService.getRespuestasByDx(Integer.valueOf(idDx));
+            }else{
+            respuestas = respuestasSolicitudService.getRespuestasByEstudio(Integer.valueOf(idEstudio));
+            }
+
+        return respuestas;
     }
 
     @RequestMapping(value = "getRespuestaDxById", method = RequestMethod.GET, produces = "application/json")
@@ -158,7 +232,7 @@ public class RespuestasDxController {
     @ResponseBody
     RespuestaSolicitud getRespuestaById(@RequestParam(value = "idRespuesta", required = true) Integer idRespuesta) throws Exception {
         logger.info("Obteniendo respuesta dx en JSON");
-        return respuestasDxService.getRespuestaDxById(idRespuesta);
+        return respuestasSolicitudService.getRespuestaDxById(idRespuesta);
     }
 
     @RequestMapping(value = "agregarActualizarRespuesta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -176,7 +250,7 @@ public class RespuestasDxController {
             Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
             RespuestaSolicitud respuesta = jsonToRespuesta(strRespuesta);
             respuesta.setUsuarioRegistro(usuario);
-            respuestasDxService.saveOrUpdateResponse(respuesta);
+            respuestasSolicitudService.saveOrUpdateResponse(respuesta);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -200,11 +274,15 @@ public class RespuestasDxController {
         JsonObject jsonpObject = new Gson().fromJson(jsonRespuesta, JsonObject.class);
         //si hay idConcepto se obtiene registro para actualizar, luego si vienen los demas datos se actualizan
         if (jsonpObject.get("idRespuesta")!=null && !jsonpObject.get("idRespuesta").getAsString().isEmpty()) {
-            respuestaDx = respuestasDxService.getRespuestaDxById(jsonpObject.get("idRespuesta").getAsInt());
+            respuestaDx = respuestasSolicitudService.getRespuestaDxById(jsonpObject.get("idRespuesta").getAsInt());
         }
         if (jsonpObject.get("idDx")!=null && !jsonpObject.get("idDx").getAsString().isEmpty()) {
             Catalogo_Dx dx = tomaMxService.getDxsById(jsonpObject.get("idDx").getAsInt());
             respuestaDx.setDiagnostico(dx);
+        }
+        if (jsonpObject.get("idEstudio")!=null && !jsonpObject.get("idEstudio").getAsString().isEmpty()) {
+            Catalogo_Estudio estudio = tomaMxService.getEstudioById(jsonpObject.get("idEstudio").getAsInt());
+            respuestaDx.setEstudio(estudio);
         }
         if (jsonpObject.get("nombre")!=null && !jsonpObject.get("nombre").getAsString().isEmpty())
             respuestaDx.setNombre(jsonpObject.get("nombre").getAsString());
@@ -236,11 +314,23 @@ public class RespuestasDxController {
         return conceptoService.getConceptById(idTipoDato);
     }
 
-    @RequestMapping(value = "getRespuestasActivasDx", method = RequestMethod.GET, produces = "application/json")
+
+    @RequestMapping(value = "getRespuestasActivas", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<RespuestaSolicitud> getRespuestasActivasDx(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
-        logger.info("Obteniendo las respuestas activas de dx en JSON");
-        return respuestasDxService.getRespuestasActivasByDx(Integer.valueOf(idDx));
+    List<RespuestaSolicitud> getRespuestasActivas(@RequestParam(value = "idDx", required = false) String idDx, @RequestParam(value = "idEstudio", required = false) String idEstudio) throws Exception {
+        logger.info("Obteniendo las respuestas activas de dx o estudio en JSON");
+        List<RespuestaSolicitud> respuestasActivas = null;
+
+        if(!idDx.equals("") || !idEstudio.equals("")){
+            if(idEstudio.equals("")){
+                respuestasActivas = respuestasSolicitudService.getRespuestasActivasByDx(Integer.valueOf(idDx));
+            }else{
+                respuestasActivas = respuestasSolicitudService.getRespuestasActivasByEstudio(Integer.valueOf(idEstudio));
+            }
+        }
+
+       return  respuestasActivas;
+
     }
 
 }
