@@ -179,7 +179,7 @@ var finalResult = function(){
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
                             content: $("#disappear").val(),
-                            color: "#C46A69",
+                            color: "#C79121",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });
