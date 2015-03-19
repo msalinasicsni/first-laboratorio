@@ -168,7 +168,6 @@ public class ResultadoFinalService {
         return crit.list();
     }
 
-
     @SuppressWarnings("unchecked")
     public List<DaSolicitudEstudio> getEstudioByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
@@ -459,6 +458,163 @@ public class ResultadoFinalService {
         }
     }
 
+    public List<RechazoResultadoFinalSolicitud> getResultadosRechazadosByFiltro(FiltroMx filtro){
+        Session session = sessionFactory.getCurrentSession();
+        Soundex varSoundex = new Soundex();
+        Criteria crit = session.createCriteria(RechazoResultadoFinalSolicitud.class, "rechazo");
+        crit.createAlias("rechazo.solicitudEstudio","estudio");
+        crit.createAlias("estudio.idTomaMx","tomaMx");
+        crit.createAlias("tomaMx.estadoMx","estado");
+        crit.createAlias("tomaMx.idNotificacion", "noti");
+        //siempre se tomam las muestras que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("tomaMx.anulada", false))
+        );//y las ordenes en estado según filtro
+        Criteria crit2 = session.createCriteria(RechazoResultadoFinalSolicitud.class, "rechazo");
+        crit2.createAlias("rechazo.solicitudDx","rutina");
+        crit2.createAlias("rutina.idTomaMx","tomaMx");
+        crit2.createAlias("tomaMx.estadoMx","estado");
+        crit2.createAlias("tomaMx.idNotificacion", "noti");
+        //siempre se tomam las muestras que no estan anuladas
+        crit2.add( Restrictions.and(
+                        Restrictions.eq("tomaMx.anulada", false))
+        );//y las ordenes en estado según filtro
+        if (filtro.getCodEstado()!=null) {
+            crit.add(Restrictions.and(
+                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            crit2.add(Restrictions.and(
+                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+        }
+        // se filtra por nombre y apellido persona
+        if (filtro.getNombreApellido()!=null) {
+            crit.createAlias("noti.persona", "person");
+            crit2.createAlias("noti.persona", "person");
+            String[] partes = filtro.getNombreApellido().split(" ");
+            String[] partesSnd = filtro.getNombreApellido().split(" ");
+            for (int i = 0; i < partes.length; i++) {
+                try {
+                    partesSnd[i] = varSoundex.encode(partes[i]);
+                } catch (IllegalArgumentException e) {
+                    partesSnd[i] = "0000";
+                    e.printStackTrace();
+                }
+            }
+            for (int i = 0; i < partes.length; i++) {
+                Junction conditionGroup = Restrictions.disjunction();
+                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
+                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
+                crit.add(conditionGroup);
+                crit2.add(conditionGroup);
+            }
+        }
+        //se filtra por SILAIS
+        if (filtro.getCodSilais()!=null){
+            crit.createAlias("noti.codSilaisAtencion","silais");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("silais.codigo", Long.valueOf(filtro.getCodSilais())))
+            );
+            crit2.createAlias("noti.codSilaisAtencion","silais");
+            crit2.add( Restrictions.and(
+                            Restrictions.eq("silais.codigo", Long.valueOf(filtro.getCodSilais())))
+            );
+        }
+        //se filtra por unidad de salud
+        if (filtro.getCodUnidadSalud()!=null){
+            crit.createAlias("noti.codUnidadAtencion","unidadS");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
+            );
+            crit2.createAlias("noti.codUnidadAtencion","unidadS");
+            crit2.add( Restrictions.and(
+                            Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
+            );
+        }
 
+        //Se filtra por rango de fecha de recepción
+        if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
+            crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+            crit2.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+
+        }
+        // se filtra por tipo de muestra
+        if (filtro.getCodTipoMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
+            );
+            crit2.add( Restrictions.and(
+                            Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
+            );
+        }
+
+        if(filtro.getIncluirMxInadecuada()!=null && filtro.getIncluirMxInadecuada()){
+
+            crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma").add(Restrictions.isNull("calidadMx.codigo"))
+                    .add(Restrictions.or(Restrictions.ne("calidadMx.codigo", "CALIDMX|IDC")))
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+            crit2.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma").add(Restrictions.isNull("calidadMx.codigo"))
+                    .add(Restrictions.or(Restrictions.ne("calidadMx.codigo", "CALIDMX|IDC")))
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+
+        }
+
+        if(filtro.getCodigoUnicoMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            );
+            crit2.add( Restrictions.and(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            );
+        }
+
+        //nombre solicitud
+        if (filtro.getNombreSolicitud() != null) {
+            if (filtro.getCodTipoSolicitud() != null) {
+                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
+                    crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .createAlias("tipoEstudio", "estudio")
+                            .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+                }
+                if (filtro.getCodTipoSolicitud().equals("Rutina")) {
+                    crit2.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .createAlias("codDx", "dx")
+                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+                }
+            } else {
+
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("tipoEstudio", "estudio")
+                        .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))))
+                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .createAlias("codDx", "dx")
+                                .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                                .createAlias("idTomaMx", "toma")
+                                .setProjection(Property.forName("toma.idTomaMx"))));
+
+                crit.add(conditGroup);
+                crit2.add(conditGroup);
+            }
+
+
+        }
+        List<RechazoResultadoFinalSolicitud> resultado = crit.list();
+        resultado.addAll(crit2.list());
+        return resultado;
+    }
 
 }
