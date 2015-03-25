@@ -269,12 +269,12 @@
             <!-- end widget edit box -->
             <!-- widget content -->
             <div class="widget-body no-padding">
-                <table id="rejected_result" class="table table-striped table-bordered table-hover" width="100%">
+                <table id="approved_result" class="table table-striped table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
                         <th data-class="expand"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.request.large"/></th>
                         <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.request.date"/></th>
-                        <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.reject.date"/></th>
+                        <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.approve.date"/></th>
                         <th data-hide="phone"><i class="fa fa-fw fa-barcode text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.unique.code.mx"/></th>
                         <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                         <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
@@ -347,7 +347,7 @@
 <script src="${jqueryInputMask}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/resultados/rejectedResults.js" var="incomeResult" />
+<spring:url value="/resources/scripts/resultados/approvedResults.js" var="incomeResult" />
 <script src="${incomeResult}"></script>
 <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 <script src="${handleDatePickers}"></script>
@@ -357,8 +357,7 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="sSearchUrl" value="/aprobacion/searchRejected"/>
-
+<c:url var="sSearchUrl" value="/aprobacion/searchApproved"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -368,14 +367,14 @@
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}"
         };
-        RejectedResults.init(parametros);
+        ApprovedResults.init(parametros);
 
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.resultado").addClass("open");
-        $("li.rejectResult").addClass("active");
+        $("li.approvedResults").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.rejectResult").parents("ul").slideDown(200);
+            $("li.approvedResults").parents("ul").slideDown(200);
         }
     });
 </script>

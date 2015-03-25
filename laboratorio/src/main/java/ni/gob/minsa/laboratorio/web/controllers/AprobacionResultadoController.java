@@ -102,7 +102,7 @@ public class AprobacionResultadoController {
         FiltroMx filtroMx= jsonToFiltroDx(filtro);
         List<DaSolicitudDx> dxList = resultadoFinalService.getDxByFiltro(filtroMx);
         List<DaSolicitudEstudio> solicitudEstudioList = resultadoFinalService.getEstudioByFiltro(filtroMx);
-        return solicitudDx_Est_ToJson(dxList, solicitudEstudioList);
+        return solicitudDx_Est_ToJson(dxList, solicitudEstudioList, false);
     }
 
     private FiltroMx jsonToFiltroDx(String strJson) throws Exception {
@@ -120,6 +120,7 @@ public class AprobacionResultadoController {
         String codTipoSolicitud = null;
         String nombreSolicitud = null;
         String conResultado = null;
+        Boolean solicitudAprobada=null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -145,7 +146,8 @@ public class AprobacionResultadoController {
             nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
         if (jObjectFiltro.get("conResultado") != null && !jObjectFiltro.get("conResultado").getAsString().isEmpty())
             conResultado = jObjectFiltro.get("conResultado").getAsString();
-
+        if (jObjectFiltro.get("solicitudAprobada") != null && !jObjectFiltro.get("solicitudAprobada").getAsString().isEmpty())
+            solicitudAprobada = jObjectFiltro.get("solicitudAprobada").getAsBoolean();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -160,11 +162,12 @@ public class AprobacionResultadoController {
         filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las recepcionadas en laboratorio
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setResultado(conResultado);
+        filtroMx.setSolicitudAprobada(solicitudAprobada);
 
         return filtroMx;
     }
 
-    private  String solicitudDx_Est_ToJson(List<DaSolicitudDx> solicitudDxList, List<DaSolicitudEstudio> solicitudEstudioList){
+    private  String solicitudDx_Est_ToJson(List<DaSolicitudDx> solicitudDxList, List<DaSolicitudEstudio> solicitudEstudioList, boolean incluirResultados){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -176,6 +179,7 @@ public class AprobacionResultadoController {
             map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             map.put("codUnidadSalud", diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
             map.put("tipoMuestra", diagnostico.getIdTomaMx().getCodTipoMx().getNombre());
+            map.put("tipoNotificacion", diagnostico.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(diagnostico.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
@@ -200,7 +204,51 @@ public class AprobacionResultadoController {
 
             map.put("solicitud", diagnostico.getCodDx().getNombre());
             map.put("idSolicitud", diagnostico.getIdSolicitudDx());
+            map.put("fechaSolicitud",DateUtil.DateToString(diagnostico.getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
 
+            if(diagnostico.getAprobada()!=null && diagnostico.getAprobada() && diagnostico.getFechaAprobacion()!=null){
+                map.put("fechaAprobacion",DateUtil.DateToString(diagnostico.getFechaAprobacion(),"dd/MM/yyyy hh:mm:ss a"));
+            }else {
+                map.put("fechaAprobacion","");
+            }
+
+            if (incluirResultados){
+                //detalle resultado final solicitud
+                List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
+                int subIndice=1;
+                Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                for(DetalleResultadoFinal res: resultList){
+                    Map<String, String> mapResp = new HashMap<String, String>();
+                    if (res.getRespuesta()!=null) {
+                        if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                            mapResp.put("valor", cat_lista.getValor());
+                        }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                            mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                        } else {
+                            mapResp.put("valor", res.getValor());
+                        }
+                        mapResp.put("respuesta", res.getRespuesta().getNombre());
+
+                    }else if (res.getRespuestaExamen()!=null){
+                        if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                            mapResp.put("valor", cat_lista.getValor());
+                        } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                            mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                        }else {
+                            mapResp.put("valor", res.getValor());
+                        }
+                        mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                    }
+                    mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                    mapResponseResp.put(subIndice,mapResp);
+                    subIndice++;
+                }
+                map.put("resultados",new Gson().toJson(mapResponseResp));
+            }
             mapResponse.put(indice, map);
             indice ++;
         }
@@ -213,6 +261,7 @@ public class AprobacionResultadoController {
             map.put("codSilais", estudio.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             map.put("codUnidadSalud", estudio.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
             map.put("tipoMuestra", estudio.getIdTomaMx().getCodTipoMx().getNombre());
+            map.put("tipoNotificacion", estudio.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(estudio.getIdTomaMx().getIdNotificacion().getIdNotificacion());
             if (fechaInicioSintomas!=null)
@@ -237,6 +286,49 @@ public class AprobacionResultadoController {
 
             map.put("solicitud", estudio.getTipoEstudio().getNombre());
             map.put("idSolicitud", estudio.getIdSolicitudEstudio());
+            map.put("fechaSolicitud",DateUtil.DateToString(estudio.getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
+            if(estudio.getAprobada()!=null && estudio.getAprobada() && estudio.getFechaAprobacion()!=null){
+                map.put("fechaAprobacion",DateUtil.DateToString(estudio.getFechaAprobacion(),"dd/MM/yyyy hh:mm:ss a"));
+            }else {
+                map.put("fechaAprobacion","");
+            }
+            if (incluirResultados){
+                //detalle resultado final solicitud
+                List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(estudio.getIdSolicitudEstudio());
+                int subIndice=1;
+                Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                for(DetalleResultadoFinal res: resultList){
+                    Map<String, String> mapResp = new HashMap<String, String>();
+                    if (res.getRespuesta()!=null) {
+                        if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                            mapResp.put("valor", cat_lista.getValor());
+                        }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                            mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                        } else {
+                            mapResp.put("valor", res.getValor());
+                        }
+                        mapResp.put("respuesta", res.getRespuesta().getNombre());
+
+                    }else if (res.getRespuestaExamen()!=null){
+                        if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                            mapResp.put("valor", cat_lista.getValor());
+                        } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                            mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                        }else {
+                            mapResp.put("valor", res.getValor());
+                        }
+                        mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                    }
+                    mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                    mapResponseResp.put(subIndice,mapResp);
+                    subIndice++;
+                }
+                map.put("resultados",new Gson().toJson(mapResponseResp));
+            }
 
             mapResponse.put(indice, map);
             indice ++;
@@ -392,6 +484,43 @@ public class AprobacionResultadoController {
         }
     }
 
+    @RequestMapping(value = "approved", method = RequestMethod.GET)
+    public ModelAndView initApprovedForm(HttpServletRequest request) throws Exception{
+        logger.debug("Inicio de busqueda de solicitudes con resultado final aprobado");
+        String urlValidacion="";
+        try {
+            urlValidacion = seguridadService.validarLogin(request);
+            //si la url esta vacia significa que la validación del login fue exitosa
+            if (urlValidacion.isEmpty())
+                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
+        }catch (Exception e){
+            e.printStackTrace();
+            urlValidacion = "404";
+        }
+        ModelAndView mav = new ModelAndView();
+        if (urlValidacion.isEmpty()) {
+            List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+            List<TipoMx> tipoMxList = catalogoService.getTipoMuestra();
+            mav.addObject("entidades",entidadesAdtvases);
+            mav.addObject("tipoMuestra", tipoMxList);
+
+            mav.setViewName("resultados/approvedResults");
+        }else
+            mav.setViewName(urlValidacion);
+
+        return mav;
+    }
+
+    @RequestMapping(value = "searchApproved", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    String fetchAprovedResultsJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo los solicutdes con resultados rechazados");
+        FiltroMx filtroMx= jsonToFiltroDx(filtro);
+        List<DaSolicitudDx> solicitudDxList = resultadoFinalService.getDxByFiltro(filtroMx);
+        List<DaSolicitudEstudio> solicitudEstudioList = resultadoFinalService.getEstudioByFiltro(filtroMx);
+        return solicitudDx_Est_ToJson(solicitudDxList, solicitudEstudioList, true);
+    }
+
     @RequestMapping(value = "rejectResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void rejectResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
@@ -427,6 +556,12 @@ public class AprobacionResultadoController {
                     nuevaOrdenExamen.setSolicitudDx(ordenExamen.getSolicitudDx());
                     ordenExamenMxService.addOrdenExamen(nuevaOrdenExamen);
                 }
+                //Se anula el detalle del resultado final para la solicitud
+                List<DetalleResultadoFinal> resultadoFinalList = resultadoFinalService.getDetResActivosBySolicitud(idSolicitud);
+                for(DetalleResultadoFinal resultadoFinal : resultadoFinalList){
+                    resultadoFinal.setPasivo(true);
+                    resultadoFinalService.updateDetResFinal(resultadoFinal);
+                }
                 RechazoResultadoFinalSolicitud rechazo = new RechazoResultadoFinalSolicitud();
                 rechazo.setSolicitudDx(solicitudDx);
                 rechazo.setSolicitudEstudio(solicitudEstudio);
@@ -455,7 +590,7 @@ public class AprobacionResultadoController {
 
     @RequestMapping(value = "rejected", method = RequestMethod.GET)
     public ModelAndView initRejectedForm(HttpServletRequest request) throws Exception {
-        logger.debug("Inicio de busqueda de dx para ingreso de resultado final");
+        logger.debug("Inicio de busqueda de solicitudes con resultado final rechazado");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
@@ -483,7 +618,7 @@ public class AprobacionResultadoController {
     @RequestMapping(value = "searchRejected", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchRejectResultsJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo los diagnósticos con examenes realizados");
+        logger.info("Obteniendo los solicutdes con resultados rechazados");
         FiltroMx filtroMx= jsonToFiltroDx(filtro);
         List<RechazoResultadoFinalSolicitud> rechazosList = resultadoFinalService.getResultadosRechazadosByFiltro(filtroMx);
         return rechazosToJson(rechazosList);
@@ -537,7 +672,7 @@ public class AprobacionResultadoController {
             map.put("fechaRechazo",DateUtil.DateToString(rechazo.getFechaHRechazo(),"dd/MM/yyyy hh:mm:ss a"));
 
             //detalle resultado final solicitud
-            List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(idSolicitud);
+            List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResPasivosBySolicitud(idSolicitud);
             int subIndice=1;
             Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
             for(DetalleResultadoFinal res: resultList){
