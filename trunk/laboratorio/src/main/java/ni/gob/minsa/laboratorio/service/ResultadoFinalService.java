@@ -123,6 +123,19 @@ public class ResultadoFinalService {
                 .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
 
+        //se filtra por tipo de solicitud
+        if(filtro.getCodTipoSolicitud()!=null){
+            if(filtro.getCodTipoSolicitud().equals("Estudio")){
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }else{
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }
+
+        }
 
         //nombre solicitud
         if (filtro.getNombreSolicitud() != null) {
@@ -157,17 +170,23 @@ public class ResultadoFinalService {
         crit.addOrder(Order.desc("fechaHSolicitud"));
 
 
-        //filtro dx con resultado
+        //filtro dx con resultado activo
         if(filtro.getResultado() != null){
             if (filtro.getResultado().equals("Si")){
                 crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                        .createAlias("solicitudDx", "dx")
+                        .createAlias("solicitudDx", "dx").add(Restrictions.eq("pasivo",false))
                         .setProjection(Property.forName("dx.idSolicitudDx"))));
             } else{
                 crit.add(Subqueries.propertyNotIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                        .createAlias("solicitudDx", "dx")
+                        .createAlias("solicitudDx", "dx").add(Restrictions.eq("pasivo",false))
                         .setProjection(Property.forName("dx.idSolicitudDx"))));
             }
+        }
+
+        if (filtro.getSolicitudAprobada()!=null && filtro.getSolicitudAprobada()){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("diagnostico.aprobada", true))
+            );
         }
 
 
@@ -261,7 +280,19 @@ public class ResultadoFinalService {
                 .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("examen.solicitudEstudio.idSolicitudEstudio"))));
 
+        //se filtra por tipo de solicitud
+        if(filtro.getCodTipoSolicitud()!=null){
+            if(filtro.getCodTipoSolicitud().equals("Estudio")){
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }else{
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }
 
+        }
          //nombre solicitud
         if (filtro.getNombreSolicitud() != null) {
             if (filtro.getCodTipoSolicitud() != null) {
@@ -289,22 +320,28 @@ public class ResultadoFinalService {
                 crit.add(conditGroup);
             }
 
-
         }
         //ordenar por fecha
         crit.addOrder(Order.desc("fechaHSolicitud"));
 
-        //filtro estudio con resultado
+        //filtro estudio con resultado activo
         if(filtro.getResultado() != null){
             if (filtro.getResultado().equals("Si")){
                 crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                        .createAlias("solicitudEstudio", "estudio")
+                        .createAlias("solicitudEstudio", "estudio").add(Restrictions.eq("pasivo",false))
                         .setProjection(Property.forName("estudio.idSolicitudEstudio"))));
             } else{
                 crit.add(Subqueries.propertyNotIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                        .createAlias("solicitudEstudio", "estudio")
+                        .createAlias("solicitudEstudio", "estudio").add(Restrictions.eq("pasivo",false))
                         .setProjection(Property.forName("estudio.idSolicitudEstudio"))));
             }
+        }
+
+        //se filtra que la solicitud de estudio ya este aprobada
+        if (filtro.getSolicitudAprobada()!=null && filtro.getSolicitudAprobada()){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("estudio.aprobada", true))
+            );
         }
 
         return crit.list();
@@ -619,6 +656,20 @@ public class ResultadoFinalService {
         List<RechazoResultadoFinalSolicitud> resultado = crit.list();
         resultado.addAll(crit2.list());
         return resultado;
+    }
+
+    public List<DetalleResultadoFinal> getDetResPasivosBySolicitud(String idSolicitud){
+        List<DetalleResultadoFinal> resultadoFinals = new ArrayList<DetalleResultadoFinal>();
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select a from DetalleResultadoFinal as a inner join a.solicitudDx as r where a.pasivo = true and r.idSolicitudDx = :idSolicitud ";
+        Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
+        resultadoFinals = q.list();
+        String query2 = "select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = true and r.idSolicitudEstudio = :idSolicitud ";
+        Query q2 = session.createQuery(query2);
+        q2.setParameter("idSolicitud", idSolicitud);
+        resultadoFinals.addAll(q2.list());
+        return  resultadoFinals;
     }
 
 }

@@ -24,6 +24,7 @@ public class FiltroMx {
     String codTipoSolicitud;
     String nombreSolicitud;
     String resultado;
+    Boolean solicitudAprobada;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -140,4 +141,12 @@ public class FiltroMx {
     public String getResultado() { return resultado; }
 
     public void setResultado(String resultado) { this.resultado = resultado; }
+
+    public Boolean getSolicitudAprobada() {
+        return solicitudAprobada;
+    }
+
+    public void setSolicitudAprobada(Boolean solicitudAprobada) {
+        this.solicitudAprobada = solicitudAprobada;
+    }
 }

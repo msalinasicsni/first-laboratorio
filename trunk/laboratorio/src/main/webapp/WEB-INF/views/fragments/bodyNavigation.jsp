@@ -88,6 +88,9 @@
                     <li class="rejectResult">
                         <a href="<spring:url value="/aprobacion/rejected" htmlEscape="true "/>" title="<spring:message code="menu.rejected.results" />"><i class="fa fa-lg fa-fw fa-times-circle"></i> <spring:message code="menu.rejected.results" /></a>
                     </li>
+                    <li class="approvedResults">
+                        <a href="<spring:url value="/aprobacion/approved" htmlEscape="true "/>" title="<spring:message code="menu.approved.results" />"><i class="fa fa-lg fa-fw fa-check-square-o"></i> <spring:message code="menu.approved.results" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="administracion">
