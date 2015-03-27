@@ -1,4 +1,4 @@
-package ni.gob.minsa.laboratorio.domain.seguridad;
+package ni.gob.minsa.laboratorio.domain.seguridadlocal;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

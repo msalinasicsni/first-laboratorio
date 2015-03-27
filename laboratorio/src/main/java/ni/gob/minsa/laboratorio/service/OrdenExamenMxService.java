@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadExamen;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -261,10 +262,18 @@ public class OrdenExamenMxService {
                         .setProjection(Property.forName("ex.idOrdenExamen"))));
             }
         }
+    //se filtra que el usuario tenga autoridad para ver el tipo de examen(Catalogo_Examen) que tiene la orden
+        if(filtro.getNombreUsuario()!=null){
+            crit.createAlias("ordenEx.codExamen","catalogoExamen");
+            crit.add(Subqueries.propertyIn("catalogoExamen.idExamen", DetachedCriteria.forClass(AutoridadExamen.class)
+                    .createAlias("examen", "examen")
+                    .createAlias("autoridadArea","autoridadArea")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad examen activa
+                    .add(Restrictions.and(Restrictions.eq("autoridadArea.pasivo",false)))  //autoridad area que pertenece examen activa
+                    .add(Restrictions.and(Restrictions.eq("autoridadArea.user.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("examen.idExamen"))));
+        }
 
-               /*crit.add( Subqueries.propertyNotIn("idAlicuota", DetachedCriteria.forClass(DetalleResultado.class)
-                .createAlias("alicuotaRegistro", "resultado").add(Restrictions.eq("pasivo", false))
-                .setProjection(Property.forName("resultado.idAlicuota"))));*/
         return crit.list();
     }
 
@@ -401,10 +410,18 @@ public class OrdenExamenMxService {
             }
         }
 
+        //se filtra que el usuario tenga autoridad para ver el tipo de examen(Catalogo_Examen) que tiene la orden
+        if(filtro.getNombreUsuario()!=null){
+            crit.createAlias("ordenEx.codExamen","catalogoExamen");
+            crit.add(Subqueries.propertyIn("catalogoExamen.idExamen", DetachedCriteria.forClass(AutoridadExamen.class)
+                    .createAlias("examen", "examen")
+                    .createAlias("autoridadArea","autoridadArea")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad examen activa
+                    .add(Restrictions.and(Restrictions.eq("autoridadArea.pasivo",false)))  //autoridad area que pertenece examen activa
+                    .add(Restrictions.and(Restrictions.eq("autoridadArea.user.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("examen.idExamen"))));
+        }
 
-               /*crit.add( Subqueries.propertyNotIn("idAlicuota", DetachedCriteria.forClass(DetalleResultado.class)
-                .createAlias("alicuotaRegistro", "resultado").add(Restrictions.eq("pasivo", false))
-                .setProjection(Property.forName("resultado.idAlicuota"))));*/
         return crit.list();
     }
 

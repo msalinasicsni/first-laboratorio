@@ -110,6 +110,8 @@
 								<!-- end widget edit box -->
 								<!-- widget content -->
 								<div class="widget-body no-padding">
+                                    <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
+                                    <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
 									<!-- this is what the user will see -->
                                     <table id="orders_result" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
@@ -238,7 +240,7 @@
                         $.smallBox({
                             title: $("#msg_no_results_found").val() ,
                             content: $("#smallBox_content").val(),
-                            color: "#C46A69",
+                            color: "#C79121",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });

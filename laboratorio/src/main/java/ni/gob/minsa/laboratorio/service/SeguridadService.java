@@ -3,6 +3,8 @@ package ni.gob.minsa.laboratorio.service;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
+import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.UtilityProperties;
 import org.hibernate.Query;
@@ -362,4 +364,33 @@ public class SeguridadService {
         UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails.getUsername();
     }
+
+    public boolean esDirector(String userName){
+        List<User> userList = new ArrayList<User>();
+        try {
+            String query = "select usu from AutoridadDireccion as audir inner join audir.user as usu " +
+                    "where audir.pasivo = false and usu.username = :username";
+            Query q = sessionFactory.getCurrentSession().createQuery(query);
+            q.setParameter("username", userName);
+            userList = q.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userList.size() > 0;
+    }
+
+    public boolean esJefeDepartamento(String userName){
+        List<User> userList = new ArrayList<User>();
+        try {
+            String query = "select usu from AutoridadDepartamento as audep inner join audep.user as usu " +
+                    "where audep.pasivo = false and usu.username = :username";
+            Query q = sessionFactory.getCurrentSession().createQuery(query);
+            q.setParameter("username", userName);
+            userList = q.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userList.size() > 0;
+    }
+
 }

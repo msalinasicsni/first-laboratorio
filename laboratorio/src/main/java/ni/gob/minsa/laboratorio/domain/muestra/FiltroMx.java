@@ -25,6 +25,8 @@ public class FiltroMx {
     String nombreSolicitud;
     String resultado;
     Boolean solicitudAprobada;
+    String nombreUsuario;
+    Integer nivelLaboratorio;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -148,5 +150,25 @@ public class FiltroMx {
 
     public void setSolicitudAprobada(Boolean solicitudAprobada) {
         this.solicitudAprobada = solicitudAprobada;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    /**
+     * Los niveles Son: 1=Analista, 2=Jefe Departamento, 3=Director
+     * @return Integer
+     */
+    public Integer getNivelLaboratorio() {
+        return nivelLaboratorio;
+    }
+
+    public void setNivelLaboratorio(Integer nivelLaboratorio) {
+        this.nivelLaboratorio = nivelLaboratorio;
     }
 }

@@ -1,4 +1,4 @@
-package ni.gob.minsa.laboratorio.domain.seguridad;
+package ni.gob.minsa.laboratorio.domain.seguridadlocal;
 
 import java.util.Set;
 

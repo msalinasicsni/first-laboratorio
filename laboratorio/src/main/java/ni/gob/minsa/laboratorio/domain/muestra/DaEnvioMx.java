@@ -18,7 +18,7 @@ public class DaEnvioMx {
     private Float temperaturaTermo;
     private Timestamp fechaHoraEnvio;
     private long tiempoEspera;
-    private Laboratorio laboratorioProcedencia;
+    private Laboratorio laboratorioDestino;
     private Usuarios usarioRegistro;
 
     @Id
@@ -72,14 +72,14 @@ public class DaEnvioMx {
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "LABORATORIO_PROC", referencedColumnName = "CODIGO")
+    @JoinColumn(name = "LABORATORIO_DEST", referencedColumnName = "CODIGO")
     @ForeignKey(name = "ENVIO_ORDEN_LABORATORIO_FK")
-    public Laboratorio getLaboratorioProcedencia() {
-        return laboratorioProcedencia;
+    public Laboratorio getLaboratorioDestino() {
+        return laboratorioDestino;
     }
 
-    public void setLaboratorioProcedencia(Laboratorio laboratorioProcedencia) {
-        this.laboratorioProcedencia = laboratorioProcedencia;
+    public void setLaboratorioDestino(Laboratorio laboratorioDestino) {
+        this.laboratorioDestino = laboratorioDestino;
     }
 
     @ManyToOne(optional = false)

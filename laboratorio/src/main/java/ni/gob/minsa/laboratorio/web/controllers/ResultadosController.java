@@ -227,7 +227,7 @@ public class ResultadosController {
         filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las recepcionadas en laboratorio
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setResultado(examenResultado);
-
+        filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         return filtroMx;
     }
 
