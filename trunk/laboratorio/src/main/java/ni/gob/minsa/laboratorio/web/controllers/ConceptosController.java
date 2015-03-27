@@ -60,8 +60,8 @@ public class ConceptosController {
     @Resource(name = "ordenExamenMxService")
     private OrdenExamenMxService ordenExamenMxService;
 
-    @Resource(name="generacionAlicuotaService")
-    private GeneracionAlicuotaService generacionAlicuotaService;
+    @Resource(name= "separacionMxService")
+    private SeparacionMxService separacionMxService;
 
     @Resource(name = "usuarioService")
     private UsuarioService usuarioService;

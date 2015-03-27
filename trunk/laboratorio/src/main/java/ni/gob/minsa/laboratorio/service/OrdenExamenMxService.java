@@ -93,14 +93,20 @@ public class OrdenExamenMxService {
         return ordenExamenList;
     }
 
-    public List<OrdenExamen> getOrdenesExamenNoAnuladasByCodigoUnico(String codigoUnico){
+    public List<OrdenExamen> getOrdenesExamenNoAnuladasByCodigoUnico(String codigoUnicoMx){
         Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.codigoUnicoMx =:codigoUnico and oe.anulado = false ");
-        q.setParameter("codigoUnico",codigoUnico);
-        return q.list();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.codigoUnicoMx =:codigoUnicoMx and oe.anulado = false");
+        q.setParameter("codigoUnicoMx", codigoUnicoMx);
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx where mx.codigoUnicoMx =:codigoUnicoMx and oe.anulado = false ");
+        q2.setParameter("codigoUnicoMx", codigoUnicoMx);
+        ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
     }
 
-    /**
+      /**
      * Obtiene las ordenes de examen no anuladas para la muestra. Una toma no puede tener de dx y de estudios, es uno u otro.
      * @param idTomaMx id de la toma a consultar
      * @return List<OrdenExamen>

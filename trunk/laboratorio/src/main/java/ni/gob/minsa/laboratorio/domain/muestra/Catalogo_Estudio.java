@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.examen.Area;
 import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by FIRSTICT on 2/24/2015.
@@ -11,8 +12,9 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "catalogo_estudio", schema = "alerta")
-public class Catalogo_Estudio {
+public class Catalogo_Estudio implements Serializable {
 
+    private static final long serialVersionUID = 5110985758665058146L;
     private Integer idEstudio;
     private String nombre;
     private boolean pasivo;

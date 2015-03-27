@@ -87,6 +87,8 @@ var ReceiptLabOrders = function () {
                     filtros['codSilais'] = '';
                     filtros['codUnidadSalud'] = '';
                     filtros['codTipoMx'] = '';
+                    filtros['codTipoSolicitud'] = '';
+                    filtros['nombreSolicitud'] = '';
 
                 }else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
@@ -97,6 +99,8 @@ var ReceiptLabOrders = function () {
                     filtros['codTipoMx'] = $('#codTipoMx option:selected').val();
                     filtros['fecFinRecepcionLab'] = $('#fec').val();
                     filtros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    filtros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    filtros['nombreSolicitud'] = $('#nombreSoli').val();
 
                 }
                 blockUI();
@@ -108,9 +112,11 @@ var ReceiptLabOrders = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl + dataToLoad[i].codigoUnicoMx;
+                            var json =JSON.parse(dataToLoad[i].diagnosticos);
+                            var actionUrl = parametros.sActionUrl +json[1].idSolicitud;
+                            console.log(actionUrl);
 
-                            table1.fnAddData(
+                              table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>", '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
@@ -141,12 +147,13 @@ var ReceiptLabOrders = function () {
                 // `d` is the original data object for the row
                 var texto = d[indice]; //indice donde esta el input hidden
                 var diagnosticos = $(texto).val();
+
                 var json =JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:50px;">'+
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
                     '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td></tr>';
                 for (var i = 1; i <= len; i++) {
-                    childTable =childTable +
+                       childTable =childTable +
                         '<tr></tr><td>'+json[i].nombre+'</td>'+
                         '<td>'+json[i].fechaSolicitud+'</td></tr>';
                 }

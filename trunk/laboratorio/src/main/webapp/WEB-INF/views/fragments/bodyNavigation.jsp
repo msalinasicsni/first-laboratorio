@@ -67,8 +67,8 @@
                     <li class="receiptLab">
                         <a href="<spring:url value="/recepcionMx/initLab" htmlEscape="true "/>" title="<spring:message code="menu.receipt.orders.lab" />"><i class="fa fa-lg fa-fw fa-thumbs-up"></i> <spring:message code="menu.receipt.orders.lab" /></a>
                     </li>
-                    <li class="generacionAlicuota">
-                        <a href="<spring:url value="/generacionAlicuota/init" htmlEscape="true "/>" title="<spring:message code="menu.generate.aliquot" />"><i class="fa fa-lg fa-fw fa-ticket"></i> <spring:message code="menu.generate.aliquot" /></a>
+                    <li class="separacionMx">
+                        <a href="<spring:url value="/separacionMx/init" htmlEscape="true "/>" title="<spring:message code="menu.generate.aliquot" />"><i class="fa fa-lg fa-fw fa-ticket"></i> <spring:message code="menu.generate.aliquot" /></a>
                     </li>
 
                 </ul>

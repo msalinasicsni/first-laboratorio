@@ -126,7 +126,8 @@ var GenerateAliquot  = function () {
                 aliqObj['idAlicuota'] = '';
                 aliqObj['etiqueta'] = $('#etiqueta').val();
                 aliqObj['volumen'] = $('#volumen').val();
-                aliqObj['idOrden'] = $('#idOrden').val();
+                aliqObj['idSoliE'] = $('#idSoliE').val();
+                aliqObj['idSoliDx'] = $('#idSoliDx').val();
                 aliqObj['codigoUnicoMx'] = $('#codigoUnicoMx').val();
 
                 $.ajax(
@@ -182,22 +183,11 @@ var GenerateAliquot  = function () {
                     for (var i = 0; i < len; i++) {
 
                        testOrdersTable.fnAddData(
-                            [data[i].codExamen.nombre, ' <button type="button" id="btnAddAliquot" class="btn btn-primary btn-xs evento" data-toggle="modal" data-id='+data[i].idOrdenExamen+' ' +
-                                ' data-target="#myModal"> <i class="fa fa-plus icon-white"></i>'+
-                                '</button>']);
+                            [data[i].codExamen.nombre]);
                     }
 
-
-
-                    $(".evento").on("click", function(){
-                        $('#idOrden').val($(this).data('id'));
-                    });
                 })
             }
-
-
-
-
 
             function getAliquots(codigoUnicoMx) {
 
@@ -218,7 +208,7 @@ var GenerateAliquot  = function () {
                         var idDiv = "divBarcode" + i;
 
                         aliquotsTable.fnAddData(
-                            ['<div  id="' + idDiv + '"></div>', data[i].idAlicuota,  data[i].alicuotaCatalogo.etiquetaPara, data[i].volumen, data[i].idOrden.codExamen.nombre,  '<a href=' + overrideUrl + ' class="btn btn-default btn-xs btn-danger"><i class="fa fa-times"></i></a>']);
+                            ['<div  id="' + idDiv + '"></div>', data[i].idAlicuota,  data[i].alicuotaCatalogo.etiquetaPara, data[i].volumen,  '<a href=' + overrideUrl + ' class="btn btn-default btn-xs btn-danger"><i class="fa fa-times"></i></a>']);
 
                         $('#' + idDiv + '').html("").show().barcode(data[i].idAlicuota, "datamatrix", settings);
 
@@ -245,6 +235,17 @@ var GenerateAliquot  = function () {
             printSelected()
             });
 
+            $('#etiqueta').click(function() {
+                $.getJSON(parametros.volumeUrl, {
+                    idAlicuota: $(this).val(),
+                    ajax: 'true'
+                }, function (data) {
+                $('#inVolume').val(data);
+                })
+
+
+            });
+
             function printSelected() {
                 var oTT = TableTools.fnGetInstance('aliquots-list');
                 var aSelectedTrs = oTT.fnGetSelected();
@@ -269,8 +270,7 @@ var GenerateAliquot  = function () {
                                     idalicuotas += texto;
                                 }
 
-                                console.log(idalicuotas);
-                                unBlockUI();
+                               unBlockUI();
                             }
                             var loc = window.location;
                             urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+idalicuotas;

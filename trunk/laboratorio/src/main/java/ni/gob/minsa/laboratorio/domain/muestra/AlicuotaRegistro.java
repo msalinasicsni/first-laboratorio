@@ -22,12 +22,13 @@ public class AlicuotaRegistro implements Serializable {
     Float volumen;
     DaTomaMx codUnicoMx;
     Timestamp fechaHoraRegistro;
-    OrdenExamen idOrden;
+    DaSolicitudEstudio solicitudEstudio;
+    DaSolicitudDx solicitudDx;
     Usuarios usuarioRegistro;
     boolean pasivo;
 
     @Id
-    @Column(name = "ID_ALICUOTA", nullable = false, updatable = true, insertable = true, length = 16)
+    @Column(name = "ID_ALICUOTA", nullable = false, updatable = true, insertable = true, length = 24)
     public String getIdAlicuota() {
         return idAlicuota;
     }
@@ -48,7 +49,7 @@ public class AlicuotaRegistro implements Serializable {
         this.alicuotaCatalogo = alicuotaCatalogo;
     }
 
-    @Column(name = "VOLUMEN", nullable = false)
+    @Column(name = "VOLUMEN", nullable = true)
     public Float getVolumen() {
         return volumen;
     }
@@ -67,15 +68,26 @@ public class AlicuotaRegistro implements Serializable {
         this.codUnicoMx = codUnicoMx;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_ORDEN_EXAMEN", referencedColumnName = "ID_ORDEN_EXAMEN")
-    @ForeignKey(name = "ID_ORDENEX_FK")
-    public OrdenExamen getIdOrden() {
-        return idOrden;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "ID_SOLICITUD_EST", referencedColumnName = "ID_SOLICITUD_EST")
+    @ForeignKey(name = "ID_SOLI_EST_FK")
+    public DaSolicitudEstudio getSolicitudEstudio() {
+        return solicitudEstudio;
     }
 
-    public void setIdOrden(OrdenExamen idOrden) {
-        this.idOrden = idOrden;
+    public void setSolicitudEstudio(DaSolicitudEstudio solicitudEstudio) {
+        this.solicitudEstudio = solicitudEstudio;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "ID_SOLICITUD_DX", referencedColumnName = "ID_SOLICITUD_DX")
+    @ForeignKey(name = "ID_SOLI_EST_FK")
+    public DaSolicitudDx getSolicitudDx() {
+        return solicitudDx;
+    }
+
+    public void setSolicitudDx(DaSolicitudDx solicitudDx) {
+        this.solicitudDx = solicitudDx;
     }
 
     @Basic

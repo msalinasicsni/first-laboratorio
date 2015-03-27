@@ -136,7 +136,7 @@
 
 
 
-            <table id="test-orders-list" class="table table-striped table-bordered table-hover" width="70%">
+            <table id="test-orders-list" class="table table-striped table-bordered table-hover" width="100%">
                 <thead>
                 <tr data-class="expand">
 
@@ -145,11 +145,15 @@
                             code="lbl.receipt.test"/>
                     </th>
 
-                    <th style="width: 15%"><i class="fa fa-fw fa-filter text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message
-                            code="lbl.aliquot"/></th>
                 </tr>
                 </thead>
             </table>
+
+        <footer>
+
+            <button type="button" id="btnAddAliquot" class="btn btn-success btn-md pull-right header-btn" data-toggle="modal" data-target="#myModal"> <i class="fa fa-plus icon-white"></i> <spring:message code="lbl.aliquot" /></button>
+        </footer>
+
 </div>
 <!-- end widget content -->
 </div>
@@ -176,7 +180,7 @@
                 <!-- end widget edit box -->
                 <!-- widget content -->
                 <div class="widget-body no-padding">
-                    <table id="aliquots-list" class="table table-striped table-bordered table-hover" width="70%">
+                    <table id="aliquots-list" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
                         <tr data-class="expand">
                             <th>
@@ -193,9 +197,7 @@
                             <th data-hide="phone"><i
                                     class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i>
                                 <spring:message code="lbl.volume"/></th>
-                            <th data-hide="phone"><i
-                                    class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i>
-                                <spring:message code="lbl.receipt.test"/></th>
+
                             <th></th>
                         </tr>
                         </thead>
@@ -231,19 +233,20 @@
 
                     <div class="modal-body">
                         <form:form id="generateAliquot-form" class="smart-form" autocomplete="off">
-                            <input id="idOrden" hidden="hidden" type="text" name="idOrden"/>
+                            <input id="idSoliE" hidden="hidden" value="${soliE.idSolicitudEstudio}" type="text" name="idSoliE"/>
+                            <input id="idSoliDx" hidden="hidden" value="${soliDx.idSolicitudDx}" type="text" name="idSoliDx"/>
 
                             <div class="row">
                                 <section class="col col-sm-12 col-md-6 col-lg-6">
                                     <label class="text-left txt-color-blue font-md">
-                                        <spring:message code="lbl.ticket.for" /> </label>
+                                        <spring:message code="lbl.aliquot" /> </label>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-list fa-fw"></i></span>
                                         <select id="etiqueta" name="etiqueta"
                                                 class="select2">
                                             <option value=""><spring:message code="lbl.select" />...</option>
                                             <c:forEach items="${alicuotaCat}" var="alic">
-                                                <option value="${alic.idAlicuota}">${alic.etiquetaPara}</option>
+                                                <option value="${alic.idAlicuota}">${alic.alicuota}</option>
                                             </c:forEach>
                                         </select>
                                     </div>
@@ -263,6 +266,10 @@
                                                     class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.enter.volume"/>
                                             </b>
                                         </label>
+                                    </div>
+
+                                    <div class="note">
+                                     <input style="border: none" id="inVolume" />
                                     </div>
                                 </section>
                             </div>
@@ -332,11 +339,12 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="addAliquot" value="/generacionAlicuota/addAliquot"/>
-<c:url var="getAliquots" value="/generacionAlicuota/getAliquots"/>
-<c:url var="overrideAliquot" value="/generacionAlicuota/overrideAliquot/"/>
-<c:url var="getTestOrders" value="/generacionAlicuota/getTestOrders"/>
+<c:url var="addAliquot" value="/separacionMx/addAliquot"/>
+<c:url var="getAliquots" value="/separacionMx/getAliquots"/>
+<c:url var="overrideAliquot" value="/separacionMx/overrideAliquot/"/>
+<c:url var="getTestOrders" value="/separacionMx/getTestOrders"/>
 <spring:url var="sPrintUrl" value="/resultados/printBC/"/>
+<c:url var="getVolume" value="/separacionMx/getVolume"/>
 
 <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
 <script type="text/javascript">
@@ -348,14 +356,15 @@
             sTableToolsPath : "${tabletools}",
             overrideAliquot: "${overrideAliquot}",
             sPrintUrl : "${sPrintUrl}",
-            getTestOrders: "${getTestOrders}"
+            getTestOrders: "${getTestOrders}",
+            volumeUrl: "${getVolume}"
 
         };
         GenerateAliquot.init(parametros);
         $("li.laboratorio").addClass("open");
-        $("li.generacionAlicuota").addClass("active");
+        $("li.separacionMx").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.generacionAlicuota").parents("ul").slideDown(200);
+            $("li.separacionMX").parents("ul").slideDown(200);
         }
     });
 </script>
