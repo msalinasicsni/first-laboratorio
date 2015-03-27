@@ -1,5 +1,8 @@
 package ni.gob.minsa.laboratorio.domain.examen;
 
+import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
+import org.hibernate.annotations.ForeignKey;
+
 import javax.persistence.*;
 
 /**
@@ -11,6 +14,7 @@ public class Direccion {
 
     Integer idDireccion;
     String nombre;
+    Laboratorio laboratorio;
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -33,4 +37,14 @@ public class Direccion {
         this.nombre = nombre;
     }
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "CODIGO_LAB", referencedColumnName = "CODIGO", nullable = false, insertable = true, updatable = true)
+    @ForeignKey(name = "DIRECCION_LABPERTENECE_FK")
+    public Laboratorio getLaboratorio() {
+        return laboratorio;
+    }
+
+    public void setLaboratorio(Laboratorio laboratorio) {
+        this.laboratorio = laboratorio;
+    }
 }

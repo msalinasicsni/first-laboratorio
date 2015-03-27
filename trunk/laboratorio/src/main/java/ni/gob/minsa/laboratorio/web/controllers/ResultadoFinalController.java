@@ -259,6 +259,7 @@ public class ResultadoFinalController {
         if (jObjectFiltro.get("resultado") != null && !jObjectFiltro.get("resultado").getAsString().isEmpty())
            resultado = jObjectFiltro.get("resultado").getAsString();
 
+        String nombreUsuario = seguridadService.obtenerNombreUsuario();
         filtroDx.setCodSilais(codSilais);
         filtroDx.setCodUnidadSalud(codUnidadSalud);
         filtroDx.setFechaInicioRecepLab(fechaInicioRecepcion);
@@ -271,6 +272,8 @@ public class ResultadoFinalController {
         filtroDx.setCodTipoSolicitud(codTipoSolicitud);
         filtroDx.setNombreSolicitud(nombreSolicitud);
         filtroDx.setResultado(resultado);
+        filtroDx.setNombreUsuario(nombreUsuario);
+        filtroDx.setNivelLaboratorio(seguridadService.esDirector(nombreUsuario)?3:seguridadService.esJefeDepartamento(nombreUsuario)?2:1);
 
         return filtroDx;
     }

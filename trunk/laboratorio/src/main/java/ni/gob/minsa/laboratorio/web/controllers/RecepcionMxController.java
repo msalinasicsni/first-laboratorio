@@ -1205,7 +1205,7 @@ public class RecepcionMxController {
             filtroMx.setIncluirMxInadecuada(true);
         }
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
-
+        filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         return filtroMx;
     }
 

@@ -148,7 +148,7 @@ public class AprobacionResultadoController {
             conResultado = jObjectFiltro.get("conResultado").getAsString();
         if (jObjectFiltro.get("solicitudAprobada") != null && !jObjectFiltro.get("solicitudAprobada").getAsString().isEmpty())
             solicitudAprobada = jObjectFiltro.get("solicitudAprobada").getAsBoolean();
-
+        String nombreUsuario = seguridadService.obtenerNombreUsuario();
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
         filtroMx.setFechaInicioTomaMx(fechaInicioTomaMx);
@@ -163,7 +163,8 @@ public class AprobacionResultadoController {
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setResultado(conResultado);
         filtroMx.setSolicitudAprobada(solicitudAprobada);
-
+        filtroMx.setNombreUsuario(nombreUsuario);
+        filtroMx.setNivelLaboratorio(seguridadService.esDirector(nombreUsuario)?3:seguridadService.esJefeDepartamento(nombreUsuario)?2:1);
         return filtroMx;
     }
 

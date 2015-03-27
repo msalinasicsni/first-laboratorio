@@ -1,4 +1,4 @@
-package ni.gob.minsa.laboratorio.domain.seguridad;
+package ni.gob.minsa.laboratorio.domain.seguridadlocal;
 
 import java.util.Date;
 import java.util.Set;
@@ -37,7 +37,7 @@ public class User {
 
     @Id
     @Column(name = "username", nullable = false, length =50)
-    @Size(min = 5, max = 50, message = "Nombre de usuario debe contener ontener mínimo 5 caracteres.")
+    @Size(min = 5, max = 50, message = "Nombre de usuario debe contener mínimo 5 caracteres.")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Solo alfanumerico sin espacios")
     @NotBlank(message = "No puede estar vacío.")
     public String getUsername() {

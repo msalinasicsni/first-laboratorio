@@ -4,6 +4,8 @@ import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -235,6 +237,43 @@ public class RecepcionMxService {
                 crit.add(conditGroup);
             }
         }
+        //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
+        if (filtro.getNombreUsuario()!=null) {
+            crit.createAlias("tomaMx.envio","envioMx");
+            crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));
+
+            if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepción en laboratorio
+                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                Junction conditGroup = Restrictions.disjunction();
+
+                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .createAlias("tipoEstudio", "estudio")
+                        .createAlias("estudio.area", "area")
+                        .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
+                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                .setProjection(Property.forName("area.idArea"))))
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idTomaMx.idTomaMx"))))
+                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .createAlias("codDx", "dx")
+                                .createAlias("dx.area","area")
+                                .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
+                                        .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                        .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                        .setProjection(Property.forName("area.idArea"))))
+                                .createAlias("idTomaMx", "toma")
+                                .setProjection(Property.forName("toma.idTomaMx"))));
+
+                crit.add(conditGroup);
+            }
+        }
+
         return crit.list();
     }
 

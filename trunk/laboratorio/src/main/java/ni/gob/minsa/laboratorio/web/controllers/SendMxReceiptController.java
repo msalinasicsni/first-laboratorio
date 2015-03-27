@@ -324,6 +324,7 @@ public class SendMxReceiptController {
         filtroMx.setCodEstado("ESTDMX|RCP"); // sólo las recepcionadas
         filtroMx.setIncluirMxInadecuada(true);
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
+        filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         return filtroMx;
     }
 }
