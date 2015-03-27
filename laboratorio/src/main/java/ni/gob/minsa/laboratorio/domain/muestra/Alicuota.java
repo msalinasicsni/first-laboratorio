@@ -8,23 +8,25 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by FIRSTICT on 12/9/2014.
  */
 @Entity
-@Table(name = "alicuotas_mx", schema = "laboratorio")
-public class Alicuota {
+@Table(name = "alicuotas_catalogo", schema = "laboratorio")
+public class Alicuota implements Serializable {
+
+
+    private static final long serialVersionUID = -2629993117114280146L;
     Integer idAlicuota;
     String alicuota;
-    Float volumen;
+    String volumen;
     String etiquetaPara;
-    Integer cantidad;
-    Integer dia;
     TipoMx tipoMuestra;
-    TipoNotificacion tipoNotificacion;
     TipoRecepcionMx tipoRecepcionMx;
-    TipoEstudio tipoEstudio;
+    Catalogo_Estudio estudio;
+    Catalogo_Dx diagnostico;
 
 
     @Id
@@ -48,14 +50,10 @@ public class Alicuota {
         this.alicuota = alicuota;
     }
 
-    @Column(name = "VOLUMEN", nullable = true)
-    public Float getVolumen() {
-        return volumen;
-    }
+    @Column(name = "VOLUMEN", nullable = true, length = 24)
+    public String getVolumen() { return volumen; }
 
-    public void setVolumen(Float volumen) {
-        this.volumen = volumen;
-    }
+    public void setVolumen(String volumen) { this.volumen = volumen; }
 
     @Basic
     @Column(name = "ETIQUETA_PARA", nullable = false, insertable = true, updatable = true, length = 100)
@@ -65,24 +63,6 @@ public class Alicuota {
 
     public void setEtiquetaPara(String etiquetaPara) {
         this.etiquetaPara = etiquetaPara;
-    }
-
-    @Column(name = "CANTIDAD", nullable = false, length = 2)
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    @Column(name = "DIA", nullable = true, length = 2)
-    public Integer getDia() {
-        return dia;
-    }
-
-    public void setDia(Integer dia) {
-        this.dia = dia;
     }
 
     @LazyCollection(LazyCollectionOption.FALSE)
@@ -98,18 +78,6 @@ public class Alicuota {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
-    @JoinColumn(name = "TIPO_NOTIFICACION", referencedColumnName = "CODIGO", nullable = false)
-    @ForeignKey(name = "ALICUOTA_TIPONOTI_FK")
-    public TipoNotificacion getTipoNotificacion() {
-        return tipoNotificacion;
-    }
-
-    public void setTipoNotificacion(TipoNotificacion tipoNotificacion) {
-        this.tipoNotificacion = tipoNotificacion;
-    }
-
-
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
     @JoinColumn(name = "TIPO_RECEPCION", referencedColumnName = "CODIGO", nullable = false)
     @ForeignKey(name = "ALICUOTA_TIPORECEP_FK")
     public TipoRecepcionMx getTipoRecepcionMx() {
@@ -120,10 +88,28 @@ public class Alicuota {
         this.tipoRecepcionMx = tipoRecepcionMx;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
-    @JoinColumn(name = "TIPO_ESTUDIO", referencedColumnName = "CODIGO", nullable = true)
-    @ForeignKey(name = "ALICUOTA_TIPOEST_FK")
-    public TipoEstudio getTipoEstudio() { return tipoEstudio; }
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(fetch = FetchType.LAZY )
+    @JoinColumn(name = "ESTUDIO", referencedColumnName = "ID_ESTUDIO", nullable = true)
+    @ForeignKey(name = "EST_FK")
+    public Catalogo_Estudio getEstudio() {
+        return estudio;
+    }
 
-    public void setTipoEstudio(TipoEstudio tipoEstudio) { this.tipoEstudio = tipoEstudio; }
+    public void setEstudio(Catalogo_Estudio estudio) {
+        this.estudio = estudio;
+    }
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DIAGNOSTICO", referencedColumnName = "ID_DIAGNOSTICO", nullable = true)
+    @ForeignKey(name = "ALICUOTA_TIPOEST_FK")
+
+    public Catalogo_Dx getDiagnostico() {
+        return diagnostico;
+    }
+
+    public void setDiagnostico(Catalogo_Dx diagnostico) {
+        this.diagnostico = diagnostico;
+    }
 }

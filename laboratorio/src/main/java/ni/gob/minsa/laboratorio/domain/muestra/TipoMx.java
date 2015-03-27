@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import org.hibernate.annotations.NamedQueries;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by souyen-ics on 11-13-14.
@@ -11,8 +12,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "tipo_muestra", schema = "alerta")
-    public class TipoMx {
+    public class TipoMx implements Serializable {
 
+    private static final long serialVersionUID = 6373407114599760842L;
     Integer idTipoMx;
     String nombre;
     boolean pasivo;

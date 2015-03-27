@@ -4,14 +4,16 @@ import ni.gob.minsa.laboratorio.domain.examen.Area;
 import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by souyen-ics.
  */
 @Entity
 @Table(name = "catalogo_dx", schema = "alerta")
-public class Catalogo_Dx {
+public class Catalogo_Dx implements Serializable {
 
+    private static final long serialVersionUID = 7177495708144097064L;
     private Integer idDiagnostico;
     private String nombre;
     private boolean pasivo;

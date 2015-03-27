@@ -113,8 +113,8 @@
                     <!-- end widget edit box -->
                     <!-- widget content -->
                     <div class="widget-body no-padding">
-                        <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.receipt.send.dx.date"/>"/>
-                        <input id="text_dx" type="hidden" value="<spring:message code="lbl.receipt.send.dx"/>"/>
+                        <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.solic.DateTime"/>"/>
+                        <input id="text_dx" type="hidden" value="<spring:message code="lbl.desc.request"/>"/>
                         <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                         <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                         <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
@@ -209,6 +209,30 @@
                                             <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.unique.code.mx"/></b>
                                         </label>
                                     </section>
+
+                                    <section class="col col-sm-12 col-md-7 col-lg-3">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <spring:message code="lbl.request.type" /> </label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                            <select id="tipo" name="tipo"
+                                                    class="select2">
+                                                <option value=""><spring:message code="lbl.select" />...</option>
+                                                <option value="Estudio"><spring:message code="lbl.study" /></option>
+                                                <option value="Rutina"><spring:message code="lbl.routine" /></option>
+                                            </select>
+                                        </div>
+                                    </section>
+
+                                    <section class="col col-sm-12 col-md-12 col-lg-4">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <spring:message code="lbl.desc.request" />
+                                        </label>
+                                        <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
+                                            <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.request.name"/>">
+                                            <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
+                                        </label>
+                                    </section>
                                 </div>
                             </fieldset>
                             <footer>
@@ -254,7 +278,7 @@
                                 <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                 <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
-                                <th><spring:message code="lbl.dx"/></th>
+                                <th><spring:message code="lbl.request.large"/></th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -334,10 +358,10 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <spring:url value="/personas/search" var="sPersonUrl"/>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="ordersUrl" value="/generacionAlicuota/search"/>
+<c:url var="ordersUrl" value="/separacionMx/search"/>
 
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-<c:url var="generateAliquot" value="/generacionAlicuota/create/"/>
+<c:url var="generateAliquot" value="/separacionMx/create/"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();

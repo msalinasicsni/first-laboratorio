@@ -216,6 +216,13 @@ public class TomaMxService {
         return q.list();
     }
 
+    public List<DaSolicitudEstudio> getSolicitudesEstudioByMx(String idTomaMx){
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
     public DaSolicitudDx getSolicitudesDxByMxDx(String idTomaMx,  Integer idDiagnostico){
         String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx " +
                 "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";
