@@ -317,7 +317,6 @@ var ReceiptOrders = function () {
                         if (ButtonPressed === opcSi) {
                             var urlImpresion ='';
                             bloquearUI(parametros.blockMess);
-                            alert("recepción");
                             var idRecepciones = {};
                             //el input hidden debe estar siempre en la primera columna
                             for (var i = 0; i < len; i++) {

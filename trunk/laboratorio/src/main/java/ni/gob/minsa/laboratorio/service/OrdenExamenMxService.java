@@ -152,6 +152,10 @@ public class OrdenExamenMxService {
         crit.add( Restrictions.and(
                         Restrictions.eq("ordenEx.anulado", false))
         );
+        //siempre se toman las ordenes con dx no aprobado
+        crit.add( Restrictions.and(
+                       Restrictions.eq("solicitudDx.aprobada", false))
+        );
         //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
             crit.add(Restrictions.and(
@@ -298,6 +302,10 @@ public class OrdenExamenMxService {
         //siempre se tomam las ordenes que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("ordenEx.anulado", false))
+        );
+        //siempre se toman las ordenes con estudio no aprobado
+        crit.add( Restrictions.and(
+                        Restrictions.eq("solicitudEstudio.aprobada", false))
         );
         //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
