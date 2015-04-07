@@ -204,7 +204,13 @@ var enterFinalResult = function(){
                                 var valor = '';
                                 if(lenDetRes > 0){
                                     for (var j = 0; j < lenDetRes; j++) {
-                                        if (detaResultados[j].respuesta.concepto.idConcepto==dataToLoad[i].concepto.idConcepto){
+                                        var respExistente;
+                                        if (detaResultados[j].respuesta != null)
+                                            respExistente = detaResultados[j].respuesta;
+                                        else {
+                                            respExistente = detaResultados[j].respuestaExamen;
+                                        }
+                                        if (respExistente.concepto.idConcepto==dataToLoad[i].concepto.idConcepto){
                                             valor = detaResultados[j].valor;
                                             console.log('se encontró valor: '+valor);
                                             break;
