@@ -146,7 +146,7 @@ var enterFinalResult = function(){
                 var idSolicitud = null;
                 var idSoliDx = $("#idSolicitud").val();
                 var idSoliE = $("#idSolicitudE").val();
-                if(idSoliDx != null){
+                if(idSoliDx != null && idSoliDx != ""){
                     idSolicitud = idSoliDx;
                 }else{
                     idSolicitud = idSoliE;
