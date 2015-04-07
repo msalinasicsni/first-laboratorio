@@ -192,6 +192,10 @@ public class ResultadoFinalService {
             crit.add( Restrictions.and(
                             Restrictions.eq("diagnostico.aprobada", true))
             );
+        }else{
+            crit.add( Restrictions.and(
+                            Restrictions.eq("diagnostico.aprobada", false))
+            );
         }
 
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
@@ -396,6 +400,10 @@ public class ResultadoFinalService {
         if (filtro.getSolicitudAprobada()!=null && filtro.getSolicitudAprobada()){
             crit.add( Restrictions.and(
                             Restrictions.eq("estudio.aprobada", true))
+            );
+        }else {
+            crit.add( Restrictions.and(
+                            Restrictions.eq("estudio.aprobada", false))
             );
         }
 
