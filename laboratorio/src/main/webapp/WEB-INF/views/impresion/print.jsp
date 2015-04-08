@@ -123,6 +123,7 @@
             // Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
             qz.append('\nN\n');
             qz.append('b1,2,D,c16,r16,"'+codigo+'"\n');
+            qz.append('A100,20,0,2,1,1,N,"'+codigo+'"\n');
             qz.append('P1,1\n');
             // Tell the applet to print.
             qz.print();
@@ -146,11 +147,11 @@
         deployQZ();
         useDefaultPrinter();
         var codigosImprimir = "${strBarCodes}";
-        console.log(codigosImprimir);
+        //console.log(codigosImprimir);
         var arrayCodigos = codigosImprimir.split(',');
         var lengthArray = arrayCodigos.length;
         for (var i = 0; i < lengthArray; i++) {
-            console.log(arrayCodigos[i]);
+           // console.log(arrayCodigos[i]);
             printEPL(arrayCodigos[i]);
         }
         window['qzDoneAppending'] = null;
