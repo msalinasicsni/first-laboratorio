@@ -173,47 +173,56 @@ public class ResultadoFinalController {
 
       if(estudioList != null){
           for(DaSolicitudEstudio estudio : estudioList){
-              Map<String, String> map = new HashMap<String, String>();
-              map.put("codigoUnicoMx", estudio.getIdTomaMx().getCodigoUnicoMx());
-              map.put("idTomaMx", estudio.getIdTomaMx().getIdTomaMx());
-              map.put("fechaTomaMx",DateUtil.DateToString(estudio.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-              map.put("codSilais", estudio.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-              map.put("codUnidadSalud", estudio.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-              map.put("tipoMuestra", estudio.getIdTomaMx().getCodTipoMx().getNombre());
-              //Si hay fecha de inicio de sintomas se muestra
-              Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(estudio.getIdTomaMx().getIdNotificacion().getIdNotificacion());
-              if (fechaInicioSintomas!=null)
-                  map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
-              else
-                  map.put("fechaInicioSintomas"," ");
-
-              //Si hay persona
-              if (estudio.getIdTomaMx().getIdNotificacion().getPersona()!=null){
-                  /// se obtiene el nombre de la persona asociada a la ficha
-                  String nombreCompleto = "";
-                  nombreCompleto = estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                  if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                      nombreCompleto = nombreCompleto +" "+ estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                  nombreCompleto = nombreCompleto+" "+ estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                  if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                      nombreCompleto = nombreCompleto +" "+ estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                  map.put("persona",nombreCompleto);
-              }else{
-                  map.put("persona"," ");
+              boolean agregar = true;
+              //para estudios cohorte dengue y clinico dengue, sólo tomar en cuenta la muestra inicial
+              if (estudio.getTipoEstudio().getIdEstudio() == 1 || estudio.getTipoEstudio().getIdEstudio() == 2){
+                  String codigoUnicoMx = estudio.getIdTomaMx().getCodigoUnicoMx();
+                  String inicial = codigoUnicoMx.substring(codigoUnicoMx.lastIndexOf('.') + 1, codigoUnicoMx.length());
+                  agregar = inicial.equals("1");
               }
+              if (agregar) {
+                  Map<String, String> map = new HashMap<String, String>();
+                  map.put("codigoUnicoMx", estudio.getIdTomaMx().getCodigoUnicoMx());
+                  map.put("idTomaMx", estudio.getIdTomaMx().getIdTomaMx());
+                  map.put("fechaTomaMx", DateUtil.DateToString(estudio.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                  map.put("codSilais", estudio.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                  map.put("codUnidadSalud", estudio.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                  map.put("tipoMuestra", estudio.getIdTomaMx().getCodTipoMx().getNombre());
+                  //Si hay fecha de inicio de sintomas se muestra
+                  Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(estudio.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                  if (fechaInicioSintomas != null)
+                      map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                  else
+                      map.put("fechaInicioSintomas", " ");
 
-              map.put("diagnostico", estudio.getTipoEstudio().getNombre());
-              map.put("idSolicitud", estudio.getIdSolicitudEstudio());
+                  //Si hay persona
+                  if (estudio.getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                      /// se obtiene el nombre de la persona asociada a la ficha
+                      String nombreCompleto = "";
+                      nombreCompleto = estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                      if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                          nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                      nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                      if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                          nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                      map.put("persona", nombreCompleto);
+                  } else {
+                      map.put("persona", " ");
+                  }
+
+                  map.put("diagnostico", estudio.getTipoEstudio().getNombre());
+                  map.put("idSolicitud", estudio.getIdSolicitudEstudio());
 
 
-              if(!resultadoFinalService.getDetResActivosBySolicitud(estudio.getIdSolicitudEstudio()).isEmpty()){
-                  map.put("resultadoS", "Si");
-              }else{
-                  map.put("resultadoS", "No");
+                  if (!resultadoFinalService.getDetResActivosBySolicitud(estudio.getIdSolicitudEstudio()).isEmpty()) {
+                      map.put("resultadoS", "Si");
+                  } else {
+                      map.put("resultadoS", "No");
+                  }
+
+                  mapResponse.put(indice, map);
+                  indice++;
               }
-
-              mapResponse.put(indice, map);
-              indice ++;
           }
       }
 
@@ -432,7 +441,8 @@ public class ResultadoFinalController {
     public @ResponseBody
     List<DetalleResultadoFinal> getDetResFinalBySolicitud(@RequestParam(value = "idSolicitud", required = true) String idSolicitud) throws Exception {
         logger.info("Se obtienen los detalles de resultados activos para la solicitud");
-        return  resultadoFinalService.getDetResActivosBySolicitud(idSolicitud);
+        List<DetalleResultadoFinal> resultados = resultadoFinalService.getDetResActivosBySolicitud(idSolicitud);
+        return resultados;
     }
 
     @RequestMapping(value = "saveFinalResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
