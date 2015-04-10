@@ -272,6 +272,7 @@ var GenerateAliquot  = function () {
 
                                unBlockUI();
                             }
+                            idalicuotas = reemplazar(idalicuotas,".","*");
                             var loc = window.location;
                             urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+idalicuotas;
                             imprimir(urlImpresion);
@@ -306,6 +307,18 @@ var GenerateAliquot  = function () {
                 }
             }
 
+            function reemplazar (texto, buscar, nuevo){
+                var temp = '';
+                var long = texto.length;
+                for (j=0; j<long; j++) {
+                    if (texto[j] == buscar)
+                    {
+                        temp += nuevo;
+                    } else
+                        temp += texto[j];
+                }
+                return temp;
+            }
 
         }
     };

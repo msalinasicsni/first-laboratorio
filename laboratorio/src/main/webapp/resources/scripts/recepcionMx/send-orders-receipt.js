@@ -228,10 +228,7 @@ var SendOrdersReceipt = function () {
                             for (var i = 0; i < len; i++) {
                                 //var texto = aSelectedTrs[i].cells[7].innerHTML;
                                 var texto = aSelectedTrs[i].firstChild.innerHTML;
-                                console.log(texto);
                                 var input = texto.substring(texto.lastIndexOf("<"),texto.length);
-                                //console.log(input);
-                                console.log($(input).val());
                                 idOrdenes[i]=$(input).val();
                             }
                             var ordenesObj = {};

@@ -359,8 +359,9 @@ var ReceiptOrders = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
+                                            var codUnicosFormat = reemplazar(data.codigosUnicosMx,".","*");
                                             var loc = window.location;
-                                            urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+data.codigosUnicosMx;
+                                            urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+codUnicosFormat;
                                             getMxs(false);
                                         }
                                         desbloquearUI();
@@ -521,8 +522,9 @@ var ReceiptOrders = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
+                                var codUnicoFormat = reemplazar(data.codigoUnicoMx,".","*");
                                 var loc = window.location;
-                                urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+data.codigoUnicoMx;
+                                urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+codUnicoFormat;
                                 limpiarDatosRecepcion();
                                 setTimeout(function () {window.location.href = parametros.sSearchReceiptUrl},4000);
                             }
@@ -863,6 +865,19 @@ var ReceiptOrders = function () {
                     $('#txtCodUnicoMx').val('');
                 }
             });
+
+            function reemplazar (texto, buscar, nuevo){
+                var temp = '';
+                var long = texto.length;
+                for (j=0; j<long; j++) {
+                    if (texto[j] == buscar)
+                    {
+                        temp += nuevo;
+                    } else
+                        temp += texto[j];
+                }
+                return temp;
+            }
         }
     };
 
