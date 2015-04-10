@@ -27,6 +27,7 @@ public class Alicuota implements Serializable {
     TipoRecepcionMx tipoRecepcionMx;
     Catalogo_Estudio estudio;
     Catalogo_Dx diagnostico;
+    boolean pasivo;
 
 
     @Id
@@ -111,5 +112,15 @@ public class Alicuota implements Serializable {
 
     public void setDiagnostico(Catalogo_Dx diagnostico) {
         this.diagnostico = diagnostico;
+    }
+
+    @Basic
+    @Column(name = "PASIVO", nullable = true, insertable = true, updatable = true)
+    public boolean isPasivo() {
+        return pasivo;
+    }
+
+    public void setPasivo(boolean pasivo) {
+        this.pasivo = pasivo;
     }
 }
