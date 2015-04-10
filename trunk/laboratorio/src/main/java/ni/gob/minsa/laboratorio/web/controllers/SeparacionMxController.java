@@ -298,531 +298,23 @@ public class SeparacionMxController {
                         //caso de estudio cohorte
                         switch (nombreEstudio) {
                             case "Cohorte Dengue":
-                                String categoria = soliE.getIdTomaMx().getCategoriaMx().getValor();
-                                if (codigo.contains("."))
-                                    clasificacion = codigo.substring(codigo.lastIndexOf(".") + 1);
-                                if (clasificacion != null) {
-                                    //En caso de ser una mx gategoria A y de clasificacion Aguda (1) realizar la generacion de 9 alicuotas
-
-                                    //si el tipo de mx es suero hacer la generacion las 9 alicuotas
-                                    if (nombreMx.equals("Suero")) {
-                                        if (clasificacion.equals("1") && (categoria.equals("A") || categoria.equals("B"))) {
-                                            //crear 1 alicuota Serologia
-                                            //obtener alicuota catalogo para serologia
-                                            Alicuota alicSero = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "SER");
-                                            if (alicSero != null) {
-                                                addAliq(request, 1, alicSero, codigo, soliE, null);
-                                            }
-
-                                            //obtener alicuota catalogo para PCR
-                                            Alicuota alicuotaPCR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "PC");
-                                            if (alicuotaPCR != null) {
-                                                addAliq(request, 3, alicuotaPCR, codigo, soliE, null);
-                                            }
-
-                                            //obtener alicuota catalogo para Aislamiento Viral
-                                            Alicuota alicuotaAV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AV");
-                                            if (alicuotaAV != null) {
-                                                addAliq(request, 3, alicuotaAV, codigo, soliE, null);
-                                            }
-
-                                            //Obtener alicuota catalogo para Archivo
-                                            Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
-                                            if (alicuotaAR != null) {
-                                                addAliq(request, 2, alicuotaAR, codigo, soliE, null);
-                                            }
-                                        } else if (clasificacion.equals("2") && (categoria.equals("A") || categoria.equals("B"))) {
-                                            //En caso de ser una mx gategoria A y de clasificacion Convaleciente (2) realizar la generacion de 3 alicuotas
-                                            //obtener alicuota catalogo para serologia
-                                            Alicuota alicSero = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "SER");
-                                            if (alicSero != null) {
-                                                addAliq(request, 1, alicSero, codigo, soliE, null);
-                                            }
-
-                                            //Obtener alicuota catalogo para Archivo
-                                            Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
-                                            if (alicuotaAR != null) {
-                                                addAliq(request, 2, alicuotaAR, codigo, soliE, null);
-                                            }
-
-                                        }
-                                    }
-                                }
-
+                                    generarAliqEstudioCohorteDengue(soliE, request);
                                 break;
                             case "Clínico Dengue":
-                                if (codigo.contains("."))
-                                    clasificacion = codigo.substring(codigo.lastIndexOf(".") + 1);
-                                if (clasificacion != null) {
-                                    //En caso de ser una mx aguda (1) realizar generacion de alicuotas de todas las alicuotas del tipo de la mx tomada
-                                    switch (clasificacion) {
-                                        case "1":
-                                            //Realizar la generacion de alicuotas segun tipo de mx
-                                            //Mx suero
-                                            switch (nombreMx) {
-                                                case "Suero":
-                                                    //Obtener alicuota para PCR (b)
-                                                    Alicuota alicuotaPCRb = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "b");
-                                                    if (alicuotaPCRb != null) {
-                                                        addAliq(request, 1, alicuotaPCRb, codigo, soliE, null);
-                                                    }
-                                                    //Obtener alicuota para PCR (c)
-                                                    Alicuota alicuotaPCRc = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "c");
-                                                    if (alicuotaPCRc != null) {
-                                                        addAliq(request, 1, alicuotaPCRc, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PCR(d)
-                                                    Alicuota alicuotaPCRd = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "d");
-                                                    if (alicuotaPCRd != null) {
-                                                        addAliq(request, 1, alicuotaPCRd, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para AV(e)
-                                                    Alicuota alicuotaAVe = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "e");
-                                                    if (alicuotaAVe != null) {
-                                                        addAliq(request, 1, alicuotaAVe, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para AV(f)
-                                                    Alicuota alicuotaAVf = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "f");
-                                                    if (alicuotaAVf != null) {
-                                                        addAliq(request, 1, alicuotaAVf, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para AV(g)
-                                                    Alicuota alicuotaAVg = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "g");
-                                                    if (alicuotaAVg != null) {
-                                                        addAliq(request, 1, alicuotaAVg, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para archivo (h)
-                                                    Alicuota alicuotah = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "h");
-                                                    if (alicuotah != null) {
-                                                        addAliq(request, 1, alicuotah, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para archivo (i)
-                                                    Alicuota alicuotai = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "i");
-                                                    if (alicuotai != null) {
-                                                        addAliq(request, 1, alicuotai, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para NS1
-                                                    Alicuota alicuotaS = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "s");
-                                                    if (alicuotaS != null) {
-                                                        addAliq(request, 1, alicuotaS, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para viremia
-                                                    Alicuota alicuotat = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "t");
-                                                    if (alicuotat != null) {
-                                                        addAliq(request, 1, alicuotat, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para TDR
-                                                    Alicuota alicuotau = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "u");
-                                                    if (alicuotau != null) {
-                                                        addAliq(request, 1, alicuotau, codigo, soliE, null);
-                                                    }
-
-                                                    break;
-                                                case "Plasma":
-                                                    //Obtener alicuota para serologia (a)
-                                                    Alicuota alicuotaa = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "a");
-                                                    if (alicuotaa != null) {
-                                                        addAliq(request, 1, alicuotaa, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (j)
-                                                    Alicuota alicuotaj = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "j");
-                                                    if (alicuotaj != null) {
-                                                        addAliq(request, 1, alicuotaj, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (k)
-                                                    Alicuota alicuotak = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "k");
-                                                    if (alicuotak != null) {
-                                                        addAliq(request, 1, alicuotak, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (xx)
-                                                    Alicuota alicuotaxx = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "xx");
-                                                    if (alicuotaxx != null) {
-                                                        addAliq(request, 1, alicuotaxx, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (RV1)
-                                                    Alicuota alicuotaRV1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV1");
-                                                    if (alicuotaRV1 != null) {
-                                                        addAliq(request, 1, alicuotaRV1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (RV2)
-                                                    Alicuota alicuotaRV2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV2");
-                                                    if (alicuotaRV2 != null) {
-                                                        addAliq(request, 1, alicuotaRV2, codigo, soliE, null);
-                                                    }
-
-                                                    break;
-                                                case "PBMC":
-                                                    //Obtener alicuota para PBMC (m)
-                                                    Alicuota alicuotam = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "m");
-                                                    if (alicuotam != null) {
-                                                        addAliq(request, 1, alicuotam, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PBMC (n)
-                                                    Alicuota alicuotan = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "n");
-                                                    if (alicuotan != null) {
-                                                        addAliq(request, 1, alicuotan, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PBMC (o)
-                                                    Alicuota alicuotao = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "o");
-                                                    if (alicuotao != null) {
-                                                        addAliq(request, 1, alicuotao, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Adn":
-                                                    //Obtener alicuota para mcmaster (r)
-                                                    Alicuota alicuotar = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "r");
-                                                    if (alicuotar != null) {
-                                                        addAliq(request, 1, alicuotar, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Saliva":
-                                                    //Obtener alicuota para metabolomica (v1)
-                                                    Alicuota alicuotav1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v1");
-                                                    if (alicuotav1 != null) {
-                                                        addAliq(request, 1, alicuotav1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para metabolomica (v2)
-                                                    Alicuota alicuotav2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v2");
-                                                    if (alicuotav2 != null) {
-                                                        addAliq(request, 1, alicuotav2, codigo, soliE, null);
-                                                    }
-
-                                                    break;
-                                                case "Orina":
-                                                    //Obtener alicuota para metabolomica (w1)
-                                                    Alicuota alicuotaw1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w1");
-                                                    if (alicuotaw1 != null) {
-                                                        addAliq(request, 1, alicuotaw1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para metabolomica (w2)
-                                                    Alicuota alicuotaw2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w2");
-                                                    if (alicuotaw2 != null) {
-                                                        addAliq(request, 1, alicuotaw2, codigo, soliE, null);
-                                                    }
-
-                                                    break;
-                                                case "PAXGENE":
-                                                    //Obtener alicuota para Q1
-                                                    Alicuota alicuotaQ1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q1");
-                                                    if (alicuotaQ1 != null) {
-                                                        addAliq(request, 1, alicuotaQ1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para Q2
-                                                    Alicuota alicuotaQ2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q2");
-                                                    if (alicuotaQ2 != null) {
-                                                        addAliq(request, 1, alicuotaQ2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                            }
-                                            //En caso de ser una mx convaleciente (9)
-                                            break;
-                                        case "9":
-                                            //si un tipo de mx plasma
-                                            switch (nombreMx) {
-                                                case "Plasma":
-                                                    //Obtener alicuota para serologia (a)
-                                                    Alicuota alicuotaa = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "a");
-                                                    if (alicuotaa != null) {
-                                                        addAliq(request, 1, alicuotaa, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (j)
-                                                    Alicuota alicuotaj = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "j");
-                                                    if (alicuotaj != null) {
-                                                        addAliq(request, 1, alicuotaj, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (k)
-                                                    Alicuota alicuotak = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "k");
-                                                    if (alicuotak != null) {
-                                                        addAliq(request, 1, alicuotak, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (xx)
-                                                    Alicuota alicuotaxx = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "xx");
-                                                    if (alicuotaxx != null) {
-                                                        addAliq(request, 1, alicuotaxx, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (RV1)
-                                                    Alicuota alicuotaRV1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV1");
-                                                    if (alicuotaRV1 != null) {
-                                                        addAliq(request, 1, alicuotaRV1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (RV2)
-                                                    Alicuota alicuotaRV2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV2");
-                                                    if (alicuotaRV2 != null) {
-                                                        addAliq(request, 1, alicuotaRV2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Suero":
-                                                    //Obtener alicuota para TDR
-                                                    Alicuota alicuotau = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "u");
-                                                    if (alicuotau != null) {
-                                                        addAliq(request, 1, alicuotau, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "PBMC":
-                                                    //Obtener alicuota para PBMC (m)
-                                                    Alicuota alicuotam = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "m");
-                                                    if (alicuotam != null) {
-                                                        addAliq(request, 1, alicuotam, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PBMC (n)
-                                                    Alicuota alicuotan = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "n");
-                                                    if (alicuotan != null) {
-                                                        addAliq(request, 1, alicuotan, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PBMC (o)
-                                                    Alicuota alicuotao = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "o");
-                                                    if (alicuotao != null) {
-                                                        addAliq(request, 1, alicuotao, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Adn":
-                                                    //Obtener alicuota para mcmaster (r)
-                                                    Alicuota alicuotar = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "r");
-                                                    if (alicuotar != null) {
-                                                        addAliq(request, 1, alicuotar, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Saliva":
-                                                    //Obtener alicuota para metabolomica (v1)
-                                                    Alicuota alicuotav1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v1");
-                                                    if (alicuotav1 != null) {
-                                                        addAliq(request, 1, alicuotav1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para metabolomica (v2)
-                                                    Alicuota alicuotav2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v2");
-                                                    if (alicuotav2 != null) {
-                                                        addAliq(request, 1, alicuotav2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Orina":
-                                                    //Obtener alicuota para metabolomica (w1)
-                                                    Alicuota alicuotaw1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w1");
-                                                    if (alicuotaw1 != null) {
-                                                        addAliq(request, 1, alicuotaw1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para metabolomica (w2)
-                                                    Alicuota alicuotaw2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w2");
-                                                    if (alicuotaw2 != null) {
-                                                        addAliq(request, 1, alicuotaw2, codigo, soliE, null);
-                                                    }
-
-                                                    break;
-                                                case "PAXGENE":
-                                                    //Obtener alicuota para Q1
-                                                    Alicuota alicuotaQ1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q1");
-                                                    if (alicuotaQ1 != null) {
-                                                        addAliq(request, 1, alicuotaQ1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para Q2
-                                                    Alicuota alicuotaQ2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q2");
-                                                    if (alicuotaQ2 != null) {
-                                                        addAliq(request, 1, alicuotaQ2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                            }
-                                            //
-                                            break;
-                                        case "2":
-                                        case "3":
-                                            //Generacion de Alicuotas segun tipo de mx
-                                            switch (nombreMx) {
-                                                case "Plasma":
-
-                                                    //Obtener alicuota para serologia (j)
-                                                    Alicuota alicuotaj = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "j");
-                                                    if (alicuotaj != null) {
-                                                        addAliq(request, 1, alicuotaj, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (k)
-                                                    Alicuota alicuotak = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "k");
-                                                    if (alicuotak != null) {
-                                                        addAliq(request, 1, alicuotak, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para serologia (xx)
-                                                    Alicuota alicuotaxx = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "xx");
-                                                    if (alicuotaxx != null) {
-                                                        addAliq(request, 1, alicuotaxx, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "PBMC":
-                                                    //Obtener alicuota para PBMC (m)
-                                                    Alicuota alicuotam = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "m");
-                                                    if (alicuotam != null) {
-                                                        addAliq(request, 1, alicuotam, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PBMC (n)
-                                                    Alicuota alicuotan = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "n");
-                                                    if (alicuotan != null) {
-                                                        addAliq(request, 1, alicuotan, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para PBMC (o)
-                                                    Alicuota alicuotao = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "o");
-                                                    if (alicuotao != null) {
-                                                        addAliq(request, 1, alicuotao, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Adn":
-                                                    //Obtener alicuota para mcmaster (r)
-                                                    Alicuota alicuotar = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "r");
-                                                    if (alicuotar != null) {
-                                                        addAliq(request, 1, alicuotar, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Suero":
-                                                    //Obtener alicuota para TDR
-                                                    Alicuota alicuotau = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "u");
-                                                    if (alicuotau != null) {
-                                                        addAliq(request, 1, alicuotau, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Saliva":
-                                                    //Obtener alicuota para metabolomica (v1)
-                                                    Alicuota alicuotav1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v1");
-                                                    if (alicuotav1 != null) {
-                                                        addAliq(request, 1, alicuotav1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para metabolomica (v2)
-                                                    Alicuota alicuotav2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v2");
-                                                    if (alicuotav2 != null) {
-                                                        addAliq(request, 1, alicuotav2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "Orina":
-                                                    //Obtener alicuota para metabolomica (w1)
-                                                    Alicuota alicuotaw1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w1");
-                                                    if (alicuotaw1 != null) {
-                                                        addAliq(request, 1, alicuotaw1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para metabolomica (w2)
-                                                    Alicuota alicuotaw2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w2");
-                                                    if (alicuotaw2 != null) {
-                                                        addAliq(request, 1, alicuotaw2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                                case "PAXGENE":
-                                                    //Obtener alicuota para Q1
-                                                    Alicuota alicuotaQ1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q1");
-                                                    if (alicuotaQ1 != null) {
-                                                        addAliq(request, 1, alicuotaQ1, codigo, soliE, null);
-                                                    }
-
-                                                    //Obtener alicuota para Q2
-                                                    Alicuota alicuotaQ2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q2");
-                                                    if (alicuotaQ2 != null) {
-                                                        addAliq(request, 1, alicuotaQ2, codigo, soliE, null);
-                                                    }
-                                                    break;
-                                            }
-                                            break;
-                                    }
-                                }
+                                    generarAliqEstudioClinicoDengue(soliE, request);
                                 break;
                             case "Cohorte Influenza":
-                                //Generar 2 alicuotas PCR
-                                Alicuota alicuotaPCR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "PC");
-                                if (alicuotaPCR != null) {
-                                    addAliq(request, 2, alicuotaPCR, codigo, soliE, null);
-                                }
-
-                                //Generar 1 alicuota Aislamiento Viral
-                                Alicuota alicuotaAV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AV");
-                                if (alicuotaAV != null) {
-                                    addAliq(request, 1, alicuotaAV, codigo, soliE, null);
-                                }
-
-                                //Generar 2 alicuotas para archivo
-                                Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
-                                if (alicuotaAR != null) {
-                                    addAliq(request, 2, alicuotaAR, codigo, soliE, null);
-                                }
+                                generarAligEstudioCohorteInfluenza(soliE,request);
                                 break;
-
                             case "Transmisión Influenza":
-                                if(nombreMx.equals("Hisopado")){
-                                 //Generar 1 alicuota para PC
-                                 Alicuota alicuotaPC = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"PC");
-                                if(alicuotaPC != null){
-                                    addAliq(request,1,alicuotaPC,codigo,soliE,null);
-                                }
-
-                                    //Generar 1 alicuota para Archivo
-                                 Alicuota alicuotaARC = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"AR");
-                                    if(alicuotaARC != null){
-                                        addAliq(request,1,alicuotaARC,codigo,soliE,null);
-                                    }
-
-                                    //Generar 1 alicuota para Aislamiento Viral
-                                    Alicuota alicuotaAisV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"AV");
-                                    if(alicuotaAisV != null){
-                                        addAliq(request,1,alicuotaAisV,codigo,soliE,null);
-                                    }
-
-                                }
-
-                                if(nombreMx.equals("Suero")){
-                                    //Generar 2 alicuotas archivo
-                                    Alicuota alicuotaArchivo = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"AR");
-                                    if(alicuotaArchivo != null){
-                                        addAliq(request,2,alicuotaArchivo,codigo,soliE,null);
-                                    }
-                                }
+                                generarAliqEstudioTransmisionInfluenza(soliE, request);
+                                break;
                         }
-
-
                     }else{
-                     String nombreDx = soliDx.getCodDx().getNombre();
-                     String codigo = soliDx.getIdTomaMx().getCodigoUnicoMx();
-                     Integer idTipoMx = soliDx.getIdTomaMx().getCodTipoMx().getIdTipoMx();
-                     Integer idDx = soliDx.getCodDx().getIdDiagnostico();
-                     String nombreMx = soliDx.getIdTomaMx().getCodTipoMx().getNombre();
+                        String nombreDx = soliDx.getCodDx().getNombre();
 
                         if(nombreDx.equals("Diagnóstico Influenza")){
-                            //generar 1 alicuota PCR
-                            Alicuota alicuotaPCR = separacionMxService.getAliquotCatByTipoMxDxEtiqueta(idTipoMx,idDx,"PC" );
-                            if(alicuotaPCR != null){
-                                addAliq(request,1,alicuotaPCR,codigo,null,soliDx);
-                            }
-
-                            //generar 1 alicuota archivo
-                            Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxDxEtiqueta(idTipoMx,idDx,"AR" );
-                            if(alicuotaAR != null){
-                                addAliq(request,1,alicuotaAR,codigo,null,soliDx);
-                            }
+                            generarAliqDiagnosticoInfluenza(soliDx,request);
                         }
                     }
 
@@ -1058,4 +550,627 @@ public class SeparacionMxController {
         }
     }
 
+    private void generarAliqEstudioCohorteDengue(DaSolicitudEstudio soliE, HttpServletRequest request) throws Exception{
+        String codigo = soliE.getIdTomaMx().getCodigoUnicoMx();
+        String clasificacion = null;
+        Integer idTipoMx = soliE.getIdTomaMx().getCodTipoMx().getIdTipoMx();
+        Integer idEstudio = soliE.getTipoEstudio().getIdEstudio();
+        String nombreMx = soliE.getIdTomaMx().getCodTipoMx().getNombre();
+        String categoria = soliE.getIdTomaMx().getCategoriaMx().getValor();
+        if (codigo.contains("."))
+            clasificacion = codigo.substring(codigo.lastIndexOf(".") + 1);
+        if (clasificacion != null) {
+            //En caso de ser una mx gategoria A y de clasificacion Aguda (1) realizar la generacion de 9 alicuotas
+
+            //si el tipo de mx es suero hacer la generacion las 9 alicuotas
+            if (nombreMx.equals("Suero")) {
+                if (clasificacion.equals("1") && (categoria.equals("A") || categoria.equals("B"))) {
+                    //crear 1 alicuota Serologia
+                    //obtener alicuota catalogo para serologia
+                    Alicuota alicSero = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "SER");
+                    if (alicSero != null) {
+                        addAliq(request, 1, alicSero, codigo, soliE, null);
+                    }
+
+                    //obtener alicuota catalogo para PCR
+                    Alicuota alicuotaPCR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "PC");
+                    if (alicuotaPCR != null) {
+                        addAliq(request, 3, alicuotaPCR, codigo, soliE, null);
+                    }
+
+                    //obtener alicuota catalogo para Aislamiento Viral
+                    Alicuota alicuotaAV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AV");
+                    if (alicuotaAV != null) {
+                        addAliq(request, 3, alicuotaAV, codigo, soliE, null);
+                    }
+
+                    //Obtener alicuota catalogo para Archivo
+                    Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
+                    if (alicuotaAR != null) {
+                        addAliq(request, 2, alicuotaAR, codigo, soliE, null);
+                    }
+                } else if (clasificacion.equals("2") && (categoria.equals("A") || categoria.equals("B"))) {
+                    //En caso de ser una mx gategoria A y de clasificacion Convaleciente (2) realizar la generacion de 3 alicuotas
+                    //obtener alicuota catalogo para serologia
+                    Alicuota alicSero = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "SER");
+                    if (alicSero != null) {
+                        addAliq(request, 1, alicSero, codigo, soliE, null);
+                    }
+
+                    //Obtener alicuota catalogo para Archivo
+                    Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
+                    if (alicuotaAR != null) {
+                        addAliq(request, 2, alicuotaAR, codigo, soliE, null);
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void generarAliqEstudioClinicoDengue(DaSolicitudEstudio soliE, HttpServletRequest request) throws Exception {
+        String codigo = soliE.getIdTomaMx().getCodigoUnicoMx();
+        String clasificacion = null;
+        Integer idTipoMx = soliE.getIdTomaMx().getCodTipoMx().getIdTipoMx();
+        Integer idEstudio = soliE.getTipoEstudio().getIdEstudio();
+        String nombreMx = soliE.getIdTomaMx().getCodTipoMx().getNombre();
+        if (codigo.contains("."))
+            clasificacion = codigo.substring(codigo.lastIndexOf(".") + 1);
+        if (clasificacion != null) {
+            //En caso de ser una mx aguda (1) realizar generacion de alicuotas de todas las alicuotas del tipo de la mx tomada
+            switch (clasificacion) {
+                case "1":
+                    //Realizar la generacion de alicuotas segun tipo de mx
+                    //Mx suero
+                    switch (nombreMx) {
+                        case "Suero":
+                            //Obtener alicuota para PCR (b)
+                            Alicuota alicuotaPCRb = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "b");
+                            if (alicuotaPCRb != null) {
+                                addAliq(request, 1, alicuotaPCRb, codigo, soliE, null);
+                            }
+                            //Obtener alicuota para PCR (c)
+                            Alicuota alicuotaPCRc = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "c");
+                            if (alicuotaPCRc != null) {
+                                addAliq(request, 1, alicuotaPCRc, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PCR(d)
+                            Alicuota alicuotaPCRd = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "d");
+                            if (alicuotaPCRd != null) {
+                                addAliq(request, 1, alicuotaPCRd, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para AV(e)
+                            Alicuota alicuotaAVe = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "e");
+                            if (alicuotaAVe != null) {
+                                addAliq(request, 1, alicuotaAVe, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para AV(f)
+                            Alicuota alicuotaAVf = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "f");
+                            if (alicuotaAVf != null) {
+                                addAliq(request, 1, alicuotaAVf, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para AV(g)
+                            Alicuota alicuotaAVg = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "g");
+                            if (alicuotaAVg != null) {
+                                addAliq(request, 1, alicuotaAVg, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para archivo (h)
+                            Alicuota alicuotah = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "h");
+                            if (alicuotah != null) {
+                                addAliq(request, 1, alicuotah, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para archivo (i)
+                            Alicuota alicuotai = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "i");
+                            if (alicuotai != null) {
+                                addAliq(request, 1, alicuotai, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para NS1
+                            Alicuota alicuotaS = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "s");
+                            if (alicuotaS != null) {
+                                addAliq(request, 1, alicuotaS, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para viremia
+                            Alicuota alicuotat = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "t");
+                            if (alicuotat != null) {
+                                addAliq(request, 1, alicuotat, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para TDR
+                            Alicuota alicuotau = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "u");
+                            if (alicuotau != null) {
+                                addAliq(request, 1, alicuotau, codigo, soliE, null);
+                            }
+
+                            break;
+                        case "Plasma":
+                            //Obtener alicuota para serologia (a)
+                            Alicuota alicuotaa = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "a");
+                            if (alicuotaa != null) {
+                                addAliq(request, 1, alicuotaa, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (j)
+                            Alicuota alicuotaj = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "j");
+                            if (alicuotaj != null) {
+                                addAliq(request, 1, alicuotaj, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (k)
+                            Alicuota alicuotak = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "k");
+                            if (alicuotak != null) {
+                                addAliq(request, 1, alicuotak, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (xx)
+                            Alicuota alicuotaxx = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "xx");
+                            if (alicuotaxx != null) {
+                                addAliq(request, 1, alicuotaxx, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (RV1)
+                            Alicuota alicuotaRV1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV1");
+                            if (alicuotaRV1 != null) {
+                                addAliq(request, 1, alicuotaRV1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (RV2)
+                            Alicuota alicuotaRV2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV2");
+                            if (alicuotaRV2 != null) {
+                                addAliq(request, 1, alicuotaRV2, codigo, soliE, null);
+                            }
+
+                            break;
+                        case "PBMC":
+                            //Obtener alicuota para PBMC (m)
+                            Alicuota alicuotam = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "m");
+                            if (alicuotam != null) {
+                                addAliq(request, 1, alicuotam, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PBMC (n)
+                            Alicuota alicuotan = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "n");
+                            if (alicuotan != null) {
+                                addAliq(request, 1, alicuotan, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PBMC (o)
+                            Alicuota alicuotao = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "o");
+                            if (alicuotao != null) {
+                                addAliq(request, 1, alicuotao, codigo, soliE, null);
+                            }
+                            break;
+                        case "Adn":
+                            //Obtener alicuota para mcmaster (r)
+                            Alicuota alicuotar = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "r");
+                            if (alicuotar != null) {
+                                addAliq(request, 1, alicuotar, codigo, soliE, null);
+                            }
+                            break;
+                        case "Saliva":
+                            //Obtener alicuota para metabolomica (v1)
+                            Alicuota alicuotav1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v1");
+                            if (alicuotav1 != null) {
+                                addAliq(request, 1, alicuotav1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para metabolomica (v2)
+                            Alicuota alicuotav2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v2");
+                            if (alicuotav2 != null) {
+                                addAliq(request, 1, alicuotav2, codigo, soliE, null);
+                            }
+
+                            break;
+                        case "Orina":
+                            //Obtener alicuota para metabolomica (w1)
+                            Alicuota alicuotaw1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w1");
+                            if (alicuotaw1 != null) {
+                                addAliq(request, 1, alicuotaw1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para metabolomica (w2)
+                            Alicuota alicuotaw2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w2");
+                            if (alicuotaw2 != null) {
+                                addAliq(request, 1, alicuotaw2, codigo, soliE, null);
+                            }
+
+                            break;
+                        case "PAXGENE":
+                            //Obtener alicuota para Q1
+                            Alicuota alicuotaQ1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q1");
+                            if (alicuotaQ1 != null) {
+                                addAliq(request, 1, alicuotaQ1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para Q2
+                            Alicuota alicuotaQ2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q2");
+                            if (alicuotaQ2 != null) {
+                                addAliq(request, 1, alicuotaQ2, codigo, soliE, null);
+                            }
+                            break;
+                    }
+                    //En caso de ser una mx convaleciente (9)
+                    break;
+                case "9":
+                    //si un tipo de mx plasma
+                    switch (nombreMx) {
+                        case "Plasma":
+                            //Obtener alicuota para serologia (a)
+                            Alicuota alicuotaa = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "a");
+                            if (alicuotaa != null) {
+                                addAliq(request, 1, alicuotaa, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (j)
+                            Alicuota alicuotaj = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "j");
+                            if (alicuotaj != null) {
+                                addAliq(request, 1, alicuotaj, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (k)
+                            Alicuota alicuotak = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "k");
+                            if (alicuotak != null) {
+                                addAliq(request, 1, alicuotak, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (xx)
+                            Alicuota alicuotaxx = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "xx");
+                            if (alicuotaxx != null) {
+                                addAliq(request, 1, alicuotaxx, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (RV1)
+                            Alicuota alicuotaRV1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV1");
+                            if (alicuotaRV1 != null) {
+                                addAliq(request, 1, alicuotaRV1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (RV2)
+                            Alicuota alicuotaRV2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "RV2");
+                            if (alicuotaRV2 != null) {
+                                addAliq(request, 1, alicuotaRV2, codigo, soliE, null);
+                            }
+                            break;
+                        case "Suero":
+                            //Obtener alicuota para TDR
+                            Alicuota alicuotau = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "u");
+                            if (alicuotau != null) {
+                                addAliq(request, 1, alicuotau, codigo, soliE, null);
+                            }
+                            break;
+                        case "PBMC":
+                            //Obtener alicuota para PBMC (m)
+                            Alicuota alicuotam = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "m");
+                            if (alicuotam != null) {
+                                addAliq(request, 1, alicuotam, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PBMC (n)
+                            Alicuota alicuotan = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "n");
+                            if (alicuotan != null) {
+                                addAliq(request, 1, alicuotan, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PBMC (o)
+                            Alicuota alicuotao = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "o");
+                            if (alicuotao != null) {
+                                addAliq(request, 1, alicuotao, codigo, soliE, null);
+                            }
+                            break;
+                        case "Adn":
+                            //Obtener alicuota para mcmaster (r)
+                            Alicuota alicuotar = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "r");
+                            if (alicuotar != null) {
+                                addAliq(request, 1, alicuotar, codigo, soliE, null);
+                            }
+                            break;
+                        case "Saliva":
+                            //Obtener alicuota para metabolomica (v1)
+                            Alicuota alicuotav1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v1");
+                            if (alicuotav1 != null) {
+                                addAliq(request, 1, alicuotav1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para metabolomica (v2)
+                            Alicuota alicuotav2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v2");
+                            if (alicuotav2 != null) {
+                                addAliq(request, 1, alicuotav2, codigo, soliE, null);
+                            }
+                            break;
+                        case "Orina":
+                            //Obtener alicuota para metabolomica (w1)
+                            Alicuota alicuotaw1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w1");
+                            if (alicuotaw1 != null) {
+                                addAliq(request, 1, alicuotaw1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para metabolomica (w2)
+                            Alicuota alicuotaw2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w2");
+                            if (alicuotaw2 != null) {
+                                addAliq(request, 1, alicuotaw2, codigo, soliE, null);
+                            }
+
+                            break;
+                        case "PAXGENE":
+                            //Obtener alicuota para Q1
+                            Alicuota alicuotaQ1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q1");
+                            if (alicuotaQ1 != null) {
+                                addAliq(request, 1, alicuotaQ1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para Q2
+                            Alicuota alicuotaQ2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q2");
+                            if (alicuotaQ2 != null) {
+                                addAliq(request, 1, alicuotaQ2, codigo, soliE, null);
+                            }
+                            break;
+                    }
+                    //
+                    break;
+                case "2":
+                case "3":
+                    //Generacion de Alicuotas segun tipo de mx
+                    switch (nombreMx) {
+                        case "Plasma":
+
+                            //Obtener alicuota para serologia (j)
+                            Alicuota alicuotaj = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "j");
+                            if (alicuotaj != null) {
+                                addAliq(request, 1, alicuotaj, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (k)
+                            Alicuota alicuotak = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "k");
+                            if (alicuotak != null) {
+                                addAliq(request, 1, alicuotak, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para serologia (xx)
+                            Alicuota alicuotaxx = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "xx");
+                            if (alicuotaxx != null) {
+                                addAliq(request, 1, alicuotaxx, codigo, soliE, null);
+                            }
+                            break;
+                        case "PBMC":
+                            //Obtener alicuota para PBMC (m)
+                            Alicuota alicuotam = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "m");
+                            if (alicuotam != null) {
+                                addAliq(request, 1, alicuotam, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PBMC (n)
+                            Alicuota alicuotan = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "n");
+                            if (alicuotan != null) {
+                                addAliq(request, 1, alicuotan, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para PBMC (o)
+                            Alicuota alicuotao = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "o");
+                            if (alicuotao != null) {
+                                addAliq(request, 1, alicuotao, codigo, soliE, null);
+                            }
+                            break;
+                        case "Adn":
+                            //Obtener alicuota para mcmaster (r)
+                            Alicuota alicuotar = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "r");
+                            if (alicuotar != null) {
+                                addAliq(request, 1, alicuotar, codigo, soliE, null);
+                            }
+                            break;
+                        case "Suero":
+                            //Obtener alicuota para TDR
+                            Alicuota alicuotau = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "u");
+                            if (alicuotau != null) {
+                                addAliq(request, 1, alicuotau, codigo, soliE, null);
+                            }
+                            break;
+                        case "Saliva":
+                            //Obtener alicuota para metabolomica (v1)
+                            Alicuota alicuotav1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v1");
+                            if (alicuotav1 != null) {
+                                addAliq(request, 1, alicuotav1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para metabolomica (v2)
+                            Alicuota alicuotav2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "v2");
+                            if (alicuotav2 != null) {
+                                addAliq(request, 1, alicuotav2, codigo, soliE, null);
+                            }
+                            break;
+                        case "Orina":
+                            //Obtener alicuota para metabolomica (w1)
+                            Alicuota alicuotaw1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w1");
+                            if (alicuotaw1 != null) {
+                                addAliq(request, 1, alicuotaw1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para metabolomica (w2)
+                            Alicuota alicuotaw2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "w2");
+                            if (alicuotaw2 != null) {
+                                addAliq(request, 1, alicuotaw2, codigo, soliE, null);
+                            }
+                            break;
+                        case "PAXGENE":
+                            //Obtener alicuota para Q1
+                            Alicuota alicuotaQ1 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q1");
+                            if (alicuotaQ1 != null) {
+                                addAliq(request, 1, alicuotaQ1, codigo, soliE, null);
+                            }
+
+                            //Obtener alicuota para Q2
+                            Alicuota alicuotaQ2 = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "Q2");
+                            if (alicuotaQ2 != null) {
+                                addAliq(request, 1, alicuotaQ2, codigo, soliE, null);
+                            }
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void generarAligEstudioCohorteInfluenza(DaSolicitudEstudio soliE, HttpServletRequest request) throws Exception {
+        String codigo = soliE.getIdTomaMx().getCodigoUnicoMx();
+        Integer idTipoMx = soliE.getIdTomaMx().getCodTipoMx().getIdTipoMx();
+        Integer idEstudio = soliE.getTipoEstudio().getIdEstudio();
+        //Generar 2 alicuotas PCR
+        Alicuota alicuotaPCR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "PC");
+        if (alicuotaPCR != null) {
+            addAliq(request, 2, alicuotaPCR, codigo, soliE, null);
+        }
+
+        //Generar 1 alicuota Aislamiento Viral
+        Alicuota alicuotaAV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AV");
+        if (alicuotaAV != null) {
+            addAliq(request, 1, alicuotaAV, codigo, soliE, null);
+        }
+
+        //Generar 2 alicuotas para archivo
+        Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
+        if (alicuotaAR != null) {
+            addAliq(request, 2, alicuotaAR, codigo, soliE, null);
+        }
+    }
+
+    private void generarAliqEstudioTransmisionInfluenza(DaSolicitudEstudio soliE, HttpServletRequest request) throws Exception {
+        String codigo = soliE.getIdTomaMx().getCodigoUnicoMx();
+        Integer idTipoMx = soliE.getIdTomaMx().getCodTipoMx().getIdTipoMx();
+        Integer idEstudio = soliE.getTipoEstudio().getIdEstudio();
+        String nombreMx = soliE.getIdTomaMx().getCodTipoMx().getNombre();
+        if(nombreMx.equals("Hisopado")){
+            //Generar 1 alicuota para PC
+            Alicuota alicuotaPC = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"PC");
+            if(alicuotaPC != null){
+                addAliq(request,1,alicuotaPC,codigo,soliE,null);
+            }
+
+            //Generar 1 alicuota para Archivo
+            Alicuota alicuotaARC = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"AR");
+            if(alicuotaARC != null){
+                addAliq(request,1,alicuotaARC,codigo,soliE,null);
+            }
+
+            //Generar 1 alicuota para Aislamiento Viral
+            Alicuota alicuotaAisV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"AV");
+            if(alicuotaAisV != null){
+                addAliq(request,1,alicuotaAisV,codigo,soliE,null);
+            }
+
+        }
+
+        if(nombreMx.equals("Suero")){
+            //Generar 2 alicuotas archivo
+            Alicuota alicuotaArchivo = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx,idEstudio,"AR");
+            if(alicuotaArchivo != null){
+                addAliq(request,2,alicuotaArchivo,codigo,soliE,null);
+            }
+        }
+    }
+
+    private void generarAliqDiagnosticoInfluenza(DaSolicitudDx soliDx, HttpServletRequest request) throws Exception{
+        String codigo = soliDx.getIdTomaMx().getCodigoUnicoMx();
+        Integer idTipoMx = soliDx.getIdTomaMx().getCodTipoMx().getIdTipoMx();
+        Integer idDx = soliDx.getCodDx().getIdDiagnostico();
+        String nombreMx = soliDx.getIdTomaMx().getCodTipoMx().getNombre();
+        //generar 1 alicuota PCR
+        Alicuota alicuotaPCR = separacionMxService.getAliquotCatByTipoMxDxEtiqueta(idTipoMx,idDx,"PC" );
+        if(alicuotaPCR != null){
+            addAliq(request,1,alicuotaPCR,codigo,null,soliDx);
+        }
+
+        //generar 1 alicuota archivo
+        Alicuota alicuotaAR = separacionMxService.getAliquotCatByTipoMxDxEtiqueta(idTipoMx,idDx,"AR" );
+        if(alicuotaAR != null){
+            addAliq(request,1,alicuotaAR,codigo,null,soliDx);
+        }
+    }
+
+    @RequestMapping(value = "impresionMasiva" ,method = RequestMethod.GET, produces = "application/json" )
+    public ResponseEntity<String> impresionMasiva(@RequestParam(value = "idSolicitudes", required = true) String idSolicitudes, HttpServletRequest request) throws Exception {
+        String idAlicuotasImprimir = "";
+        if (!idSolicitudes.isEmpty()){
+            String[] idSolicitudesArray = idSolicitudes.replaceAll("\\*","-").split(",");
+            for(String idSolicitud : idSolicitudesArray){
+                idAlicuotasImprimir += generarAliqSolicitud(idSolicitud, request);
+            }
+            if (!idAlicuotasImprimir.isEmpty()){
+                //si el último caracter en el string es una coma, la borramos para que no de errores a la hora de imprimir
+                char ultimoCaracter = idAlicuotasImprimir.charAt(idAlicuotasImprimir.length()-1);
+                if (ultimoCaracter == ','){
+                    idAlicuotasImprimir = idAlicuotasImprimir.substring(0,idAlicuotasImprimir.length()-1);
+                }
+            }
+        }
+        return createJsonResponse(idAlicuotasImprimir);
+    }
+
+    private String generarAliqSolicitud(String idSolicitud, HttpServletRequest request) throws Exception{
+        String idAlicuotas = "";
+        if (idSolicitud != null) {
+            DaSolicitudEstudio soliE = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
+            DaSolicitudDx soliDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
+
+            if (soliDx != null || soliE != null) {
+                //obtener la descripcion del estudio o solicitud de la muestra
+                List<AlicuotaRegistro> aliqRec = null;
+
+                if (soliDx != null) {
+                    //buscar registros de alicuotas
+                    aliqRec = separacionMxService.getAliquotsRecordsByCodigoUnicoMx(soliDx.getIdTomaMx().getCodigoUnicoMx());
+                } else {
+                    //buscar registros de alicuotas
+                    aliqRec = separacionMxService.getAliquotsRecordsByCodigoUnicoMx(soliE.getIdTomaMx().getCodigoUnicoMx());
+                }
+                //generar creacion de alicuotas segun tipo de recepcion
+                if (aliqRec.isEmpty()) {
+
+                    //generar alicuotas para solicitud de estudios
+                    if (soliE != null) {
+                        String nombreEstudio = soliE.getTipoEstudio().getNombre();
+                        //caso de estudio cohorte
+                        switch (nombreEstudio) {
+                            case "Cohorte Dengue":
+                                generarAliqEstudioCohorteDengue(soliE, request);
+                                break;
+                            case "Clínico Dengue":
+                                generarAliqEstudioClinicoDengue(soliE, request);
+                                break;
+                            case "Cohorte Influenza":
+                                generarAligEstudioCohorteInfluenza(soliE, request);
+                                break;
+                            case "Transmisión Influenza":
+                                generarAliqEstudioTransmisionInfluenza(soliE, request);
+                                break;
+                        }
+                    } else {
+                        String nombreDx = soliDx.getCodDx().getNombre();
+
+                        if (nombreDx.equals("Diagnóstico Influenza")) {
+                            generarAliqDiagnosticoInfluenza(soliDx, request);
+                        }
+                    }
+                    //se consultan las alicuotas recien registradas
+                    if (soliDx != null) {
+                        //buscar registros de alicuotas
+                        aliqRec = separacionMxService.getAliquotsRecordsByCodigoUnicoMx(soliDx.getIdTomaMx().getCodigoUnicoMx());
+                    } else {
+                        //buscar registros de alicuotas
+                        aliqRec = separacionMxService.getAliquotsRecordsByCodigoUnicoMx(soliE.getIdTomaMx().getCodigoUnicoMx());
+                    }
+                }
+                for (AlicuotaRegistro alicuotaRegistro : aliqRec) {
+                    idAlicuotas = idAlicuotas + alicuotaRegistro.getIdAlicuota() + ",";
+                }
+            }
+
+        }
+        return idAlicuotas;
+    }
 }

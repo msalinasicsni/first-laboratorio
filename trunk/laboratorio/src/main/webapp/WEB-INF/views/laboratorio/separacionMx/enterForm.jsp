@@ -149,11 +149,6 @@
                 </thead>
             </table>
 
-        <footer>
-
-            <button type="button" id="btnAddAliquot" class="btn btn-success btn-md pull-right header-btn" data-toggle="modal" data-target="#myModal"> <i class="fa fa-plus icon-white"></i> <spring:message code="lbl.aliquot" /></button>
-        </footer>
-
 </div>
 <!-- end widget content -->
 </div>
@@ -202,10 +197,14 @@
                         </tr>
                         </thead>
                     </table>
-                    <footer>
-                        <button id="btnPrint" type="button" class="btn btn-success btn-md pull-right header-btn"><i class="fa fa-print"></i> <spring:message code="act.print" /></button>
-                    </footer>
+
                 </div>
+                <form class="smart-form" novalidate="novalidate">
+                    <footer> <!---->
+                        <button id="btnPrint" type="button" class="btn btn-success btn-md header-btn pull-right"><i class="fa fa-print"></i> <spring:message code="act.print" /></button>
+                        <button type="button" id="btnAddAliquot" class="btn btn-success btn-md header-btn pull-right" data-toggle="modal" data-target="#myModal"> <i class="fa fa-plus icon-white"></i> <spring:message code="lbl.aliquot" /></button>
+                    </footer>
+                </form>
                 <!-- end widget content -->
             </div>
             <!-- end widget div -->

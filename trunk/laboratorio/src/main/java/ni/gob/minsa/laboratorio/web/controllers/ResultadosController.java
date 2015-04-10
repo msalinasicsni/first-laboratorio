@@ -338,6 +338,7 @@ public class ResultadosController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
+            strBarCodes = strBarCodes.replaceAll("\\*",".");
             mav.addObject("strBarCodes",strBarCodes);
             mav.setViewName("impresion/print");
         }else

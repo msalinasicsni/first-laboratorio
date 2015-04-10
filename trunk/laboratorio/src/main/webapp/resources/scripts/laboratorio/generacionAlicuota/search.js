@@ -11,8 +11,11 @@ var ReceiptLabOrders = function () {
                 tablet : 1024,
                 phone : 480
             };
+            var text_selected_all = $("#text_selected_all").val();
+            var text_selected_none = $("#text_selected_none").val();
             var table1 = $('#orders_result').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "T"+
                     "t"+
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth" : true,
@@ -36,6 +39,11 @@ var ReceiptLabOrders = function () {
                 },
                 "drawCallback" : function(oSettings) {
                     responsiveHelper_dt_basic.respond();
+                },
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
                 }
             });
 
@@ -114,10 +122,9 @@ var ReceiptLabOrders = function () {
                         for (var i = 0; i < len; i++) {
                             var json =JSON.parse(dataToLoad[i].diagnosticos);
                             var actionUrl = parametros.sActionUrl +json[1].idSolicitud;
-                            console.log(actionUrl);
 
                               table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
+                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+json[1].idSolicitud+"'/>", dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>", '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
@@ -240,7 +247,94 @@ var ReceiptLabOrders = function () {
                 }
             });
 
+            $('#btnPrint').click(function() {
+                printSelected()
+            });
 
+            function reemplazar (texto, buscar, nuevo){
+                var temp = '';
+                var long = texto.length;
+                for (j=0; j<long; j++) {
+                    if (texto[j] == buscar)
+                    {
+                        temp += nuevo;
+                    } else
+                        temp += texto[j];
+                }
+                return temp;
+            }
+
+            function getAlicuotasImprimir(idSolicitudes){
+                $.getJSON(parametros.sImpresionMasivaAliquot, {
+                    idSolicitudes: idSolicitudes,
+                    ajax: 'false'
+                }, function (data) {
+                    //console.log(data);
+                    var loc = window.location;
+                    var dataFormat = reemplazar(data,".","*");
+                    //console.log(dataFormat);
+                    var urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+dataFormat;
+                     imprimir(urlImpresion);
+                })
+            }
+
+            function printSelected() {
+                var oTT = TableTools.fnGetInstance('orders_result');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                var urlImpresion ='';
+                if (len > 0) {
+                    $.SmartMessageBox({
+                        title: $("#msg_print_confirm").val(),
+                        content: $("#msg_print_confirm_content").val(),
+                        buttons: '['+opcSi+']['+opcNo+']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            blockUI(parametros.blockMess);
+                            var idSolicitudes="";
+                            for (var i = 0; i < len; i++) {
+                                var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                var input = texto.substring(texto.lastIndexOf("<"),texto.length);
+                                if (i+1< len){
+                                    idSolicitudes += $(input).val() + ",";
+                                }else{
+                                    idSolicitudes += $(input).val();
+                                }
+                            }
+                            idSolicitudes = reemplazar(idSolicitudes,"-","*");
+                            getAlicuotasImprimir(idSolicitudes);
+                            unBlockUI();
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msg_print_canceled").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
+                                color: "#C46A69",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 4000
+                            });
+                        }
+
+                    });
+                }else{
+                    $.smallBox({
+                        title : $("#msg_print_aliquot_select").val(),
+                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
+                        color : "#C46A69",
+                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                        timeout : 4000
+                    });
+                }
+
+            }
+
+            function imprimir (urlImpresion) {
+                if (urlImpresion.length>0) {
+                    window.open(urlImpresion, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
+                }
+            }
         }
     };
 

@@ -118,6 +118,14 @@
                         <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                         <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                         <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
+                        <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
+                        <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
+                        <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                        <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                        <input id="msg_print_confirm" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                        <input id="msg_print_confirm_content" type="hidden" value="<spring:message code="msg.print.confirm.content"/>"/>
+                        <input id="msg_print_canceled" type="hidden" value="<spring:message code="msg.print.canceled"/>"/>
+                        <input id="msg_print_aliquot_select" type="hidden" value="<spring:message code="msg.print.aliquot.select"/>"/>
                         <form id="searchOrders-form" class="smart-form" autocomplete="off">
                             <fieldset>
                                 <div class="row">
@@ -284,6 +292,11 @@
                             </thead>
                         </table>
                     </div>
+                    <form class="smart-form" novalidate="novalidate">
+                        <footer> <!---->
+                            <button id="btnPrint" type="button" class="btn btn-success btn-md header-btn pull-right"><i class="fa fa-print"></i> <spring:message code="act.print" /></button>
+                        </footer>
+                    </form>
                     <!-- end widget content -->
                 </div>
                 <!-- end widget div -->
@@ -362,6 +375,8 @@
 
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 <c:url var="generateAliquot" value="/separacionMx/create/"/>
+<c:url var="sImpresionMasivaAliquot" value="/separacionMx/impresionMasiva"/>
+<spring:url var="sPrintUrl" value="/resultados/printBC/"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
@@ -369,7 +384,10 @@
             sOrdersUrl : "${ordersUrl}",
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}",
-            sActionUrl : "${generateAliquot}"
+            sActionUrl : "${generateAliquot}",
+            sTableToolsPath : "${tabletools}",
+            sImpresionMasivaAliquot : "${sImpresionMasivaAliquot}",
+            sPrintUrl : "${sPrintUrl}"
         };
         ReceiptLabOrders.init(parametros);
 
