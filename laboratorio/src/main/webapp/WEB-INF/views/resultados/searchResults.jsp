@@ -56,7 +56,7 @@
             <i class="fa-fw fa fa-file-text-o"></i>
             <spring:message code="lbl.final.result" />
 						<span><i class="fa fa-angle-right"></i>
-							<spring:message code="lbl.search.diagnosis" />
+							<spring:message code="lbl.search.request" />
 						</span>
         </h1>
     </div>

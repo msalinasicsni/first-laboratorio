@@ -32,7 +32,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/recepcionMx/searchOrdersLab" htmlEscape="true "/>"><spring:message code="menu.receipt.orders.lab" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/aprobacion/init" htmlEscape="true "/>"><spring:message code="menu.approval.results" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -46,8 +46,8 @@
     <div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
         <h1 class="page-title txt-color-blueDark">
             <!-- PAGE HEADER -->
-            <i class="fa-fw fa fa-group"></i>
-            <spring:message code="lbl.result.title" />
+            <i class="fa-fw fa fa-check-circle"></i>
+            <spring:message code="lbl.final.result" />
 						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.approve.result.subtitle" />
 						</span>
