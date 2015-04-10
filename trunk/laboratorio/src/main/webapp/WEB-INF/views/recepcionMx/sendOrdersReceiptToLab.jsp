@@ -44,7 +44,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/envioOrdenMx/create" htmlEscape="true "/>"><spring:message code="menu.receipt.orders" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>"><spring:message code="menu.send.receipt.orders" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -58,7 +58,7 @@
 				<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
-						<i class="fa-fw fa fa-group"></i> 
+						<i class="fa-fw fa fa-shopping-cart"></i>
 							<spring:message code="lbl.send.receipt.orders.title" />
 						<span> <i class="fa fa-angle-right"></i>  
 							<spring:message code="lbl.send.receipt.orders" />

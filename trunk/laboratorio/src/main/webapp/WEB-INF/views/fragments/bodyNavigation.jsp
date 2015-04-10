@@ -77,7 +77,7 @@
                 <a href="#" title="<spring:message code="menu.result" />"><i class="fa fa-lg fa-fw fa-th-list"></i> <span class="menu-item-parent"><spring:message code="menu.result" /></span></a>
                 <ul>
                     <li class="ingresoResultado">
-                        <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="lbl.exam.result" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="lbl.exam.result" /></a>
+                        <a href="<spring:url value="/resultados/init" htmlEscape="true "/>" title="<spring:message code="menu.exam.result" />"><i class="fa fa-lg fa-fw fa-file-text"></i> <spring:message code="menu.exam.result" /></a>
                     </li>
                     <li class="enterFinalResult">
                         <a href="<spring:url value="/resultadoFinal/init" htmlEscape="true "/>" title="<spring:message code="menu.enter.final.result" />"><i class="fa fa-lg fa-fw fa-file-text-o"></i> <spring:message code="menu.enter.final.result" /></a>
