@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
@@ -391,6 +392,20 @@ public class SeguridadService {
             e.printStackTrace();
         }
         return userList.size() > 0;
+    }
+
+    public Laboratorio getLaboratorioUsuario(String userName){
+        Laboratorio laboratorio = new Laboratorio();
+        try {
+            String query = "select aulab.laboratorio from AutoridadLaboratorio as aulab inner join aulab.user as usu " +
+                    "where aulab.pasivo = false and usu.username = :username";
+            Query q = sessionFactory.getCurrentSession().createQuery(query);
+            q.setParameter("username", userName);
+            laboratorio = (Laboratorio)q.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return laboratorio;
     }
 
 }

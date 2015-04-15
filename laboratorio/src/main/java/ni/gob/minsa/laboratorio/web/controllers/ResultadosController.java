@@ -247,8 +247,14 @@ public class ResultadosController {
                 map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
                 map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-                map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
+                    map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                }
+                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
+                    map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                }else {
+                    map.put("codUnidadSalud","");
+                }
                 map.put("tipoMuestra", orden.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
                 //Si hay fecha de inicio de sintomas se muestra
                 Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getIdNotificacion());

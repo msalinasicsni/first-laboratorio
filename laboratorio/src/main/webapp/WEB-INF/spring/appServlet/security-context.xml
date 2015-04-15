@@ -27,6 +27,7 @@
         <intercept-url pattern="/resultados/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/resultadoFinal/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/aprobacion/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/tomaMx/**" access="ROLE_ADMIN" />
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->

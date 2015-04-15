@@ -123,8 +123,16 @@ public class SeparacionMxController {
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcionLab",DateUtil.DateToString(recepcion.getFechaHoraRecepcionLab(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            if (recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
+                map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+            }else{
+                map.put("codSilais","");
+            }
+            if (recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
+                map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            }else {
+                map.put("codUnidadSalud","");
+            }
             map.put("separadaMx",(recepcion.getTomaMx().getMxSeparada()!=null?(recepcion.getTomaMx().getMxSeparada()?"Si":"No"):""));
             map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos()!=null?String.valueOf(recepcion.getTomaMx().getCanTubos()):""));
             map.put("tipoMuestra", recepcion.getTomaMx().getCodTipoMx().getNombre());

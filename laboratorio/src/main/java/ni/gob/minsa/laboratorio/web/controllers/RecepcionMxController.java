@@ -188,7 +188,9 @@ public class RecepcionMxController {
             List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
             Date fechaInicioSintomas = null;
             if (tomaMx.getIdNotificacion()!=null) {
-                unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+                if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
+                    unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+                }
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
             }
             String html = "";
@@ -256,7 +258,9 @@ public class RecepcionMxController {
                 List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
                 esEstudio = solicitudEstudioList.size()>0;
 
-                unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+                if(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
+                    unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
+                }
                 fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
                 ordenExamenList = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
                 long idUsuario = seguridadService.obtenerIdUsuario(request);
@@ -1013,8 +1017,16 @@ public class RecepcionMxController {
             map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+            if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
+                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+            }else{
+                map.put("codSilais","");
+            }
+            if (tomaMx.getIdNotificacion().getCodUnidadAtencion()!=null) {
+                map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+            }else {
+                map.put("codUnidadSalud","");
+            }
             //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
             map.put("separadaMx",(tomaMx.getMxSeparada()!=null?(tomaMx.getMxSeparada()?"Si":"No"):""));
             map.put("cantidadTubos", (tomaMx.getCanTubos()!=null?String.valueOf(tomaMx.getCanTubos()):""));
@@ -1066,8 +1078,17 @@ public class RecepcionMxController {
             //map.put("fechaHoraOrden",DateUtil.DateToString(ordenExamen.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            if (recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
+                map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+            }else{
+                map.put("codSilais","");
+            }
+
+            if (recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
+                map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+            }else {
+                map.put("codUnidadSalud","");
+            }
             //map.put("estadoOrden", ordenExamen.getOrdenExamen().getCodEstado().getValor());
             map.put("separadaMx",(recepcion.getTomaMx().getMxSeparada()!=null?(recepcion.getTomaMx().getMxSeparada()?"Si":"No"):""));
             map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos()!=null?String.valueOf(recepcion.getTomaMx().getCanTubos()):""));
