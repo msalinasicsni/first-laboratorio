@@ -131,8 +131,16 @@ public class ResultadoFinalController {
                 map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoUnicoMx());
                 map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
                 map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-                map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                map.put("codUnidadSalud", diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
+                    map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                }else{
+                    map.put("codSilais","");
+                }
+                if (diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
+                    map.put("codUnidadSalud", diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                }else {
+                    map.put("codUnidadSalud","");
+                }
                 map.put("tipoMuestra", diagnostico.getIdTomaMx().getCodTipoMx().getNombre());
                 //Si hay fecha de inicio de sintomas se muestra
                 Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(diagnostico.getIdTomaMx().getIdNotificacion().getIdNotificacion());

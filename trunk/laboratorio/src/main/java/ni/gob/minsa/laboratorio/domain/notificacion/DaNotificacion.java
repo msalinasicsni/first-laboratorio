@@ -95,8 +95,8 @@ public class DaNotificacion {
     }
 
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "COD_SILAIS_ATENCION", referencedColumnName = "CODIGO")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "COD_SILAIS_ATENCION", referencedColumnName = "CODIGO", nullable = true)
     @ForeignKey(name = "COD_SILAIS_FK")
     public EntidadesAdtvas getCodSilaisAtencion() {
         return codSilaisAtencion;
@@ -106,8 +106,8 @@ public class DaNotificacion {
         this.codSilaisAtencion = codSilaisAtencion;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "COD_UNIDAD_ATENCION", referencedColumnName = "CODIGO")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "COD_UNIDAD_ATENCION", referencedColumnName = "CODIGO", nullable = true)
     @ForeignKey(name = "COD_UNIDAD_FK")
     public Unidades getCodUnidadAtencion() {
         return codUnidadAtencion;

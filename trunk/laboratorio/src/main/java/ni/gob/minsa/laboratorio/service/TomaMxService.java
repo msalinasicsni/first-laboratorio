@@ -369,4 +369,76 @@ public class TomaMxService {
         Session session = sessionFactory.getCurrentSession();
         session.update(solicitud);
     }
+
+    /************************************************************/
+    /***************TOMA MX VIP**********************************/
+    /************************************************************/
+    @SuppressWarnings("unchecked")
+    public List<TipoMx_TipoNotificacion> getTipoMxByTipoNoti(String codigo){
+        //Retrieve session Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.createQuery("FROM TipoMx_TipoNotificacion tmx where tmx.tipoNotificacion = :codigo and tmx.pasivo= false");
+        query.setString("codigo", codigo);
+        //retrieve all
+        return query.list();
+
+    }
+
+    /**
+     * Retorna tipoMx
+     * @param id
+     */
+    public TipoMx getTipoMxById(String id){
+        String query = "from TipoMx where idTipoMx = :id";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("id", id);
+        return (TipoMx)q.uniqueResult();
+    }
+
+    /**
+     * Agrega solicitud rutina
+     */
+    public void addSolicitudDx(DaSolicitudDx orden) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(orden);
+    }
+
+    public void addEnvioOrden(DaEnvioMx dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.save(dto);
+            }
+            else
+                throw new Exception("Objeto Envio Orden es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
+    /**
+     * Retorna rutina
+     * @param id
+     */
+    public Catalogo_Dx getDxById(String id){
+        String query = "from Catalogo_Dx where idDiagnostico = :id";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("id", id);
+        return (Catalogo_Dx)q.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DaTomaMx> getTomaMxByIdNoti(String idNotificacion){
+        //Retrieve session Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.createQuery("FROM DaTomaMx tmx where tmx.idNotificacion = :idNotificacion");
+        query.setString("idNotificacion", idNotificacion);
+        //retrieve all
+        return query.list();
+
+    }
 }

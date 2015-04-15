@@ -1,6 +1,26 @@
 /**
  * Created by souyen-ics on 11-05-14.
  */
+var bloquearUI = function(mensaje){
+    var loc = window.location;
+    var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+    var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
+    $.blockUI({ message: mess,
+        css: {
+            border: 'none',
+            padding: '15px',
+            backgroundColor: '#000',
+            '-webkit-border-radius': '10px',
+            '-moz-border-radius': '10px',
+            opacity: .5,
+            color: '#fff'
+        }
+    });
+};
+
+var desbloquearUI = function() {
+    setTimeout($.unblockUI, 500);
+};
 
 var EnterFormTomaMx = function () {
 
@@ -18,7 +38,7 @@ var EnterFormTomaMx = function () {
             });
 
             $('#codTipoMx').change(function() {
-                $.getJSON(parametros.examenesUrl, {
+                $.getJSON(parametros.dxUrl, {
                     codMx: $('#codTipoMx').val(),
                     tipoNoti: $('#tipoNoti').val(),
                     ajax: 'true'
@@ -26,12 +46,13 @@ var EnterFormTomaMx = function () {
                     var len = data.length;
                     var html = null;
                     for (var i = 0; i < len; i++) {
-                       html += '<option value="' + data[i].idExamen + '">'
-                            + data[i].codExamen.valor
+                        console.log(data[i]);
+                       html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
+                            + data[i].diagnostico.nombre
                             + '</option>';
                     }
 
-                    $('#examenes').html(html);
+                    $('#dx').html(html);
                 });
             });
 
@@ -78,37 +99,59 @@ var EnterFormTomaMx = function () {
             });
 
             function save() {
-                var datos_form = $('#registroMx').serialize();
+                var objetoTomaMx = {};
+                objetoTomaMx['idNotificacion'] = $("#idNotificacion").val();
+                objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();
+                objetoTomaMx['canTubos'] = $("#canTubos").val();
+                objetoTomaMx['volumen'] = $("#volumen").val();
+                objetoTomaMx['horaRefrigeracion'] = $("#horaRefrigeracion").val();
+                objetoTomaMx['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
+                objetoTomaMx['dx'] = $('#dx').val();
+                objetoTomaMx['categoriaMx'] = $('#codCategoriaMx').find('option:selected').val();
+                objetoTomaMx['mensaje'] = '';
+                bloquearUI(parametros.blockMess);
                 $.ajax({
-                    type: "GET",
                     url: parametros.saveTomaUrl,
-                    data: datos_form,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function () {
-                        $.smallBox({
-                            title: $('#msjSuccessful').val() ,
-                            content:  $('#disappear').val(),
-                            color: "#739E73",
-                            iconSmall: "fa fa-check-circle",
-                            timeout: 2000
-                        });
-
-                        window.location.href = parametros.searchUrl;
+                    type: 'POST',
+                    dataType: 'json',
+                    data: JSON.stringify(objetoTomaMx),
+                    contentType: 'application/json',
+                    mimeType: 'application/json',
+                    success: function (data) {
+                        desbloquearUI();
+                        if (data.mensaje.length > 0) {
+                            $.smallBox({
+                                title: data.mensaje,
+                                content: $("#disappear").val(),
+                                color: "#C46A69",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        } else {
+                            $.smallBox({
+                                title: $('#msjSuccessful').val(),
+                                content: $('#disappear').val(),
+                                color: "#739E73",
+                                iconSmall: "fa fa-check-circle",
+                                timeout: 4000
+                            });
+                            setTimeout(function () {
+                                window.location.href = parametros.searchUrl;
+                            }, 4000);
+                        }
 
                     },
-                    error: function (status, er) {
-                        alert("error: " + " status: " + status + " er:" + er);
+                    error: function (data, status, er) {
+                        desbloquearUI();
                         $.smallBox({
-                            title: $('#msjErrorSaving').val(),
-                            content:  $('#disappear').val(),
+                            title: $('#msjErrorSaving').val() + " error: " + data + " status: " + status + " er:" + er,
+                            content: $('#disappear').val(),
                             color: "#C46A69",
                             iconSmall: "fa fa-warning",
-                            timeout: 2000
+                            timeout: 5000
                         });
                     }
                 });
-
             }
 
 
