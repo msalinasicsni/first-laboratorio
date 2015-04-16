@@ -241,8 +241,16 @@ public class SearchMxController {
             map.put("idTomaMx", tomaMx.getIdTomaMx());
             map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
-            map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+            if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
+                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+            }else {
+                map.put("codSilais","");
+            }
+            if (tomaMx.getIdNotificacion().getCodUnidadAtencion()!=null) {
+                map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+            }else{
+                map.put("codUnidadSalud","");
+            }
             map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
             map.put("estadoMx", tomaMx.getEstadoMx().getValor());
 
