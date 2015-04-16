@@ -145,6 +145,7 @@ public class SeparacionMxService {
         cr.add(Restrictions.eq("tipo.idTipoMx", idTipoMx));
         cr.add(Restrictions.eq("estudio.idEstudio", idEstudio));
         cr.add(Restrictions.eq("catAlic.etiquetaPara", etiqueta));
+        cr.add(Restrictions.eq("catAlic.pasivo", false));
         return (Alicuota) cr.uniqueResult();
     }
 
@@ -196,6 +197,7 @@ public class SeparacionMxService {
         cr.add(Restrictions.eq("tipo.idTipoMx", idTipoMx));
         cr.add(Restrictions.eq("dx.idDiagnostico", idDx));
         cr.add(Restrictions.eq("catAlic.etiquetaPara", etiqueta));
+        cr.add(Restrictions.eq("catAlic.pasivo", false));
         return (Alicuota) cr.uniqueResult();
     }
 

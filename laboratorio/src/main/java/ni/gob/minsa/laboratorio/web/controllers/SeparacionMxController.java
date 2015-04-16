@@ -158,7 +158,7 @@ public class SeparacionMxController {
             }
 
             //se arma estructura de diagnósticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcion.getTomaMx().getIdTomaMx());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
 
 
@@ -315,6 +315,52 @@ public class SeparacionMxController {
                                 generarAligEstudioCohorteInfluenza(soliE,request);
                                 break;
                             case "Transmisión Influenza":
+
+                                switch (nombreMx) {
+                                    case "Hisopado":
+                                        //Generar 1 alicuota para PC
+                                        Alicuota alicuotaPC = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "PC");
+                                        if (alicuotaPC != null) {
+                                            addAliq(request, 1, alicuotaPC, codigo, soliE, null);
+                                        }
+
+                                        //Generar 1 alicuota para Archivo
+                                        Alicuota alicuotaARC = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
+                                        if (alicuotaARC != null) {
+                                            addAliq(request, 1, alicuotaARC, codigo, soliE, null);
+                                        }
+
+                                        //Generar 1 alicuota para Aislamiento Viral
+                                        Alicuota alicuotaAisV = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AV");
+                                        if (alicuotaAisV != null) {
+                                            addAliq(request, 1, alicuotaAisV, codigo, soliE, null);
+                                        }
+
+                                        break;
+                                    case "Suero":
+                                        //Generar 2 alicuotas archivo
+                                        Alicuota alicuotaArchivo = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
+                                        if (alicuotaArchivo != null) {
+                                            addAliq(request, 2, alicuotaArchivo, codigo, soliE, null);
+                                        }
+                                        break;
+                                    case "PBMC":
+                                        //Generar 2 alicuotas PB
+                                        Alicuota alicuotaPB = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "PB");
+                                        if (alicuotaPB != null) {
+                                            addAliq(request, 2, alicuotaPB, codigo, soliE, null);
+                                        }
+
+                                        break;
+                                    case "Adn":
+                                        //Generar 2 alicuotas de archivo
+                                        Alicuota alicAr = separacionMxService.getAliquotCatByTipoMxEstudioEtiqueta(idTipoMx, idEstudio, "AR");
+                                        if (alicAr != null) {
+                                            addAliq(request, 2, alicAr, codigo, soliE, null);
+                                        }
+                                        break;
+                                }
+
                                 generarAliqEstudioTransmisionInfluenza(soliE, request);
                                 break;
                         }

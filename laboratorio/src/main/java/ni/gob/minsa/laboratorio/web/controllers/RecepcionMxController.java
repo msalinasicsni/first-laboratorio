@@ -184,7 +184,7 @@ public class RecepcionMxController {
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<Unidades> unidades = null;
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(tomaMx.getIdTomaMx());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx());
             List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
             Date fechaInicioSintomas = null;
             if (tomaMx.getIdNotificacion()!=null) {
@@ -792,7 +792,7 @@ public class RecepcionMxController {
                 try {
                     //se procesan las ordenes de examen
                     //boolean tieneOrdenesAnuladas = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
-                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcionMx.getTomaMx().getIdTomaMx());
+                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
                     if (solicitudDxList!=null && solicitudDxList.size()> 0){
                         //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
                         Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());

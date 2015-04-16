@@ -123,6 +123,7 @@ var ReceiptLabOrders = function () {
                             var json =JSON.parse(dataToLoad[i].diagnosticos);
                             var actionUrl = parametros.sActionUrl +json[1].idSolicitud;
 
+
                               table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+json[1].idSolicitud+"'/>", dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx,dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].diagnosticos+"'/>", '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);

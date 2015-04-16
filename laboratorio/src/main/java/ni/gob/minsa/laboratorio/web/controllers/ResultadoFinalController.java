@@ -437,12 +437,14 @@ public class ResultadoFinalController {
     List<Catalogo_Lista> getCatalogoListaConcepto(@RequestParam(value = "idDx", required = false) String idDx, @RequestParam(value = "idEstudio", required = false) String idEstudio) throws Exception {
         logger.info("Obteniendo los valores para los conceptos tipo lista asociados a las respuesta del estudio o dx");
 
-        if(idEstudio.isEmpty()){
-            return respuestasSolicitudService.getCatalogoListaConceptoByIdDx(Integer.valueOf(idDx));
-        }else{
-            return respuestasSolicitudService.getCatalogoListaConceptoByIdEstudio(Integer.valueOf(idEstudio));
+        List<Catalogo_Lista> catLista = null;
+        if (idEstudio.isEmpty()) {
+            catLista = respuestasSolicitudService.getCatalogoListaConceptoByIdDx(Integer.valueOf(idDx));
+        } else {
+            catLista = respuestasSolicitudService.getCatalogoListaConceptoByIdEstudio(Integer.valueOf(idEstudio));
         }
 
+        return catLista;
     }
 
     @RequestMapping(value = "getDetResFinalBySolicitud", method = RequestMethod.GET, produces = "application/json")

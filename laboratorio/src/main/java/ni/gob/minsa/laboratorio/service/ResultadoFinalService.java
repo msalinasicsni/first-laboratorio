@@ -866,4 +866,32 @@ public class ResultadoFinalService {
         return  resultadoFinals;
     }
 
+    /**
+     * Obtiene el ultimo registro de un detalle de resultado
+     * @param idSolicitud
+     * @return Catalogo_lista
+     */
+    public Object getFechaResultadoByIdSoli(String idSolicitud) {
+        Object fechaResultado = null;
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select max (a.fechahRegistro) from DetalleResultadoFinal as a inner join a.solicitudDx as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud ";
+        Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
+
+        String query2 = "select max(a.fechahRegistro) from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud ";
+        Query q2 = session.createQuery(query2);
+        q2.setParameter("idSolicitud", idSolicitud);
+
+        Object det = q.uniqueResult();
+        Object detE = q2.uniqueResult();
+
+        if (det != null) {
+            fechaResultado = det;
+        } else if (detE != null) {
+            fechaResultado = detE;
+        }
+
+        return fechaResultado;
+    }
+
 }

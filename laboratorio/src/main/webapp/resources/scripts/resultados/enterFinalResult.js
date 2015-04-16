@@ -202,17 +202,20 @@ var enterFinalResult = function(){
                                     '</section>';
                                 //se busca si existe valor registrado para la respuesta
                                 var valor = '';
-                                if(lenDetRes > 0){
+                                if (lenDetRes > 0) {
                                     for (var j = 0; j < lenDetRes; j++) {
+                                        console.log(detaResultados[j]);
+                                        console.log(dataToLoad[i]);
                                         var respExistente;
                                         if (detaResultados[j].respuesta != null)
                                             respExistente = detaResultados[j].respuesta;
                                         else {
                                             respExistente = detaResultados[j].respuestaExamen;
                                         }
-                                        if (respExistente.concepto.idConcepto==dataToLoad[i].concepto.idConcepto){
+                                        if (respExistente.concepto.idConcepto == dataToLoad[i].concepto.idConcepto) {
+
                                             valor = detaResultados[j].valor;
-                                            console.log('se encontró valor: '+valor);
+                                            console.log('se encontró valor: ' + valor);
                                             break;
                                         }
                                     }
