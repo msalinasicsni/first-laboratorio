@@ -180,6 +180,23 @@ public class TomaMxService {
                     .setProjection(Property.forName("labautorizado.codigo"))));
         }
 
+        //filtro para solicitudes aprobadas
+       /* if (filtro.get) {
+            if (filtro.getCodTipoSolicitud() != null) {
+                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
+                    crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .createAlias("tipoEstudio", "estudio")
+                            .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+                } else {
+                    crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .createAlias("codDx", "dx")
+                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+                }
+            }
+        }*/
+
         return crit.list();
     }
 
@@ -209,7 +226,7 @@ public class TomaMxService {
         return fecInicioSintomas;
     }
 
-    public List<DaSolicitudDx> getSolicitudesDxByMx(String idTomaMx){
+    public List<DaSolicitudDx> getSolicitudesDxByIdToma(String idTomaMx){
         String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -370,6 +387,23 @@ public class TomaMxService {
         session.update(solicitud);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudDx> getSoliDxAprobByIdToma(String idTomaMx){
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and  aprobada = true ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudEstudio> getSoliEstudioAprobByIdTomaMx(String idTomaMx){
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx and aprobada = true ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+
     /************************************************************/
     /***************TOMA MX VIP**********************************/
     /************************************************************/
@@ -441,4 +475,5 @@ public class TomaMxService {
         return query.list();
 
     }
+
 }

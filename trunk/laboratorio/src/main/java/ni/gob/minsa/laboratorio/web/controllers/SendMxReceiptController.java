@@ -231,7 +231,7 @@ public class SendMxReceiptController {
                 map.put("persona"," ");
             }
             //se arma estructura de diagnósticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcion.getTomaMx().getIdTomaMx());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx());
             Map<Integer, Object> mapSolicitudesList = new HashMap<Integer, Object>();
             Map<String, String> mapSolicitud = new HashMap<String, String>();
             if (solicitudDxList.size()>0) {
@@ -258,7 +258,7 @@ public class SendMxReceiptController {
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
             }
             //se arma estructura de diagnósticos
-            /*List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByMx(recepcion.getTomaMx().getIdTomaMx());
+            /*List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx());
             Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
             Map<String, String> mapDx = new HashMap<String, String>();
             int subIndice=0;
