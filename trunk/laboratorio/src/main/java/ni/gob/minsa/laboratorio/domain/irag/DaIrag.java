@@ -32,7 +32,6 @@ public class DaIrag implements Serializable {
     private Captacion codCaptacion;
     private Cie10 diagnostico;
     private Integer tarjetaVacuna;
-    private Date fechaInicioSintomas;
     private Respuesta codAntbUlSem;
     private Integer cantidadAntib;
     private String nombreAntibiotico;
@@ -181,18 +180,6 @@ public class DaIrag implements Serializable {
     public void setTarjetaVacuna(Integer tarjetaVacuna) {
         this.tarjetaVacuna = tarjetaVacuna;
     }
-
-    @Basic
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @Column(name = "FECHA_INICIO_SINTOMAS", nullable = true, insertable = true, updatable = true)
-    public Date getFechaInicioSintomas() {
-        return fechaInicioSintomas;
-    }
-
-    public void setFechaInicioSintomas(Date fechaInicioSintomas) {
-        this.fechaInicioSintomas = fechaInicioSintomas;
-    }
-
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
     @JoinColumn(name = "COD_ANTB_ULSEM", referencedColumnName = "CODIGO", nullable = true)

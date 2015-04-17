@@ -52,7 +52,6 @@ public class DaSindFebril implements Serializable{
     private String animales;
     private String otrosAnimales;
     
-    private Date fechaInicioSintomas;
     private Date fechaTomaMuestra;
     private Float temperatura;
     private Integer pas;
@@ -286,15 +285,6 @@ public class DaSindFebril implements Serializable{
 
 	public void setOtrosAnimales(String otrosAnimales) {
 		this.otrosAnimales = otrosAnimales;
-	}
-
-	@Column(name = "FECHA_INICIO_SINTOMAS", nullable = true)
-	public Date getFechaInicioSintomas() {
-		return fechaInicioSintomas;
-	}
-
-	public void setFechaInicioSintomas(Date fechaInicioSintomas) {
-		this.fechaInicioSintomas = fechaInicioSintomas;
 	}
 
 	@Column(name = "FECHA_TOMA_MUESTRA", nullable = true)

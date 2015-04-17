@@ -190,7 +190,7 @@ public class AprobacionResultadoController {
             map.put("tipoMuestra", diagnostico.getIdTomaMx().getCodTipoMx().getNombre());
             map.put("tipoNotificacion", diagnostico.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(diagnostico.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = diagnostico.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -272,7 +272,7 @@ public class AprobacionResultadoController {
             map.put("tipoMuestra", estudio.getIdTomaMx().getCodTipoMx().getNombre());
             map.put("tipoNotificacion", estudio.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(estudio.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = estudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -369,9 +369,9 @@ public class AprobacionResultadoController {
                 DaSolicitudDx solicitudDx =  tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
                 DaSolicitudEstudio solicitudEstudio =  tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
                 if (solicitudDx!=null) {
-                    fechaInicioSintomas =  tomaMxService.getFechaInicioSintomas(solicitudDx.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                    fechaInicioSintomas = solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
                 }else {
-                    fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(solicitudEstudio.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                    fechaInicioSintomas = solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
                 }
                 mav.addObject("solicitudDx", solicitudDx);
                 mav.addObject("solicitudEstudio", solicitudEstudio);
@@ -657,7 +657,7 @@ public class AprobacionResultadoController {
             map.put("tipoMx", tomaMx.getCodTipoMx().getNombre());
             map.put("tipoNotificacion", tomaMx.getIdNotificacion().getCodTipoNotificacion().getValor());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else

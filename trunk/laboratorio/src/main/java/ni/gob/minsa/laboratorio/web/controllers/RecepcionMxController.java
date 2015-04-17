@@ -191,7 +191,7 @@ public class RecepcionMxController {
                 if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
                     unidades = unidadesService.getPrimaryUnitsBySilais(tomaMx.getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 }
-                fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+                fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
             }
             String html = "";
             //si hay fecha de inicio de síntomas validar si es muestra válida para vigilancia rutinaria
@@ -261,7 +261,7 @@ public class RecepcionMxController {
                 if(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
                     unidades = unidadesService.getPrimaryUnitsBySilais(recepcionMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","));
                 }
-                fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcionMx.getTomaMx().getIdNotificacion().getIdNotificacion());
+                fechaInicioSintomas = recepcionMx.getTomaMx().getIdNotificacion().getFechaInicioSintomas();
                 ordenExamenList = ordenExamenMxService.getOrdenesExamenByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
                 long idUsuario = seguridadService.obtenerIdUsuario(request);
                 Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
@@ -1033,7 +1033,7 @@ public class RecepcionMxController {
             map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
             //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(tomaMx.getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else
@@ -1096,7 +1096,7 @@ public class RecepcionMxController {
             //map.put("tipoExamen", ordenExamen.getOrdenExamen().getCodExamen().getNombre());
             //map.put("areaProcesa", ordenExamen.getOrdenExamen().getCodExamen().getArea().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
+            Date fechaInicioSintomas = recepcion.getTomaMx().getIdNotificacion().getFechaInicioSintomas();
             if (fechaInicioSintomas!=null)
                 map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
             else

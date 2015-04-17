@@ -143,7 +143,7 @@ public class ResultadoFinalController {
                 }
                 map.put("tipoMuestra", diagnostico.getIdTomaMx().getCodTipoMx().getNombre());
                 //Si hay fecha de inicio de sintomas se muestra
-                Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(diagnostico.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                Date fechaInicioSintomas = diagnostico.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
                 if (fechaInicioSintomas!=null)
                     map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
                 else
@@ -197,7 +197,7 @@ public class ResultadoFinalController {
                   map.put("codUnidadSalud", estudio.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
                   map.put("tipoMuestra", estudio.getIdTomaMx().getCodTipoMx().getNombre());
                   //Si hay fecha de inicio de sintomas se muestra
-                  Date fechaInicioSintomas = tomaMxService.getFechaInicioSintomas(estudio.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+                  Date fechaInicioSintomas = estudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
                   if (fechaInicioSintomas != null)
                       map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
                   else
