@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import com.sun.media.jfxmedia.logging.Logger;
 
 import ni.gob.minsa.laboratorio.domain.persona.*;
 
@@ -23,79 +26,80 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("personaService")
 @Transactional
 public class PersonaService {
-	
-	@Resource(name="sessionFactory")
-	private SessionFactory sessionFactory;
 
+    @Resource(name="sessionFactory")
+    private SessionFactory sessionFactory;
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PersonaService.class);
     private PersonaUTMService personaUTMService;
     private InitialContext initialContext;
 
-	@SuppressWarnings("unchecked")
-	public List<SisPersona> getPersonas(String filtro){
-		try {
-			filtro = URLDecoder.decode(filtro, "utf-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		Session session = sessionFactory.getCurrentSession();
-		if(filtro.matches("[0-9]*")){
-			return session.createCriteria(SisPersona.class)
-					.add( Restrictions.or(
-					        Restrictions.eq("telefonoResidencia", filtro),
-					        Restrictions.eq("telefonoMovil", filtro))
-					 )
-				    .list();
+    @SuppressWarnings("unchecked")
+    public List<SisPersona> getPersonas(String filtro){
+        try {
+            filtro = URLDecoder.decode(filtro, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        Session session = sessionFactory.getCurrentSession();
+        if(filtro.matches("[0-9]*")){
+            return session.createCriteria(SisPersona.class)
+                    .add( Restrictions.or(
+                                    Restrictions.eq("telefonoResidencia", filtro),
+                                    Restrictions.eq("telefonoMovil", filtro))
+                    )
+                    .list();
         }else if(filtro.matches("[a-zA-Zí\\s]*")){
-        	Soundex varSoundex = new Soundex();
-        	Criteria crit = session.createCriteria(SisPersona.class);
+            Soundex varSoundex = new Soundex();
+            Criteria crit = session.createCriteria(SisPersona.class);
             String[] partes = filtro.split(" ");
             String[] partesSnd = filtro.split(" ");
             for(int i=0;i<partes.length;i++){
-            	try{
-            		partesSnd[i] = varSoundex.encode(partes[i]);
-            	}
-            	catch (IllegalArgumentException e){
-            		partesSnd[i] = "0000";
-            		e.printStackTrace();
-            	}
+                try{
+                    partesSnd[i] = varSoundex.encode(partes[i]);
+                }
+                catch (IllegalArgumentException e){
+                    partesSnd[i] = "0000";
+                    e.printStackTrace();
+                }
             }
             for(int i=0;i<partes.length;i++){
-            	Junction conditionGroup = Restrictions.disjunction();
-            	conditionGroup.add(Restrictions.ilike("primerNombre" , "%"+partes[i]+"%" ))
-            					.add(Restrictions.ilike( "primerApellido" , "%"+partes[i]+"%"  ))
-            					.add(Restrictions.ilike( "segundoNombre" , "%"+partes[i]+"%"  ))
-            					.add(Restrictions.ilike( "segundoApellido" , "%"+partes[i]+"%"  ))
-            					.add(Restrictions.ilike("sndNombre", "%"+partesSnd[i]+"%"));
-            	crit.add(conditionGroup);
+                Junction conditionGroup = Restrictions.disjunction();
+                conditionGroup.add(Restrictions.ilike("primerNombre" , "%"+partes[i]+"%" ))
+                        .add(Restrictions.ilike( "primerApellido" , "%"+partes[i]+"%"  ))
+                        .add(Restrictions.ilike( "segundoNombre" , "%"+partes[i]+"%"  ))
+                        .add(Restrictions.ilike( "segundoApellido" , "%"+partes[i]+"%"  ))
+                        .add(Restrictions.ilike("sndNombre", "%"+partesSnd[i]+"%"));
+                crit.add(conditionGroup);
             }
-            
-        	return crit.list();
+
+            return crit.list();
         }
         else{
-        	return session.createCriteria(SisPersona.class)
-				    .add( Restrictions.or(
-					        Restrictions.eq("identificacionHse", filtro).ignoreCase(),
-					        Restrictions.eq("identificacion", filtro).ignoreCase())
-					 )
-				    .list();
+            return session.createCriteria(SisPersona.class)
+                    .add( Restrictions.or(
+                                    Restrictions.eq("identificacionHse", filtro).ignoreCase(),
+                                    Restrictions.eq("identificacion", filtro).ignoreCase())
+                    )
+                    .list();
         }
-	}
-	
-	public SisPersona getPersona(long idPerson){
-		// Retrieve session from Hibernate
-		Session session = sessionFactory.getCurrentSession();
-		Query query = session.createQuery("FROM SisPersona p where p.personaId = :idPerson");
-		query.setParameter("idPerson", idPerson);
-		SisPersona persona = (SisPersona) query.uniqueResult();
-		return persona;
-		
-	}
+    }
+
+    public SisPersona getPersona(long idPerson){
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM SisPersona p where p.personaId = :idPerson");
+        query.setParameter("idPerson", idPerson);
+        SisPersona persona = (SisPersona) query.uniqueResult();
+        return persona;
+
+    }
 
     /**
      * @param dto
@@ -119,6 +123,7 @@ public class PersonaService {
         this.initialContext = new InitialContext();
         this.personaUTMService = (PersonaUTMService) initialContext.lookup(ConstantsSecurity.EJB_BIN_PERSON_UTM);
         this.personaUTMService.iniciarTransaccion();
+        logger.info("Se inicia transacción personaUTMService");
     }
 
     public void commitTransaccion() throws Exception {
@@ -127,14 +132,17 @@ public class PersonaService {
 
     public void rollbackTransaccion() throws Exception {
         this.personaUTMService.rollbackTransaccion();
+        logger.info("Se hiso rollback personaUTMService");
     }
 
     public void remover() throws Exception {
         this.personaUTMService.remover();
         this.initialContext.close();
+        logger.info("Se cierra conexión personaUTMService");
     }
 
     public InfoResultado guardarPersona(Persona pPersona, String pUsuarioRegistra) {
+        logger.info("Se guardar persona mediante componente");
         return this.personaUTMService.guardarPersona(pPersona, pUsuarioRegistra);
     }
 
@@ -150,11 +158,13 @@ public class PersonaService {
             infoResultado = servicio.obtenerPorId(pIdPersona);
             if(infoResultado.isOk() && infoResultado.getObjeto()!=null){
                 persona = (Persona) infoResultado.getObjeto();
+            }else{
+                throw new Exception("No se encontro persona"+infoResultado.getMensaje()+infoResultado.getMensajeDetalle());
             }
             ctx.close();
         }catch(Exception e){
             e.printStackTrace();
-            throw e;
+            throw new Exception(e);
         }
 
         return persona;
@@ -297,7 +307,7 @@ public class PersonaService {
             persona.setTelefonoResi(pPersona.getTelefonoResidencia());
             persona.setTelefonoMovil(pPersona.getTelefonoMovil());
             persona.setSexoCodigo(pPersona.getSexo()!=null ? pPersona.getSexo().getCodigo() : null);
-            persona.setEtniaCodigo(pPersona.getEtnia().getCodigo());
+            persona.setEtniaCodigo(pPersona.getEtnia()!=null ?pPersona.getEtnia().getCodigo() : null);
             persona.setOcupacionCodigo(pPersona.getOcupacion()!=null ? pPersona.getOcupacion().getCodigo() : null);
             persona.setTipoAsegCodigo(pPersona.getTipoAsegurado()!=null? pPersona.getTipoAsegurado().getCodigo() : null);
             persona.setIdentCodigo(pPersona.getTipoIdentificacion()!=null ? pPersona.getTipoIdentificacion().getCodigo() : null);

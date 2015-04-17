@@ -48,6 +48,14 @@
             <li class="home">
                 <a href="<spring:url value="/" htmlEscape="true "/>" title="<spring:message code="menu.home" />"><i class="fa fa-lg fa-fw fa-home"></i> <span class="menu-item-parent"><spring:message code="menu.home" /></span></a>
             </li>
+            <li class="mantenimiento">
+                <a href="#" title="<spring:message code="menu.maint" />"><i class="fa fa-lg fa-fw fa-cogs"></i> <span class="menu-item-parent"><spring:message code="menu.maint" /></span></a>
+                <ul>
+                    <li class="personas">
+                        <a href="<spring:url value="/personas/search" htmlEscape="true "/>" title="<spring:message code="menu.persons" />"><i class="fa fa-lg fa-fw fa-group"></i> <spring:message code="menu.persons" /></a>
+                    </li>
+                </ul>
+            </li>
             <li class="recepcion">
                 <a href="#" title="<spring:message code="menu.receipt.orders" />"><i class="fa fa-lg fa-fw fa-tint"></i> <span class="menu-item-parent"><spring:message code="menu.receipt.orders" /></span></a>
                 <ul>
@@ -68,7 +76,6 @@
 
                 </ul>
             </li>
-
             <li class="laboratorio">
                 <a href="#" title="<spring:message code="menu.lab" />"><i class="fa fa-lg fa-fw fa-flask"></i> <span class="menu-item-parent"><spring:message code="menu.lab" /></span></a>
                 <ul>

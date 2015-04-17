@@ -389,19 +389,4 @@ public class TomaMxController {
             response.getOutputStream().close();
         }
     }
-
-    /**
-     * Retorna una lista de personas. Acepta una solicitud GET para JSON
-     * @return Un arreglo JSON de personas
-     */
-    @RequestMapping(value = "persons", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody List<SisPersona> fetchPersonasJson(@RequestParam(value = "strFilter", required = true) String filtro) {
-        logger.info("Obteniendo las personas en JSON");
-        List<SisPersona> personas = personaService.getPersonas(filtro);
-        if (personas == null){
-            logger.debug("Nulo");
-        }
-        return personas;
-    }
-
 }

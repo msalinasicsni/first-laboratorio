@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <html>
 <!-- BEGIN HEAD -->
 <head>
@@ -153,6 +154,14 @@
 								<!-- end widget content -->
 							</div>
 							<!-- end widget div -->
+                            <div style="border: none" class="row">
+                                <spring:url value="/personas/create" var="newUrl">
+                                </spring:url>
+                                <a href="${fn:escapeXml(newUrl)}"
+                                   class="btn btn-default btn-large btn-primary pull-right"><i
+                                        class="fa fa-plus"></i> <spring:message
+                                        code="lbl.person" /> </a>
+                            </div>
 						</div>
 						<!-- end widget -->
 					</article>
@@ -203,7 +212,7 @@
 	<spring:url value="/resources/scripts/personas/person-search.js" var="personSearch" />
 	<script src="${personSearch}"></script>
 	<!-- END PAGE LEVEL SCRIPTS -->
-	<spring:url value="/tomaMx/persons" var="sPersonUrl"/>
+	<spring:url value="/personas/persons" var="sPersonUrl"/>
 	<spring:url value="/tomaMx/noticesrut" var="sActionUrl"/>
 	<c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 	<script type="text/javascript">

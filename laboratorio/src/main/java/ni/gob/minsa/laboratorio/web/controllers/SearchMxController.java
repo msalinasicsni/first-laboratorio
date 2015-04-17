@@ -371,7 +371,9 @@ public class SearchMxController {
                     String fechaformateada = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
                     edad = DateUtil.edad(fechaformateada);
                     fechaToma =  new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getIdTomaMx().getFechaHTomaMx());
-                    fis =  new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(tomaMxService.getFechaInicioSintomas(solicitudDx.getIdTomaMx().getIdNotificacion().getIdNotificacion()));
+                    if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
+                        fis = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
+                    }
                     fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
                     fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(resultadoFinalService.getFechaResultadoByIdSoli(solicitudDx.getIdSolicitudDx()));
                     detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
@@ -396,8 +398,6 @@ public class SearchMxController {
                         nombreSilais = "---------------";
                         nombreUS = "---------------";
                     }
-
-
                 }
             } else {
                 for (DaSolicitudEstudio solicitudE : solicEstudio) {
@@ -405,7 +405,9 @@ public class SearchMxController {
                     RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solicitudE.getIdTomaMx().getCodigoUnicoMx());
                     edad = DateUtil.edad(fechaformateada);
                     fechaToma =  new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudE.getIdTomaMx().getFechaHTomaMx());
-                    fis =  new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(tomaMxService.getFechaInicioSintomas(solicitudE.getIdTomaMx().getIdNotificacion().getIdNotificacion()));
+                    if (solicitudE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
+                        fis = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(solicitudE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
+                    }
                     fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
                     detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudE.getIdSolicitudEstudio());
                     fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(resultadoFinalService.getFechaResultadoByIdSoli(solicitudE.getIdSolicitudEstudio()));

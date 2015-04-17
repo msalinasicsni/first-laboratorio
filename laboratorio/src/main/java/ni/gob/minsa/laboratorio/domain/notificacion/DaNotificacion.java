@@ -4,11 +4,15 @@ import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
+import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 
 /**
@@ -27,7 +31,9 @@ public class DaNotificacion {
     private Usuarios usuarioRegistro;
     private Timestamp fechaAnulacion;
     private Timestamp fechaRegistro;
-
+    private Comunidades comunidadResidencia;
+    private String direccionResidencia;
+    private Date fechaInicioSintomas;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -125,5 +131,34 @@ public class DaNotificacion {
 
     public void setFechaAnulacion(Timestamp fechaAnulacion) {
         this.fechaAnulacion = fechaAnulacion;
+    }
+
+    @ManyToOne(fetch=FetchType.LAZY,targetEntity=Comunidades.class)
+    @JoinColumn(name="CODIGO_COMUNIDAD_RESIDENCIA", referencedColumnName="CODIGO", nullable=true)
+    public Comunidades getComunidadResidencia() {
+        return comunidadResidencia;
+    }
+
+    public void setComunidadResidencia(Comunidades comunidadResidencia) {
+        this.comunidadResidencia = comunidadResidencia;
+    }
+
+    @Column(name="DIRECCION_RESIDENCIA", length=100)
+    public String getDireccionResidencia() {
+        return direccionResidencia;
+    }
+
+    public void setDireccionResidencia(String direccionResidencia) {
+        this.direccionResidencia = direccionResidencia;
+    }
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_INICIO_SINTOMAS", nullable = true)
+    public Date getFechaInicioSintomas() {
+        return fechaInicioSintomas;
+    }
+
+    public void setFechaInicioSintomas(Date fechaInicioSintomas) {
+        this.fechaInicioSintomas = fechaInicioSintomas;
     }
 }
