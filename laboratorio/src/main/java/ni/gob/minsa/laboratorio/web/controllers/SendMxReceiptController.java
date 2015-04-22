@@ -22,13 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Date;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Miguel Salinas on 12/10/2014.
@@ -62,6 +58,10 @@ public class SendMxReceiptController {
     @Autowired
     @Qualifier(value = "areaService")
     private AreaService areaService;
+
+    @Autowired
+    @Qualifier(value = "hojaTrabajoService")
+    private HojaTrabajoService hojaTrabajoService;
 
     @Autowired
     MessageSource messageSource;
@@ -128,6 +128,7 @@ public class SendMxReceiptController {
         String json;
         String resultado = "";
         String strOrdenes="";
+        String numeroHoja="";
         Integer cantRecepciones = 0;
         Integer cantRecepProc = 0;
         try {
@@ -138,24 +139,44 @@ public class SendMxReceiptController {
             strOrdenes = jsonpObject.get("strOrdenes").toString();
             cantRecepciones = jsonpObject.get("cantRecepciones").getAsInt();
 
-            //Se obtiene estado recepcionado
+            //Se obtiene estado enviado a procesar en laboratorio
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
-            //se obtiene muestra a recepcionar
+            //se obtiene muestra a enviar a laboratorio
             DaTomaMx tomaMx;
             JsonObject jObjectTomasMx = new Gson().fromJson(strOrdenes, JsonObject.class);
-            for(int i = 0; i< cantRecepciones;i++) {
-                String idTomaMx = jObjectTomasMx.get(String.valueOf(i)).getAsString();
-                tomaMx = tomaMxService.getTomaMxById(idTomaMx);
-                if (tomaMx != null) {
-                    //se tiene que actualizar el estado de la muestra a ENVIADA PARA PROCESAR EN LABORATORIO
-                    tomaMx.setEstadoMx(estadoMx);
-                    try {
-                        tomaMxService.updateTomaMx(tomaMx);
-                        cantRecepProc++;
-                    } catch (Exception ex) {
-                        resultado = messageSource.getMessage("msg.update.order.error", null, null);
-                        resultado = resultado + ". \n " + ex.getMessage();
-                        ex.printStackTrace();
+            HojaTrabajo hojaTrabajo = new HojaTrabajo();
+            hojaTrabajo.setNumero(hojaTrabajoService.obtenerNumeroHoja());
+            hojaTrabajo.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+            hojaTrabajo.setFechaRegistro(new Date());
+            //se crea hoja de trabajo
+            try {
+                hojaTrabajoService.addHojaTrabajo(hojaTrabajo);
+                numeroHoja = String.valueOf(hojaTrabajo.getNumero());
+            }catch (Exception ex){
+                throw new Exception(ex);
+            }
+            if (hojaTrabajo.getIdHojaTrabajo()!=null) {
+                for (int i = 0; i < cantRecepciones; i++) {
+                    String idTomaMx = jObjectTomasMx.get(String.valueOf(i)).getAsString();
+                    tomaMx = tomaMxService.getTomaMxById(idTomaMx);
+                    if (tomaMx != null) {
+                        //se tiene que actualizar el estado de la muestra a ENVIADA PARA PROCESAR EN LABORATORIO
+                        tomaMx.setEstadoMx(estadoMx);
+                        try {
+                            tomaMxService.updateTomaMx(tomaMx);
+                            //se registra muestra en hoja de trabajo
+                            Mx_HojaTrabajo mxHojaTrabajo = new Mx_HojaTrabajo();
+                            mxHojaTrabajo.setHojaTrabajo(hojaTrabajo);
+                            mxHojaTrabajo.setTomaMx(tomaMx);
+                            mxHojaTrabajo.setFechaRegistro(new Date());
+                            hojaTrabajoService.addDetalleHojaTrabajo(mxHojaTrabajo);
+
+                            cantRecepProc++;
+                        } catch (Exception ex) {
+                            resultado = messageSource.getMessage("msg.update.order.error", null, null);
+                            resultado = resultado + ". \n " + ex.getMessage();
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
@@ -171,6 +192,7 @@ public class SendMxReceiptController {
             map.put("mensaje",resultado);
             map.put("cantRecepciones",cantRecepciones.toString());
             map.put("cantRecepProc",cantRecepProc.toString());
+            map.put("numeroHoja",numeroHoja);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

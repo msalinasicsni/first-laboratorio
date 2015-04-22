@@ -15,6 +15,10 @@ public class Laboratorio {
     String codigo;
     String nombre;
     String codTipo;
+    String descripcion;
+    String direccion;
+    String telefono;
+    String telefax;
 
     @Id
     @Column(name = "CODIGO", nullable = false, insertable = true, updatable = true, length = 10)
@@ -44,5 +48,45 @@ public class Laboratorio {
 
     public void setCodTipo(String codTipo) {
         this.codTipo = codTipo;
+    }
+
+    @Basic
+    @Column(name = "DESCRIPCION", nullable = true, insertable = true, updatable = true, length = 100)
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    @Basic
+    @Column(name = "DIRECCION", nullable = true, insertable = true, updatable = true, length = 200)
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    @Basic
+    @Column(name = "TELEFONO", nullable = true, insertable = true, updatable = true, length = 20)
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    @Basic
+    @Column(name = "TELEFAX", nullable = true, insertable = true, updatable = true, length = 20)
+    public String getTelefax() {
+        return telefax;
+    }
+
+    public void setTelefax(String telefax) {
+        this.telefax = telefax;
     }
 }

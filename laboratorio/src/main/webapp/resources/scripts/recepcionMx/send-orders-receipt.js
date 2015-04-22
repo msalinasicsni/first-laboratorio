@@ -208,6 +208,27 @@ var SendOrdersReceipt = function () {
                 getOrders(true);
             });
 
+            function imprimirHojaTrabajo(hoja) {
+                $.ajax(
+                    {
+                        url: parametros.sPrintUrl,
+                        type: 'GET',
+                        dataType: 'text',
+                        data: {hojas: hoja},
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+
+                            var blob = blobData(data, 'application/pdf');
+                            showBlob(blob);
+                        },
+                        error: function (data, status, er) {
+                            unBlockUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
             function enviarRecepcionesSeleccionadas() {
                 var oTT = TableTools.fnGetInstance('orders_result');
                 var aSelectedTrs = oTT.fnGetSelected();
@@ -236,6 +257,7 @@ var SendOrdersReceipt = function () {
                             ordenesObj['mensaje'] = '';
                             ordenesObj['cantRecepciones']=len;
                             ordenesObj['cantRecepProc'] = '';
+                            ordenesObj['numeroHoja']='';
                             $.ajax(
                                 {
                                     url: parametros.sAgregarEnvioUrl,
@@ -245,6 +267,7 @@ var SendOrdersReceipt = function () {
                                     contentType: 'application/json',
                                     mimeType: 'application/json',
                                     success: function (data) {
+                                        desbloquearUI();
                                         if (data.mensaje.length > 0){
                                             $.smallBox({
                                                 title: data.mensaje ,
@@ -263,9 +286,9 @@ var SendOrdersReceipt = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
+                                            imprimirHojaTrabajo(data.numeroHoja);
                                             getOrders(false);
                                         }
-                                        desbloquearUI();
                                     },
                                     error: function (data, status, er) {
                                         desbloquearUI();
