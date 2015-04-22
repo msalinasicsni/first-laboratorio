@@ -408,4 +408,11 @@ public class SeguridadService {
         return laboratorio;
     }
 
+    public User getUsuario(String userName){
+        String query = "from User as usu " +
+                "where usu.username = :username";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("username", userName);
+        return  (User)q.uniqueResult();
+    }
 }

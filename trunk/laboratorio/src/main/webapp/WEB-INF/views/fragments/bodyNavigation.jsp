@@ -73,7 +73,9 @@
                     <li class="tomaMx">
                         <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.taking.sample" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.taking.sample" /></a>
                     </li>
-
+                    <li class="workSheet">
+                        <a href="<spring:url value="/workSheet/init" htmlEscape="true "/>" title="<spring:message code="menu.search.workSheet" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.search.workSheet" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="laboratorio">
