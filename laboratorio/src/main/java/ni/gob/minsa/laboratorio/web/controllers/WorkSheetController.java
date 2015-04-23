@@ -218,12 +218,13 @@ public class WorkSheetController {
                 solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx_hoja.getIdTomaMx());
                 solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx_hoja.getIdTomaMx());
                 //int numFila = 0;
-                String[] content = new String[5];
+                String[] content = null;
                 String fis = "";
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    content = new String[5];
                     y = y - 20;
                     if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
-                        fis = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy hh:mm:ss a");
+                        fis = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
                     }
                     content[0] = solicitudDx.getIdTomaMx().getCodigoUnicoMx();
                     content[1] = solicitudDx.getCodDx().getNombre();
@@ -235,9 +236,10 @@ public class WorkSheetController {
 
                 }
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
+                    content = new String[5];
                     y = y - 20;
                     if (solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
-                        fis = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy hh:mm:ss a");
+                        fis = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
                     }
                     content[0] = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
                     content[1] = solicitudEstudio.getTipoEstudio().getNombre();

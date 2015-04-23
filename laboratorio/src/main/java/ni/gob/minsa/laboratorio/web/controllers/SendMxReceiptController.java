@@ -264,6 +264,7 @@ public class SendMxReceiptController {
                     mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     subIndice++;
                     mapSolicitudesList.put(subIndice, mapSolicitud);
+                    mapSolicitud = new HashMap<String, String>();
                 }
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
             }else{
