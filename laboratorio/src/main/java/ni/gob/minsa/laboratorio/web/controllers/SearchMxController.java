@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -106,6 +107,10 @@ public class SearchMxController {
     private ResultadoFinalService resultadoFinalService;
 
     @Autowired
+    @Qualifier(value = "resultadosService")
+    private ResultadosService resultadosService;
+
+    @Autowired
     @Qualifier(value = "rechazoResultadoSolicitudService")
     private RechazoResultadoSolicitudService rechazoResultadoSolicitudService;
 
@@ -116,9 +121,25 @@ public class SearchMxController {
     @Autowired
     MessageSource messageSource;
 
+    String nombreSoli = null;
+    String nombrePersona = null;
+    String nombreSilais = null;
+    String nombreUS = null;
+    int edad = 0;
+    String sexo = null;
+    String fechaRecepcion = null;
+    String fechaToma = null;
+    String fis = null;
+    String fechaResultado = null;
+    String fechaAprobacion = null;
+    List<DetalleResultadoFinal> detalleResultado = null;
+    String fechaImpresion = null;
+    String orderSample = null;
+
 
     /**
      * Método que se llama al entrar a la opción de menu "Recepción Mx Vigilancia". Se encarga de inicializar las listas para realizar la búsqueda de envios de Mx
+     *
      * @param request para obtener información de la petición del cliente
      * @return ModelAndView
      * @throws Exception
@@ -132,18 +153,18 @@ public class SearchMxController {
             //si la url esta vacia significa que la validación del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             urlValidacion = "404";
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            mav.addObject("entidades",entidadesAdtvases);
+            mav.addObject("entidades", entidadesAdtvases);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.setViewName("recepcionMx/searchMx");
-        }else
+        } else
             mav.setViewName(urlValidacion);
 
         return mav;
@@ -151,13 +172,15 @@ public class SearchMxController {
 
     /**
      * Método para realizar la búsqueda de Mx para recepcionar en Mx Vigilancia general
+     *
      * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
      * @return String con las Mx encontradas
      * @throws Exception
      */
     @RequestMapping(value = "searchMx", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody
-    String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
+    public
+    @ResponseBody
+    String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
         logger.info("Obteniendo las mx según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
@@ -166,6 +189,7 @@ public class SearchMxController {
 
     /**
      * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
+     *
      * @param strJson String con la información de los filtros
      * @return FiltroMx
      * @throws Exception
@@ -184,18 +208,18 @@ public class SearchMxController {
         String codigoUnicoMx = null;
         String codTipoSolicitud = null;
         String nombreSolicitud = null;
-        String aprobado = null;
+        Boolean solicitudAprobada = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
         if (jObjectFiltro.get("fechaInicioTomaMx") != null && !jObjectFiltro.get("fechaInicioTomaMx").getAsString().isEmpty())
             fechaInicioTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioTomaMx").getAsString() + " 00:00:00");
         if (jObjectFiltro.get("fechaFinTomaMx") != null && !jObjectFiltro.get("fechaFinTomaMx").getAsString().isEmpty())
-            fechaFinTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaFinTomaMx").getAsString()+" 23:59:59");
+            fechaFinTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaFinTomaMx").getAsString() + " 23:59:59");
         if (jObjectFiltro.get("fechaInicioRecep") != null && !jObjectFiltro.get("fechaInicioRecep").getAsString().isEmpty())
-            fechaInicioRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
+            fechaInicioRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString() + " 00:00:00");
         if (jObjectFiltro.get("fechaFinRecepcion") != null && !jObjectFiltro.get("fechaFinRecepcion").getAsString().isEmpty())
-            fechaFinRecep =DateUtil. StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
+            fechaFinRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString() + " 23:59:59");
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsString();
         if (jObjectFiltro.get("codUnidadSalud") != null && !jObjectFiltro.get("codUnidadSalud").getAsString().isEmpty())
@@ -208,8 +232,8 @@ public class SearchMxController {
             codTipoSolicitud = jObjectFiltro.get("codTipoSolicitud").getAsString();
         if (jObjectFiltro.get("nombreSolicitud") != null && !jObjectFiltro.get("nombreSolicitud").getAsString().isEmpty())
             nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
-        if (jObjectFiltro.get("aprobado") != null && !jObjectFiltro.get("aprobado").getAsString().isEmpty())
-            aprobado = jObjectFiltro.get("aprobado").getAsString();
+        if (jObjectFiltro.get("solicitudAprobada") != null && !jObjectFiltro.get("solicitudAprobada").getAsString().isEmpty())
+            solicitudAprobada = jObjectFiltro.get("solicitudAprobada").getAsBoolean();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -223,50 +247,62 @@ public class SearchMxController {
         filtroMx.setNombreSolicitud(nombreSolicitud);
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
-       // filtroMx.setSolicitudAprobada(aprobado);
+        filtroMx.setSolicitudAprobada(solicitudAprobada);
+
         return filtroMx;
     }
 
     /**
      * Método que convierte una lista de tomaMx a un string con estructura Json
+     *
      * @param tomaMxList lista con las tomaMx a convertir
      * @return String
      */
-    private String tomaMxToJson(List<DaTomaMx> tomaMxList){
+    private String tomaMxToJson(List<DaTomaMx> tomaMxList) {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
-        Integer indice=0;
-        for(DaTomaMx tomaMx : tomaMxList){
+        Integer indice = 0;
+        for (DaTomaMx tomaMx : tomaMxList) {
             Map<String, String> map = new HashMap<String, String>();
+            RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx());
             map.put("idTomaMx", tomaMx.getIdTomaMx());
             map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
-            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-            if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
-                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
-            }else {
-                map.put("codSilais","");
+            map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+
+            if (rec != null) {
+                if (rec.getCalidadMx() != null) {
+                    map.put("calidad", rec.getCalidadMx().getValor());
+                } else {
+                    map.put("calidad", "");
+                }
             }
-            if (tomaMx.getIdNotificacion().getCodUnidadAtencion()!=null) {
+
+            if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
+                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+            } else {
+                map.put("codSilais", "");
+            }
+            if (tomaMx.getIdNotificacion().getCodUnidadAtencion() != null) {
                 map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
-            }else{
-                map.put("codUnidadSalud","");
+            } else {
+                map.put("codUnidadSalud", "");
             }
             map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
             map.put("estadoMx", tomaMx.getEstadoMx().getValor());
 
             //Si hay persona
-            if (tomaMx.getIdNotificacion().getPersona()!=null){
+            if (tomaMx.getIdNotificacion().getPersona() != null) {
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto = "";
                 nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-            }else{
-                map.put("persona"," ");
+                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                map.put("persona", nombreCompleto);
+            } else {
+                map.put("persona", " ");
             }
 
             //se arma estructura de diagnósticos o estudios
@@ -276,48 +312,58 @@ public class SearchMxController {
 
             Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
             Map<String, String> mapDx = new HashMap<String, String>();
-            int subIndice=0;
+            int subIndice = 0;
 
-            if(!solicitudDxList.isEmpty()){
-                for(DaSolicitudDx solicitudDx: solicitudDxList){
+            if (!solicitudDxList.isEmpty()) {
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     mapDx.put("idSolicitud", solicitudDx.getIdSolicitudDx());
-                    mapDx.put("nombre",solicitudDx.getCodDx().getNombre());
+                    mapDx.put("nombre", solicitudDx.getCodDx().getNombre());
                     mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     List<DetalleResultadoFinal> detRes = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
 
-                    if(solicitudDx.getAprobada() != null){
-                        if (solicitudDx.getAprobada().equals(true)){
-                            mapDx.put("estado", "Resultado Aprobado");
+                    if (solicitudDx.getAprobada() != null) {
+                        if (solicitudDx.getAprobada().equals(true)) {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.approval.result", null, null)));
+                        } else {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
                         }
-                    } else if(!detRes.isEmpty()){
-                        mapDx.put("estado", "Resultado en Espera de Aprobación");
-                    }else {
-                        mapDx.put("estado", "Sin Resultado");
+                    } else {
+                        if (!detRes.isEmpty()) {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.result.pending.approval", null, null)));
+                        } else {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                        }
                     }
 
+
                     subIndice++;
-                    mapDxList.put(subIndice,mapDx);
+                    mapDxList.put(subIndice, mapDx);
                     mapDx = new HashMap<String, String>();
                 }
-            }else{
-                for(DaSolicitudEstudio solicitudEstudio: solicitudEList){
+            } else {
+                for (DaSolicitudEstudio solicitudEstudio : solicitudEList) {
                     mapDx.put("idSolicitud", solicitudEstudio.getIdSolicitudEstudio());
-                    mapDx.put("nombre",solicitudEstudio.getTipoEstudio().getNombre());
+                    mapDx.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
                     mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     List<DetalleResultadoFinal> detRes = resultadoFinalService.getDetResActivosBySolicitud(solicitudEstudio.getIdSolicitudEstudio());
 
-                   if(solicitudEstudio.getAprobada() != null){
-                       if (solicitudEstudio.getAprobada().equals(true)){
-                           mapDx.put("estado", "Resultado Aprobado");
-                       }
-                   } else if(!detRes.isEmpty()){
-                       mapDx.put("estado", "Resultado en Espera de Aprobación");
-                   }else{
-                       mapDx.put("estado", "Sin Resultado");
-                   }
+                    if (solicitudEstudio.getAprobada() != null) {
+                        if (solicitudEstudio.getAprobada().equals(true)) {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.approval.result", null, null)));
+                        } else {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                        }
+                    } else {
+                        if (!detRes.isEmpty()) {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.result.pending.approval", null, null)));
+                        } else {
+                            mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                        }
+                    }
+
 
                     subIndice++;
-                    mapDxList.put(subIndice,mapDx);
+                    mapDxList.put(subIndice, mapDx);
                     mapDx = new HashMap<String, String>();
                 }
             }
@@ -326,446 +372,858 @@ public class SearchMxController {
             map.put("solicitudes", new Gson().toJson(mapDxList));
 
             mapResponse.put(indice, map);
-            indice ++;
+            indice++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
-        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
     }
 
     @RequestMapping(value = "printResults", method = RequestMethod.GET)
-    public @ResponseBody String getPDF(@RequestParam(value = "codigos", required = true) String codigos, HttpServletRequest request) throws IOException, COSVisitorException, ParseException {
+    public
+    @ResponseBody
+    String getPDF(@RequestParam(value = "codigos", required = true) String codigos, HttpServletRequest request) throws IOException, COSVisitorException, ParseException {
         String res = null;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
+
         PDDocument doc = new PDDocument();
+        List<DaSolicitudDx> solicDx = null;
+        List<DaSolicitudEstudio> solicEstudio = null;
+        DaSolicitudDx detalleSoliDx = null;
+        DaSolicitudEstudio detalleSoliE = null;
+        PDPageContentStream stream = null;
 
-
-        List<DaSolicitudDx> solicDx;
-        List<DaSolicitudEstudio> solicEstudio;
-        String nombreSoli = null;
-        String nombrePersona = null;
-        String nombreSilais = null;
-        String nombreUS = null;
-        int edad = 0;
-        String fechaRecepcion = null;
-        String fechaToma = null;
-        String fis = null;
-        String fechaResultado = null;
-        String workingDir = System.getProperty("user.dir");
-        String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-
+        String nombreExamen = null;
 
         String[] toma = codigos.split(",");
 
         for (String idToma : toma) {
             solicDx = tomaMxService.getSoliDxAprobByIdToma(idToma);
-            solicEstudio = tomaMxService.getSoliEstudioAprobByIdTomaMx(idToma);
-            List<DetalleResultadoFinal> detalleResultado = null;
+            solicEstudio = tomaMxService.getSoliEAprobByIdTomaMxOrderCodigo(idToma);
 
+            String codigoAnterior = null;
+            detalleResultado = null;
+            fechaAprobacion = null;
+            nombreSoli = null;
+            nombrePersona = null;
+            nombreSilais = null;
+            nombreUS = null;
+            edad = 0;
+            sexo = null;
+            fechaRecepcion = null;
+            fechaToma = null;
+            fis = null;
+            fechaResultado = null;
+            fechaImpresion = null;
+            orderSample = null;
 
-            //Obtener las respuestas activas de la solicitud
-            if (!solicDx.isEmpty()) {
-                for (DaSolicitudDx solicitudDx : solicDx) {
-                    RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solicitudDx.getIdTomaMx().getCodigoUnicoMx());
-                    String fechaformateada = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
-                    edad = DateUtil.edad(fechaformateada);
-                    fechaToma =  new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getIdTomaMx().getFechaHTomaMx());
-                    if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
-                        fis = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
-                    }
-                    fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
-                    fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(resultadoFinalService.getFechaResultadoByIdSoli(solicitudDx.getIdSolicitudDx()));
-                    detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
-                    nombreSoli = solicitudDx.getCodDx().getNombre();
-                    nombrePersona = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                    if(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null){
-                        nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                    }else{
-                        nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+            if (!solicDx.isEmpty() || !solicEstudio.isEmpty()) {
+                //Obtener las respuestas activas de la solicitud
+                if (!solicDx.isEmpty()) {
+                    for (DaSolicitudDx solicitudDx : solicDx) {
+                        detalleSoliDx = solicitudDx;
+                        detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
+                        fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
-                    }
-                    if(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null){
-                        nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                    }
-
-                    if (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() != null){
-                        nombreSilais = solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-                        nombreUS = solicitudDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
-
-                    }else {
-                        nombreSilais = "---------------";
-                        nombreUS = "---------------";
-                    }
-                }
-            } else {
-                for (DaSolicitudEstudio solicitudE : solicEstudio) {
-                    String fechaformateada = DateUtil.DateToString(solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
-                    RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solicitudE.getIdTomaMx().getCodigoUnicoMx());
-                    edad = DateUtil.edad(fechaformateada);
-                    fechaToma =  new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudE.getIdTomaMx().getFechaHTomaMx());
-                    if (solicitudE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
-                        fis = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(solicitudE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
-                    }
-                    fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
-                    detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudE.getIdSolicitudEstudio());
-                    fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(resultadoFinalService.getFechaResultadoByIdSoli(solicitudE.getIdSolicitudEstudio()));
-                    nombreSoli = solicitudE.getTipoEstudio().getNombre();
-                    nombrePersona = solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                    if(solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null){
-                        nombrePersona = nombrePersona + " " + solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombrePersona = nombrePersona + " " + solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                    }else{
-                        nombrePersona = nombrePersona + " " + solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-
-                    }
-                    if(solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null){
-                        nombrePersona = nombrePersona + " " + solicitudE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                    }
-                    nombreSilais = solicitudE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-                    nombreUS = solicitudE.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
-
-
-                }
-            }
-
-            if (detalleResultado != null) {
-
-                float inY = 750;
-                float m = 20;
-                float m1 = 50;
-
-                //Prepare the document.
-                PDPage page = addNewPage(doc);
-                PDPageContentStream stream = new PDPageContentStream(doc, page);
-
-                //dibujar encabezado pag y pie de pagina
-                BufferedImage awtImage = ImageIO.read(new File(workingDir + "/encabezadoMinsa.jpg"));
-                PDXObjectImage ximage = new PDPixelMap(doc, awtImage);
-                stream.drawXObject(ximage, 5, inY, 590, 80);
-                inY -= m1;
-
-                BufferedImage awtImage2 = ImageIO.read(new File(workingDir + "/piePMinsa.jpg"));
-                PDXObjectImage ximage2 = new PDPixelMap(doc, awtImage2);
-                stream.drawXObject(ximage2, 5, 30, 600, 70);
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-                stream.moveTextPositionByAmount(216, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.minsa",null,null));
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-                stream.moveTextPositionByAmount(110, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.cndr",null,null));
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-                stream.moveTextPositionByAmount(208, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.lab.result",null,null));
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-                stream.moveTextPositionByAmount(80, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.info.cndr",null,null));
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-                stream.moveTextPositionByAmount(187, inY);
-                inY -= m1;
-                stream.drawString(messageSource.getMessage("lbl.tel.cndr",null,null));
-                stream.endText();
-
-
-                //Dibujar encabezado de resultado
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(15, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.request.name1",null,null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(nombreSoli);
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(15, inY);
-                stream.drawString(messageSource.getMessage("lbl.name1",null,null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(nombrePersona);
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(290, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.age", null, null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(String.valueOf(edad));
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(15, inY);
-                stream.drawString(messageSource.getMessage("lbl.fis", null, null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(fis);
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(290, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.sampling.datetime1", null, null) +" ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(fechaToma);
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(15, inY);
-                stream.drawString(messageSource.getMessage("lbl.reception.datetime",null,null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(fechaRecepcion);
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(290, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.result.datetime", null, null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(fechaResultado);
-                stream.endText();
-
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(15, inY);
-                inY -= m;
-                stream.drawString(messageSource.getMessage("lbl.silais1",null,null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(nombreSilais);
-                stream.endText();
-
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-                stream.moveTextPositionByAmount(15, inY);
-                stream.drawString(messageSource.getMessage("lbl.health.unit1",null,null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(nombreUS);
-                stream.endText();
-
-                float y = 540;
-                boolean lista = false;
-                String valor = null;
-                String respuesta;
-                String[][] content = new String[detalleResultado.size()][2];
-
-/*
-                //draw the header
-                stream.drawLine(50,y,50+500,y);
-                stream.drawLine(50,y,50,y-20);
-                stream.drawLine(300,y,300,y-20);
-                stream.drawLine(550,y,550,y-20);
-
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                stream.beginText();
-                stream.moveTextPositionByAmount(55, 555);
-                stream.drawString("Respuesta");
-                stream.endText();
-
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                stream.beginText();
-                stream.moveTextPositionByAmount(305, 555);
-                stream.drawString("Valor");
-                stream.endText();
-*/
-                int numFila = 0;
-                for (DetalleResultadoFinal resul : detalleResultado) {
-                    y = y - 20;
-                  if(resul.getRespuesta() != null){
-                      respuesta = resul.getRespuesta().getNombre();
-                      lista = resul.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
-                    }else{
-                        respuesta = resul.getRespuestaExamen().getNombre();
-                      lista = resul.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
-                    }
-
-                    if(lista){
-                        Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
-                    valor = catLista.getValor() ;
-                    }else{
-                        valor = resul.getValor();
-                    }
-
-
-                    content[numFila][0] = respuesta;
-                    content[numFila][1] = valor;
-                    numFila ++;
-
-                   /* float margin = 50;
-                    final int rows = content.length;
-                    final int cols = content[0].length;
-                    final float rowHeight = 20f;
-                    final float tableWidth = 500;
-                    final float tableHeight = rowHeight * rows;
-                    final float colWidth = tableWidth/(float)cols;
-                    final float cellMargin=5f;
-
-
-                    //draw the rows
-                    float nexty = y ;
-                    for (int i = 0; i <= rows; i++) {
-                        stream.drawLine(margin,nexty,margin+tableWidth,nexty);
-                        nexty-= rowHeight;
-                    }
-
-                    //draw the columns
-                    float nextx = margin;
-                    for (int i = 0; i <= cols; i++) {
-                        stream.drawLine(nextx,y,nextx,y-tableHeight);
-                        nextx += colWidth;
-                    }
-
-                    //now add the text
-                    float textx = margin+cellMargin;
-                    float texty = y-15;
-                    for (String[] aContent : content) {
-                        for (int j = 0; j < aContent.length; j++) {
-
-                            if (j == 0) {
-                                stream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-                                String text = aContent[j];
-                                stream.beginText();
-                                stream.moveTextPositionByAmount(textx, texty);
-                                stream.drawString(text);
-                                stream.endText();
-                            } else {
-                                stream.setFont(PDType1Font.HELVETICA, 12);
-                                String text = aContent[j];
-                                stream.beginText();
-                                stream.moveTextPositionByAmount(textx, texty);
-                                stream.drawString(text);
-                                stream.endText();
-                            }
-
-                            textx += colWidth;
+                        if (solicitudDx.getFechaAprobacion() != null) {
+                            fechaAprobacion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getFechaAprobacion());
                         }
-                        texty -= rowHeight;
-                        textx = margin + cellMargin;
-                    }*/
+                    }
+                } else {
+                    for (DaSolicitudEstudio solicitudE : solicEstudio) {
+                        fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
 
-                }
-            //Initialize table
-                float margin = 50;
-                float tableWidth = 500;
-                float yStartNewPage = 410;
-                float yStart = yStartNewPage;
-                float bottomMargin = 45;
-                BaseTable table = new BaseTable(yStart,yStartNewPage,bottomMargin,tableWidth, margin, doc, page, true, true);
+                        List<DaSolicitudEstudio> solicitudes = null;
+
+                        boolean lista = false;
+                        String valor = null;
+                        String respuesta;
 
 
-                //Create Header row
-                Row headerRow = table.createRow(15f);
-                Cell cell = headerRow.createCell(100,"");
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFillColor(Color.black);cell.setTextColor(Color.WHITE);
+                        if (solicitudE.getTipoEstudio().getIdEstudio().equals(1) || solicitudE.getTipoEstudio().getIdEstudio().equals(2)) {
 
-                table.setHeader(headerRow);
+                            //Prepare document
 
-                //Create 2 column row
-                Row row;
-               /* cell = row.createCell(75,"Source:");
-                cell.setFont(PDType1Font.HELVETICA);
-
-                cell = row.createCell(25,"http://www.factsofbelgium.com/");
-                cell.setFont(PDType1Font.HELVETICA_OBLIQUE);*/
-
-                //Create Fact header row
-                Row factHeaderrow = table.createRow(15f);
-                cell = factHeaderrow.createCell(50 , messageSource.getMessage("lbl.approve.response",null,null));
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
-                cell.setFillColor(Color.LIGHT_GRAY);
-
-                cell = factHeaderrow.createCell((50),messageSource.getMessage("lbl.value",null,null));
-                cell.setFillColor(Color.lightGray);
-                cell.setFont(PDType1Font.HELVETICA_BOLD);cell.setFontSize(10);
-
-                //Add multiple rows with random facts about Belgium
-
-                for(String[] fact : content) {
-
-                    row = table.createRow(15f);
-                    cell = row.createCell(50, fact[0]);
-                    cell.setFont(PDType1Font.HELVETICA);cell.setFontSize(10);
+                           PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
+                            doc.addPage(page);
+                            stream = new PDPageContentStream(doc, page);
 
 
-                    for(int i = 1; i< fact.length; i++) {
-                        cell = row.createCell(50 ,fact[i]);
-                        cell.setFont(PDType1Font.HELVETICA_OBLIQUE);cell.setFontSize(10);
+                            //draw Page Header
+                            drawHeaderRep(stream, doc);
+
+                            String codigoUnico = solicitudE.getIdTomaMx().getCodigoUnicoMx();
+                          /*  if(codigoAnterior != null) {
+                                codigoAnterior = codigoAnterior.substring(0, codigoAnterior.lastIndexOf("."));
+
+                                if (!codigoUnico.contains(codigoAnterior)) {
+                                    //solicitudes por codigo
+                                    solicitudes = tomaMxService.getSoliEAprobByCodigo(codigoAnterior);
+                                    codigoAnterior = codigoUnico;
+
+                                }
+                            }else {
+                                    String codigo = codigoUnico.substring(0, codigoUnico.lastIndexOf("."));
+                                    solicitudes = tomaMxService.getSoliEAprobByCodigo(codigo);
+
+                                }*/
+                            //primera muestra
+                            String codigo = solicitudE.getIdTomaMx().getCodigoUnicoMx();
+                            String secuencia = null;
+                            float m = 20;
+                            float y = 500;
+                            float m1 = 50;
+                            float m2 = 10;
+                            float m3 = 140;
+
+                            List<DetalleResultado> resultadoExamen = null;
+                            List<DetalleResultadoFinal> detalleRF = null;
+
+
+                            if (codigo.contains("."))
+                                secuencia = codigo.substring(codigo.lastIndexOf(".") + 1);
+
+                            if (secuencia.equals("1")) {
+
+                                if (solicitudE.getFechaAprobacion() != null) {
+                                    fechaAprobacion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudE.getFechaAprobacion());
+                                }
+
+                                if (solicitudE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas() != null) {
+                                    fis = String.valueOf(solicitudE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
+                                }
+
+                                orderSample = messageSource.getMessage("lbl.first.sample", null, null);
+                                detalleRF = resultadoFinalService.getDetResActivosBySolicitud(solicitudE.getIdSolicitudEstudio());
+
+                                fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudE.getIdTomaMx().getFechaHTomaMx());
+
+
+                                //draw Report Header
+                                drawReportHeader(stream, null, solicitudE);
+                                //draw info sample1
+                                drawInfoSpecialSample(orderSample, y, solicitudE, stream);
+                                y -= m;
+                                if (y<320) {
+                                    stream.close();
+                                    page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                    doc.addPage(page);
+                                    stream = new PDPageContentStream(doc, page);
+                                    drawHeaderRep(stream, doc);
+                                    y= 600;
+                                }
+
+
+                                //Obtener ordenes de examen  con resultado segun solicitud
+                                FiltroMx filtro = new FiltroMx();
+                                filtro.setResultado("Si");
+                                filtro.setCodigoUnicoMx(solicitudE.getIdTomaMx().getCodigoUnicoMx());
+
+                                List<OrdenExamen> ordenExamen = ordenExamenMxService.getOrdenesExamenEstudioResultadoByFiltro(filtro);
+
+
+                                for (OrdenExamen orden : ordenExamen) {
+
+                                    nombreExamen = orden.getCodExamen().getNombre();
+
+                                    //add info test
+                                    drawTEXT(messageSource.getMessage("lbl.test", null, null), y, 15, stream, nombreExamen);
+                                    y -= m2;
+                                    if (y<320) {
+                                        stream.close();
+                                        page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                        doc.addPage(page);
+                                        stream = new PDPageContentStream(doc, page);
+                                        drawHeaderRep(stream, doc);
+                                        y= 600;
+                                    }
+
+                                    //Obtener resultado del examen
+                                    resultadoExamen = resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen());
+
+                                    String[][] exam = new String[resultadoExamen.size()][2];
+                                    float tableHeight = (resultadoExamen.size() + 3) * 15;
+
+                                    int numFila = 0;
+                                    for (DetalleResultado resulExa : resultadoExamen) {
+
+                                        if (resulExa.getRespuesta() != null) {
+                                            respuesta = resulExa.getRespuesta().getNombre();
+                                            lista = resulExa.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                        } else {
+                                            respuesta = resulExa.getRespuesta().getNombre();
+                                            lista = resulExa.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                        }
+
+                                        if (lista) {
+                                            Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resulExa.getValor()));
+                                            valor = catLista.getValor();
+                                        } else {
+                                            valor = resulExa.getValor();
+                                        }
+
+
+                                        exam[numFila][0] = respuesta;
+                                        exam[numFila][1] = valor;
+                                        numFila++;
+
+                                    }
+
+                                    //draw test result table Sample 1
+                                    drawFinalResultTable(exam, doc, page, y);
+                                    y -= tableHeight;
+                                    if (y<320) {
+                                        stream.close();
+                                        page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                        doc.addPage(page);
+                                        stream = new PDPageContentStream(doc, page);
+                                        drawHeaderRep(stream, doc);
+                                        y= 600;
+                                    }
+
+
+                                }
+
+                                //Sample 2
+                                String codMx = codigoUnico.substring(0, codigoUnico.lastIndexOf("."));
+
+                                //Getting Sample2
+                                DaSolicitudEstudio sample2 = tomaMxService.getSoliEstByCodigo(codMx + "." + "2");
+
+                                if (sample2 != null) {
+                                    orderSample = messageSource.getMessage("lbl.second.sample", null, null);
+
+                                    //draw info sample2
+                                    drawInfoSpecialSample(orderSample, y, sample2, stream);
+                                    y -= m;
+                                    if (y<320) {
+                                        stream.close();
+                                        page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                        doc.addPage(page);
+                                        stream = new PDPageContentStream(doc, page);
+                                        drawHeaderRep(stream, doc);
+                                        y= 600;
+                                    }
+
+                                    FiltroMx filtro1 = new FiltroMx();
+                                    filtro1.setResultado("Si");
+                                    filtro1.setCodigoUnicoMx(sample2.getIdTomaMx().getCodigoUnicoMx());
+
+                                    //Obtener ordenes de examen segun solicitud
+                                    List<OrdenExamen> ordenExamen2 = ordenExamenMxService.getOrdenesExamenEstudioResultadoByFiltro(filtro1);
+
+
+                                    for (OrdenExamen orden : ordenExamen2) {
+
+                                        nombreExamen = orden.getCodExamen().getNombre();
+
+                                        //add info test
+                                        drawTEXT(messageSource.getMessage("lbl.test", null, null), y, 15, stream, nombreExamen);
+                                        y -= m;
+                                        if (y<320) {
+                                            stream.close();
+                                            page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                            doc.addPage(page);
+                                            stream = new PDPageContentStream(doc, page);
+                                            drawHeaderRep(stream, doc);
+                                            y= 600;
+                                        }
+
+                                        //Obtener resultado del examen
+                                        resultadoExamen = resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen());
+
+                                        String[][] exam = new String[resultadoExamen.size()][2];
+
+                                        int numFila = 0;
+                                        float tableHeight = (resultadoExamen.size()+3) * 15;
+
+                                        for (DetalleResultado resulExa : resultadoExamen) {
+
+                                            if (resulExa.getRespuesta() != null) {
+                                                respuesta = resulExa.getRespuesta().getNombre();
+                                                lista = resulExa.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                            } else {
+                                                respuesta = resulExa.getRespuesta().getNombre();
+                                                lista = resulExa.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                            }
+
+                                            if (lista) {
+                                                Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resulExa.getValor()));
+                                                valor = catLista.getValor();
+                                            } else {
+                                                valor = resulExa.getValor();
+                                            }
+
+
+                                            exam[numFila][0] = respuesta;
+                                            exam[numFila][1] = valor;
+                                            numFila++;
+
+
+                                        }
+
+                                        //draw test result table Sample 2
+                                        drawFinalResultTable(exam, doc, page, y);
+                                        y -= tableHeight;
+                                        if (y<320) {
+                                            stream.close();
+                                            page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                            doc.addPage(page);
+                                            stream = new PDPageContentStream(doc, page);
+                                            drawHeaderRep(stream, doc);
+                                            y= 600;
+                                        }
+
+
+                                    }
+
+
+                                }
+
+
+                                //dibujar resultado final
+
+                                boolean listaFinal = false;
+                                String valorFinal = null;
+                                String respuestaFinal;
+                                String[][] content = new String[detalleRF.size()][2];
+
+
+                                int numFila = 0;
+                                for (DetalleResultadoFinal rFinal : detalleRF) {
+
+                                    if (rFinal.getRespuesta() != null) {
+                                        respuestaFinal = rFinal.getRespuesta().getNombre();
+                                        listaFinal = rFinal.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                    } else {
+                                        respuestaFinal = rFinal.getRespuestaExamen().getNombre();
+                                        listaFinal = rFinal.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                    }
+
+                                    if (listaFinal) {
+                                        Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(rFinal.getValor()));
+                                        valorFinal = catLista.getValor();
+                                    } else {
+                                        valorFinal = rFinal.getValor();
+                                    }
+
+
+                                    content[numFila][0] = respuestaFinal;
+                                    content[numFila][1] = valorFinal;
+                                    numFila++;
+                                }
+
+                                drawTEXT(messageSource.getMessage("lbl.final.result1", null, null), y, 15, stream, "");
+                                y -= m2;
+                                if (y<320) {
+                                    stream.close();
+                                    page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                    doc.addPage(page);
+                                    stream = new PDPageContentStream(doc, page);
+                                    drawHeaderRep(stream, doc);
+                                    y= 600;
+                                }
+                                drawFinalResultTable(content, doc, page, y);
+                                y -= m3;
+                                if (y<320) {
+                                    stream.close();
+                                    page = new PDPage(PDPage.PAGE_SIZE_A4);
+                                    doc.addPage(page);
+                                    stream = new PDPageContentStream(doc, page);
+                                    drawHeaderRep(stream, doc);
+                                    y= 600;
+                                }
+                                drawFooterRep(stream, y);
+                                stream.close();
+
+
+                            } else {
+                                detalleSoliE = solicitudE;
+                                detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudE.getIdSolicitudEstudio());
+                                if (solicitudE.getFechaAprobacion() != null) {
+                                    fechaAprobacion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudE.getFechaAprobacion());
+                                }
+                            }
+                        }
                     }
                 }
-                table.draw();
+
+                if (detalleResultado != null) {
+
+                    //Prepare the document.
+                    float y = 500;
+                    float m1 = 20;
+
+                    PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
+                    doc.addPage(page);
+                    stream = new PDPageContentStream(doc, page);
+
+                    drawHeaderRep(stream, doc);
+                    drawReportHeader(stream, detalleSoliDx, detalleSoliE);
+
+                    drawInfoSample(stream, detalleSoliDx, detalleSoliE, y);
+                    y-=m1;
 
 
-                //dibujar lineas de firmas
-                stream.drawLine(90,200, 250 ,200);
-                stream.drawLine(340,200,500,200);
+                    boolean lista = false;
+                    String valor = null;
+                    String respuesta;
+                    String[][] content = new String[detalleResultado.size()][2];
 
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
-                stream.moveTextPositionByAmount(145, 190);
-                stream.drawString(messageSource.getMessage("lbl.analyst",null,null));
-                stream.endText();
 
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
-                stream.moveTextPositionByAmount(400, 190);
-                stream.drawString(messageSource.getMessage("lbl.director",null,null));
-                stream.endText();
+                    int numFila = 0;
+                    for (DetalleResultadoFinal resul : detalleResultado) {
+                        y = y - 20;
+                        if (resul.getRespuesta() != null) {
+                            respuesta = resul.getRespuesta().getNombre();
+                            lista = resul.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                        } else {
+                            respuesta = resul.getRespuestaExamen().getNombre();
+                            lista = resul.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                        }
 
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
-                stream.moveTextPositionByAmount(360, 115);
-                stream.drawString(messageSource.getMessage("lbl.print.datetime",null,null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(fechaImpresion);
-                stream.endText();
+                        if (lista) {
+                            Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
+                            valor = catLista.getValor();
+                        } else {
+                            valor = resul.getValor();
+                        }
 
-                stream.close();
+
+                        content[numFila][0] = respuesta;
+                        content[numFila][1] = valor;
+                        numFila++;
+
+                    }
+
+                    drawFinalResultTable(content, doc, page, y);
+                    y = y-140;
+                    drawFooterRep(stream, y);
+                    stream.close();
+
+                }
+
 
             }
 
-            }
-
-        doc.save(output);
-        doc.close();
-        // generate the file
-        res = Base64.encodeBase64String(output.toByteArray());
+        }
+        if(!solicDx.isEmpty()|| !solicEstudio.isEmpty()){
+            doc.save(output);
+            doc.close();
+            // generate the file
+            res = Base64.encodeBase64String(output.toByteArray());
+        }
 
         return res;
     }
 
+    private void drawTEXT(String texto, float inY, float inX, PDPageContentStream stream, String content) throws IOException {
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+        stream.moveTextPositionByAmount(15, inY);
+        stream.drawString(texto + " ");
+        stream.setFont(PDType1Font.HELVETICA, 10f);
+        stream.drawString(content);
+        stream.endText();
 
 
-    private static PDPage addNewPage(PDDocument doc) {
-        PDPage page = new PDPage();
-        page.setMediaBox(PDPage.PAGE_SIZE_A4);
-        doc.addPage(page);
-        return page;
+    }
+
+    private void drawHeaderRep(PDPageContentStream stream, PDDocument doc) throws IOException {
+        String workingDir = System.getProperty("user.dir");
+        float inY = 750;
+        float m = 20;
+        float m1 = 50;
+
+        //dibujar encabezado pag y pie de pagina
+        BufferedImage awtImage = ImageIO.read(new File(workingDir + "/encabezadoMinsa.jpg"));
+        PDXObjectImage ximage = new PDPixelMap(doc, awtImage);
+        stream.drawXObject(ximage, 5, inY, 590, 80);
+        inY -= m;
+
+        BufferedImage awtImage2 = ImageIO.read(new File(workingDir + "/piePMinsa.jpg"));
+        PDXObjectImage ximage2 = new PDPixelMap(doc, awtImage2);
+        stream.drawXObject(ximage2, 5, 20, 600, 70);
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
+        stream.moveTextPositionByAmount(216, inY);
+        inY -= m;
+        stream.drawString(messageSource.getMessage("lbl.minsa", null, null));
+        stream.endText();
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
+        stream.moveTextPositionByAmount(110, inY);
+        inY -= m;
+        stream.drawString(messageSource.getMessage("lbl.cndr", null, null));
+        stream.endText();
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
+        stream.moveTextPositionByAmount(208, inY);
+        inY -= m;
+        stream.drawString(messageSource.getMessage("lbl.lab.result", null, null));
+        stream.endText();
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA, 14f);
+        stream.moveTextPositionByAmount(80, inY);
+        inY -= m;
+        stream.drawString(messageSource.getMessage("lbl.info.cndr", null, null));
+        stream.endText();
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA, 14f);
+        stream.moveTextPositionByAmount(187, inY);
+        stream.drawString(messageSource.getMessage("lbl.tel.cndr", null, null));
+        stream.endText();
+    }
+
+
+    private void drawReportHeader(PDPageContentStream stream, DaSolicitudDx soliDx, DaSolicitudEstudio soliE) throws IOException {
+
+        float inY = 610;
+        float m = 20;
+
+        if (soliDx != null || soliE != null) {
+
+            if (soliDx != null) {
+                nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                nombreSoli = soliDx.getCodDx().getNombre();
+
+                if (soliDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas() != null) {
+                    fis = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(soliDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
+                } else {
+                    fis = "---------------";
+                }
+
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null) {
+                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                } else {
+                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+
+                }
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null) {
+                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                }
+
+                if (soliDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                    nombreSilais = soliDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
+                    nombreUS = soliDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
+
+                } else {
+                    nombreSilais = "---------------";
+                    nombreUS = "---------------";
+                }
+
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor() != null) {
+                    sexo = soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor();
+                } else {
+                    sexo = "----------------";
+                }
+
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento() != null) {
+                    String fechaformateada = DateUtil.DateToString(soliDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
+                    edad = DateUtil.edad(fechaformateada);
+                }
+
+            } else {
+                nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                nombreSoli = soliE.getTipoEstudio().getNombre();
+
+                if (soliE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas() != null) {
+                    fis = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(soliE.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
+                } else {
+                    fis = "---------------";
+                }
+
+                if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null) {
+                    nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                } else {
+                    nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+
+                }
+                if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null) {
+                    nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                }
+
+                if (soliE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                    nombreSilais = soliE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
+                    nombreUS = soliE.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
+
+                } else {
+                    nombreSilais = "---------------";
+                    nombreUS = "---------------";
+                }
+
+                if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor() != null) {
+                    sexo = soliE.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor();
+                } else {
+                    sexo = "----------------";
+                }
+
+                if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento() != null) {
+                    String fechaformateada = DateUtil.DateToString(soliE.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
+                    edad = DateUtil.edad(fechaformateada);
+                }
+
+
+            }
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            inY -= m;
+            stream.drawString(messageSource.getMessage("lbl.request.name1", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 12f);
+            stream.drawString(nombreSoli);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            stream.drawString(messageSource.getMessage("lbl.name1", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(nombrePersona);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(290, inY);
+
+            stream.drawString(messageSource.getMessage("lbl.age", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(String.valueOf(edad));
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(350, inY);
+            inY -= m;
+            stream.drawString(messageSource.getMessage("lbl.sex", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(sexo);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            inY -= m;
+            stream.drawString(messageSource.getMessage("lbl.silais1", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(nombreSilais);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            inY -= m;
+            stream.drawString(messageSource.getMessage("lbl.health.unit1", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(nombreUS);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            stream.drawString(messageSource.getMessage("lbl.fis", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(fis);
+            stream.endText();
+
+        }
+
+    }
+
+    private void drawInfoSample(PDPageContentStream stream, DaSolicitudDx solDx, DaSolicitudEstudio solE, float inY) throws IOException {
+        float m = 20;
+
+        if (solDx != null || solE != null) {
+            if (solDx != null) {
+
+                if (solDx.getIdTomaMx().getFechaHTomaMx() != null) {
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx());
+                }
+
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx());
+                if (recepcion != null) {
+                    fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
+                }
+
+
+                Object fechaResultadoFinal = resultadoFinalService.getFechaResultadoByIdSoli(solDx.getIdSolicitudDx());
+                if (fechaResultadoFinal != null) {
+                    fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(fechaResultadoFinal);
+                }
+
+
+            } else {
+
+                if (solE.getIdTomaMx().getFechaHTomaMx() != null) {
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solE.getIdTomaMx().getFechaHTomaMx());
+                }
+
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx());
+                if (recepcion != null) {
+                    fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
+                }
+
+                Object fechaResultadoFinal = resultadoFinalService.getFechaResultadoByIdSoli(solE.getIdSolicitudEstudio());
+                if (fechaResultadoFinal != null) {
+                    fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(fechaResultadoFinal);
+                }
+
+            }
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+
+            stream.drawString(messageSource.getMessage("lbl.sampling.datetime1", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(fechaToma);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(290, inY);
+            inY -= m;
+            stream.drawString(messageSource.getMessage("lbl.reception.datetime", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(fechaRecepcion);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            stream.drawString(messageSource.getMessage("lbl.finalResult.datetime", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(fechaResultado);
+            stream.endText();
+
+        }
+
+    }
+
+    private void drawFinalResultTable(String[][] content, PDDocument doc, PDPage page, float y) throws IOException {
+
+        //Initialize table
+        float margin = 50;
+        float tableWidth = 500;
+        float yStartNewPage = y;
+        float yStart = yStartNewPage;
+        float bottomMargin = 45;
+        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+
+        //Create Header row
+        Row headerRow = table.createRow(15f);
+      /*  Cell cell = headerRow.createCell(100, "");
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFillColor(Color.black);
+        cell.setTextColor(Color.WHITE);*/
+
+        table.setHeader(headerRow);
+
+        //Create 2 column row
+        Row row;
+        Cell cell;
+
+        //Create Fact header row
+        Row factHeaderrow = table.createRow(15f);
+        cell = factHeaderrow.createCell(50, messageSource.getMessage("lbl.approve.response", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell((50), messageSource.getMessage("lbl.value", null, null));
+        cell.setFillColor(Color.lightGray);
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+
+        //Add multiple rows with random facts about Belgium
+
+        for (String[] fact : content) {
+
+            row = table.createRow(15f);
+            cell = row.createCell(50, fact[0]);
+            cell.setFont(PDType1Font.HELVETICA);
+            cell.setFontSize(10);
+
+
+            for (int i = 1; i < fact.length; i++) {
+                cell = row.createCell(50, fact[i]);
+                cell.setFont(PDType1Font.HELVETICA_OBLIQUE);
+                cell.setFontSize(10);
+            }
+        }
+        table.draw();
+    }
+
+    private void drawInfoSpecialSample(String orderSample, float inY, DaSolicitudEstudio detSoliE, PDPageContentStream stream) throws IOException {
+        float m = 20;
+
+        if (detSoliE != null) {
+            if (detSoliE.getIdTomaMx().getFechaHTomaMx() != null) {
+                fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(detSoliE.getIdTomaMx().getFechaHTomaMx());
+            }
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(15, inY);
+            stream.drawString(orderSample);
+            stream.endText();
+
+            stream.beginText();
+            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
+            stream.moveTextPositionByAmount(290, inY);
+            stream.drawString(messageSource.getMessage("lbl.sampling.datetime1", null, null) + " ");
+            stream.setFont(PDType1Font.HELVETICA, 10f);
+            stream.drawString(fechaToma);
+            stream.endText();
+
+        }
+
+    }
+
+
+    private void drawFooterRep(PDPageContentStream stream, float y) throws IOException {
+        //dibujar lineas de firmas
+        stream.drawLine(90, y, 250, y);
+        stream.drawLine(340, y, 500, y);
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
+        stream.moveTextPositionByAmount(145, y - 10);
+        stream.drawString(messageSource.getMessage("lbl.analyst", null, null));
+        stream.endText();
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
+        stream.moveTextPositionByAmount(400, y - 10);
+        stream.drawString(messageSource.getMessage("lbl.director", null, null));
+        stream.endText();
+
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
+        stream.moveTextPositionByAmount(15, 115);
+        stream.drawString(messageSource.getMessage("lbl.approval.datetime", null, null) + " ");
+        stream.setFont(PDType1Font.HELVETICA, 10f);
+        stream.drawString(fechaAprobacion);
+        stream.endText();
+
+        stream.beginText();
+        stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
+        stream.moveTextPositionByAmount(360, 115);
+        stream.drawString(messageSource.getMessage("lbl.print.datetime", null, null) + " ");
+        stream.setFont(PDType1Font.HELVETICA, 10f);
+        stream.drawString(fechaImpresion);
+        stream.endText();
     }
 
 

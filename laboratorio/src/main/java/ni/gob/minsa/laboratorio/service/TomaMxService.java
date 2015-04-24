@@ -1,9 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
-import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,6 +59,7 @@ public class TomaMxService {
         return (DaTomaMx)q.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     public List<DaTomaMx> getTomaMxByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
@@ -181,21 +179,22 @@ public class TomaMxService {
         }
 
         //filtro para solicitudes aprobadas
-       /* if (filtro.get) {
-            if (filtro.getCodTipoSolicitud() != null) {
-                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
-                    crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                            .createAlias("tipoEstudio", "estudio")
-                            .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-                } else {
-                    crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                            .createAlias("codDx", "dx")
-                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-                }
-            }
-        }*/
+        if (filtro.getSolicitudAprobada() != null) {
+           Junction conditGroup = Restrictions.disjunction();
+            conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                    .createAlias("idTomaMx", "toma")
+                    .setProjection(Property.forName("toma.idTomaMx"))))
+
+                    .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+
+
+            crit.add(conditGroup);
+
+        }
 
         return crit.list();
     }
@@ -376,6 +375,32 @@ public class TomaMxService {
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
     }
+
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudEstudio> getSoliEAprobByIdTomaMxOrderCodigo(String idTomaMx){
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudEstudio> getSoliEAprobByCodigo(String codigoUnico){
+        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx like :codigoUnico and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigoUnico",codigoUnico + "%");
+        return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public DaSolicitudEstudio getSoliEstByCodigo(String codigoUnico){
+        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigoUnico",codigoUnico);
+        return (DaSolicitudEstudio) q.uniqueResult();
+    }
+
+
 
 
     /************************************************************/

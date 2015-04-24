@@ -16,7 +16,7 @@ var SearchMx = function () {
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true,
                 "columns": [
-                    null,null,null,null,null,null,null,
+                    null,null,null,null,null,null,null, null,
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -95,7 +95,7 @@ var SearchMx = function () {
                     mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
-                    mxFiltros['aprobado'] = '';
+                    mxFiltros['solicitudAprobada'] = '';
                 }else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
@@ -107,7 +107,7 @@ var SearchMx = function () {
                     mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
                     mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
-                    mxFiltros['aprobado'] = $('#aprobado').val();
+                    mxFiltros['solicitudAprobada'] = $('#aprobado').val();
                 }
                 blockUI();
     			$.getJSON(parametros.searchUrl, {
@@ -117,12 +117,13 @@ var SearchMx = function () {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
+                        console.log(dataToLoad);
                         for (var i = 0; i < len; i++) {
 
                          //   var actionUrl = parametros.sActionUrl+idLoad;
                             //'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>'
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx +" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].estadoMx, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
+                                [dataToLoad[i].codigoUnicoMx +" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].estadoMx, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
 
                         }
                     }else{
@@ -159,7 +160,7 @@ var SearchMx = function () {
                     '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td><td style="font-weight: bold">'+$('#res_aprob').val()+'</td> </tr>';
                 for (var i = 1; i <= len; i++) {
                     childTable =childTable +
-                        '<tr></tr><td>'+json[i].nombre+'</td>'+
+                        '<tr><td>'+json[i].nombre+'</td>'+
                         '<td>'+json[i].fechaSolicitud+'</td>'+
                         '<td>'+json[i].estado+'</td></tr>';
                 }
@@ -177,7 +178,7 @@ var SearchMx = function () {
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),7)).show();
+                    row.child( format(row.data(),8)).show();
                     tr.addClass('shown');
                 }
             } );
@@ -357,10 +358,23 @@ var SearchMx = function () {
                             contentType: 'application/json',
                             mimeType: 'application/json',
                             success: function (data) {
-                                var blob = b64toBlob(data, 'application/pdf');
-                                var blobUrl = URL.createObjectURL(blob);
+                                    if(data.length != 0){
+                                        var blob = b64toBlob(data, 'application/pdf');
+                                        var blobUrl = URL.createObjectURL(blob);
 
-                                window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
+                                        window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
+                                    }else{
+                                        $.smallBox({
+                                            title : $("#msg_select").val(),
+                                            content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                            color : "#C46A69",
+                                            iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                                            timeout : 4000
+                                        });
+                                    }
+
+
+
                                 unBlockUI();
                             },
                             error: function (data, status, er) {
@@ -373,7 +387,7 @@ var SearchMx = function () {
 
                 }else{
                     $.smallBox({
-                        title : $("#msg_select_receipt").val(),
+                        title : $("#msg_select_sample").val(),
                         content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
                         color : "#C46A69",
                         iconSmall : "fa fa-times fa-2x fadeInRight animated",

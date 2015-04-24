@@ -125,7 +125,8 @@
                                     <input id="text_dx" type="hidden" value="<spring:message code="lbl.desc.request"/>"/>
                                     <input id="res_aprob" type="hidden" value="<spring:message code="lbl.condition"/>"/>
                                     <input id="msg_request_printed" type="hidden" value="<spring:message code="msg.request.printed"/>"/>
-
+                                    <input id="msg_select_sample" type="hidden" value="<spring:message code="msg.select.sample"/>"/>
+                                    <input id="msg_select" type="hidden" value="<spring:message code="msg.notSelected.approval.result"/>"/>
 
                                     <form id="searchMx-form" class="smart-form" autocomplete="off">
                                         <fieldset>
@@ -234,7 +235,7 @@
                                                 </section>
                                             </div>
 
-                                         <%--   <div class="row">
+                                        <div class="row">
                                                 <section class="col col-sm-12 col-md-7 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.approved.results" /> </label>
@@ -243,12 +244,12 @@
                                                         <select id="aprobado" name="aprobado"
                                                                 class="select2">
                                                             <option value=""><spring:message code="lbl.select" />...</option>
-                                                            <option value="Si"><spring:message code="lbl.yes" /></option>
-                                                            <option value="No"><spring:message code="lbl.no" /></option>
+                                                            <option value="true"><spring:message code="lbl.yes" /></option>
+                                                            <option value="false"><spring:message code="lbl.no" /></option>
                                                         </select>
                                                     </div>
                                                 </section>
-                                            </div>--%>
+                                            </div>
                                         </fieldset>
                                         <footer>
                                             <button type="submit" id="search-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
@@ -288,6 +289,7 @@
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.condition.sample"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.quality"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
@@ -297,7 +299,7 @@
                                     </table>
                                     <form id="printRequest-form" class="smart-form" autocomplete="off">
                                         <footer>
-                                            <button type="button" id="print" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-send"></i> <spring:message code="act.print" /></button>
+                                            <button type="button" id="print" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-send"></i> <spring:message code="lbl.print.approved" /></button>
                                         </footer>
                                     </form>
                                 </div>
