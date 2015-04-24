@@ -436,6 +436,47 @@ public class OrdenExamenMxService {
                     .setProjection(Property.forName("examen.idExamen"))));
         }
 
+
+        return crit.list();
+    }
+
+    public List<OrdenExamen> getOrdenesExamenEstudioResultadoByFiltro(FiltroMx filtro){
+        Session session = sessionFactory.getCurrentSession();
+        Soundex varSoundex = new Soundex();
+        Criteria crit = session.createCriteria(OrdenExamen.class, "ordenEx");
+        crit.createAlias("ordenEx.solicitudEstudio","solicitudEstudio");
+        crit.createAlias("solicitudEstudio.idTomaMx","tomaMx");
+
+        //siempre se tomam las muestras que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("tomaMx.anulada", false))
+        );
+        //siempre se tomam las ordenes que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("ordenEx.anulado", false))
+        );
+
+
+        //filtro examen con resultado
+        if(filtro.getResultado() != null){
+            if (filtro.getResultado().equals("Si")){
+                crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "ex")
+                        .setProjection(Property.forName("ex.idOrdenExamen"))));
+            } else{
+                crit.add(Subqueries.propertyNotIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "ex")
+                        .setProjection(Property.forName("ex.idOrdenExamen"))));
+            }
+        }
+
+
+        //filtro por Codigo Unico
+        if (filtro.getCodigoUnicoMx()!=null) {
+            crit.add(Restrictions.and(
+                    Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())));
+        }
+
         return crit.list();
     }
 
