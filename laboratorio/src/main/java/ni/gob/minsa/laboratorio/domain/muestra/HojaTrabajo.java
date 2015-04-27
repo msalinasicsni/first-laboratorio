@@ -1,7 +1,9 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -19,6 +21,7 @@ public class HojaTrabajo {
     private int numero;
     private Date fechaRegistro;
     private User usuarioRegistro;
+    private Laboratorio laboratorio;
 
 
     @Id
@@ -54,11 +57,23 @@ public class HojaTrabajo {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
+    @ForeignKey(name = "fk_hojatrabajo_usuarioregistro")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
     }
 
     public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name="CODIGO_LAB", referencedColumnName="CODIGO", nullable=true)
+    @ForeignKey(name = "fk_hojatrabajo_laboratorio")
+    public Laboratorio getLaboratorio() {
+        return laboratorio;
+    }
+
+    public void setLaboratorio(Laboratorio laboratorio) {
+        this.laboratorio = laboratorio;
     }
 }

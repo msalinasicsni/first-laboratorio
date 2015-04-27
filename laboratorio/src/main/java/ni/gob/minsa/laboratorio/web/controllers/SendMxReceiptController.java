@@ -145,9 +145,11 @@ public class SendMxReceiptController {
             DaTomaMx tomaMx;
             JsonObject jObjectTomasMx = new Gson().fromJson(strOrdenes, JsonObject.class);
             HojaTrabajo hojaTrabajo = new HojaTrabajo();
-            hojaTrabajo.setNumero(hojaTrabajoService.obtenerNumeroHoja());
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            hojaTrabajo.setNumero(hojaTrabajoService.obtenerNumeroHoja(labUser.getCodigo()));
             hojaTrabajo.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
             hojaTrabajo.setFechaRegistro(new Date());
+            hojaTrabajo.setLaboratorio(labUser);
             //se crea hoja de trabajo
             try {
                 hojaTrabajoService.addHojaTrabajo(hojaTrabajo);

@@ -14,9 +14,9 @@
         textarea {
             resize: none;
         }
-        tr.active {
+        /*tr.active {
             color: #3276B1!important;
-        }
+        }*/
 
         td.details-control {
             background: url("${plus}") no-repeat center center;

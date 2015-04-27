@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -85,7 +86,20 @@ public class HojaTrabajoService {
         return numero;
     }
 
-    public List<HojaTrabajo> getTomaMxByFiltro(FiltroMx filtro){
+    public Integer obtenerNumeroHoja(String codigoLaboratorio){
+        Integer numero=null;
+        String query = "select count(a.numero)+1 from HojaTrabajo as a where a.laboratorio.codigo = :codLab";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("codLab", codigoLaboratorio);
+        Object oNumero  = q.uniqueResult();
+        if (oNumero!=null){
+            numero = Integer.valueOf(oNumero.toString());
+        }
+        return numero;
+    }
+
+    public List<HojaTrabajo> getTomaMxByFiltro(Integer numHoja, Date fechaInicio, Date fechaFin, String userName){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();
         Criteria crit = session.createCriteria(HojaTrabajo.class, "hoja");
@@ -97,143 +111,18 @@ public class HojaTrabajoService {
                                 Restrictions.eq("tomaMx.anulada", false))
                 )
                 .setProjection(Property.forName("hojaTrabajo.numero"))));//y las ordenes en estado según filtro
-        /*if (filtro.getCodEstado()!=null) {
-            crit.add(Restrictions.and(
-                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
-        }*/
-        // se filtra por nombre y apellido persona
-        if (filtro.getNombreApellido()!=null) {
-            String[] partes = filtro.getNombreApellido().split(" ");
-            String[] partesSnd = filtro.getNombreApellido().split(" ");
-            for (int i = 0; i < partes.length; i++) {
-                try {
-                    partesSnd[i] = varSoundex.encode(partes[i]);
-                } catch (IllegalArgumentException e) {
-                    partesSnd[i] = "0000";
-                    e.printStackTrace();
-                }
-            }
-            for (int i = 0; i < partes.length; i++) {
-                Junction conditionGroup = Restrictions.disjunction();
-                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
-                //crit.add(conditionGroup);
-                crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                        .createAlias("hojaTrabajo","hojaTrabajo")
-                        .createAlias("tomaMx","tomaMx")
-                        .createAlias("tomaMx.idNotificacion", "notifi")
-                        .createAlias("notifi.persona", "person")
-                        .add(conditionGroup)
-                        .setProjection(Property.forName("hojaTrabajo.numero"))));
-            }
-
-        }
-        //se filtra por SILAIS
-        if (filtro.getCodSilais()!=null){
-            crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                    .createAlias("hojaTrabajo","hojaTrabajo")
-                    .createAlias("tomaMx","tomaMx")
-                    .createAlias("tomaMx.idNotificacion", "notifi")
-                    .add( Restrictions.and(
-                                    Restrictions.eq("notifi.codSilaisAtencion.codigo", Long.valueOf(filtro.getCodSilais())))
-                    )
-                    .setProjection(Property.forName("hojaTrabajo.numero"))));
-        }
-        //se filtra por unidad de salud
-        if (filtro.getCodUnidadSalud()!=null){
-            crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                    .createAlias("hojaTrabajo","hojaTrabajo")
-                    .createAlias("tomaMx","tomaMx")
-                    .createAlias("tomaMx.idNotificacion", "notifi")
-                    .createAlias("notifi.codUnidadAtencion","unidadS")
-                    .add( Restrictions.and(
-                                    Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
-                    )
-                    .setProjection(Property.forName("hojaTrabajo.numero"))));
+        //se filtra por número de hoja
+        if (numHoja!=null){
+            crit.add( Restrictions.and(Restrictions.eq("hoja.numero", numHoja)));
         }
         //Se filtra por rango de fecha de registro hoja trabajo (se usan campos de filtro que hacen referencia a fecha toma mx)
-        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
+        if (fechaInicio!=null && fechaFin!=null){
             crit.add( Restrictions.and(
-                            Restrictions.between("hoja.fechaRegistro", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+                            Restrictions.between("hoja.fechaRegistro", fechaInicio,fechaFin))
             );
         }
-        // se filtra por tipo de muestra
-        if (filtro.getCodTipoMx()!=null){
-            crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                    .createAlias("hojaTrabajo","hojaTrabajo")
-                    .createAlias("tomaMx","tomaMx")
-                    .add( Restrictions.and(
-                                    Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
-                    )
-                    .setProjection(Property.forName("hojaTrabajo.numero"))));
-        }
-
-        //se filtra por tipo de solicitud
-        if(filtro.getCodTipoSolicitud()!=null){
-            if(filtro.getCodTipoSolicitud().equals("Estudio")){
-                crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                        .createAlias("hojaTrabajo","hojaTrabajo")
-                        .createAlias("tomaMx","tomaMx")
-                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                                .createAlias("idTomaMx", "idTomaMx")
-                                .setProjection(Property.forName("idTomaMx.idTomaMx"))))
-                        .setProjection(Property.forName("hojaTrabajo.numero"))));
-            }else{
-                crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                        .createAlias("hojaTrabajo","hojaTrabajo")
-                        .createAlias("tomaMx","tomaMx")
-                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                                .createAlias("idTomaMx", "idTomaMx")
-                                .setProjection(Property.forName("idTomaMx.idTomaMx"))))
-                        .setProjection(Property.forName("hojaTrabajo.numero"))));
-            }
-        }
-
-        //nombre solicitud
-        if (filtro.getNombreSolicitud() != null) {
-            if (filtro.getCodTipoSolicitud() != null) {
-                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
-                    crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                            .createAlias("hojaTrabajo","hojaTrabajo")
-                            .createAlias("tomaMx","tomaMx")
-                            .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                                    .createAlias("tipoEstudio", "estudio")
-                                    .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                                    .setProjection(Property.forName("idTomaMx.idTomaMx"))))
-                            .setProjection(Property.forName("hojaTrabajo.numero"))));
-                } else {
-                    crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                            .createAlias("hojaTrabajo","hojaTrabajo")
-                            .createAlias("tomaMx","tomaMx")
-                            .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                                    .createAlias("codDx", "dx")
-                                    .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                                    .setProjection(Property.forName("idTomaMx.idTomaMx"))))
-                            .setProjection(Property.forName("hojaTrabajo.numero"))));
-                }
-            } else {
-
-                Junction conditGroup = Restrictions.disjunction();
-                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                        .createAlias("tipoEstudio", "estudio")
-                        .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                        .setProjection(Property.forName("idTomaMx.idTomaMx"))))
-                        .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                                .createAlias("codDx", "dx")
-                                .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                                .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-                crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
-                        .createAlias("hojaTrabajo","hojaTrabajo")
-                        .createAlias("tomaMx","tomaMx")
-                        .add(conditGroup)
-                        .setProjection(Property.forName("hojaTrabajo.numero"))));
-            }
-        }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
-        if (filtro.getNombreUsuario()!=null) {
+        if (userName!=null) {
             crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
                     .createAlias("hojaTrabajo","hojaTrabajo")
                     .createAlias("tomaMx","tomaMx")
@@ -242,7 +131,7 @@ public class HojaTrabajoService {
                             .createAlias("laboratorio", "labautorizado")
                             .createAlias("user", "usuario")
                             .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                            .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                            .add(Restrictions.and(Restrictions.eq("usuario.username",userName))) //usuario
                             .setProjection(Property.forName("labautorizado.codigo"))))
                     .setProjection(Property.forName("hojaTrabajo.numero"))));
 
