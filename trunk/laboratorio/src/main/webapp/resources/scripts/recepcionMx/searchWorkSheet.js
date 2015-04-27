@@ -89,28 +89,13 @@ var SearchWorkSheet = function () {
             function getWorkSheets(showAll) {
                 var mxFiltros = {};
                 if (showAll){
-                    mxFiltros['nombreApellido'] = '';
-                    mxFiltros['fechaInicioTomaMx'] = '';
-                    mxFiltros['fechaFinTomaMx'] = '';
-                    mxFiltros['codSilais'] = '';
-                    mxFiltros['codUnidadSalud'] = '';
-                    mxFiltros['codTipoMx'] = '';
-                    mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
-                    mxFiltros['codTipoSolicitud'] = '';
-                    mxFiltros['nombreSolicitud'] = '';
-                    mxFiltros['aprobado'] = '';
+                    mxFiltros['hoja'] = '';
+                    mxFiltros['fechaInicioHoja'] = '';
+                    mxFiltros['fechaFinHoja'] = '';
                 }else {
-                    mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
-                    mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
-                    mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
-                    mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
-                    mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
-                    mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
-                    mxFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
-                    mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
-                    mxFiltros['aprobado'] = $('#aprobado').val();
+                    mxFiltros['hoja'] = $('#txtHoja').val();
+                    mxFiltros['fechaInicioHoja'] = $('#fecInicioHoja').val();
+                    mxFiltros['fechaFinHoja'] = $('#fecFinHoja').val();
                 }
                 blockUI();
                 $.getJSON(parametros.searchUrl, {

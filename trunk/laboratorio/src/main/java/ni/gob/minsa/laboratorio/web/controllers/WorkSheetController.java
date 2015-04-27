@@ -84,28 +84,15 @@ public class WorkSheetController {
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
         logger.debug("buscar ordenes para recepcion");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
-        ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Area> areaList = areaService.getAreas();
 
-            mav.addObject("entidades",entidadesAdtvases);
-            mav.addObject("tipoMuestra", tipoMxList);
-            mav.addObject("area",areaList);
-            mav.setViewName("recepcionMx/searchWorkSheet");
-        }else
-            mav.setViewName(urlValidacion);
+        ModelAndView mav = new ModelAndView();
+        List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        List<Area> areaList = areaService.getAreas();
+        mav.addObject("entidades",entidadesAdtvases);
+        mav.addObject("tipoMuestra", tipoMxList);
+        mav.addObject("area",areaList);
+        mav.setViewName("recepcionMx/searchWorkSheet");
 
         return mav;
     }
@@ -350,72 +337,18 @@ public class WorkSheetController {
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las mx según filtros en JSON");
-        FiltroMx filtroMx = jsonToFiltroMx(filtro);
-        List<HojaTrabajo> hojaTrabajoList = hojaTrabajoService.getTomaMxByFiltro(filtroMx);
+        JsonObject jObjectFiltro = new Gson().fromJson(filtro, JsonObject.class);
+        Integer hoja = null;
+        Date fechaInicioHoja = null;
+        Date fechaFinHoja = null;
+        if (jObjectFiltro.get("hoja") != null && !jObjectFiltro.get("hoja").getAsString().isEmpty())
+            hoja = jObjectFiltro.get("hoja").getAsInt();
+        if (jObjectFiltro.get("fechaInicioHoja") != null && !jObjectFiltro.get("fechaInicioHoja").getAsString().isEmpty())
+            fechaInicioHoja = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioHoja").getAsString() + " 00:00:00");
+        if (jObjectFiltro.get("fechaFinHoja") != null && !jObjectFiltro.get("fechaFinHoja").getAsString().isEmpty())
+            fechaFinHoja = DateUtil.StringToDate(jObjectFiltro.get("fechaFinHoja").getAsString()+" 23:59:59");
+        List<HojaTrabajo> hojaTrabajoList = hojaTrabajoService.getTomaMxByFiltro(hoja,fechaInicioHoja,fechaFinHoja,seguridadService.obtenerNombreUsuario());
         return hojasTrabajoToJson(hojaTrabajoList);
-    }
-
-    /**
-     * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
-     * @param strJson String con la información de los filtros
-     * @return FiltroMx
-     * @throws Exception
-     */
-    private FiltroMx jsonToFiltroMx(String strJson) throws Exception {
-        JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
-        FiltroMx filtroMx = new FiltroMx();
-        String nombreApellido = null;
-        Date fechaInicioTomaMx = null;
-        Date fechaFinTomaMx = null;
-        Date fechaInicioRecep = null;
-        Date fechaFinRecep = null;
-        String codSilais = null;
-        String codUnidadSalud = null;
-        String codTipoMx = null;
-        String codigoUnicoMx = null;
-        String codTipoSolicitud = null;
-        String nombreSolicitud = null;
-        String aprobado = null;
-
-        if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
-            nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
-        if (jObjectFiltro.get("fechaInicioTomaMx") != null && !jObjectFiltro.get("fechaInicioTomaMx").getAsString().isEmpty())
-            fechaInicioTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioTomaMx").getAsString() + " 00:00:00");
-        if (jObjectFiltro.get("fechaFinTomaMx") != null && !jObjectFiltro.get("fechaFinTomaMx").getAsString().isEmpty())
-            fechaFinTomaMx = DateUtil.StringToDate(jObjectFiltro.get("fechaFinTomaMx").getAsString()+" 23:59:59");
-        if (jObjectFiltro.get("fechaInicioRecep") != null && !jObjectFiltro.get("fechaInicioRecep").getAsString().isEmpty())
-            fechaInicioRecep = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioRecep").getAsString()+" 00:00:00");
-        if (jObjectFiltro.get("fechaFinRecepcion") != null && !jObjectFiltro.get("fechaFinRecepcion").getAsString().isEmpty())
-            fechaFinRecep =DateUtil. StringToDate(jObjectFiltro.get("fechaFinRecepcion").getAsString()+" 23:59:59");
-        if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
-            codSilais = jObjectFiltro.get("codSilais").getAsString();
-        if (jObjectFiltro.get("codUnidadSalud") != null && !jObjectFiltro.get("codUnidadSalud").getAsString().isEmpty())
-            codUnidadSalud = jObjectFiltro.get("codUnidadSalud").getAsString();
-        if (jObjectFiltro.get("codTipoMx") != null && !jObjectFiltro.get("codTipoMx").getAsString().isEmpty())
-            codTipoMx = jObjectFiltro.get("codTipoMx").getAsString();
-        if (jObjectFiltro.get("codigoUnicoMx") != null && !jObjectFiltro.get("codigoUnicoMx").getAsString().isEmpty())
-            codigoUnicoMx = jObjectFiltro.get("codigoUnicoMx").getAsString();
-        if (jObjectFiltro.get("codTipoSolicitud") != null && !jObjectFiltro.get("codTipoSolicitud").getAsString().isEmpty())
-            codTipoSolicitud = jObjectFiltro.get("codTipoSolicitud").getAsString();
-        if (jObjectFiltro.get("nombreSolicitud") != null && !jObjectFiltro.get("nombreSolicitud").getAsString().isEmpty())
-            nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
-        if (jObjectFiltro.get("aprobado") != null && !jObjectFiltro.get("aprobado").getAsString().isEmpty())
-            aprobado = jObjectFiltro.get("aprobado").getAsString();
-
-        filtroMx.setCodSilais(codSilais);
-        filtroMx.setCodUnidadSalud(codUnidadSalud);
-        filtroMx.setFechaInicioTomaMx(fechaInicioTomaMx);
-        filtroMx.setFechaFinTomaMx(fechaFinTomaMx);
-        filtroMx.setFechaInicioRecep(fechaInicioRecep);
-        filtroMx.setFechaFinRecep(fechaFinRecep);
-        filtroMx.setNombreApellido(nombreApellido);
-        filtroMx.setCodTipoMx(codTipoMx);
-        filtroMx.setCodTipoSolicitud(codTipoSolicitud);
-        filtroMx.setNombreSolicitud(nombreSolicitud);
-        filtroMx.setCodigoUnicoMx(codigoUnicoMx);
-        filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
-        // filtroMx.setSolicitudAprobada(aprobado);
-        return filtroMx;
     }
 
     /**

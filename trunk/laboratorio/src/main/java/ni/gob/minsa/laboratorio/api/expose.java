@@ -217,7 +217,7 @@ public class expose {
     List<Dx_TipoMx_TipoNoti> getDiagnosticos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
         logger.info("Obteniendo los dx por tipo mx en JSON");
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Dx_TipoMx_TipoNoti>();
-        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti);
+        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
         return dxTipoMxTipoNotis;
     }
 
