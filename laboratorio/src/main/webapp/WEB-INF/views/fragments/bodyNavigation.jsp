@@ -124,6 +124,19 @@
                     </li>
                 </ul>
             </li>
+
+            <li class="reportes">
+                <a href="#" title="<spring:message code="menu.reports" />"><i class="fa fa-lg fa-fw fa-file-pdf-o"></i> <span class="menu-item-parent"><spring:message code="menu.reports" /></span></a>
+                <ul>
+                    <li class="receptionReport">
+                        <a href="<spring:url value="/reports/reception/init" htmlEscape="true "/>" title="<spring:message code="menu.reception.report" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.reception.report" /></a>
+                    </li>
+
+
+                </ul>
+            </li>
+
+
             <li>
                 <a href="<spring:url value="/logout" htmlEscape="true "/>"> <i class="fa fa-lg fa-fw fa-sign-out"></i> <span class="menu-item-parent"><spring:message code="menu.logout" /></span></a>
             </li>

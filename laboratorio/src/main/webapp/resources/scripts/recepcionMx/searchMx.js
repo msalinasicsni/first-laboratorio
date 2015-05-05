@@ -117,7 +117,7 @@ var SearchMx = function () {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
-                        console.log(dataToLoad);
+
                         for (var i = 0; i < len; i++) {
 
                          //   var actionUrl = parametros.sActionUrl+idLoad;
