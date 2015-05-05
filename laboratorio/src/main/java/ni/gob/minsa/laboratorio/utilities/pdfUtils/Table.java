@@ -34,8 +34,8 @@ public abstract class Table<T extends PDPage> {
     private PDPageContentStream tableContentStream;
     private List<PDOutlineItem> bookmarks;
     private static final float VerticalCellMargin = 2f;
-    private static final float HorizontalCellMargin = 2f;
-    private static final int xSpacing  = 7;
+    private static final float HorizontalCellMargin = 4f;
+    private static final int xSpacing  = 0;
     private Row header;
     private List<Row> rows = new ArrayList<Row>();
 
@@ -241,7 +241,7 @@ public abstract class Table<T extends PDPage> {
             //this.tableContentStream.drawString(cell.getText());
             this.tableContentStream.endText();
             this.tableContentStream.closeSubPath();
-            nextX += cell.getWidth() + HorizontalCellMargin;
+            nextX += cell.getWidth()-4 + HorizontalCellMargin;
         }
         //Set Y position for next row
         yStart = yStart - row.getHeight();
