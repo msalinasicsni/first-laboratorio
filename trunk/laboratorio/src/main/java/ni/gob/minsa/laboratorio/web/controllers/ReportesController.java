@@ -342,11 +342,11 @@ public class ReportesController {
                         nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
 
                     content[numFila][0] = recepcion.getTomaMx().getCodigoUnicoMx() != null ? recepcion.getTomaMx().getCodigoUnicoMx() : "";
-                    content[numFila][1] = recepcion.getTomaMx().getCodTipoMx().getNombre() != null ? recepcion.getTomaMx().getCodTipoMx().getNombre() : "";
+                    content[numFila][1] = recepcion.getTomaMx().getCodTipoMx() != null ? recepcion.getTomaMx().getCodTipoMx().getNombre() : "";
                     content[numFila][2] = recepcion.getFechaHoraRecepcion() != null ? DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a") : "";
                     content[numFila][3] = recepcion.getCalidadMx() != null ? recepcion.getCalidadMx().getValor() : "";
-                    content[numFila][4] = recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() != null ? recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() : "";
-                    content[numFila][5] = recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() != null ? recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() : "";
+                    content[numFila][4] = recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() : "";
+                    content[numFila][5] = recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() : "";
                     content[numFila][6] = recepcion.getTomaMx().getIdNotificacion().getPersona() != null ? nombrePersona : "";
                     content[numFila][7] = nombreSolitud != null ? nombreSolitud : "";
 
@@ -371,8 +371,10 @@ public class ReportesController {
             table.setHeader(headerRow);
 
             //Create 2 column row
-            Row row = null;
+
             Cell cell;
+            Row row ;
+
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
@@ -481,23 +483,17 @@ public class ReportesController {
                     cell.setFontSize(10);
                     y -= 15;
 
-                    row = table.createRow(15f);
-                    cell = row.createCell(10, fact[0]);
-                    cell.setFont(PDType1Font.HELVETICA);
-                    cell.setFontSize(10);
-                    y -=15;
 
-
-                }else{
-                    row = table.createRow(15f);
-                    cell = row.createCell(10, fact[0]);
-                    cell.setFont(PDType1Font.HELVETICA);
-                    cell.setFontSize(10);
-                    y -=15;
                 }
 
+                row = table.createRow(15);
+                cell = row.createCell(10, fact[0]);
+                cell.setFont(PDType1Font.HELVETICA);
+                cell.setFontSize(10);
+                y -=15;
+
                 for (int i = 1; i < fact.length; i++) {
-                    if(i == 1){
+                        if(i == 1){
                         cell = row.createCell(10, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
@@ -531,7 +527,8 @@ public class ReportesController {
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
                     }
-                }
+
+                    }
             }
             table.draw();
 
