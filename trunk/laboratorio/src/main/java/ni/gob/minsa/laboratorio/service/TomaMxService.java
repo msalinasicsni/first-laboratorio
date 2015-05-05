@@ -401,11 +401,19 @@ public class TomaMxService {
     }
 
     @SuppressWarnings("unchecked")
-    public DaSolicitudEstudio getSoliEstByCodigo(String codigoUnico){
+     public DaSolicitudEstudio getSoliEstByCodigo(String codigoUnico){
         String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
         return (DaSolicitudEstudio) q.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public DaSolicitudDx getSoliDxByCodigo(String codigoUnico){
+        String query = "from DaSolicitudDx where idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigoUnico",codigoUnico);
+        return (DaSolicitudDx) q.uniqueResult();
     }
 
 
