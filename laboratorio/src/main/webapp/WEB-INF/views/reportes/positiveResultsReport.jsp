@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: souyen-ics
-  Date: 04-24-15
-  Time: 04:40 PM
+  Date: 05-05-15
+  Time: 01:40 PM
   To change this template use File | Settings | File Templates.
 --%>
 <!DOCTYPE html>
@@ -52,7 +52,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/reports/reception/init" htmlEscape="true "/>"><spring:message code="lbl.reception.report" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/reports/positiveResults/init" htmlEscape="true "/>"><spring:message code="lbl.positiveResultReport" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -67,7 +67,7 @@
         <h1 class="page-title txt-color-blueDark">
             <!-- PAGE HEADER -->
             <i class="fa-fw fa fa-list"></i>
-            <spring:message code="lbl.reception.report" />
+            <spring:message code="lbl.positiveResultReport" />
 
         </h1>
     </div>
@@ -126,8 +126,6 @@
                 <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                 <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                 <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
-                <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
-                <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
                 <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.solic.DateTime"/>"/>
                 <input id="text_dx" type="hidden" value="<spring:message code="lbl.desc.request"/>"/>
                 <input id="res_aprob" type="hidden" value="<spring:message code="lbl.condition"/>"/>
@@ -135,54 +133,62 @@
                 <input id="msg_select_sample" type="hidden" value="<spring:message code="msg.select.sample"/>"/>
                 <input id="msg_select" type="hidden" value="<spring:message code="msg.unrealized.search"/>"/>
 
-                <form id="received-samples-form" class="smart-form" autocomplete="off">
+                <form id="positive-request-form" class="smart-form" autocomplete="off">
                     <fieldset>
                         <div class="row">
-                            <section class="col col-sm-6 col-md-4 col-lg-4">
+                            <section class="col col-sm-6 col-md-3 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.sample.type" /> </label>
+                                    <spring:message code="lbl.end.approval.date"/>
+                                </label>
+                                <label class="input">
+                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
+                                    <input type="text" name="fecInicioAprob" id="fecInicioAprob"
+                                           placeholder="<spring:message code="lbl.date.format"/>"
+                                           class="form-control from_date" data-date-end-date="+0d"/>
+                                    <b class="tooltip tooltip-bottom-right"> <i
+                                            class="fa fa-warning txt-color-pink"></i> <spring:message
+                                            code="tooltip.receipt.startdate"/></b>
+                                </label>
+                            </section>
+                            <section class="col col-sm-6 col-md-3 col-lg-3">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.start.approval.date"/>
+                                </label>
+                                <label class="input">
+                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
+                                    <input type="text" name="fecFinAprob" id="fecFinAprob"
+                                           placeholder="<spring:message code="lbl.date.format"/>"
+                                           class="form-control to_date" data-date-end-date="+0d"/>
+                                    <b class="tooltip tooltip-bottom-right"> <i
+                                            class="fa fa-warning txt-color-pink"></i> <spring:message
+                                            code="tooltip.receipt.enddate"/></b>
+                                </label>
+                            </section>
+                            <section class="col col-sm-6 col-md-3 col-lg-3">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.request.type" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="codTipoMx" name="codTipoMx"
+                                    <select id="tipo" name="tipo"
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
-                                        <c:forEach items="${tipoMuestra}" var="tipoMuestra">
-                                            <option value="${tipoMuestra.idTipoMx}">${tipoMuestra.nombre}</option>
-                                        </c:forEach>
+                                        <option value="Estudio"><spring:message code="lbl.study" /></option>
+                                        <option value="Rutina"><spring:message code="lbl.routine" /></option>
                                     </select>
                                 </div>
                             </section>
-
-                        <section class="col col-sm-6 col-md-4 col-lg-3">
+                            <section class="col col-sm-6 col-md-3 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.receipt.start.date.mx" />
+                                    <spring:message code="lbl.desc.request" />
                                 </label>
-                                <label class="input">
-                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                    <input type="text" name="fecInicioRecepcion" id="fecInicioRecepcion"
-                                           placeholder="<spring:message code="lbl.date.format"/>"
-                                           class="form-control from_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
+                                <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
+                                    <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.desc.request"/>">
+                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
                                 </label>
                             </section>
-                            <section class="col col-sm-6 col-md-4 col-lg-3">
-                                <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.receipt.end.date.mx" />
-                                </label>
-                                <label class="input">
-                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                    <input type="text" name="fecFinRecepcion" id="fecFinRecepcion"
-                                           placeholder="<spring:message code="lbl.date.format"/>"
-                                           class="form-control to_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
-                                </label>
-
-
-                            </section>
-
                         </div>
                         <div class="row">
-                            <section class="col col-sm-12 col-md-5 col-lg-4">
+                            <section class="col col-sm-12 col-md-6 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
                                     <spring:message code="lbl.silais" /> </label>
                                 <div class="input-group">
@@ -196,7 +202,7 @@
                                     </select>
                                 </div>
                             </section>
-                            <section class="col col-sm-12 col-md-7 col-lg-6">
+                            <section class="col col-sm-12 col-md-6 col-lg-5">
                                 <label class="text-left txt-color-blue font-md">
                                     <spring:message code="lbl.health.unit" /> </label>
                                 <div class="input-group">
@@ -209,38 +215,10 @@
                             </section>
                         </div>
 
-                        <div class="row">
-
-
-                            <section class="col col-sm-12 col-md-7 col-lg-4">
-                                <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.request.type" /> </label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="tipo" name="tipo"
-                                            class="select2">
-                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                        <option value="Estudio"><spring:message code="lbl.study" /></option>
-                                        <option value="Rutina"><spring:message code="lbl.routine" /></option>
-                                    </select>
-                                </div>
-                            </section>
-
-                            <section class="col col-sm-12 col-md-12 col-lg-4">
-                                <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.desc.request" />
-                                </label>
-                                <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
-                                    <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.desc.request"/>">
-                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
-                                </label>
-                            </section>
-                        </div>
-
                     </fieldset>
                     <footer>
-                        <button type="submit" id="search-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
-                        <button type="button" id="all-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
+                        <button type="submit" id="search-request" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
+                        <button type="button" id="all-request" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
                     </footer>
                 </form>
             </div>
@@ -269,13 +247,11 @@
             <!-- end widget edit box -->
             <!-- widget content -->
             <div class="widget-body no-padding">
-                <table id="received-samples" class="table table-striped table-bordered table-hover" width="100%">
+                <table id="positive_request" class="table table-striped table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
                         <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.unique.code.mx.short"/></th>
-                        <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
-                        <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.dateTime"/></th>
-                        <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.quality"/></th>
+                       <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.approve.date"/></th>
                         <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                         <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                         <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
@@ -285,7 +261,7 @@
                 </table>
                 <form id="printRequest-form" class="smart-form" autocomplete="off">
                     <footer>
-                        <button type="button" id="export" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o "></i> <spring:message code="lbl.export.pdf" /></button>
+                        <button type="button" id="posReqExport" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o "></i> <spring:message code="lbl.export.pdf" /></button>
                     </footer>
                 </form>
             </div>
@@ -359,18 +335,18 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="searchUrl" value="/reports/searchSamples"/>
-<c:url var="exportUrl" value="/reports/expToPDF"/>
+<c:url var="searchReqUrl" value="/reports/searchRequest"/>
+<c:url var="posReqExportUrl" value="/reports/positiveRequestToPDF"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 
 
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
-        var parametros = {searchUrl : "${searchUrl}",
+        var parametros = {searchReqUrl : "${searchReqUrl}",
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}",
-            exportUrl: "${exportUrl}"
+            posReqExportUrl: "${posReqExportUrl}"
 
         };
         ReceptionReport.init(parametros);
@@ -378,9 +354,9 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.reportes").addClass("open");
-        $("li.receptionReport").addClass("active");
+        $("li.positiveResultsReport").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.receptionReport").parents("ul").slideDown(200);
+            $("li.positiveResultsReport").parents("ul").slideDown(200);
         }
     });
 </script>

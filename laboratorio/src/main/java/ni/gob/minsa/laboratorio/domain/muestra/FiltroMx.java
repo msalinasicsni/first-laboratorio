@@ -27,6 +27,8 @@ public class FiltroMx {
     Boolean solicitudAprobada;
     String nombreUsuario;
     Integer nivelLaboratorio;
+    Date fechaInicioAprob;
+    Date fechaFinAprob;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -159,6 +161,14 @@ public class FiltroMx {
     public void setNombreUsuario(String nombreUsuario) {
         this.nombreUsuario = nombreUsuario;
     }
+
+    public Date getFechaInicioAprob() { return fechaInicioAprob; }
+
+    public void setFechaInicioAprob(Date fechaInicioAprob) { this.fechaInicioAprob = fechaInicioAprob; }
+
+    public Date getFechaFinAprob() { return fechaFinAprob; }
+
+    public void setFechaFinAprob(Date fechaFinAprob) { this.fechaFinAprob = fechaFinAprob; }
 
     /**
      * Los niveles Son: 1=Analista, 2=Jefe Departamento, 3=Director
