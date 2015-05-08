@@ -131,7 +131,9 @@
                     <li class="receptionReport">
                         <a href="<spring:url value="/reports/reception/init" htmlEscape="true "/>" title="<spring:message code="menu.reception.report" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.reception.report" /></a>
                     </li>
-
+                    <li class="positiveResultsReport">
+                        <a href="<spring:url value="/reports/positiveResults/init" htmlEscape="true "/>" title="<spring:message code="menu.positiveResultsReport" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.positiveResultsReport" /></a>
+                    </li>
 
                 </ul>
             </li>
