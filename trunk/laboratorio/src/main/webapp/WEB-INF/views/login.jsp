@@ -48,88 +48,88 @@ ICS-Nicaragua :: Muestreo anual
     <link href="${googleFontsCss}" rel="stylesheet" type="text/css"/>
 </head>
 
-<body>
+<body class="animated fadeInDown">
 <header id="header">
     <div id="logo-group">
         <!-- PLACE YOUR LOGO HERE -->
         <spring:url value="/resources/img/logo.png" var="logo" />
+
         <span id="logo"> <img src="${logo}" alt="<spring:message code="heading" />"> </span>
         <!-- END LOGO PLACEHOLDER -->
     </div>
-    <!-- pulled right: nav area -->
-    <div class="pull-right">
 
-        <!-- collapse menu button -->
-        <!-- end logout button -->
-        <!-- fullscreen button -->
-        <div id="fullscreen" class="btn-header transparent pull-right">
-
-        </div>
-        <!-- end fullscreen button -->
-    </div>
-    <!-- end pulled right: nav area -->
 </header>
 <!-- Form area -->
-<div class="admin-form">
+<div id="admin-form" role="main">
+    <!-- MAIN CONTENT -->
     <div class="container">
         <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
-                <!-- Widget starts -->
-                <div class="widget worange">
-                    <!-- Widget head -->
-                    <div class="widget-head">
+            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 hidden-xs hidden-sm">
+                <h1 class="txt-color-red login-header-big"><spring:message code="lbl.first.lab" /></h1>
+                <div class="row" >
+
+                    <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 hidden-xs hidden-sm" >
+                        <h4 class="paragraph-header"><spring:message code="lab.summary" /></h4>
+
                     </div>
 
-                    <div class="widget-content" style="padding-top: 10px">
-                        <div class="well no-padding">
-                            <!-- Login form -->
-                            <form class="smart-form"
-                                  action="<c:url value='j_spring_security_check' />"
-                                  method='POST'>
-                                <header>
-                                    <i class="icon-lock"></i>
-                                    <fmt:message key="login.title"/>
-                                </header>
-                                <fieldset>
-                                    <section>
-                                        <label class="label"><fmt:message key="login.username"/></label>
-                                        <label class="input"> <i class="icon-append fa fa-user"></i>
-                                            <input type="text" class="form-control" id="username"
-                                                   name='j_username' value=''
-                                                   placeholder="<fmt:message key="login.username"/>">
-                                            <b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i><fmt:message key="login.username.tooltip"/> </b></label>
-                                    </section>
-                                    <section>
-                                        <label class="label"><fmt:message key="login.password"/></label>
-                                        <label class="input"> <i class="icon-append fa fa-lock"></i>
-                                            <input type="password" class="form-control" name='j_password'
-                                                   placeholder="<fmt:message key="login.password"/>">
-                                            <b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i><fmt:message key="login.password.tooltip"/> </b> </label>
-                                        <!--<div class="note">
-                                            <a href="forgotpassword.html">Forgot password?</a>
-                                        </div>-->
-                                    </section>
-                                </fieldset>
-                                <footer>
-                                        <button name="submit" type="submit" class="btn btn-primary">
-                                            <fmt:message key="button.login"/>
-                                        </button>
-                                        <button name="reset" type="reset" class="btn btn-default">
-                                            <fmt:message key="button.Reset"/>
-                                        </button>
-                                </footer>
-                                <br />
-                            </form>
-
-                        </div>
+                    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 hidden-xs hidden-sm" >
+                    <spring:url value="/resources/img/lab.jpg" var="lab" />
+                    <img src="${lab}" class="pull-right display-image" alt="" style="width:330px; height:310px; align-content: center">
                     </div>
                 </div>
+
+
             </div>
             <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                <div class="well no-padding">
+                    <form class="smart-form client-form"
+                          action="<c:url value='j_spring_security_check' />"
+                          method='POST'>
+                        <header>
+                            <i class="icon-lock"></i>
+                            <fmt:message key="login.title"/>
+                        </header>
+                        <fieldset>
+                            <section>
+                                <label class="label"><fmt:message key="login.username"/></label>
+                                <label class="input"> <i class="icon-append fa fa-user"></i>
+                                    <input type="text" class="form-control" id="username"
+                                           name='j_username' value=''
+                                           placeholder="<fmt:message key="login.username"/>">
+                                    <b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i><fmt:message key="login.username.tooltip"/> </b></label>
+                            </section>
+                            <section>
+                                <label class="label"><fmt:message key="login.password"/></label>
+                                <label class="input"> <i class="icon-append fa fa-lock"></i>
+                                    <input type="password" class="form-control" name='j_password'
+                                           placeholder="<fmt:message key="login.password"/>">
+                                    <b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i><fmt:message key="login.password.tooltip"/> </b> </label>
+                                <!--<div class="note">
+                                    <a href="forgotpassword.html">Forgot password?</a>
+                                </div>-->
+                            </section>
+                        </fieldset>
+                        <footer>
+                            <button name="submit" type="submit" class="btn btn-primary">
+                                <fmt:message key="button.login"/>
+                            </button>
+                            <button name="reset" type="reset" class="btn btn-default">
+                                <fmt:message key="button.Reset"/>
+                            </button>
+                        </footer>
+                        <br />
+                    </form>
+
+                </div>
+
+                <spring:url value="/resources/img/logo_ssi.jpg" var="logoSSI" />
+                <img src="${logoSSI}"  alt="" style="width:350px; height: 60px">
+
             </div>
         </div>
+
+
         <c:if test="${not empty error}">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4">
@@ -145,13 +145,6 @@ ICS-Nicaragua :: Muestreo anual
         </c:if>
     </div>
 
-    <div class="page-footer">
-        <div class="row">
-            <div class="col-xs-12 col-sm-6">
-                <span class="txt-color-white"><spring:message code="title" /></span>
-            </div>
-        </div>
-    </div>
 </div>
 
 
