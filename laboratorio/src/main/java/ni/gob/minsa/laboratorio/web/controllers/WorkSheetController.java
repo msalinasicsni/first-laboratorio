@@ -118,8 +118,8 @@ public class WorkSheetController {
             //Prepare the document.
             PDPage page = GeneralUtils.addNewPage(doc);
             PDPageContentStream stream = new PDPageContentStream(doc, page);
-            HojaTrabajo hojaTrabajo = hojaTrabajoService.getHojaTrabajo(Integer.valueOf(numHoja));
-            tomasHoja = hojaTrabajoService.getTomaMxByHojaTrabajo(Integer.valueOf(numHoja));
+            HojaTrabajo hojaTrabajo = hojaTrabajoService.getHojaTrabajo(Integer.valueOf(numHoja),labProcesa.getCodigo());
+            tomasHoja = hojaTrabajoService.getTomaMxByHojaTrabajo(Integer.valueOf(numHoja), hojaTrabajo.getLaboratorio().getCodigo());
             //dibujar encabezado pag y pie de pagina
             GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
 
@@ -141,7 +141,8 @@ public class WorkSheetController {
                 float y = 540;
 
                 //cod_mx, solicitud,lab_destino,techa toma mx, fec_inicio_sintomas
-                solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx_hoja.getIdTomaMx());
+                Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+                solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx_hoja.getIdTomaMx(),labUser.getCodigo());
                 solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx_hoja.getIdTomaMx());
                 //int numFila = 0;
                 String[] content = null;
@@ -302,7 +303,7 @@ public class WorkSheetController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("numero", String.valueOf(hojaTrabajo.getNumero()));
             map.put("fecha",DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-            tomaMxList = hojaTrabajoService.getTomaMxByHojaTrabajo(hojaTrabajo.getNumero());
+            tomaMxList = hojaTrabajoService.getTomaMxByHojaTrabajo(hojaTrabajo.getNumero(),hojaTrabajo.getLaboratorio().getCodigo());
             map.put("cantidad",String.valueOf(tomaMxList.size()));
             Map<Integer, Object> mapMxList = new HashMap<Integer, Object>();
             Map<String, String> mapMx = new HashMap<String, String>();

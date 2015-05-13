@@ -250,7 +250,8 @@ public class ReportesController {
 
 
             //se arma estructura de diagnósticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(receivedMx.getTomaMx().getIdTomaMx());
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(receivedMx.getTomaMx().getIdTomaMx(),labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(receivedMx.getTomaMx().getIdTomaMx());
 
 
@@ -342,13 +343,13 @@ public class ReportesController {
             int numFila = 0;
             for (String codigoUnico : codigosArray) {
 
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(codigoUnico);
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(codigoUnico, labProcesa.getCodigo());
 
                 if (recepcion != null) {
                     String nombreSolitud = null;
                     String nombrePersona = null;
 
-                    DaSolicitudDx soliDx = tomaMxService.getSoliDxByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
+                    DaSolicitudDx soliDx = tomaMxService.getSoliDxByCodigo(recepcion.getTomaMx().getCodigoUnicoMx(),seguridadService.obtenerNombreUsuario());
                     DaSolicitudEstudio soliE = tomaMxService.getSoliEstByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
 
                     if (soliDx != null || soliE != null) {
@@ -911,7 +912,7 @@ public class ReportesController {
                     String silais = null;
                     String unidadSalud = null;
 
-                    DaSolicitudDx soliDx = tomaMxService.getSoliDxByCodigo(codigoUnico);
+                    DaSolicitudDx soliDx = tomaMxService.getSoliDxByCodigo(codigoUnico,seguridadService.obtenerNombreUsuario());
                     DaSolicitudEstudio soliE = tomaMxService.getSoliEstByCodigo(codigoUnico);
 
                     if (soliDx != null || soliE != null) {

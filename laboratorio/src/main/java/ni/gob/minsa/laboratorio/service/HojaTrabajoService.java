@@ -54,21 +54,23 @@ public class HojaTrabajoService {
         }
     }
 
-    public List<DaTomaMx> getTomaMxByHojaTrabajo(int numeroHoja){
+    public List<DaTomaMx> getTomaMxByHojaTrabajo(int numeroHoja, String codLaboratorio){
         String query = "select b from Mx_HojaTrabajo as a inner join a.tomaMx as b inner join a.hojaTrabajo as c " +
-                "where c.numero =:numero";
+                "where c.numero =:numero and c.laboratorio.codigo = :codLaboratorio";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("numero", numeroHoja);
+        q.setParameter("codLaboratorio",codLaboratorio);
         return q.list();
     }
 
-    public HojaTrabajo getHojaTrabajo(int numeroHoja){
+    public HojaTrabajo getHojaTrabajo(int numeroHoja, String codLaboratorio){
         String query = "from HojaTrabajo as c " +
-                "where c.numero =:numero";
+                "where c.numero =:numero and c.laboratorio.codigo = :codLaboratorio";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("numero", numeroHoja);
+        q.setParameter("codLaboratorio",codLaboratorio);
         return (HojaTrabajo)q.uniqueResult();
     }
 
@@ -106,6 +108,7 @@ public class HojaTrabajoService {
         //siempre se tomam las muestras que no estan anuladas
         crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
                 .createAlias("hojaTrabajo","hojaTrabajo")
+                .createAlias("hojaTrabajo.laboratorio","laboratorio")
                 .createAlias("tomaMx","tomaMx")
                 .add( Restrictions.and(
                                 Restrictions.eq("tomaMx.anulada", false))
@@ -123,8 +126,9 @@ public class HojaTrabajoService {
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (userName!=null) {
-            crit.add(Subqueries.propertyIn("numero", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
+            /*crit.add(Subqueries.propertyIn("laboratorio.codigo", DetachedCriteria.forClass(Mx_HojaTrabajo.class)
                     .createAlias("hojaTrabajo","hojaTrabajo")
+                    .createAlias("hojaTrabajo.laboratorio","labo")
                     .createAlias("tomaMx","tomaMx")
                     .createAlias("tomaMx.envio","envioMx")
                     .add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
@@ -133,7 +137,14 @@ public class HojaTrabajoService {
                             .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                             .add(Restrictions.and(Restrictions.eq("usuario.username",userName))) //usuario
                             .setProjection(Property.forName("labautorizado.codigo"))))
-                    .setProjection(Property.forName("hojaTrabajo.numero"))));
+                    .setProjection(Property.forName("labo.codigo"))));*/
+            crit.add(Subqueries.propertyIn("laboratorio.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                            .createAlias("laboratorio", "labautorizado")
+                            .createAlias("user", "usuario")
+                            .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                            .add(Restrictions.and(Restrictions.eq("usuario.username",userName))) //usuario
+                            .setProjection(Property.forName("labautorizado.codigo"))));
+
 
         }
 

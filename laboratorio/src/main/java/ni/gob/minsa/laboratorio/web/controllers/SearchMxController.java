@@ -245,6 +245,7 @@ public class SearchMxController {
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         filtroMx.setSolicitudAprobada(solicitudAprobada);
+        filtroMx.setIncluirTraslados(true);
 
         return filtroMx;
     }
@@ -259,9 +260,10 @@ public class SearchMxController {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
+        Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         for (DaTomaMx tomaMx : tomaMxList) {
             Map<String, String> map = new HashMap<String, String>();
-            RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx());
+            RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
             map.put("idTomaMx", tomaMx.getIdTomaMx());
             map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
@@ -272,6 +274,8 @@ public class SearchMxController {
                 } else {
                     map.put("calidad", "");
                 }
+            }else {
+                map.put("calidad", "");
             }
 
             if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
@@ -303,7 +307,8 @@ public class SearchMxController {
             }
 
             //se arma estructura de diagnósticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx());
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(),labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
 
 
@@ -941,7 +946,7 @@ public class SearchMxController {
 
     private void drawInfoSample(PDPageContentStream stream, DaSolicitudDx solDx, DaSolicitudEstudio solE, float inY) throws IOException {
         float m = 20;
-
+        Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario()); //laboratorio al que pertenece el usuario
         if (solDx != null || solE != null) {
             if (solDx != null) {
 
@@ -949,7 +954,7 @@ public class SearchMxController {
                     fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx());
                 }
 
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx());
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
                 if (recepcion != null) {
                     fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
                 }
@@ -967,7 +972,7 @@ public class SearchMxController {
                     fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solE.getIdTomaMx().getFechaHTomaMx());
                 }
 
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx());
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
                 if (recepcion != null) {
                     fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
                 }

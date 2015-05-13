@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
@@ -71,8 +72,15 @@ public class TomaMxService {
                         Restrictions.eq("tomaMx.anulada", false))
         );//y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
-            crit.add(Restrictions.and(
-                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            if (filtro.getIncluirTraslados()){
+                crit.add(Restrictions.or(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()).
+                        add(Restrictions.or(
+                                Restrictions.eq("estado.codigo", "ESTDMX|TRAS"))));
+            }else {
+                crit.add(Restrictions.and(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            }
         }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
@@ -169,13 +177,36 @@ public class TomaMxService {
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {
-            crit.createAlias("tomaMx.envio","envioMx");
+            /*crit.createAlias("tomaMx.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
+            */
+            Junction conditGroup = Restrictions.disjunction();
+
+            //usuario tiene autorizado envio actual, o alguno que este en histórico para la muestra
+            conditGroup.add(Subqueries.propertyIn("tomaMx.envio.idEnvio", DetachedCriteria.forClass(DaEnvioMx.class)
+                    .createAlias("laboratorioDestino", "destino")
+                    .add(Subqueries.propertyIn("destino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                            .createAlias("laboratorio", "labautorizado")
+                            .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                            .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                            .setProjection(Property.forName("labautorizado.codigo"))))
+                    .setProjection(Property.forName("idEnvio"))))
+                    .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(HistoricoEnvioMx.class)
+                            .createAlias("envioMx", "envio")
+                            .add(Subqueries.propertyIn("envio.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                    .createAlias("laboratorio", "labautorizado")
+                                    .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                    .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                    .setProjection(Property.forName("labautorizado.codigo"))))
+                            .createAlias("tomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+
+            crit.add(conditGroup);
         }
 
         //filtro para solicitudes aprobadas
@@ -195,14 +226,34 @@ public class TomaMxService {
             crit.add(conditGroup);
 
         }
+        //filtro sólo control calidad en el laboratio del usuario
+        if (filtro.getControlCalidad()!=null) {
+            crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                    .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
+                    .createAlias("idTomaMx", "toma")
+                    //.createAlias("labProcesa","labProcesa")
+                    .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                            .createAlias("laboratorio", "labautorizado")
+                            .createAlias("user", "usuario")
+                            .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                            .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                            .setProjection(Property.forName("labautorizado.codigo"))))
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+        }
 
         return crit.list();
     }
 
-    public List<DaSolicitudDx> getSolicitudesDxByIdToma(String idTomaMx){
-        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
+    public List<DaSolicitudDx> getSolicitudesDxByIdToma(String idTomaMx, String codigoLab){
+        /*String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx inner join mx.envio en " +
+                "where mx.idTomaMx = :idTomaMx and en.laboratorioDestino.codigo = :codigoLab " +
+                "and sdx.labProcesa.codigo = :codigoLab ORDER BY sdx.fechaHSolicitud";*/
+        String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
+                "where mx.idTomaMx = :idTomaMx " +
+                "and sdx.labProcesa.codigo = :codigoLab ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("codigoLab",codigoLab);
         return q.list();
     }
 
@@ -214,7 +265,7 @@ public class TomaMxService {
     }
 
     public DaSolicitudDx getSolicitudesDxByMxDx(String idTomaMx,  Integer idDiagnostico){
-        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx " +
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and idTomaMx.envio.laboratorioDestino.codigo = labProcesa.codigo " +
                 "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -409,10 +460,12 @@ public class TomaMxService {
     }
 
     @SuppressWarnings("unchecked")
-    public DaSolicitudDx getSoliDxByCodigo(String codigoUnico){
-        String query = "from DaSolicitudDx where idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
+    public DaSolicitudDx getSoliDxByCodigo(String codigoUnico, String userName){
+        String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
+        q.setParameter("userName",userName);
         return (DaSolicitudDx) q.uniqueResult();
     }
 
@@ -491,4 +544,36 @@ public class TomaMxService {
 
     }
 
+    public List<DaSolicitudDx> getSolicitudesDxPrioridadByIdToma(String idTomaMx){
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+    /**
+     * Se toma las solicitudes dx cuya área no se encuentra en la tabla de traslados para esa mx
+     * @param idTomaMx
+     * @return
+     */
+    public List<DaSolicitudDx> getSolicitudesDxSinTrasladoByIdToma(String idTomaMx){
+        String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx t inner join sdx.codDx dx, RecepcionMx r " +
+                "where r.tomaMx.idTomaMx = t.idTomaMx and t.idTomaMx = :idTomaMx " +
+                "and dx.area.idArea not in ( " +
+                "           select rl.area.idArea from RecepcionMxLab rl where rl.recepcionMx.idRecepcion = r.idRecepcion) " +
+                "ORDER BY dx.prioridad asc";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        return q.list();
+    }
+
+    public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea){
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx " +
+                "and codDx.area.idArea = :idArea ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("idArea",idArea);
+        return q.list();
+    }
 }

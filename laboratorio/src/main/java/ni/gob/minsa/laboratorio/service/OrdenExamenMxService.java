@@ -80,15 +80,25 @@ public class OrdenExamenMxService {
         return (OrdenExamen)q.uniqueResult();
     }
 
-    public List<OrdenExamen> getOrdenesExamenByIdMx(String idTomaMx){
+    /**
+     * Método que obtiene las ordenes de exámenes generadas para la muestra, en las àreas a las que tiene autoridad el usuario que consulta
+     * @param idTomaMx
+     * @param username
+     * @return
+     */
+    public List<OrdenExamen> getOrdenesExamenByIdMxAndUser(String idTomaMx, String username){
         Session session = sessionFactory.getCurrentSession();
         List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx where mx.idTomaMx =:idTomaMx ");
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
+                "AutoridadArea as aa where dx.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username");
         q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("username",username);
         ordenExamenList = q.list();
         //se toman las que son de estudio
-        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx where mx.idTomaMx =:idTomaMx ");
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx inner join oe.solicitudEstudio.tipoEstudio as es, " +
+                "AutoridadArea as aa where es.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username");
         q2.setParameter("idTomaMx",idTomaMx);
+        q2.setParameter("username",username);
         ordenExamenList.addAll(q2.list());
         return ordenExamenList;
     }
@@ -125,14 +135,15 @@ public class OrdenExamenMxService {
         return ordenExamenList;
     }
 
-    public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdDxIdExamen(String idTomaMx, int idDx, int idExamen){
+    public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdDxIdExamen(String idTomaMx, int idDx, int idExamen, String userName){
         Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx " +
-                "where mx.idTomaMx =:idTomaMx " +
-                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and oe.anulado = false ");
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx, AutoridadLaboratorio as al " +
+                "where al.laboratorio.codigo = sdx.labProcesa.codigo and  mx.idTomaMx =:idTomaMx " +
+                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false ");
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idDx",idDx);
         q.setParameter("idExamen",idExamen);
+        q.setParameter("userName",userName);
         return q.list();
     }
 
@@ -158,8 +169,15 @@ public class OrdenExamenMxService {
         );
         //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
-            crit.add(Restrictions.and(
-                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            if (filtro.getIncluirTraslados()){
+                crit.add(Restrictions.or(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()).
+                        add(Restrictions.or(
+                                Restrictions.eq("estado.codigo", "ESTDMX|TRAS"))));
+            }else {
+                crit.add(Restrictions.and(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            }
         }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
@@ -501,6 +519,29 @@ public class OrdenExamenMxService {
         Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false ");
         q2.setParameter("idSolicitud",idSolicitud);
         ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
+    }
+
+    /**
+     * Obtiene las ordenes de examen no anuladas para la muestra y que el usuario tenga autorizasión sobre el examen. Una toma no puede tener de dx y de estudios, es uno u otro.
+     * @param idTomaMx id de la toma a consultar
+     * @return List<OrdenExamen>
+     */
+    public List<OrdenExamen> getOrdenesExamenNoAnuladasByIdMxAndUser(String idTomaMx, String username){
+        Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
+                "AutoridadArea as aa, AutoridadLaboratorio  al where sdx.labProcesa.codigo = al.laboratorio.codigo and  dx.area.idArea = aa.area.idArea " +
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false");
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("username",username);
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx inner join oe.solicitudEstudio.tipoEstudio as es, " +
+                "AutoridadArea as aa where es.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username and oe.anulado = false");
+        q2.setParameter("idTomaMx",idTomaMx);
+        q2.setParameter("username",username);
         return ordenExamenList;
     }
 }

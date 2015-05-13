@@ -52,8 +52,15 @@ public class ResultadoFinalService {
                         Restrictions.eq("tomaMx.anulada", false))
         );//y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
-            crit.add(Restrictions.and(
-                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            if (filtro.getIncluirTraslados()){
+                crit.add(Restrictions.or(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()).
+                        add(Restrictions.or(
+                                Restrictions.eq("estado.codigo", "ESTDMX|TRAS"))));
+            }else {
+                crit.add(Restrictions.and(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            }
         }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
@@ -198,10 +205,17 @@ public class ResultadoFinalService {
             );
         }
 
-        //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
+        //se filtra que usuario tenga autorizado laboratorio en el que se proceso la solicitud(rutina)
         if (filtro.getNombreUsuario()!=null) {
-            crit.createAlias("tomaMx.envio","envioMx");
+            /*crit.createAlias("tomaMx.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));*/
+            //se filtra que laboratorio que procesa solicitud
+            crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
@@ -211,32 +225,32 @@ public class ResultadoFinalService {
             //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
             //nivel analista
             if (filtro.getNivelLaboratorio() == 1) {
-                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                crit.add(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
                                 .add(Restrictions.eq("pasivo", false)) //autoridad area activa
                                 .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("area.idArea"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("toma.idTomaMx"))));
+                        //.createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idSolicitudDx"))));
             }
             //nivel jefe departamento
             if (filtro.getNivelLaboratorio() == 2) {
-                crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.departamento.idDepartamento", DetachedCriteria.forClass(AutoridadDepartamento.class)
                                 .add(Restrictions.eq("pasivo", false)) //autoridad area activa
                                 .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("departamento.idDepartamento"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("toma.idTomaMx")))));
+                        //.createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idSolicitudDx")))));
             }
             //nivel director
             if (filtro.getNivelLaboratorio() == 3) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
-                crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .createAlias("area.departamento","departamento")
@@ -244,8 +258,8 @@ public class ResultadoFinalService {
                                 .add(Restrictions.eq("pasivo", false)) //autoridad area activa
                                 .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("direccion.idDireccion"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("toma.idTomaMx")))));
+                        //.createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idSolicitudDx")))));
             }
         }
 
@@ -420,33 +434,33 @@ public class ResultadoFinalService {
             //nivel analista
             if (filtro.getNivelLaboratorio() == 1) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
-                crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
                                 .add(Restrictions.eq("pasivo", false)) //autoridad area activa
                                 .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("area.idArea"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("toma.idTomaMx")))));
+                        //.createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idSolicitudEstudio")))));
             }
             //nivel jefe departamento
             if (filtro.getNivelLaboratorio() == 2) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
-                crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.departamento.idDepartamento", DetachedCriteria.forClass(AutoridadDepartamento.class)
                                 .add(Restrictions.eq("pasivo", false)) //autoridad area activa
                                 .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("departamento.idDepartamento"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("toma.idTomaMx")))));
+                        //.createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idSolicitudEstudio")))));
             }
             //nivel director
             if (filtro.getNivelLaboratorio() == 3) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
-                crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .createAlias("area.departamento","departamento")
@@ -454,8 +468,8 @@ public class ResultadoFinalService {
                                 .add(Restrictions.eq("pasivo", false)) //autoridad area activa
                                 .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("direccion.idDireccion"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("toma.idTomaMx")))));
+                        //.createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("idSolicitudEstudio")))));
             }
         }
 
@@ -473,6 +487,7 @@ public class ResultadoFinalService {
 
         crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("examen", "examen")
+                .add(Restrictions.and(Restrictions.eq("pasivo",false)))
                 .setProjection(Property.forName("examen.idOrdenExamen"))));
 
         return crit.list();
@@ -489,13 +504,14 @@ public class ResultadoFinalService {
 
         crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("examen", "examen")
+                .add(Restrictions.and(Restrictions.eq("pasivo",false)))
                 .setProjection(Property.forName("examen.idOrdenExamen"))));
 
         return crit.list();
     }
 
     public List<DetalleResultado> getResultDetailExaByIdOrden(String idOrdenExa){
-        String query = "from DetalleResultado where examen.idOrdenExamen = :idOrdenExa ORDER BY fechahRegistro ";
+        String query = "from DetalleResultado where examen.idOrdenExamen = :idOrdenExa and pasivo=false ORDER BY fechahRegistro ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idOrdenExa",idOrdenExa);
         return q.list();

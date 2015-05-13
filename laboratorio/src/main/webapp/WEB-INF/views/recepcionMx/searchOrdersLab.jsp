@@ -281,7 +281,9 @@
                                             <th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
-                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.transfer"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.transfer.origin.area"/></th>
                                             <th></th>
                                         </tr>
                                         </thead>

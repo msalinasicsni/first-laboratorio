@@ -122,7 +122,8 @@ public class SeparacionMxController {
             map.put("idRecepcion", recepcion.getIdRecepcion());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaRecepcionLab",DateUtil.DateToString(recepcion.getFechaHoraRecepcionLab(),"dd/MM/yyyy hh:mm:ss a"));
+            //map.put("fechaRecepcionLab",DateUtil.DateToString(recepcion.getFechaHoraRecepcionLab(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaRecepcionLab",DateUtil.DateToString(new Date(),"dd/MM/yyyy hh:mm:ss a"));
             if (recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
                 map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             }else{
@@ -158,7 +159,8 @@ public class SeparacionMxController {
             }
 
             //se arma estructura de diagnósticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx());
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx(),labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
 
 
@@ -243,6 +245,7 @@ public class SeparacionMxController {
         filtroMx.setCodTipoSolicitud(codTipoSolicitud);
         filtroMx.setNombreSolicitud(nombreSolicitud);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
+        filtroMx.setIncluirTraslados(false);
 
         return filtroMx;
     }
@@ -267,11 +270,12 @@ public class SeparacionMxController {
                 RecepcionMx recepcionMx = null;
                 DaSolicitudEstudio soliE = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
                 DaSolicitudDx soliDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
+                Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
                 if (soliE != null) {
-                    recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(soliE.getIdTomaMx().getCodigoUnicoMx());
+                    recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(soliE.getIdTomaMx().getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
                 } else {
-                    recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(soliDx.getIdTomaMx().getCodigoUnicoMx());
+                    recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(soliDx.getIdTomaMx().getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
                 }
 
                 //obtener la descripcion del estudio o solicitud de la muestra

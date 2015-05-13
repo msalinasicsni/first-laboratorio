@@ -5,12 +5,10 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
-import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +47,6 @@ public class TomaMxController {
 
     private static final Logger logger = LoggerFactory.getLogger(TomaMxController.class);
 
-    @Autowired(required = true)
-    @Qualifier(value = "sessionFactory")
-    public SessionFactory sessionFactory;
     @Autowired
     @Qualifier(value = "seguridadService")
     private SeguridadService seguridadService;

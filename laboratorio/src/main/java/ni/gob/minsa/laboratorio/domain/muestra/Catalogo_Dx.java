@@ -18,7 +18,7 @@ public class Catalogo_Dx implements Serializable {
     private String nombre;
     private boolean pasivo;
     private Area area;
-
+    private int prioridad; //indica la prioridad de recepción respecto a otros dx de la misma mx
 
     @Id
     @Column(name = "ID_DIAGNOSTICO", nullable = false, insertable = true, updatable = true, length = 10)
@@ -60,5 +60,15 @@ public class Catalogo_Dx implements Serializable {
 
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    @Basic
+    @Column(name = "PRIORIDAD", nullable = true, insertable = true, updatable = true)
+    public int getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(int prioridad) {
+        this.prioridad = prioridad;
     }
 }

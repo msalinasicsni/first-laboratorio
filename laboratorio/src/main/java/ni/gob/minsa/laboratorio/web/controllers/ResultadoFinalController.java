@@ -291,7 +291,7 @@ public class ResultadoFinalController {
         filtroDx.setResultado(resultado);
         filtroDx.setNombreUsuario(nombreUsuario);
         filtroDx.setNivelLaboratorio(seguridadService.esDirector(nombreUsuario)?3:seguridadService.esJefeDepartamento(nombreUsuario)?2:1);
-
+        filtroDx.setIncluirTraslados(true);
         return filtroDx;
     }
 

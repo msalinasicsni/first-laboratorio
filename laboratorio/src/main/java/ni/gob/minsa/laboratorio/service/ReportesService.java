@@ -119,8 +119,16 @@ public class ReportesService {
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {
-            crit.createAlias("tomaMx.envio","envioMx");
+            /*crit.createAlias("tomaMx.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));*/
+            //filtro que las rutinas pertenezcan al laboratorio del usuario que consulta
+            crit.createAlias("recepcion.labRecepcion","labRecep");
+            crit.add(Subqueries.propertyIn("labRecep.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
@@ -208,6 +216,14 @@ public class ReportesService {
         .setProjection(Property.forName("solicitudDx.idSolicitudDx"))));
 
         crit.addOrder(Order.asc("fechaAprobacion"));
+
+        crit.createAlias("rutina.labProcesa","labProcesa");
+        crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                .createAlias("laboratorio", "labautorizado")
+                .createAlias("user", "usuario")
+                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                .setProjection(Property.forName("labautorizado.codigo"))));
 
         return crit.list();
     }
