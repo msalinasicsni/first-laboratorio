@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
@@ -415,4 +416,35 @@ public class SeguridadService {
         q.setParameter("username", userName);
         return  (User)q.uniqueResult();
     }
+
+    public boolean usuarioAutorizadoArea(String userName, int idArea){
+        List<Area> areaList = new ArrayList<Area>();
+        try {
+            String query = "select usu from AutoridadArea as auarea inner join auarea.user as usu inner join auarea.area as are " +
+                    "where auarea.pasivo = false and usu.username = :username and are.idArea = :idArea";
+            Query q = sessionFactory.getCurrentSession().createQuery(query);
+            q.setParameter("username", userName);
+            q.setParameter("idArea",idArea);
+            areaList = q.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return areaList.size() > 0;
+    }
+
+    public boolean usuarioAutorizadoLaboratorio(String userName, String codigoLab){
+        List<Laboratorio> laboratorioList = new ArrayList<Laboratorio>();
+        try {
+            String query = "select usu from AutoridadLaboratorio as aulab inner join aulab.user as usu inner join aulab.laboratorio as lab " +
+                    "where aulab.pasivo = false and usu.username = :username and lab.codigo = :codigoLab";
+            Query q = sessionFactory.getCurrentSession().createQuery(query);
+            q.setParameter("username", userName);
+            q.setParameter("codigoLab",codigoLab);
+            laboratorioList = q.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return laboratorioList.size() > 0;
+    }
+
 }

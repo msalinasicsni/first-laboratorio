@@ -23,6 +23,8 @@ public class DaSolicitudDx {
     private Date fechaAprobacion;
     private Usuarios usuarioAprobacion;
     private Boolean aprobada;
+    private Boolean controlCalidad;
+    private Laboratorio labProcesa;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -110,5 +112,26 @@ public class DaSolicitudDx {
 
     public void setAprobada(Boolean aprobada) {
         this.aprobada = aprobada;
+    }
+
+    @Basic
+    @Column(name = "CONTROL_CALIDAD", columnDefinition = "number(1,0) default 0", nullable = true, insertable = true, updatable = true)
+    public Boolean getControlCalidad() {
+        return controlCalidad;
+    }
+
+    public void setControlCalidad(Boolean controlCalidad) {
+        this.controlCalidad = controlCalidad;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "LABORATORIO_PRC", referencedColumnName = "CODIGO")
+    @ForeignKey(name = "SOLIC_DX_LABORATORIO_FK")
+    public Laboratorio getLabProcesa() {
+        return labProcesa;
+    }
+
+    public void setLabProcesa(Laboratorio labProcesa) {
+        this.labProcesa = labProcesa;
     }
 }

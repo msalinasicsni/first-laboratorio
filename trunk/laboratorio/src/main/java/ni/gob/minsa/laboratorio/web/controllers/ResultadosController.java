@@ -139,7 +139,7 @@ public class ResultadosController {
             String idSolicitud = "";
             boolean solicitarResFinal = false;
             if (ordenExamen.getSolicitudDx()!=null) {
-              fechaInicioSintomas = ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
+                fechaInicioSintomas = ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
                 idTomaMx = ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx();
                 idSolicitud = ordenExamen.getSolicitudDx().getIdSolicitudDx();
             }else {
@@ -149,7 +149,8 @@ public class ResultadosController {
             }
             //sólo si aún no tiene resultado final
             if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
-                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
+                //solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
+                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
                         && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0; //y no tiene resultados el examen
 
             mav.addObject("ordenExamen", ordenExamen);
@@ -167,7 +168,9 @@ public class ResultadosController {
     public @ResponseBody  String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las ordenes de examen pendientes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
+        logger.info("antes searchOrders dx");
         List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenDxByFiltro(filtroMx);
+        logger.info("después searchOrders dx");
         ordenExamenList.addAll(ordenExamenMxService.getOrdenesExamenEstudioByFiltro(filtroMx));
         return ordenesExamenToJson(ordenExamenList);
     }
@@ -228,6 +231,7 @@ public class ResultadosController {
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setResultado(examenResultado);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
+        filtroMx.setIncluirTraslados(true);
         return filtroMx;
     }
 
@@ -551,7 +555,7 @@ public class ResultadosController {
             //se determina si luego de anular la respuesta del examen, se debe solicitar resultado final al ingresar nuevo resultado
             //sólo si aún no tiene resultado final
             if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
-                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
+                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
                         && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0; //y no tiene resultados el examen
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);

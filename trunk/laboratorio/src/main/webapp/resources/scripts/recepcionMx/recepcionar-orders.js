@@ -221,6 +221,7 @@ var ReceiptOrders = function () {
                     mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
+                    mxFiltros['controlCalidad'] = '';
                 }else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
@@ -230,8 +231,9 @@ var ReceiptOrders = function () {
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
                     mxFiltros['esLab'] =  $('#txtEsLaboratorio').val();
                     mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
-                    mxFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
+                    mxFiltros['controlCalidad'] = $('#quality').find('option:selected').val();
                 }
                 blockUI();
     			$.getJSON(parametros.sOrdersUrl, {
@@ -251,7 +253,7 @@ var ReceiptOrders = function () {
                             var actionUrl = parametros.sActionUrl+idLoad;
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+idLoad+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
                     }else{

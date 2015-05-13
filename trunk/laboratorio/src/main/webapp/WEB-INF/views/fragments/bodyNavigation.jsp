@@ -87,7 +87,12 @@
                     <li class="separacionMx">
                         <a href="<spring:url value="/separacionMx/init" htmlEscape="true "/>" title="<spring:message code="menu.generate.aliquot" />"><i class="fa fa-lg fa-fw fa-ticket"></i> <spring:message code="menu.generate.aliquot" /></a>
                     </li>
-
+                    <li class="trasladoMx">
+                        <a href="<spring:url value="/trasladoMx/init" htmlEscape="true "/>" title="<spring:message code="menu.transfer.internal.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.internal.mx" /></a>
+                    </li>
+                    <li class="trasladoMxCC">
+                        <a href="<spring:url value="/trasladoMx/initCC" htmlEscape="true "/>" title="<spring:message code="menu.transfer.quality.control.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.quality.control.mx" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="resultado">

@@ -165,6 +165,7 @@ public class AprobacionResultadoController {
         filtroMx.setSolicitudAprobada(solicitudAprobada);
         filtroMx.setNombreUsuario(nombreUsuario);
         filtroMx.setNivelLaboratorio(seguridadService.esDirector(nombreUsuario)?3:seguridadService.esJefeDepartamento(nombreUsuario)?2:1);
+        filtroMx.setIncluirTraslados(true);
         return filtroMx;
     }
 

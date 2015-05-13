@@ -1,9 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
-import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
-import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
+import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import org.apache.commons.codec.language.Soundex;
@@ -58,6 +55,26 @@ public class RecepcionMxService {
     }
 
     /**
+     * Agrega una Registro de Recepción de muestra en laboratorio
+     *
+     * @param dto Objeto a agregar
+     * @throws Exception
+     */
+    public void addRecepcionMxLab(RecepcionMxLab dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.save(dto);
+            }
+            else
+                throw new Exception("Objeto Recepción Muestra Lab es NULL");
+        }catch (Exception ex){
+            logger.error("Error al agregar recepción de muestra Lab",ex);
+            throw ex;
+        }
+    }
+
+    /**
      * Actualiza una Registro de Recepción de muestra
      *
      * @param dto Objeto a actualizar
@@ -86,12 +103,14 @@ public class RecepcionMxService {
         return  (RecepcionMx)q.uniqueResult();
     }
 
-    public RecepcionMx getRecepcionMxByCodUnicoMx(String codigoUnicoMx){
-        String query = "from RecepcionMx as a where tomaMx.codigoUnicoMx= :codigoUnicoMx";
+    public RecepcionMx getRecepcionMxByCodUnicoMx(String codigoUnicoMx, String codLaboratorio){
+        String query = "select a from RecepcionMx as a inner join a.tomaMx as t where t.codigoUnicoMx= :codigoUnicoMx " +
+                "and a.labRecepcion.codigo = :codLaboratorio";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setString("codigoUnicoMx", codigoUnicoMx);
+        q.setString("codLaboratorio",codLaboratorio);
         return  (RecepcionMx)q.uniqueResult();
     }
 
@@ -108,9 +127,17 @@ public class RecepcionMxService {
                         Restrictions.eq("tomaMx.anulada", false))
         );//y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
-            crit.add(Restrictions.and(
-                    Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            if (filtro.getIncluirTraslados()){
+                crit.add(Restrictions.or(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()).
+                        add(Restrictions.or(
+                        Restrictions.eq("estado.codigo", "ESTDMX|TRAS"))));
+            }else {
+                crit.add(Restrictions.and(
+                        Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
+            }
         }
+
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
             crit.createAlias("notifi.persona", "person");
@@ -199,9 +226,14 @@ public class RecepcionMxService {
             }else{
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("idTomaMx", "toma")
+                        .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                .createAlias("laboratorio", "labautorizado")
+                                .createAlias("user", "usuario")
+                                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                                .setProjection(Property.forName("labautorizado.codigo"))))
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }
-
         }
 
         //nombre solicitud
@@ -239,14 +271,14 @@ public class RecepcionMxService {
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {
-            crit.createAlias("tomaMx.envio","envioMx");
+            /*crit.createAlias("tomaMx.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
-
+            */
             if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepción en laboratorio
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 Junction conditGroup = Restrictions.disjunction();
@@ -273,6 +305,14 @@ public class RecepcionMxService {
                 crit.add(conditGroup);
             }
         }
+        //filtro que las rutinas pertenezcan al laboratorio del usuario que consulta
+        crit.createAlias("recepcion.labRecepcion","labRecep");
+        crit.add(Subqueries.propertyIn("labRecep.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                        .createAlias("laboratorio", "labautorizado")
+                        .createAlias("user", "usuario")
+                        .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                        .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                        .setProjection(Property.forName("labautorizado.codigo"))));
 
         return crit.list();
     }

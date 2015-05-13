@@ -29,6 +29,8 @@ public class FiltroMx {
     Integer nivelLaboratorio;
     Date fechaInicioAprob;
     Date fechaFinAprob;
+    Boolean incluirTraslados;
+    Boolean controlCalidad;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -180,5 +182,21 @@ public class FiltroMx {
 
     public void setNivelLaboratorio(Integer nivelLaboratorio) {
         this.nivelLaboratorio = nivelLaboratorio;
+    }
+
+    public Boolean getIncluirTraslados() {
+        return incluirTraslados;
+    }
+
+    public void setIncluirTraslados(Boolean incluirTraslados) {
+        this.incluirTraslados = incluirTraslados;
+    }
+
+    public Boolean getControlCalidad() {
+        return controlCalidad;
+    }
+
+    public void setControlCalidad(Boolean controlCalidad) {
+        this.controlCalidad = controlCalidad;
     }
 }

@@ -216,50 +216,51 @@ public class SendMxReceiptController {
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
             map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
             //map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaRecepcion",DateUtil.DateToString(recepcion.getFechaHoraRecepcion(),"dd/MM/yyyy hh:mm:ss a"));
-            if (recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
+            map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaRecepcion", DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a"));
+            if (recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
                 map.put("codSilais", recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            }else{
-                map.put("codSilais","");
+            } else {
+                map.put("codSilais", "");
             }
-            if (recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
+            if (recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
                 map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            }else {
-                map.put("codUnidadSalud","");
+            } else {
+                map.put("codUnidadSalud", "");
             }
             //map.put("estadoOrden", recepcion.getOrdenExamen().getCodEstado().getValor());
-            map.put("separadaMx",(recepcion.getTomaMx().getMxSeparada()!=null?(recepcion.getTomaMx().getMxSeparada()?"Si":"No"):""));
-            map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos()!=null?String.valueOf(recepcion.getTomaMx().getCanTubos()):""));
+            map.put("separadaMx", (recepcion.getTomaMx().getMxSeparada() != null ? (recepcion.getTomaMx().getMxSeparada() ? "Si" : "No") : ""));
+            map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos() != null ? String.valueOf(recepcion.getTomaMx().getCanTubos()) : ""));
             map.put("tipoMuestra", recepcion.getTomaMx().getCodTipoMx().getNombre());
             //map.put("tipoExamen", recepcion.getOrdenExamen().getCodExamen().getNombre());
             //map.put("areaProcesa", recepcion.getOrdenExamen().getCodExamen().getArea().getNombre());
             //Si hay fecha de inicio de sintomas se muestra
             Date fechaInicioSintomas = recepcion.getTomaMx().getIdNotificacion().getFechaInicioSintomas();
-            if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
+            if (fechaInicioSintomas != null)
+                map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
             else
-                map.put("fechaInicioSintomas"," ");
+                map.put("fechaInicioSintomas", " ");
             //Si hay persona
-            if (recepcion.getTomaMx().getIdNotificacion().getPersona()!=null){
+            if (recepcion.getTomaMx().getIdNotificacion().getPersona() != null) {
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto;
                 nombreCompleto = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-            }else{
-                map.put("persona"," ");
+                if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                    nombreCompleto = nombreCompleto + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                    nombreCompleto = nombreCompleto + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                map.put("persona", nombreCompleto);
+            } else {
+                map.put("persona", " ");
             }
             //se arma estructura de diagnósticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx());
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx(), labUser.getCodigo());
             Map<Integer, Object> mapSolicitudesList = new HashMap<Integer, Object>();
             Map<String, String> mapSolicitud = new HashMap<String, String>();
-            if (solicitudDxList.size()>0) {
-                int subIndice=0;
+            if (solicitudDxList.size() > 0) {
+                int subIndice = 0;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
                     mapSolicitud.put("tipo", "Rutina");
@@ -269,9 +270,9 @@ public class SendMxReceiptController {
                     mapSolicitud = new HashMap<String, String>();
                 }
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
-            }else{
+            } else {
                 List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
-                int subIndice=0;
+                int subIndice = 0;
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudios) {
                     mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
                     mapSolicitud.put("tipo", "Estudio");
@@ -282,21 +283,9 @@ public class SendMxReceiptController {
                 }
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
             }
-            //se arma estructura de diagnósticos
-            /*List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx());
-            Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
-            Map<String, String> mapDx = new HashMap<String, String>();
-            int subIndice=0;
-            for(DaSolicitudDx solicitudDx: solicitudDxList){
-                mapDx.put("nombre",solicitudDx.getCodDx().getNombre());
-                mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                subIndice++;
-            }
-            mapDxList.put(subIndice,mapDx);
-            map.put("diagnosticos", new Gson().toJson(mapDxList));*/
 
             mapResponse.put(indice, map);
-            indice ++;
+            indice++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
@@ -358,6 +347,7 @@ public class SendMxReceiptController {
         filtroMx.setIncluirMxInadecuada(true);
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
+        filtroMx.setIncluirTraslados(false);
         return filtroMx;
     }
 }

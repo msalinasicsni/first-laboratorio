@@ -21,9 +21,6 @@
         tr.shown td.details-control {
             background: url("${minus}") no-repeat center center;
         }
-        tr.active {
-            color: #3276B1!important;
-        }
     </style>
 </head>
 <!-- END HEAD -->

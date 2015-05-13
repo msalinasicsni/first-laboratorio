@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -22,15 +23,14 @@ public class RecepcionMx {
     DaTomaMx tomaMx;
     Timestamp fechaHoraRecepcion;
     TipoRecepcionMx tipoRecepcionMx;
-    Usuarios usuarioRecepcion;
-    TecnicaxLaboratorio tecnicaxLaboratorio;
+    User usuarioRecepcion;
     TipoTubo tipoTubo;
     CalidadMx calidadMx;
     boolean cantidadTubosCk;
     boolean tipoMxCk;
     String causaRechazo;
-    Timestamp fechaHoraRecepcionLab;
-    Usuarios usuarioRecepcionLab;
+    Laboratorio labRecepcion;
+
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -66,13 +66,13 @@ public class RecepcionMx {
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "USUARIO_RECEPCION", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO_RECEPCION", referencedColumnName = "username")
     @ForeignKey(name = "RECEPCION_USUARIO_FK")
-    public Usuarios getUsuarioRecepcion() {
+    public User getUsuarioRecepcion() {
         return usuarioRecepcion;
     }
 
-    public void setUsuarioRecepcion(Usuarios usuarioRecepcion) {
+    public void setUsuarioRecepcion(User usuarioRecepcion) {
         this.usuarioRecepcion = usuarioRecepcion;
     }
 
@@ -87,16 +87,6 @@ public class RecepcionMx {
         this.tomaMx = tomaMx;
     }
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "TECNICA_LAB", referencedColumnName = "ID_TECNICALAB")
-    @ForeignKey(name = "RECEPCION_TECLAB_FK")
-    public TecnicaxLaboratorio getTecnicaxLaboratorio() {
-        return tecnicaxLaboratorio;
-    }
-
-    public void setTecnicaxLaboratorio(TecnicaxLaboratorio tecnicaxLaboratorio) {
-        this.tecnicaxLaboratorio = tecnicaxLaboratorio;
-    }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
     @JoinColumn(name = "COD_TIPO_TUBO", referencedColumnName = "CODIGO")
@@ -150,24 +140,14 @@ public class RecepcionMx {
         this.causaRechazo = causaRechazo;
     }
 
-    @Basic
-    @Column(name = "FECHAH_RECEPCION_LAB", nullable = true, insertable = true, updatable = true)
-    public Timestamp getFechaHoraRecepcionLab() {
-        return fechaHoraRecepcionLab;
-    }
-
-    public void setFechaHoraRecepcionLab(Timestamp fechaHoraRecepcionLab) {
-        this.fechaHoraRecepcionLab = fechaHoraRecepcionLab;
-    }
-
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_RECEPCIONLAB", referencedColumnName = "USUARIO_ID")
-    @ForeignKey(name = "RECEPCIONLAB_USUARIO_FK")
-    public Usuarios getUsuarioRecepcionLab() {
-        return usuarioRecepcionLab;
+    @JoinColumn(name = "LABORATORIO_RECEP", referencedColumnName = "CODIGO")
+    @ForeignKey(name = "RECEPCION_MX_LABORATORIO_FK")
+    public Laboratorio getLabRecepcion() {
+        return labRecepcion;
     }
 
-    public void setUsuarioRecepcionLab(Usuarios usuarioRecepcionLab) {
-        this.usuarioRecepcionLab = usuarioRecepcionLab;
+    public void setLabRecepcion(Laboratorio labRecepcion) {
+        this.labRecepcion = labRecepcion;
     }
 }

@@ -33,7 +33,7 @@ public class User {
     private String email;
     private Boolean enabled=true;
     private String usuario;
-    private Set<Authority> authorities;
+    //private Set<Authority> authorities;
 
     @Id
     @Column(name = "username", nullable = false, length =50)
@@ -85,14 +85,14 @@ public class User {
 	this.enabled = enabled;
     }
 
-    @OneToMany(mappedBy = "user", fetch=FetchType.EAGER)
+    /*@OneToMany(mappedBy = "user", fetch=FetchType.EAGER)
     @IndexColumn(name = "username", base=0)
     public Set<Authority> getAuthorities() {
 	return authorities;
     }
     public void setAuthorities(Set<Authority> authorities) {
 	this.authorities = authorities;
-    }
+    }*/
 
     @Column(name = "usuario", nullable = false, length =50)
     public String getUsuario() {
