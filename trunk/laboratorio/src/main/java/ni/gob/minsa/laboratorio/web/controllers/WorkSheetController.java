@@ -6,7 +6,6 @@ import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.service.*;
-import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.BaseTable;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.Cell;
@@ -19,8 +18,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
-import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +30,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -127,77 +121,22 @@ public class WorkSheetController {
             HojaTrabajo hojaTrabajo = hojaTrabajoService.getHojaTrabajo(Integer.valueOf(numHoja));
             tomasHoja = hojaTrabajoService.getTomaMxByHojaTrabajo(Integer.valueOf(numHoja));
             //dibujar encabezado pag y pie de pagina
-            BufferedImage awtImage = ImageIO.read(new File(workingDir + "/encabezadoMinsa.jpg"));
-            PDXObjectImage ximage = new PDPixelMap(doc, awtImage);
-            stream.drawXObject(ximage, 5, inY, 590, 80);
-            inY -= m1;
+            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
 
-            BufferedImage awtImage2 = ImageIO.read(new File(workingDir + "/piePMinsa.jpg"));
-            PDXObjectImage ximage2 = new PDPixelMap(doc, awtImage2);
-            stream.drawXObject(ximage2, 5, 30, 600, 70);
+            String pageNumber= String.valueOf(doc.getNumberOfPages());
+            GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
 
-            textoImprimir = messageSource.getMessage("lbl.minsa", null, null);
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-            stream.moveTextPositionByAmount(GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14f,textoImprimir), inY);
-            inY -= m;
-            stream.drawString(textoImprimir);
-            stream.endText();
+            drawInfoLab(stream,page, labProcesa);
 
-            textoImprimir = labProcesa.getDescripcion()!=null?labProcesa.getDescripcion():"";
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-            stream.moveTextPositionByAmount(GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14f,textoImprimir), inY);
-            inY -= m;
-            stream.drawString(textoImprimir);
-            stream.endText();
 
-            textoImprimir = messageSource.getMessage("lbl.work.sheet", null, null);
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-            stream.moveTextPositionByAmount(GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14f,textoImprimir), inY);
-            inY -= m;
-            stream.drawString(textoImprimir);
-            stream.endText();
+            //draw worksheet info
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", 610, 30, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), 610, 120, stream, 12, PDType1Font.HELVETICA);
 
-            textoImprimir = messageSource.getMessage("lbl.address", null, null)+ " " + (labProcesa.getDireccion()!=null?labProcesa.getDireccion():"");
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-            stream.moveTextPositionByAmount(GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14f,textoImprimir), inY);
-            inY -= m;
-            stream.drawString(textoImprimir);
-            stream.endText();
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", 610, 310, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), 610, 410, stream, 12, PDType1Font.HELVETICA);
 
-            textoImprimir = messageSource.getMessage("lbl.telephone", null, null)+ " " +
-                    (labProcesa.getTelefono()!=null?labProcesa.getTelefono():"--")+
-                    " - " +
-                    messageSource.getMessage("lbl.fax", null, null)+ " " +
-                    (labProcesa.getTelefax()!=null?labProcesa.getTelefax():"--");
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 14f);
-            stream.moveTextPositionByAmount(GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14f,textoImprimir), inY);
-            inY -= m1;
-            stream.drawString(textoImprimir);
-            stream.endText();
-            //Dibujar encabezado de resultado
 
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-            stream.moveTextPositionByAmount(30, inY);
-
-            stream.drawString(messageSource.getMessage("lbl.sheet.number", null, null) + ": ");
-            stream.setFont(PDType1Font.HELVETICA, 10f);
-            stream.drawString(String.valueOf(hojaTrabajo.getNumero()));
-            stream.endText();
-
-            stream.beginText();
-            stream.setFont(PDType1Font.HELVETICA_BOLD, 12f);
-            stream.moveTextPositionByAmount(290, inY);
-
-            stream.drawString(messageSource.getMessage("lbl.sheet.date", null, null) + ": ");
-            stream.setFont(PDType1Font.HELVETICA, 10f);
-            stream.drawString(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-            stream.endText();
             for (DaTomaMx tomaMx_hoja : tomasHoja) {
                 float y = 540;
 
@@ -304,13 +243,11 @@ public class WorkSheetController {
                 }
                 table.draw();
 
-                stream.beginText();
-                stream.setFont(PDType1Font.HELVETICA_BOLD, 10f);
-                stream.moveTextPositionByAmount(360, 115);
-                stream.drawString(messageSource.getMessage("lbl.print.datetime", null, null) + " ");
-                stream.setFont(PDType1Font.HELVETICA, 10f);
-                stream.drawString(fechaImpresion);
-                stream.endText();
+                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
+                GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
+
+
+
 
 
 
@@ -411,5 +348,43 @@ public class WorkSheetController {
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
     }
+
+    private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
+        float xCenter;
+
+        float inY = 720;
+        float m = 20;
+
+        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
+        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+        inY -= m;
+
+        if(labProcesa != null){
+
+            if(labProcesa.getDescripcion()!= null){
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
+                GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                inY -= m;
+            }
+
+            if(labProcesa.getDireccion() != null){
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
+                GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                inY -= m;
+            }
+
+            if(labProcesa.getTelefono() != null){
+
+                if(labProcesa.getTelefax() != null){
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getTelefono() + " " + labProcesa.getTelefax());
+                    GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                }else{
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getTelefono());
+                    GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                }
+            }
+        }
+    }
+
 
 }
