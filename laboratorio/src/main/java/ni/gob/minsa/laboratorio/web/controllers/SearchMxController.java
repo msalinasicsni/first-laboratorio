@@ -402,7 +402,7 @@ public class SearchMxController {
         String[] toma = codigos.split(",");
 
         for (String idToma : toma) {
-            solicDx = tomaMxService.getSoliDxAprobByIdToma(idToma);
+            solicDx = tomaMxService.getSoliDxAprobByTomaAndUser(idToma, seguridadService.obtenerNombreUsuario());
             solicEstudio = tomaMxService.getSoliEAprobByIdTomaMxOrderCodigo(idToma);
 
             String codigoAnterior = null;
