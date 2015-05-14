@@ -479,6 +479,16 @@ public class TomaMxService {
         return q.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudDx> getSoliDxAprobByTomaAndUser(String idToma, String userName){
+        String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx like :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("userName",userName);
+        return q.list();
+    }
+
 
     public DaSolicitudDx getSolicitudDxByIdSolicitudUser(String idSolicitud, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
