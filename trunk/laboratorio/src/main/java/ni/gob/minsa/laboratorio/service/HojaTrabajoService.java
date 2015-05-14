@@ -144,8 +144,6 @@ public class HojaTrabajoService {
                             .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                             .add(Restrictions.and(Restrictions.eq("usuario.username",userName))) //usuario
                             .setProjection(Property.forName("labautorizado.codigo"))));
-
-
         }
 
         return crit.list();

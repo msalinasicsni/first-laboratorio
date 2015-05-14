@@ -317,4 +317,16 @@ public class RecepcionMxService {
         return crit.list();
     }
 
+    public RecepcionMxLab getRecepcionMxLabByIdRecepGral(String idRecepcion){
+        RecepcionMxLab resultado = null;
+        String query = "select a from RecepcionMxLab as a inner join a.recepcionMx as t where t.idRecepcion= :idRecepcion order by a.fechaHoraRecepcion desc";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("idRecepcion", idRecepcion);
+        List<RecepcionMxLab> recepcionMxLabList = q.list();
+        if (recepcionMxLabList!=null & recepcionMxLabList.size()>0){
+            resultado = recepcionMxLabList.get(0);
+        }
+        return  resultado;
+    }
 }

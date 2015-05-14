@@ -42,7 +42,7 @@ public class TrasladosService {
 
     public TrasladoMx getTrasladoActivoMx(String idTomaMx){
         String query = "select t from TrasladoMx t inner join t.tomaMx mx " +
-                "where mx.idTomaMx = :idTomaMx and t.recepcionado = true" ;
+                "where mx.idTomaMx = :idTomaMx and t.recepcionado = false" ;
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);

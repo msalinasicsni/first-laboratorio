@@ -542,6 +542,9 @@ public class OrdenExamenMxService {
                 "AutoridadArea as aa where es.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username and oe.anulado = false");
         q2.setParameter("idTomaMx",idTomaMx);
         q2.setParameter("username",username);
+        ordenExamenList.addAll(q2.list());
         return ordenExamenList;
     }
+
+
 }

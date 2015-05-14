@@ -485,6 +485,18 @@ public class RecepcionMxController {
             recepcionMx.setTomaMx(tomaMx);
             try {
                 idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+                //si tiene traslado activo marcarlo como recepcionado
+                TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
+                if (trasladoActivo!=null) {
+                    if (trasladoActivo.isTrasladoExterno()){ //control de calidad, por tanto llega a recepción general
+                        if (trasladoActivo.getLaboratorioDestino().getCodigo().equals(recepcionMx.getLabRecepcion().getCodigo())){
+                            trasladoActivo.setRecepcionado(true);
+                            trasladoActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                            trasladoActivo.setUsuarioRecepcion(usuario);
+                            trasladosService.saveTrasladoMx(trasladoActivo);
+                        }
+                    }
+                }
             }catch (Exception ex){
                 resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
@@ -547,8 +559,7 @@ public class RecepcionMxController {
             if (jsonpObject.get("causaRechazo")!=null && !jsonpObject.get("causaRechazo").getAsString().isEmpty())
                 causaRechazo = jsonpObject.get("causaRechazo").getAsString();
 
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             //Se obtiene estado recepcionado en laboratorio
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCLAB");
             //se obtiene calidad de la muestra
@@ -563,13 +574,19 @@ public class RecepcionMxController {
 
             RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
             recepcionMxLab.setRecepcionMx(recepcionMx);
-            recepcionMxLab.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+            recepcionMxLab.setUsuarioRecepcion(usuario);
             recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx(),false);
+            boolean actualizarTraslado = false;
             if (trasladoMxActivo!=null) {
                 if (!trasladoMxActivo.isTrasladoExterno()) {
                     if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
                         recepcionMxLab.setArea(trasladoMxActivo.getAreaDestino());
+                        //si tiene traslado activo marcarlo como recepcionado
+                        trasladoMxActivo.setRecepcionado(true);
+                        trasladoMxActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                        trasladoMxActivo.setUsuarioRecepcion(usuario);
+                        actualizarTraslado = true;
                     }
                 }
             }else{
@@ -589,6 +606,8 @@ public class RecepcionMxController {
             try {
                 recepcionMxService.updateRecepcionMx(recepcionMx);
                 recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                if (actualizarTraslado)
+                    trasladosService.saveTrasladoMx(trasladoMxActivo);
             }catch (Exception ex){
                 resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
@@ -784,6 +803,18 @@ public class RecepcionMxController {
                 recepcionMx.setTomaMx(tomaMx);
                 try {
                     idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+                    //si tiene traslado activo marcarlo como recepcionado
+                    TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
+                    if (trasladoActivo!=null) {
+                        if (trasladoActivo.isTrasladoExterno()){ //control de calidad, por tanto llega a recepción general
+                            if (trasladoActivo.getLaboratorioDestino().getCodigo().equals(recepcionMx.getLabRecepcion().getCodigo())){
+                                trasladoActivo.setRecepcionado(true);
+                                trasladoActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                                trasladoActivo.setUsuarioRecepcion(usuario);
+                                trasladosService.saveTrasladoMx(trasladoActivo);
+                            }
+                        }
+                    }
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
                     resultado = resultado + ". \n " + ex.getMessage();
@@ -843,6 +874,7 @@ public class RecepcionMxController {
 
             long idUsuario = seguridadService.obtenerIdUsuario(request);
             Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            User user = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             //Se obtiene estado recepcionado en laboratorio
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCLAB");
             //se obtiene calidad de la muestra
@@ -860,13 +892,19 @@ public class RecepcionMxController {
 
                 RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
                 recepcionMxLab.setRecepcionMx(recepcionMx);
-                recepcionMxLab.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                recepcionMxLab.setUsuarioRecepcion(user);
                 recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
                 TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx(),false);
+                boolean actualizarTraslado = false;
                 if (trasladoMxActivo!=null) {
                     if (!trasladoMxActivo.isTrasladoExterno()) {
                         if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
                             recepcionMxLab.setArea(trasladoMxActivo.getAreaDestino());
+                            //si tiene traslado activo marcarlo como recepcionado
+                            trasladoMxActivo.setRecepcionado(true);
+                            trasladoMxActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                            trasladoMxActivo.setUsuarioRecepcion(user);
+                            actualizarTraslado = true;
                         }
                     }
                 }else {
@@ -995,6 +1033,8 @@ public class RecepcionMxController {
                     if (procesarRecepcion) {
                         recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                         recepcionMxService.updateRecepcionMx(recepcionMx);
+                        if (actualizarTraslado)
+                            trasladosService.saveTrasladoMx(trasladoMxActivo);
                     }
                 }catch (Exception ex){
                     resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
