@@ -121,17 +121,19 @@
                                     <section>
                                         <label class="label"><fmt:message key="login.username"/></label>
                                         <label class="input"> <i class="icon-append fa fa-user"></i>
-                                            <input type="text" class="form-control" id="username"
+                                            <input required="" type="text" class="form-control" id="username"
                                                    name='j_username' value=''
                                                    placeholder="<fmt:message key="login.username"/>">
-                                            <b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i><fmt:message key="login.username.tooltip"/> </b></label>
+                                            <%--<b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i><fmt:message key="login.username.tooltip"/> </b>--%>
+                                        </label>
                                     </section>
                                     <section>
                                         <label class="label"><fmt:message key="login.password"/></label>
                                         <label class="input"> <i class="icon-append fa fa-lock"></i>
-                                            <input type="password" class="form-control" name='j_password'
+                                            <input required="" type="password" class="form-control" name='j_password'
                                                    placeholder="<fmt:message key="login.password"/>">
-                                            <b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i><fmt:message key="login.password.tooltip"/> </b> </label>
+                                            <%--<b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i><fmt:message key="login.password.tooltip"/> </b> --%>
+                                        </label>
                                         <!--<div class="note">
                                             <a href="forgotpassword.html">Forgot password?</a>
                                         </div>-->

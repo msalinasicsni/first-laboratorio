@@ -39,10 +39,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by souyen-ics.
@@ -162,7 +160,6 @@ public class ReportesController {
         String nombreSolicitud = null;
 
 
-
         if (jObjectFiltro.get("fechaInicioRecepcion") != null && !jObjectFiltro.get("fechaInicioRecepcion").getAsString().isEmpty())
             fechaInicioRecepcion = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioRecepcion").getAsString() + " 00:00:00");
         if (jObjectFiltro.get("fechaFinRecepcion") != null && !jObjectFiltro.get("fechaFinRecepcion").getAsString().isEmpty())
@@ -251,7 +248,7 @@ public class ReportesController {
 
             //se arma estructura de diagnósticos o estudios
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(receivedMx.getTomaMx().getIdTomaMx(),labUser.getCodigo());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(receivedMx.getTomaMx().getIdTomaMx(), labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(receivedMx.getTomaMx().getIdTomaMx());
 
 
@@ -315,7 +312,7 @@ public class ReportesController {
             float xCenter;
 
             GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
-            String pageNumber= String.valueOf(doc.getNumberOfPages());
+            String pageNumber = String.valueOf(doc.getNumberOfPages());
             GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
             drawInfoLab(stream, page, labProcesa);
 
@@ -324,24 +321,26 @@ public class ReportesController {
 
             //nombre del reporte
             xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 12, messageSource.getMessage("lbl.reception.report", null, null).toUpperCase());
-            GeneralUtils.drawTEXT( messageSource.getMessage("lbl.reception.report", null, null).toUpperCase(), y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
-            y = y-10;
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.reception.report", null, null).toUpperCase(), y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
+            y = y - 10;
             //Rango de Fechas
-            if(!fromDate.equals("") && !toDate.equals("")){
-                GeneralUtils.drawTEXT( messageSource.getMessage("lbl.from", null, null), y, 55, stream, 12, PDType1Font.HELVETICA_BOLD);
+            if (!fromDate.equals("") && !toDate.equals("")) {
+                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.from", null, null), y, 55, stream, 12, PDType1Font.HELVETICA_BOLD);
                 GeneralUtils.drawTEXT(fromDate, y, 100, stream, 12, PDType1Font.HELVETICA_BOLD);
 
-                GeneralUtils.drawTEXT( messageSource.getMessage("lbl.to", null, null), y, 660, stream, 12, PDType1Font.HELVETICA_BOLD);
-                GeneralUtils.drawTEXT( toDate, y, 720, stream, 12, PDType1Font.HELVETICA_BOLD);
+                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.to", null, null), y, 660, stream, 12, PDType1Font.HELVETICA_BOLD);
+                GeneralUtils.drawTEXT(toDate, y, 720, stream, 12, PDType1Font.HELVETICA_BOLD);
                 y -= m;
             }
 
 
             String[] codigosArray = codes.replaceAll("\\*", "-").split(",");
-            String[][] content = new String[codigosArray.length][8];
+            List<String[]> recList = new ArrayList<String[]>();
 
             int numFila = 0;
+
             for (String codigoUnico : codigosArray) {
+                String[] content = null;
 
                 RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(codigoUnico, labProcesa.getCodigo());
 
@@ -349,37 +348,59 @@ public class ReportesController {
                     String nombreSolitud = null;
                     String nombrePersona = null;
 
-                    DaSolicitudDx soliDx = tomaMxService.getSoliDxByCodigo(recepcion.getTomaMx().getCodigoUnicoMx(),seguridadService.obtenerNombreUsuario());
+                    List<DaSolicitudDx> listDx = tomaMxService.getSolicitudesDxCodigo(codigoUnico, seguridadService.obtenerNombreUsuario());
                     DaSolicitudEstudio soliE = tomaMxService.getSoliEstByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
 
-                    if (soliDx != null || soliE != null) {
-                        if (soliDx != null) {
-                            nombreSolitud = soliDx.getCodDx().getNombre();
-                        } else {
-                            nombreSolitud = soliE.getTipoEstudio().getNombre();
-                        }
+
+                    for (DaSolicitudDx sol : listDx) {
+                        content = new String[8];
+
+                        nombreSolitud = sol.getCodDx().getNombre();
+
+                        nombrePersona = sol.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                        if (sol.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombrePersona = nombrePersona + " " + sol.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                        nombrePersona = nombrePersona + " " + sol.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                        if (sol.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            nombrePersona = nombrePersona + " " + sol.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+
+                        content[0] = sol.getIdTomaMx().getCodigoUnicoMx() != null ? sol.getIdTomaMx().getCodigoUnicoMx() : "";
+                        content[1] = sol.getIdTomaMx().getCodTipoMx() != null ? sol.getIdTomaMx().getCodTipoMx().getNombre() : "";
+                        content[2] = recepcion.getFechaHoraRecepcion() != null ? DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a") : "";
+                        content[3] = recepcion.getCalidadMx() != null ? recepcion.getCalidadMx().getValor() : "";
+                        content[4] = sol.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null ? sol.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() : "";
+                        content[5] = sol.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null ? sol.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() : "";
+                        content[6] = sol.getIdTomaMx().getIdNotificacion().getPersona() != null ? nombrePersona : "";
+                        content[7] = nombreSolitud != null ? nombreSolitud : "";
+
+                        recList.add(content);
                     }
 
-                    nombrePersona = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                    if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                        nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                    nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                    if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                        nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    if (soliE != null) {
+                        content = new String[8];
 
-                    content[numFila][0] = recepcion.getTomaMx().getCodigoUnicoMx() != null ? recepcion.getTomaMx().getCodigoUnicoMx() : "";
-                    content[numFila][1] = recepcion.getTomaMx().getCodTipoMx() != null ? recepcion.getTomaMx().getCodTipoMx().getNombre() : "";
-                    content[numFila][2] = recepcion.getFechaHoraRecepcion() != null ? DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a") : "";
-                    content[numFila][3] = recepcion.getCalidadMx() != null ? recepcion.getCalidadMx().getValor() : "";
-                    content[numFila][4] = recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() : "";
-                    content[numFila][5] = recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() : "";
-                    content[numFila][6] = recepcion.getTomaMx().getIdNotificacion().getPersona() != null ? nombrePersona : "";
-                    content[numFila][7] = nombreSolitud != null ? nombreSolitud : "";
+                        nombreSolitud = soliE.getTipoEstudio().getNombre();
 
-                    numFila++;
+                        nombrePersona = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                        if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                        nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                        if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+
+                        content[0] = recepcion.getTomaMx().getCodigoUnicoMx() != null ? recepcion.getTomaMx().getCodigoUnicoMx() : "";
+                        content[1] = recepcion.getTomaMx().getCodTipoMx() != null ? recepcion.getTomaMx().getCodTipoMx().getNombre() : "";
+                        content[2] = recepcion.getFechaHoraRecepcion() != null ? DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a") : "";
+                        content[3] = recepcion.getCalidadMx() != null ? recepcion.getCalidadMx().getValor() : "";
+                        content[4] = recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() : "";
+                        content[5] = recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() : "";
+                        content[6] = recepcion.getTomaMx().getIdNotificacion().getPersona() != null ? nombrePersona : "";
+                        content[7] = nombreSolitud != null ? nombreSolitud : "";
+
+                        recList.add(content);
+                    }
+
                 }
-
-
             }
 
             //drawTable
@@ -399,7 +420,7 @@ public class ReportesController {
             //Create 2 column row
 
             Cell cell;
-            Row row ;
+            Row row;
 
 
             //Create Fact header row
@@ -443,10 +464,10 @@ public class ReportesController {
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
-            y -=15;
+            y -= 15;
 
             //Add multiple rows with random facts about Belgium
-            for (String[] fact : content) {
+            for (String[] fact : recList) {
 
                 if (y < 260) {
                     table.draw();
@@ -458,7 +479,7 @@ public class ReportesController {
                     stream.concatenate2CTM(0, 1, -1, 0, page.getMediaBox().getWidth(), 0);
                     y = 470;
                     GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
-                    pageNumber= String.valueOf(doc.getNumberOfPages());
+                    pageNumber = String.valueOf(doc.getNumberOfPages());
                     GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
 
 
@@ -518,45 +539,45 @@ public class ReportesController {
                 cell = row.createCell(10, fact[0]);
                 cell.setFont(PDType1Font.HELVETICA);
                 cell.setFontSize(10);
-                y -=15;
+                y -= 15;
 
                 for (int i = 1; i < fact.length; i++) {
-                        if(i == 1){
+                    if (i == 1) {
                         cell = row.createCell(10, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
-                    }else if(i == 2) {
+                    } else if (i == 2) {
                         cell = row.createCell(9, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
-                    }else if(i== 5) {
+                    } else if (i == 5) {
                         cell = row.createCell(17, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
-                    }else if(i== 7) {
+                    } else if (i == 7) {
                         cell = row.createCell(9, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
-                    }else if(i == 4){
+                    } else if (i == 4) {
                         cell = row.createCell(17, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
-                    } else if(i==6){
-                       cell = row.createCell(16, fact[i] );
-                       cell.setFont(PDType1Font.HELVETICA);
-                       cell.setFontSize(10);
+                    } else if (i == 6) {
+                        cell = row.createCell(16, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
 
 
-                    }else {
+                    } else {
                         cell = row.createCell(12, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
                     }
 
-                    }
+                }
             }
             table.draw();
 
@@ -576,7 +597,6 @@ public class ReportesController {
     }
 
 
-
     private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
         float xCenter;
 
@@ -587,26 +607,26 @@ public class ReportesController {
         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
         inY -= m;
 
-        if(labProcesa != null){
+        if (labProcesa != null) {
 
-            if(labProcesa.getDescripcion()!= null){
+            if (labProcesa.getDescripcion() != null) {
                 xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
                 GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
 
-            if(labProcesa.getDireccion() != null){
+            if (labProcesa.getDireccion() != null) {
                 xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
                 GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
 
-            if(labProcesa.getTelefono() != null){
+            if (labProcesa.getTelefono() != null) {
 
-                if(labProcesa.getTelefax() != null){
+                if (labProcesa.getTelefax() != null) {
                     xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getTelefono() + " " + labProcesa.getTelefax());
                     GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
-                }else{
+                } else {
                     xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getTelefono());
                     GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 }
@@ -622,6 +642,7 @@ public class ReportesController {
 
     /**
      * Método que se llama al entrar a la opción de menu de Reportes "Reporte Resultados Positivos".
+     *
      * @param request para obtener información de la petición del cliente
      * @return ModelAndView
      * @throws Exception
@@ -653,25 +674,28 @@ public class ReportesController {
 
     /**
      * Método para realizar la búsqueda de Resultados positivos
+     *
      * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
     @RequestMapping(value = "searchRequest", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody String fetchRequestJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
+    public
+    @ResponseBody
+    String fetchRequestJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
         logger.info("Obteniendo las solicitudes positivas según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaSolicitudDx> positiveRoutineReqList = null;
         List<DaSolicitudEstudio> positiveStudyReqList = null;
 
-        if(filtroMx.getCodTipoSolicitud()!= null){
-            if(filtroMx.getCodTipoSolicitud().equals("Estudio")){
+        if (filtroMx.getCodTipoSolicitud() != null) {
+            if (filtroMx.getCodTipoSolicitud().equals("Estudio")) {
                 positiveStudyReqList = reportesService.getPositiveStudyRequestByFilter(filtroMx);
-            }else{
+            } else {
                 positiveRoutineReqList = reportesService.getPositiveRoutineRequestByFilter(filtroMx);
             }
 
-        }else{
+        } else {
             positiveRoutineReqList = reportesService.getPositiveRoutineRequestByFilter(filtroMx);
             positiveStudyReqList = reportesService.getPositiveStudyRequestByFilter(filtroMx);
         }
@@ -735,6 +759,7 @@ public class ReportesController {
                 if (mostrar) {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("solicitud", soli.getCodDx().getNombre());
+                    map.put("idSolicitud", soli.getIdSolicitudDx());
                     map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoUnicoMx());
                     map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
 
@@ -815,6 +840,7 @@ public class ReportesController {
                 if (mostrar) {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("solicitud", soliE.getTipoEstudio().getNombre());
+                    map.put("idSolicitud", soliE.getIdSolicitudEstudio());
                     map.put("codigoUnicoMx", soliE.getIdTomaMx().getCodigoUnicoMx());
                     map.put("fechaAprobacion", DateUtil.DateToString(soliE.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
 
@@ -878,7 +904,7 @@ public class ReportesController {
 
             GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
 
-            String pageNumber= String.valueOf(doc.getNumberOfPages());
+            String pageNumber = String.valueOf(doc.getNumberOfPages());
             GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
 
             drawInfoLab(stream, page, labProcesa);
@@ -888,87 +914,101 @@ public class ReportesController {
 
             //nombre del reporte
             xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 12, messageSource.getMessage("lbl.positiveResultReport", null, null).toUpperCase());
-            GeneralUtils.drawTEXT( messageSource.getMessage("lbl.positiveResultReport", null, null).toUpperCase(), y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
-            y = y-10;
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.positiveResultReport", null, null).toUpperCase(), y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
+            y = y - 10;
             //Rango de Fechas
-            if(!fromDate.equals("") && !toDate.equals("")){
-                GeneralUtils.drawTEXT( messageSource.getMessage("lbl.from", null, null), y, 55, stream, 12, PDType1Font.HELVETICA_BOLD);
+            if (!fromDate.equals("") && !toDate.equals("")) {
+                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.from", null, null), y, 55, stream, 12, PDType1Font.HELVETICA_BOLD);
                 GeneralUtils.drawTEXT(fromDate, y, 100, stream, 12, PDType1Font.HELVETICA_BOLD);
 
-                GeneralUtils.drawTEXT( messageSource.getMessage("lbl.to", null, null), y, 660, stream, 12, PDType1Font.HELVETICA_BOLD);
-                GeneralUtils.drawTEXT( toDate, y, 720, stream, 12, PDType1Font.HELVETICA_BOLD);
+                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.to", null, null), y, 660, stream, 12, PDType1Font.HELVETICA_BOLD);
+                GeneralUtils.drawTEXT(toDate, y, 720, stream, 12, PDType1Font.HELVETICA_BOLD);
                 y -= m;
             }
 
 
-            String[] codigosArray = codes.replaceAll("\\*", "-").split(",");
-            String[][] content = new String[codigosArray.length][6];
+            String[] idSoli = codes.split(",");
+            List<String[]> reqList = new ArrayList<String[]>();
 
-            int numFila = 0;
-            for (String codigoUnico : codigosArray) {
-                    String nombreSolitud = null;
-                    String nombrePersona = null;
-                    String fechaAprob = null;
-                    String silais = null;
-                    String unidadSalud = null;
 
-                    DaSolicitudDx soliDx = tomaMxService.getSoliDxByCodigo(codigoUnico,seguridadService.obtenerNombreUsuario());
-                    DaSolicitudEstudio soliE = tomaMxService.getSoliEstByCodigo(codigoUnico);
+            for (String idSolicitud : idSoli) {
+                String nombreSolitud = null;
+                String nombrePersona = null;
+                String fechaAprob = null;
+                String silais = null;
+                String unidadSalud = null;
+                String[] content = null;
 
-                    if (soliDx != null || soliE != null) {
-                        if (soliDx != null) {
-                            nombreSolitud = soliDx.getCodDx().getNombre();
+               DaSolicitudDx soli = tomaMxService.getSolicitudDxByIdSolicitudUser(idSolicitud, seguridadService.obtenerNombreUsuario());
+               DaSolicitudEstudio soliE = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
 
-                            nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                            if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                                nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                            nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                            if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                                nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
 
-                            if(soliDx.getFechaAprobacion() != null){
-                                fechaAprob = DateUtil.DateToString(soliDx.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a");
-                            }
+               if(soli != null){
 
-                            if(soliDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null){
-                                silais = soliDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-                            }
+                    content = new String[6];
+                    nombreSolitud = soli.getCodDx().getNombre();
 
-                            if(soliDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null){
-                                unidadSalud = soliDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
-                            }
+                    nombrePersona = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                    if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                    if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
 
-                        } else {
-                            nombreSolitud = soliE.getTipoEstudio().getNombre();
+                    if (soli.getFechaAprobacion() != null) {
+                        fechaAprob = DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a");
+                    }
 
-                            nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                            if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                                nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                            nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                            if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                                nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                        silais = soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
+                    }
 
-                            if(soliE.getFechaAprobacion() != null){
-                            fechaAprob = DateUtil.DateToString(soliE.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a");
-                            }
+                    if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                        unidadSalud = soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
+                    }
 
-                            if(soliE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null){
-                                silais = soliE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-                            }
+                    content[0] = soli.getIdTomaMx() != null ? soli.getIdTomaMx().getCodigoUnicoMx() : "";
+                    content[1] = fechaAprob != null ? fechaAprob : "";
+                    content[2] = silais != null ? silais : "";
+                    content[3] = unidadSalud != null ? unidadSalud : "";
+                    content[4] = nombrePersona != null ? nombrePersona : "";
+                    content[5] = nombreSolitud != null ? nombreSolitud : "";
+                    reqList.add(content);
 
-                            if(soliE.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null){
-                                unidadSalud = soliE.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
-                            }
-                        }
+                }
 
-                    content[numFila][0] = codigoUnico != null ? codigoUnico : "";
-                    content[numFila][1] = fechaAprob != null ? fechaAprob : "";
-                    content[numFila][2] = silais != null ? silais : "";
-                    content[numFila][3] = unidadSalud != null ? unidadSalud : "";
-                    content[numFila][4] = nombrePersona != null ? nombrePersona : "";
-                    content[numFila][5] = nombreSolitud != null ? nombreSolitud : "";
+                if (soliE != null) {
+                    content = new String[6];
+                    nombreSolitud = soliE.getTipoEstudio().getNombre();
 
-                    numFila++;
+                    nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                    if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                    if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+
+                    if (soliE.getFechaAprobacion() != null) {
+                        fechaAprob = DateUtil.DateToString(soliE.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a");
+                    }
+
+                    if (soliE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                        silais = soliE.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
+                    }
+
+                    if (soliE.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                        unidadSalud = soliE.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
+                    }
+
+                    content[0] = soliE.getIdTomaMx() != null ? soliE.getIdTomaMx().getCodigoUnicoMx() : "";
+                    content[1] = fechaAprob != null ? fechaAprob : "";
+                    content[2] = silais != null ? silais : "";
+                    content[3] = unidadSalud != null ? unidadSalud : "";
+                    content[4] = nombrePersona != null ? nombrePersona : "";
+                    content[5] = nombreSolitud != null ? nombreSolitud : "";
+                    reqList.add(content);
+
+
                 }
             }
 
@@ -988,7 +1028,7 @@ public class ReportesController {
 
             //Create 2 column row
             Cell cell;
-            Row row ;
+            Row row;
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
@@ -1021,10 +1061,10 @@ public class ReportesController {
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
-            y -=15;
+            y -= 15;
 
             //Add multiple rows with random facts about Belgium
-            for (String[] fact : content) {
+            for (String[] fact : reqList) {
 
                 if (y < 260) {
                     table.draw();
@@ -1037,7 +1077,7 @@ public class ReportesController {
                     y = 470;
                     GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
 
-                    pageNumber= String.valueOf(doc.getNumberOfPages());
+                    pageNumber = String.valueOf(doc.getNumberOfPages());
                     GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
 
                     table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
@@ -1086,29 +1126,29 @@ public class ReportesController {
                 cell = row.createCell(12, fact[0]);
                 cell.setFont(PDType1Font.HELVETICA);
                 cell.setFontSize(10);
-                y -=15;
+                y -= 15;
 
                 for (int i = 1; i < fact.length; i++) {
-                    if(i == 1){
+                    if (i == 1) {
                         cell = row.createCell(16, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
-                    }else if(i == 2) {
+                    } else if (i == 2) {
                         cell = row.createCell(17, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
-                    }else if(i== 3) {
+                    } else if (i == 3) {
                         cell = row.createCell(20, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
-                    }else if(i == 4){
+                    } else if (i == 4) {
                         cell = row.createCell(20, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
-                    } else if(i==5){
-                        cell = row.createCell(15, fact[i] );
+                    } else if (i == 5) {
+                        cell = row.createCell(15, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
                     }

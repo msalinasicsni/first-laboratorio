@@ -14,7 +14,7 @@ import java.sql.Timestamp;
  * V1.0
  */
 @Entity
-@Table(name = "historio_envio_mx", schema = "laboratorio")
+@Table(name = "historico_envio_mx", schema = "laboratorio")
 public class HistoricoEnvioMx {
 
     String idHistorico;

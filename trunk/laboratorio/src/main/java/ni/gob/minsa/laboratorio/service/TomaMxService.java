@@ -469,7 +469,25 @@ public class TomaMxService {
         return (DaSolicitudDx) q.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudDx> getSolicitudesDxCodigo(String codigo, String userName){
+        String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx like :codigo ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigo",codigo);
+        q.setParameter("userName",userName);
+        return q.list();
+    }
 
+
+    public DaSolicitudDx getSolicitudDxByIdSolicitudUser(String idSolicitud, String userName){
+        String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx like :idSolicitud ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idSolicitud",idSolicitud);
+        q.setParameter("userName",userName);
+        return (DaSolicitudDx)q.uniqueResult();
+    }
 
 
     /************************************************************/

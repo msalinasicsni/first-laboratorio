@@ -392,15 +392,15 @@ var ReceptionReport = function () {
                                 [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona,dataToLoad[i].solicitud]);
 
                              if (i+1< len) {
-                                 codigos += dataToLoad[i].codigoUnicoMx + ",";
+                                 codigos += dataToLoad[i].idSolicitud + ",";
 
                              } else {
-                                 codigos += dataToLoad[i].codigoUnicoMx;
+                                 codigos += dataToLoad[i].idSolicitud;
 
                              }
 
                            }
-                        codigos = reemplazar(codigos,"-","*");
+
 
                     }else{
                         $.smallBox({

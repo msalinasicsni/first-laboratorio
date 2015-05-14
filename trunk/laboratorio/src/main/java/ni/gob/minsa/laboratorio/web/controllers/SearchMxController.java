@@ -432,6 +432,63 @@ public class SearchMxController {
                         if (solicitudDx.getFechaAprobacion() != null) {
                             fechaAprobacion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getFechaAprobacion());
                         }
+
+
+                        if (detalleResultado != null) {
+
+                            //Prepare the document.
+                            float y = 500;
+                            float m1 = 20;
+
+                            PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
+                            doc.addPage(page);
+                            stream = new PDPageContentStream(doc, page);
+
+                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
+                            drawInfoLab(stream,page, labProcesa);
+                            drawReportHeader(stream, detalleSoliDx, detalleSoliE);
+
+                            drawInfoSample(stream, detalleSoliDx, detalleSoliE, y);
+                            y-=m1;
+
+
+                            boolean lista = false;
+                            String valor = null;
+                            String respuesta;
+                            String[][] content = new String[detalleResultado.size()][2];
+
+
+                            int numFila = 0;
+                            for (DetalleResultadoFinal resul : detalleResultado) {
+                                y = y - 20;
+                                if (resul.getRespuesta() != null) {
+                                    respuesta = resul.getRespuesta().getNombre();
+                                    lista = resul.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                } else {
+                                    respuesta = resul.getRespuestaExamen().getNombre();
+                                    lista = resul.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
+                                }
+
+                                if (lista) {
+                                    Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
+                                    valor = catLista.getValor();
+                                } else {
+                                    valor = resul.getValor();
+                                }
+
+
+                                content[numFila][0] = respuesta;
+                                content[numFila][1] = valor;
+                                numFila++;
+
+                            }
+
+                            drawFinalResultTable(content, doc, page, y);
+                            y = y-140;
+                            drawFinalInfo(stream, y, fechaAprobacion, fechaImpresion);
+                            stream.close();
+
+                        }
                     }
                 } else {
                     for (DaSolicitudEstudio solicitudE : solicEstudio) {
@@ -751,63 +808,6 @@ public class SearchMxController {
                         }
                     }
                 }
-
-                if (detalleResultado != null) {
-
-                    //Prepare the document.
-                    float y = 500;
-                    float m1 = 20;
-
-                    PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
-                    doc.addPage(page);
-                    stream = new PDPageContentStream(doc, page);
-
-                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                   drawInfoLab(stream,page, labProcesa);
-                    drawReportHeader(stream, detalleSoliDx, detalleSoliE);
-
-                    drawInfoSample(stream, detalleSoliDx, detalleSoliE, y);
-                    y-=m1;
-
-
-                    boolean lista = false;
-                    String valor = null;
-                    String respuesta;
-                    String[][] content = new String[detalleResultado.size()][2];
-
-
-                    int numFila = 0;
-                    for (DetalleResultadoFinal resul : detalleResultado) {
-                        y = y - 20;
-                        if (resul.getRespuesta() != null) {
-                            respuesta = resul.getRespuesta().getNombre();
-                            lista = resul.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
-                        } else {
-                            respuesta = resul.getRespuestaExamen().getNombre();
-                            lista = resul.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
-                        }
-
-                        if (lista) {
-                            Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
-                            valor = catLista.getValor();
-                        } else {
-                            valor = resul.getValor();
-                        }
-
-
-                        content[numFila][0] = respuesta;
-                        content[numFila][1] = valor;
-                        numFila++;
-
-                    }
-
-                    drawFinalResultTable(content, doc, page, y);
-                    y = y-140;
-                    drawFinalInfo(stream, y, fechaAprobacion, fechaImpresion);
-                    stream.close();
-
-                }
-
 
             }
 
