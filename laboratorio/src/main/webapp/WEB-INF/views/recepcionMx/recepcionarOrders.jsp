@@ -324,6 +324,7 @@
                                                                         <td><c:out value="${record.tipoEstudio.nombre}" /></td>
                                                                         <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
                                                                         <td><c:out value="${record.tipoEstudio.area.nombre}" /></td>
+                                                                        <td><spring:message code="lbl.no" /></td>
                                                                     </tr>
                                                                 </c:forEach>
                                                             </c:otherwise>
