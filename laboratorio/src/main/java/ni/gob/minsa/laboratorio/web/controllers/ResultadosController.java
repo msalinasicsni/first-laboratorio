@@ -371,28 +371,6 @@ public class ResultadosController {
         return resultadosService.getDetallesResultadoActivosByExamen(idOrdenExamen);
     }
 
-    @RequestMapping(value = "ver", method = RequestMethod.GET)
-    public ModelAndView verResultado(HttpServletRequest request) throws Exception {
-        logger.debug("ver resultado demo");
-        String urlValidacion="";
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
-        ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            mav.setViewName("resultados/verResultado");
-        }else
-            mav.setViewName(urlValidacion);
-
-        return mav;
-    }
-
     @RequestMapping(value = "saveResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void saveResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
