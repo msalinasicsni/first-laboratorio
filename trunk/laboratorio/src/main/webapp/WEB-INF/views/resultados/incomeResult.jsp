@@ -57,33 +57,6 @@
 					</h1>
 				</div>
 				<!-- end col -->
-				<!-- right side of the page with the sparkline graphs -->
-				<!-- col -->
-				<div class="col-xs-12 col-sm-5 col-md-5 col-lg-8">
-					<!-- sparks -->
-					<ul id="sparks">
-						<li class="sparks-info">
-							<h5> <spring:message code="sp.day" /> <span class="txt-color-greenDark"><i class="fa fa-arrow-circle-down"></i>17</span></h5>
-							<div class="sparkline txt-color-blue hidden-mobile hidden-md hidden-sm">
-								0,1,3,4,11,12,11,13,10,11,15,14,20,17
-							</div>
-						</li>
-						<li class="sparks-info">
-							<h5> <spring:message code="sp.week" /> <span class="txt-color-red"><i class="fa fa-arrow-circle-up"></i>&nbsp;57</span></h5>
-							<div class="sparkline txt-color-purple hidden-mobile hidden-md hidden-sm">
-								23,32,11,23,33,45,44,54,45,48,57
-							</div>
-						</li>
-						<li class="sparks-info">
-							<h5> <spring:message code="sp.month" /> <span class="txt-color-red"><i class="fa fa-arrow-circle-up"></i>&nbsp;783</span></h5>
-							<div class="sparkline txt-color-purple hidden-mobile hidden-md hidden-sm">
-								235,323,114,231,333,451,444,541,451,483,783
-							</div>
-						</li>
-					</ul>
-					<!-- end sparks -->
-				</div>
-				<!-- end col -->
 			</div>
 			<!-- end row -->
 			<!-- widget grid -->
