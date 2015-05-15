@@ -65,33 +65,7 @@
 					</h1>
 				</div>
 				<!-- end col -->
-				<!-- right side of the page with the sparkline graphs -->
-				<!-- col -->
-				<div class="col-xs-12 col-sm-5 col-md-5 col-lg-8">
-					<!-- sparks -->
-					<ul id="sparks">
-						<li class="sparks-info">
-							<h5> <spring:message code="sp.day" /> <span class="txt-color-greenDark"><i class="fa fa-arrow-circle-down"></i>17</span></h5>
-							<div class="sparkline txt-color-blue hidden-mobile hidden-md hidden-sm">
-								0,1,3,4,11,12,11,13,10,11,15,14,20,17
-							</div>
-						</li>
-						<li class="sparks-info">
-							<h5> <spring:message code="sp.week" /> <span class="txt-color-red"><i class="fa fa-arrow-circle-up"></i>&nbsp;57</span></h5>
-							<div class="sparkline txt-color-purple hidden-mobile hidden-md hidden-sm">
-								23,32,11,23,33,45,44,54,45,48,57
-							</div>
-						</li>
-						<li class="sparks-info">
-							<h5> <spring:message code="sp.month" /> <span class="txt-color-red"><i class="fa fa-arrow-circle-up"></i>&nbsp;783</span></h5>
-							<div class="sparkline txt-color-purple hidden-mobile hidden-md hidden-sm">
-								235,323,114,231,333,451,444,541,451,483,783
-							</div>
-						</li>
-					</ul>
-					<!-- end sparks -->
-				</div>
-				<!-- end col -->
+
 			</div>
 			<!-- end row -->
 			<!-- widget grid -->
@@ -123,6 +97,7 @@
                                     <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
                                     <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.solic.DateTime"/>"/>
                                     <input id="text_dx" type="hidden" value="<spring:message code="lbl.desc.request"/>"/>
+                                    <input id="text_cc" type="hidden" value="<spring:message code="lbl.cc"/>"/>
                                     <input id="res_aprob" type="hidden" value="<spring:message code="lbl.condition"/>"/>
                                     <input id="msg_request_printed" type="hidden" value="<spring:message code="msg.request.printed"/>"/>
                                     <input id="msg_select_sample" type="hidden" value="<spring:message code="msg.select.sample"/>"/>
@@ -292,6 +267,8 @@
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.quality"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.lab"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.solic.area.prc"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
                                             <th><spring:message code="lbl.request.large"/></th>
                                         </tr>

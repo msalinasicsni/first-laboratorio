@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
@@ -115,6 +116,10 @@ public class SearchMxController {
     private ConceptoService conceptoService;
 
     @Autowired
+    @Qualifier(value = "trasladosService")
+    private TrasladosService trasladosService;
+
+    @Autowired
     MessageSource messageSource;
 
     String nombreSoli = null;
@@ -131,7 +136,6 @@ public class SearchMxController {
     List<DetalleResultadoFinal> detalleResultado = null;
     String fechaImpresion = null;
     String orderSample = null;
-
 
 
     /**
@@ -263,7 +267,7 @@ public class SearchMxController {
         Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         for (DaTomaMx tomaMx : tomaMxList) {
             Map<String, String> map = new HashMap<String, String>();
-            RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
+            RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
             map.put("idTomaMx", tomaMx.getIdTomaMx());
             map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
@@ -274,7 +278,7 @@ public class SearchMxController {
                 } else {
                     map.put("calidad", "");
                 }
-            }else {
+            } else {
                 map.put("calidad", "");
             }
 
@@ -288,6 +292,61 @@ public class SearchMxController {
             } else {
                 map.put("codUnidadSalud", "");
             }
+
+            //laboratorio y area
+
+            //Search transferred assets
+            DaSolicitudEstudio estudio = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
+            RecepcionMx lastRecepcion = recepcionMxService.getMaxRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx());
+            TrasladoMx traslado = trasladosService.getTrasladoActivoMx(tomaMx.getIdTomaMx());
+
+            if (estudio != null) {
+                map.put("area", estudio.getTipoEstudio().getArea().getNombre());
+                map.put("laboratorio", estudio.getIdTomaMx().getEnvio().getLaboratorioDestino().getNombre());
+            } else {
+                //asset transfers
+                if (traslado != null) {
+                    //CC
+                    if (traslado.isTrasladoExterno()) {
+                        List<DaSolicitudDx> soliPriori = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), traslado.getLaboratorioDestino().getCodigo());
+
+                        map.put("laboratorio", traslado.getLaboratorioDestino().getNombre());
+                        map.put("area", soliPriori.get(0).getCodDx().getArea().getNombre());
+
+                    } else {
+                        //Intern
+                        Laboratorio lab = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+                        if(lab != null){
+                            List<DaSolicitudDx> soli = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), lab.getCodigo());
+
+                            if(soli != null){
+                                map.put("area", soli.get(0).getCodDx().getArea().getNombre());
+                            }
+                        }
+
+                        if (lastRecepcion != null) {
+                            map.put("laboratorio", lastRecepcion.getLabRecepcion().getNombre());
+                        }
+                    }
+                } else {
+                    if (lastRecepcion != null) {
+                        map.put("laboratorio", lastRecepcion.getLabRecepcion().getNombre());
+                    } else {
+                        map.put("laboratorio", "");
+                    }
+
+                    DaSolicitudDx soli = tomaMxService.getMaxSoliByToma(tomaMx.getIdTomaMx());
+
+                    if (soli != null) {
+
+                        map.put("area", soli.getCodDx().getArea().getNombre());
+                    } else {
+                        map.put("area", "");
+                    }
+                }
+            }
+
+
             map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
             map.put("estadoMx", tomaMx.getEstadoMx().getValor());
 
@@ -308,7 +367,7 @@ public class SearchMxController {
 
             //se arma estructura de diagnósticos o estudios
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(),labUser.getCodigo());
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
 
 
@@ -337,6 +396,14 @@ public class SearchMxController {
                         }
                     }
 
+                    if(solicitudDx.getControlCalidad().equals(true)){
+                        mapDx.put("cc", (messageSource.getMessage("lbl.yes", null, null)));
+
+                    }else{
+                        mapDx.put("cc", (messageSource.getMessage("lbl.no", null, null)));
+
+                    }
+
 
                     subIndice++;
                     mapDxList.put(subIndice, mapDx);
@@ -362,6 +429,8 @@ public class SearchMxController {
                             mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
                         }
                     }
+
+                    mapDx.put("cc", (messageSource.getMessage("lbl.not.apply", null, null)));
 
 
                     subIndice++;
@@ -400,12 +469,13 @@ public class SearchMxController {
         String nombreExamen = null;
 
         String[] toma = codigos.split(",");
+        boolean reporteCRes = false;
 
         for (String idToma : toma) {
             solicDx = tomaMxService.getSoliDxAprobByTomaAndUser(idToma, seguridadService.obtenerNombreUsuario());
             solicEstudio = tomaMxService.getSoliEAprobByIdTomaMxOrderCodigo(idToma);
 
-            String codigoAnterior = null;
+
             detalleResultado = null;
             fechaAprobacion = null;
             nombreSoli = null;
@@ -422,6 +492,8 @@ public class SearchMxController {
             orderSample = null;
 
             if (!solicDx.isEmpty() || !solicEstudio.isEmpty()) {
+                reporteCRes = true;
+
                 //Obtener las respuestas activas de la solicitud
                 if (!solicDx.isEmpty()) {
                     for (DaSolicitudDx solicitudDx : solicDx) {
@@ -444,12 +516,12 @@ public class SearchMxController {
                             doc.addPage(page);
                             stream = new PDPageContentStream(doc, page);
 
-                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                            drawInfoLab(stream,page, labProcesa);
+                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                            drawInfoLab(stream, page, labProcesa);
                             drawReportHeader(stream, detalleSoliDx, detalleSoliE);
 
                             drawInfoSample(stream, detalleSoliDx, detalleSoliE, y);
-                            y-=m1;
+                            y -= m1;
 
 
                             boolean lista = false;
@@ -484,7 +556,7 @@ public class SearchMxController {
                             }
 
                             drawFinalResultTable(content, doc, page, y);
-                            y = y-140;
+                            y = y - 140;
                             drawFinalInfo(stream, y, fechaAprobacion, fechaImpresion);
                             stream.close();
 
@@ -506,14 +578,14 @@ public class SearchMxController {
 
                             //Prepare document
 
-                           PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
+                            PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
                             doc.addPage(page);
                             stream = new PDPageContentStream(doc, page);
 
 
                             //draw Page Header
-                           GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                           drawInfoLab(stream, page, labProcesa);
+                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                            drawInfoLab(stream, page, labProcesa);
 
                             String codigoUnico = solicitudE.getIdTomaMx().getCodigoUnicoMx();
                           /*  if(codigoAnterior != null) {
@@ -567,13 +639,13 @@ public class SearchMxController {
                                 //draw info sample1
                                 drawInfoSpecialSample(orderSample, y, solicitudE, stream);
                                 y -= m;
-                                if (y<320) {
+                                if (y < 320) {
                                     stream.close();
                                     page = new PDPage(PDPage.PAGE_SIZE_A4);
                                     doc.addPage(page);
                                     stream = new PDPageContentStream(doc, page);
-                                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                    y= 700;
+                                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                    y = 700;
                                 }
 
 
@@ -590,18 +662,18 @@ public class SearchMxController {
                                     nombreExamen = orden.getCodExamen().getNombre();
 
                                     //add info test
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.test", null, null), y, 15, stream, 12,PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(nombreExamen, y, 80, stream, 12,PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.test", null, null), y, 15, stream, 12, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(nombreExamen, y, 80, stream, 12, PDType1Font.HELVETICA);
 
 
                                     y -= m2;
-                                    if (y<320) {
+                                    if (y < 320) {
                                         stream.close();
                                         page = new PDPage(PDPage.PAGE_SIZE_A4);
                                         doc.addPage(page);
                                         stream = new PDPageContentStream(doc, page);
-                                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                        y= 700;
+                                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                        y = 700;
                                     }
 
                                     //Obtener resultado del examen
@@ -638,13 +710,13 @@ public class SearchMxController {
                                     //draw test result table Sample 1
                                     drawFinalResultTable(exam, doc, page, y);
                                     y -= tableHeight;
-                                    if (y<320) {
+                                    if (y < 320) {
                                         stream.close();
                                         page = new PDPage(PDPage.PAGE_SIZE_A4);
                                         doc.addPage(page);
                                         stream = new PDPageContentStream(doc, page);
-                                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                        y= 700;
+                                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                        y = 700;
                                     }
 
 
@@ -662,13 +734,13 @@ public class SearchMxController {
                                     //draw info sample2
                                     drawInfoSpecialSample(orderSample, y, sample2, stream);
                                     y -= m;
-                                    if (y<320) {
+                                    if (y < 320) {
                                         stream.close();
                                         page = new PDPage(PDPage.PAGE_SIZE_A4);
                                         doc.addPage(page);
                                         stream = new PDPageContentStream(doc, page);
-                                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                        y= 700;
+                                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                        y = 700;
                                     }
 
                                     FiltroMx filtro1 = new FiltroMx();
@@ -684,17 +756,17 @@ public class SearchMxController {
                                         nombreExamen = orden.getCodExamen().getNombre();
 
                                         //add info test
-                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.test", null, null), y, 15, stream, 12,PDType1Font.HELVETICA_BOLD);
-                                        GeneralUtils.drawTEXT(nombreExamen, y, 80, stream, 12,PDType1Font.HELVETICA);
+                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.test", null, null), y, 15, stream, 12, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.drawTEXT(nombreExamen, y, 80, stream, 12, PDType1Font.HELVETICA);
 
                                         y -= m;
-                                        if (y<320) {
+                                        if (y < 320) {
                                             stream.close();
                                             page = new PDPage(PDPage.PAGE_SIZE_A4);
                                             doc.addPage(page);
                                             stream = new PDPageContentStream(doc, page);
-                                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                            y= 700;
+                                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                            y = 700;
                                         }
 
                                         //Obtener resultado del examen
@@ -703,7 +775,7 @@ public class SearchMxController {
                                         String[][] exam = new String[resultadoExamen.size()][2];
 
                                         int numFila = 0;
-                                        float tableHeight = (resultadoExamen.size()+3) * 15;
+                                        float tableHeight = (resultadoExamen.size() + 3) * 15;
 
                                         for (DetalleResultado resulExa : resultadoExamen) {
 
@@ -730,13 +802,13 @@ public class SearchMxController {
                                         //draw test result table Sample 2
                                         drawFinalResultTable(exam, doc, page, y);
                                         y -= tableHeight;
-                                        if (y<320) {
+                                        if (y < 320) {
                                             stream.close();
                                             page = new PDPage(PDPage.PAGE_SIZE_A4);
                                             doc.addPage(page);
                                             stream = new PDPageContentStream(doc, page);
-                                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                            y= 700;
+                                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                            y = 700;
                                         }
                                     }
                                 }
@@ -776,23 +848,23 @@ public class SearchMxController {
 
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.final.result1", null, null), y, 15, stream, 14, PDType1Font.HELVETICA_BOLD);
                                 y -= m2;
-                                if (y<320) {
+                                if (y < 320) {
                                     stream.close();
                                     page = new PDPage(PDPage.PAGE_SIZE_A4);
                                     doc.addPage(page);
                                     stream = new PDPageContentStream(doc, page);
-                                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                    y= 700;
+                                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                    y = 700;
                                 }
                                 drawFinalResultTable(content, doc, page, y);
                                 y -= m3;
-                                if (y<320) {
+                                if (y < 320) {
                                     stream.close();
                                     page = new PDPage(PDPage.PAGE_SIZE_A4);
                                     doc.addPage(page);
                                     stream = new PDPageContentStream(doc, page);
-                                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
-                                    y= 700;
+                                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                    y = 700;
                                 }
                                 drawFinalInfo(stream, y, fechaAprobacion, fechaImpresion);
                                 stream.close();
@@ -812,7 +884,7 @@ public class SearchMxController {
             }
 
         }
-        if(!solicDx.isEmpty()|| !solicEstudio.isEmpty()){
+        if (reporteCRes) {
             doc.save(output);
             doc.close();
             // generate the file
@@ -954,7 +1026,7 @@ public class SearchMxController {
                     fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx());
                 }
 
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
                 if (recepcion != null) {
                     fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
                 }
@@ -972,7 +1044,7 @@ public class SearchMxController {
                     fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solE.getIdTomaMx().getFechaHTomaMx());
                 }
 
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx(),(laboratorioUsuario.getCodigo()!=null?laboratorioUsuario.getCodigo():""));
+                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
                 if (recepcion != null) {
                     fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
                 }
@@ -1057,7 +1129,7 @@ public class SearchMxController {
         if (detSoliE != null) {
             if (detSoliE.getIdTomaMx().getFechaHTomaMx() != null) {
                 fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(detSoliE.getIdTomaMx().getFechaHTomaMx());
-            }else{
+            } else {
                 fechaToma = "----------";
             }
 
@@ -1078,26 +1150,26 @@ public class SearchMxController {
         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
         inY -= m;
 
-        if(labProcesa != null){
+        if (labProcesa != null) {
 
-            if(labProcesa.getDescripcion()!= null){
+            if (labProcesa.getDescripcion() != null) {
                 xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
                 GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
 
-            if(labProcesa.getDireccion() != null){
+            if (labProcesa.getDireccion() != null) {
                 xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
                 GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
 
-            if(labProcesa.getTelefono() != null){
+            if (labProcesa.getTelefono() != null) {
 
-                if(labProcesa.getTelefax() != null){
+                if (labProcesa.getTelefax() != null) {
                     xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getTelefono() + " " + labProcesa.getTelefax());
                     GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
-                }else{
+                } else {
                     xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getTelefono());
                     GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 }
@@ -1110,11 +1182,11 @@ public class SearchMxController {
         stream.drawLine(90, y, 250, y);
         stream.drawLine(340, y, 500, y);
 
-        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.analyst", null, null), y-10, 145, stream, 10, PDType1Font.HELVETICA_BOLD);
-        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.director", null, null), y-10, 400, stream, 10, PDType1Font.HELVETICA_BOLD);
+        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.analyst", null, null), y - 10, 145, stream, 10, PDType1Font.HELVETICA_BOLD);
+        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.director", null, null), y - 10, 400, stream, 10, PDType1Font.HELVETICA_BOLD);
 
         //info reporte
-        if(fechaAprobacion != null){
+        if (fechaAprobacion != null) {
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.approval.datetime", null, null), 115, 15, stream, 10, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(fechaAprobacion, 115, 120, stream, 10, PDType1Font.HELVETICA);
 
