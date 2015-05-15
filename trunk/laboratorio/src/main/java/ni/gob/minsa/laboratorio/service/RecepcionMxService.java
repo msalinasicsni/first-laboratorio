@@ -114,6 +114,15 @@ public class RecepcionMxService {
         return  (RecepcionMx)q.uniqueResult();
     }
 
+    public RecepcionMx getMaxRecepcionMxByCodUnicoMx(String codigoUnicoMx) {
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select  re from RecepcionMx as re  inner join re.tomaMx as t where t.codigoUnicoMx= :codigoUnicoMx and re.fechaHoraRecepcion= (SELECT MAX(re.fechaHoraRecepcion)" +
+                "FROM RecepcionMx )";
+        Query q = session.createQuery(query);
+        q.setParameter("codigoUnicoMx", codigoUnicoMx);
+        return (RecepcionMx)q.uniqueResult();
+    }
+
     public List<RecepcionMx> getRecepcionesByFiltro(FiltroMx filtro){
         Session session = sessionFactory.getCurrentSession();
         Soundex varSoundex = new Soundex();

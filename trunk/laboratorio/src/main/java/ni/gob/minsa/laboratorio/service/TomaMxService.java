@@ -573,11 +573,29 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSolicitudesDxPrioridadByIdToma(String idTomaMx){
-        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc";
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
     }
+
+    public List<DaSolicitudDx> getSoliDxPrioridadByTomaAndLab(String idTomaMx, String lab){
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx and sdx.labProcesa =:lab ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("lab",lab);
+        return q.list();
+    }
+
+    public DaSolicitudDx getMaxSoliByToma(String tomaMx) {
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select sol from DaSolicitudDx as sol  inner join sol.idTomaMx as t where t.idTomaMx= :tomaMx and sol.fechaHSolicitud= (SELECT MAX(fechaHSolicitud)" +
+                "FROM DaSolicitudDx )";
+        Query q = session.createQuery(query);
+        q.setParameter("tomaMx", tomaMx);
+        return (DaSolicitudDx)q.uniqueResult();
+    }
+
 
     /**
      * Se toma las solicitudes dx cuya área no se encuentra en la tabla de traslados para esa mx

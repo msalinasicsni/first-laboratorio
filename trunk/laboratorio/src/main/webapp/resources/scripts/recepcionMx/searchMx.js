@@ -16,7 +16,7 @@ var SearchMx = function () {
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true,
                 "columns": [
-                    null,null,null,null,null,null,null, null,
+                    null,null,null,null,null,null,null, null,null,null,
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -123,7 +123,7 @@ var SearchMx = function () {
                          //   var actionUrl = parametros.sActionUrl+idLoad;
                             //'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>'
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx +" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].estadoMx, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
+                                [dataToLoad[i].codigoUnicoMx +" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].estadoMx, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].laboratorio, dataToLoad[i].area, dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
 
                         }
                     }else{
@@ -157,10 +157,11 @@ var SearchMx = function () {
                 var json =JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
                 var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td><td style="font-weight: bold">'+$('#res_aprob').val()+'</td> </tr>';
+                    '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_cc').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td><td style="font-weight: bold">'+$('#res_aprob').val()+'</td> </tr>';
                 for (var i = 1; i <= len; i++) {
                     childTable =childTable +
                         '<tr><td>'+json[i].nombre+'</td>'+
+                        '<td>'+json[i].cc+'</td>'+
                         '<td>'+json[i].fechaSolicitud+'</td>'+
                         '<td>'+json[i].estado+'</td></tr>';
                 }
@@ -178,7 +179,7 @@ var SearchMx = function () {
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),8)).show();
+                    row.child( format(row.data(),10)).show();
                     tr.addClass('shown');
                 }
             } );
