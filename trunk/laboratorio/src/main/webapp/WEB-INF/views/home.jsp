@@ -218,10 +218,21 @@
                             timeout: 4000
                         });
                     }
-                })
-                        .fail(function() {
-                            alert( "error" );
-                        });
+                }).fail(function(response) {
+                    $.smallBox({
+                        title: "error: "+ response.status + "-" + response.statusText ,
+                        content: "${ordersUrl}" ,
+                        color: "#C46A69",
+                        iconSmall: "fa fa-warning",
+                        timeout: 4000
+                    });
+                    //if (response.status!=null && response.status != 403){
+                        //alert( "error: "+ response.status + "-" + response.statusText );
+                    //}
+                    //alert( "error: "+ response.status + "-" + response.statusText + "\n" + "${ordersUrl}" );
+
+                });
+
             }
 
             getOrders();

@@ -267,7 +267,7 @@
                                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.desc.request"/></th>
                                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
                                                             <th data-hide="phone"><spring:message code="lbl.solic.area.prc"/></th>
-                                                            <th data-hide="phone"><spring:message code="lbl.transfer.type.quality.control"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.cc"/></th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
