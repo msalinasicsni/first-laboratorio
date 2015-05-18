@@ -116,8 +116,9 @@ public class RecepcionMxService {
 
     public RecepcionMx getMaxRecepcionMxByCodUnicoMx(String codigoUnicoMx) {
         Session session = sessionFactory.getCurrentSession();
-        String query = "select  re from RecepcionMx as re  inner join re.tomaMx as t where t.codigoUnicoMx= :codigoUnicoMx and re.fechaHoraRecepcion= (SELECT MAX(re.fechaHoraRecepcion)" +
-                "FROM RecepcionMx )";
+        String query = "select  re from RecepcionMx as re  inner join re.tomaMx as t " +
+                "where t.codigoUnicoMx= :codigoUnicoMx and re.fechaHoraRecepcion= (SELECT MAX(remax.fechaHoraRecepcion)" +
+                "FROM RecepcionMx as remax where remax.tomaMx.codigoUnicoMx = :codigoUnicoMx)";
         Query q = session.createQuery(query);
         q.setParameter("codigoUnicoMx", codigoUnicoMx);
         return (RecepcionMx)q.uniqueResult();

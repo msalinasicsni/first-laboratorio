@@ -445,7 +445,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DaSolicitudEstudio> getSoliEAprobByCodigo(String codigoUnico){
-        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx like :codigoUnico and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
+        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx = :codigoUnico and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico + "%");
         return q.list();
@@ -453,7 +453,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
      public DaSolicitudEstudio getSoliEstByCodigo(String codigoUnico){
-        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
+        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
         return (DaSolicitudEstudio) q.uniqueResult();
@@ -580,7 +580,7 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSoliDxPrioridadByTomaAndLab(String idTomaMx, String lab){
-        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx and sdx.labProcesa =:lab ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx and sdx.labProcesa.codigo =:lab ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("lab",lab);
