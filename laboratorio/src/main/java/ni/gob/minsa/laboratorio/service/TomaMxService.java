@@ -228,17 +228,36 @@ public class TomaMxService {
         }
         //filtro sólo control calidad en el laboratio del usuario
         if (filtro.getControlCalidad()!=null) {
-            crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                    .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
-                    .createAlias("idTomaMx", "toma")
-                    //.createAlias("labProcesa","labProcesa")
-                    .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                            .createAlias("laboratorio", "labautorizado")
-                            .createAlias("user", "usuario")
-                            .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                            .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                            .setProjection(Property.forName("labautorizado.codigo"))))
-                    .setProjection(Property.forName("toma.idTomaMx"))));
+            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", sólo incluir rutinas
+                crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
+                        .createAlias("idTomaMx", "toma")
+                                //.createAlias("labProcesa","labProcesa")
+                        .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                .createAlias("laboratorio", "labautorizado")
+                                .createAlias("user", "usuario")
+                                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                                .setProjection(Property.forName("labautorizado.codigo"))))
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }else { //si hay filtro por control de calidad y es "No", siempre incluir los estudios
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
+                        .createAlias("idTomaMx", "toma")
+                                //.createAlias("labProcesa","labProcesa")
+                        .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                .createAlias("laboratorio", "labautorizado")
+                                .createAlias("user", "usuario")
+                                .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                                .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                                .setProjection(Property.forName("labautorizado.codigo"))))
+                        .setProjection(Property.forName("toma.idTomaMx"))))
+                        .add(Restrictions.or(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                                .createAlias("idTomaMx", "idTomaMx")
+                                .setProjection(Property.forName("idTomaMx.idTomaMx")))));
+                crit.add(conditGroup);
+            }
         }
 
         return crit.list();
@@ -589,8 +608,8 @@ public class TomaMxService {
 
     public DaSolicitudDx getMaxSoliByToma(String tomaMx) {
         Session session = sessionFactory.getCurrentSession();
-        String query = "select sol from DaSolicitudDx as sol  inner join sol.idTomaMx as t where t.idTomaMx= :tomaMx and sol.fechaHSolicitud= (SELECT MAX(fechaHSolicitud)" +
-                "FROM DaSolicitudDx where idTomaMx.idTomaMx = :tomaMx)";
+        String query = "select sol from DaSolicitudDx as sol  inner join sol.idTomaMx as t where t.idTomaMx= :tomaMx and sol.fechaHSolicitud= (SELECT MAX(tsdx.fechaHSolicitud) " +
+                "FROM DaSolicitudDx as tsdx where tsdx.idTomaMx.idTomaMx = t.idTomaMx)";
         Query q = session.createQuery(query);
         q.setParameter("tomaMx", tomaMx);
         return (DaSolicitudDx)q.uniqueResult();

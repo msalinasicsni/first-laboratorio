@@ -58,7 +58,7 @@
 						<i class="fa-fw fa fa-thumbs-up"></i>
 							<spring:message code="lbl.transfer.mx.title" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="lbl.transfer.type.quality.control" />
+							<spring:message code="lbl.cc" />
 						</span>
 					</h1>
 				</div>

@@ -210,6 +210,18 @@
                                                         <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.unique.code.mx"/></b>
                                                     </label>
                                                 </section>
+                                                <section class="col col-sm-12 col-md-6 col-lg-2">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.cc" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="quality" name="quality" class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <option value="true"><spring:message code="lbl.yes" /></option>
+                                                            <option value="false"><spring:message code="lbl.no" /></option>
+                                                        </select>
+                                                    </div>
+                                                </section>
                                             </div>
                                         </fieldset>
                                         <footer>

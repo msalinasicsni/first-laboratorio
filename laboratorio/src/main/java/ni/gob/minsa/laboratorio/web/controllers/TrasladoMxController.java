@@ -206,10 +206,8 @@ public class TrasladoMxController {
 
             Laboratorio labDestino = null;//laboratoriosService.getLaboratorioByCodigo("LABCNDR");
             Laboratorio labOrigen = null;//seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-            Catalogo_Dx dxTraslado = null;
-            if (!tipoTraslado.equals("cc")){
-                dxTraslado = tomaMxService.getDxById(idRutina);
-            }else{
+            Catalogo_Dx dxTraslado = tomaMxService.getDxById(idRutina);
+            if (tipoTraslado.equals("cc")){
                 labDestino = laboratoriosService.getLaboratorioByCodigo("LABCNDR");
                 if (labDestino==null){
                     throw new Exception("No se logró recuperar laboratio destino");
@@ -224,14 +222,7 @@ public class TrasladoMxController {
                 Timestamp fhRegistro = new Timestamp(new Date().getTime());
                 String idTomaMx = jObjectRecepciones.get(String.valueOf(i)).getAsString();
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(idTomaMx);
-                List<DaSolicitudDx> solicitudDxPendTrasladoList = tomaMxService.getSolicitudesDxSinTrasladoByIdToma(idTomaMx);
-                //determinar si existe una solicitud pendiente para el nuevo tipo de dx solicitado, en caso de existir no se va a registrar nueva solicitud
-                for (DaSolicitudDx solicitudDx : solicitudDxPendTrasladoList){
-                    if (solicitudDx.getCodDx().getIdDiagnostico().equals(dxTraslado.getIdDiagnostico())){
-                        crearSolicitud = false;
-                        break;
-                    }
-                }
+
                 //se obtiene tomaMx a recepcionar
                 DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
                 TrasladoMx trasladoMx = new TrasladoMx();
@@ -264,6 +255,14 @@ public class TrasladoMxController {
 
                     //crear solicitud dx, sólo si no existe solicitud pendiente de traslado para el nuevo dx solicitado
                     if (!tipoTraslado.equals("cc")){ //interno
+                        List<DaSolicitudDx> solicitudDxPendTrasladoList = tomaMxService.getSolicitudesDxSinTrasladoByIdToma(idTomaMx);
+                        //determinar si existe una solicitud pendiente para el nuevo tipo de dx solicitado, en caso de existir no se va a registrar nueva solicitud
+                        for (DaSolicitudDx solicitudDx : solicitudDxPendTrasladoList){
+                            if (solicitudDx.getCodDx().getIdDiagnostico().equals(dxTraslado.getIdDiagnostico())){
+                                crearSolicitud = false;
+                                break;
+                            }
+                        }
                         if (crearSolicitud) {
                             //sólo si no existe solicitud pendiente de traslado
                             DaSolicitudDx solicitudDx = new DaSolicitudDx();
@@ -278,47 +277,18 @@ public class TrasladoMxController {
                         }
                         tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
                     }else{// control de calidad //crear envio y solicitud dx
-                        //sólo la solicitud positiva se envia a control de calidad
-                        for(DaSolicitudDx solDx:solicitudDxList) {
-                            boolean agregarDx = false;
-                            List<DetalleResultadoFinal> resultadoFinalList = resultadoFinalService.getDetResActivosBySolicitud(solDx.getIdSolicitudDx());
-                            for (DetalleResultadoFinal res:resultadoFinalList){
-                                Concepto conceptoAsociado = null;
-                                if (res.getRespuesta()!=null)
-                                    conceptoAsociado = res.getRespuesta().getConcepto();
-                                else
-                                    conceptoAsociado = res.getRespuestaExamen().getConcepto();
 
-                                if (conceptoAsociado.getTipo().getCodigo().equals("TPDATO|TXT")) {
-                                    if (res.getValor().toLowerCase().equals("positivo")) {
-                                        agregarDx = true;
-                                        break;
-                                    }
+                        DaSolicitudDx solicitudDx = new DaSolicitudDx();
+                        solicitudDx.setIdTomaMx(tomaMx);
+                        solicitudDx.setAprobada(false);
+                        solicitudDx.setCodDx(dxTraslado);
+                        solicitudDx.setFechaHSolicitud(fhRegistro);
+                        solicitudDx.setControlCalidad(true);
+                        solicitudDx.setUsarioRegistro(usurioRegistro);
+                        solicitudDx.setLabProcesa(labDestino);
+                        tomaMxService.addSolicitudDx(solicitudDx);
+                        tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
 
-                                } else if (conceptoAsociado.getTipo().getCodigo().equals("TPDATO|LIST")) {
-                                    Integer idLista = Integer.valueOf(res.getValor());
-                                    Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
-
-                                    if (valor.getValor().toLowerCase().equals("positivo")) {
-                                        agregarDx = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (agregarDx) {
-                                DaSolicitudDx solicitudDx = new DaSolicitudDx();
-                                solicitudDx.setIdTomaMx(tomaMx);
-                                solicitudDx.setAprobada(false);
-                                solicitudDx.setCodDx(solDx.getCodDx());
-                                solicitudDx.setFechaHSolicitud(fhRegistro);
-                                solicitudDx.setControlCalidad(true);
-                                solicitudDx.setUsarioRegistro(usurioRegistro);
-                                solicitudDx.setLabProcesa(labDestino);
-                                tomaMxService.addSolicitudDx(solicitudDx);
-                                tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
-                            }
-
-                        }
                         DaEnvioMx envioMx = new DaEnvioMx();
                         envioMx.setLaboratorioDestino(labDestino);
                         envioMx.setUsarioRegistro(usurioRegistro);

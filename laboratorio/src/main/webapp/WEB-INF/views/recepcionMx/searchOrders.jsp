@@ -202,7 +202,7 @@
 
                                                 <section class="col col-sm-12 col-md-6 col-lg-2">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <spring:message code="lbl.transfer.type.quality.control" /> </label>
+                                                        <spring:message code="lbl.cc" /> </label>
                                                     <div class="input-group">
                                                         <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
                                                         <select id="quality" name="quality" class="select2">
@@ -257,7 +257,7 @@
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.transfer"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.cc"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.transfer.origin.lab"/></th>
                                             <th></th>
                                         </tr>

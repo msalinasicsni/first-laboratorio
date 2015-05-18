@@ -324,6 +324,38 @@ public class RecepcionMxService {
                         .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                         .setProjection(Property.forName("labautorizado.codigo"))));
 
+        //filtro sólo control calidad en el laboratio del usuario
+        if (filtro.getControlCalidad()!=null) {
+            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", sólo incluir rutinas
+                crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
+                        .createAlias("idTomaMx", "toma")
+                        .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                .createAlias("laboratorio", "labautorizado")
+                                .createAlias("user", "usuario")
+                                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                                .setProjection(Property.forName("labautorizado.codigo"))))
+                        .setProjection(Property.forName("toma.idTomaMx"))));
+            }else { //si hay filtro por control de calidad y es "No", siempre incluir los estudios
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
+                        .createAlias("idTomaMx", "toma")
+                        .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                .createAlias("laboratorio", "labautorizado")
+                                .createAlias("user", "usuario")
+                                .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                                .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                                .setProjection(Property.forName("labautorizado.codigo"))))
+                        .setProjection(Property.forName("toma.idTomaMx"))))
+                        .add(Restrictions.or(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                                .createAlias("idTomaMx", "idTomaMx")
+                                .setProjection(Property.forName("idTomaMx.idTomaMx")))));
+                crit.add(conditGroup);
+            }
+        }
+
         return crit.list();
     }
 
