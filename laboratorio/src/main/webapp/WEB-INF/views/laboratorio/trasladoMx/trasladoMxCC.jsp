@@ -255,8 +255,23 @@
                                         <fieldset>
                                             <div class="row">
                                                 <input type="hidden" id="tipoTraslado" value="cc">
-                                                <div id="divControlCalidad"  class="col col-sm-12 col-md-6 col-lg-9">
-                                                    <section class="col col-8">
+                                                <div id="divControlCalidad"  class="col col-sm-12 col-md-12 col-lg-12">
+                                                    <section class="col col-sm-12 col-md-6 col-lg-5">
+                                                        <label class="text-left txt-color-blue font-md">
+                                                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.diagnostic" />
+                                                        </label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                            <select id="idDxSolicitado" name="idDxSolicitado"
+                                                                    class="select2">
+                                                                <option value=""><spring:message code="lbl.select" />...</option>
+                                                                <c:forEach items="${rutinas}" var="rutina">
+                                                                    <option value="${rutina.idDiagnostico}">${rutina.nombre}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                        </div>
+                                                    </section>
+                                                    <section class="col col-sm-12 col-md-3 col-4">
                                                         <label class="text-left txt-color-blue font-md">
                                                             <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.send.person.carrying" />
                                                         </label>
@@ -265,7 +280,7 @@
                                                             <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.person.carrying"/></b>
                                                         </label>
                                                     </section>
-                                                    <section class="col col-4">
+                                                    <section class="col col-sm-12 col-md-3 col-3">
                                                         <label class="text-left txt-color-blue font-md">
                                                             <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.send.temperature.thermo" />
                                                         </label>
