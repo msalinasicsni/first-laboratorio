@@ -276,10 +276,10 @@ public class SearchMxController {
                 if (rec.getCalidadMx() != null) {
                     map.put("calidad", rec.getCalidadMx().getValor());
                 } else {
-                    map.put("calidad", "");
+                    map.put("calidad", "Sin definir");
                 }
             } else {
-                map.put("calidad", "");
+                map.put("calidad", "Sin definir");
             }
 
             if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
@@ -294,58 +294,61 @@ public class SearchMxController {
             }
 
             //laboratorio y area
+             if(tomaMx.getEstadoMx().getCodigo().equals("ESTDMX|ENV")){
+                map.put("area", "No recepcionada");
+                map.put("laboratorio", "No recepcionada");
+            }else{
+                //Search transferred assets
+                DaSolicitudEstudio estudio = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
+                RecepcionMx lastRecepcion = recepcionMxService.getMaxRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx());
+                TrasladoMx traslado = trasladosService.getTrasladoActivoMx(tomaMx.getIdTomaMx());
 
-            //Search transferred assets
-            DaSolicitudEstudio estudio = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
-            RecepcionMx lastRecepcion = recepcionMxService.getMaxRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx());
-            TrasladoMx traslado = trasladosService.getTrasladoActivoMx(tomaMx.getIdTomaMx());
+                if (estudio != null) {
+                    map.put("area", estudio.getTipoEstudio().getArea().getNombre());
+                    map.put("laboratorio", estudio.getIdTomaMx().getEnvio().getLaboratorioDestino().getNombre());
+                } else {
+                    //asset transfers
+                    if (traslado != null) {
+                        //CC
+                        if (traslado.isTrasladoExterno()) {
+                            List<DaSolicitudDx> soliPriori = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), traslado.getLaboratorioDestino().getCodigo());
 
-            if (estudio != null) {
-                map.put("area", estudio.getTipoEstudio().getArea().getNombre());
-                map.put("laboratorio", estudio.getIdTomaMx().getEnvio().getLaboratorioDestino().getNombre());
-            } else {
-                //asset transfers
-                if (traslado != null) {
-                    //CC
-                    if (traslado.isTrasladoExterno()) {
-                        List<DaSolicitudDx> soliPriori = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), traslado.getLaboratorioDestino().getCodigo());
+                            map.put("laboratorio", traslado.getLaboratorioDestino().getNombre());
+                            map.put("area", soliPriori.get(0).getCodDx().getArea().getNombre());
 
-                        map.put("laboratorio", traslado.getLaboratorioDestino().getNombre());
-                        map.put("area", soliPriori.get(0).getCodDx().getArea().getNombre());
+                        } else {
+                            //Intern
+                            Laboratorio lab = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+                            if(lab != null){
+                                List<DaSolicitudDx> soli = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), lab.getCodigo());
 
-                    } else {
-                        //Intern
-                        Laboratorio lab = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-                        if(lab != null){
-                            List<DaSolicitudDx> soli = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), lab.getCodigo());
+                                if(soli != null){
+                                    map.put("area", soli.get(0).getCodDx().getArea().getNombre());
+                                }
+                            }
 
-                            if(soli != null){
-                                map.put("area", soli.get(0).getCodDx().getArea().getNombre());
+                            if (lastRecepcion != null) {
+                                map.put("laboratorio", lastRecepcion.getLabRecepcion().getNombre());
                             }
                         }
-
+                    } else {
                         if (lastRecepcion != null) {
                             map.put("laboratorio", lastRecepcion.getLabRecepcion().getNombre());
+                        } else {
+                            map.put("laboratorio", "");
                         }
-                    }
-                } else {
-                    if (lastRecepcion != null) {
-                        map.put("laboratorio", lastRecepcion.getLabRecepcion().getNombre());
-                    } else {
-                        map.put("laboratorio", "");
-                    }
 
-                    DaSolicitudDx soli = tomaMxService.getMaxSoliByToma(tomaMx.getIdTomaMx());
+                        DaSolicitudDx soli = tomaMxService.getMaxSoliByToma(tomaMx.getIdTomaMx());
 
-                    if (soli != null) {
+                        if (soli != null) {
 
-                        map.put("area", soli.getCodDx().getArea().getNombre());
-                    } else {
-                        map.put("area", "");
+                            map.put("area", soli.getCodDx().getArea().getNombre());
+                        } else {
+                            map.put("area", "");
+                        }
                     }
                 }
             }
-
 
             map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
             map.put("estadoMx", tomaMx.getEstadoMx().getValor());
@@ -369,7 +372,6 @@ public class SearchMxController {
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
-
 
             Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
             Map<String, String> mapDx = new HashMap<String, String>();
