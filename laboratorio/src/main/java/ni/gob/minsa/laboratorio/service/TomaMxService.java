@@ -590,7 +590,7 @@ public class TomaMxService {
     public DaSolicitudDx getMaxSoliByToma(String tomaMx) {
         Session session = sessionFactory.getCurrentSession();
         String query = "select sol from DaSolicitudDx as sol  inner join sol.idTomaMx as t where t.idTomaMx= :tomaMx and sol.fechaHSolicitud= (SELECT MAX(fechaHSolicitud)" +
-                "FROM DaSolicitudDx )";
+                "FROM DaSolicitudDx where idTomaMx.idTomaMx = :tomaMx)";
         Query q = session.createQuery(query);
         q.setParameter("tomaMx", tomaMx);
         return (DaSolicitudDx)q.uniqueResult();
