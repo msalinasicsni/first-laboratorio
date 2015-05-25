@@ -148,11 +148,20 @@ public class ResultadosController {
                 idSolicitud = ordenExamen.getSolicitudEstudio().getIdSolicitudEstudio();
             }
             //sólo si aún no tiene resultado final
-            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
-                //solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
-                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
-                        && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0; //y no tiene resultados el examen
+            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0) {
+                DaSolicitudEstudio soliE = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
+                if (soliE != null) {//si es estudio
+                    String codMx = soliE.getIdTomaMx().getCodigoUnicoMx();
+                    solicitarResFinal = codMx.contains(".") && codMx.substring(codMx.lastIndexOf(".")+1, codMx.length()).equals("1") && //es muestra inicial
+                            ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
+                            && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size() <= 0; //y no tiene resultados el examen
+                } else {
 
+                    //solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(idTomaMx).size() == 1 //sólo es un un examen
+                    solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
+                            && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size() <= 0; //y no tiene resultados el examen
+                }
+            }
             mav.addObject("ordenExamen", ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
@@ -532,9 +541,18 @@ public class ResultadosController {
 
             //se determina si luego de anular la respuesta del examen, se debe solicitar resultado final al ingresar nuevo resultado
             //sólo si aún no tiene resultado final
-            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0)
-                solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
-                        && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size()<=0; //y no tiene resultados el examen
+            if (resultadoFinalService.getDetResActivosBySolicitud(idSolicitud).size()<=0) {
+                DaSolicitudEstudio soliE = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
+                if (soliE!=null){//si es estudio
+                    String codMx = soliE.getIdTomaMx().getCodigoUnicoMx();
+                    solicitarResFinal  = codMx.contains(".") && codMx.substring(codMx.lastIndexOf(".")+1,codMx.length()).equals("1") && //es muestra inicial
+                        ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
+                                && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size() <= 0; //y no tiene resultados el examen
+                }else {
+                    solicitarResFinal = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud).size() == 1 //sólo es un un examen
+                            && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size() <= 0; //y no tiene resultados el examen
+                }
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
