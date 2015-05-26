@@ -378,6 +378,8 @@ public class SeparacionMxController {
 
                         if(nombreDx.equals("Diagnóstico Influenza")){
                             generarAliqDiagnosticoInfluenza(soliDx,request);
+                        }else if(nombreDx.equals("Diagnóstico Dengue")){
+                            generarAliqDiagnosticoDengue(soliDx,request);
                         }
                     }
 
@@ -1153,6 +1155,19 @@ public class SeparacionMxController {
         if(alicuotaAR != null){
             addAliq(request,1,alicuotaAR,codigo,null,soliDx);
         }
+    }
+
+    private void generarAliqDiagnosticoDengue(DaSolicitudDx soliDx, HttpServletRequest request) throws Exception{
+        String codigo = soliDx.getIdTomaMx().getCodigoUnicoMx();
+        Integer idTipoMx = soliDx.getIdTomaMx().getCodTipoMx().getIdTipoMx();
+        Integer idDx = soliDx.getCodDx().getIdDiagnostico();
+         //generar 1 alicuota IGM
+        Alicuota alicuotaSER = separacionMxService.getAliquotCatByTipoMxDxEtiqueta(idTipoMx,idDx,"SER" );
+        if(alicuotaSER != null){
+            addAliq(request,1,alicuotaSER,codigo,null,soliDx);
+        }
+
+
     }
 
     @RequestMapping(value = "impresionMasiva" ,method = RequestMethod.GET, produces = "application/json" )

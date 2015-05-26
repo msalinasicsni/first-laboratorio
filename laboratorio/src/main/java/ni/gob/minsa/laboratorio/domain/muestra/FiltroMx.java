@@ -31,6 +31,7 @@ public class FiltroMx {
     Date fechaFinAprob;
     Boolean incluirTraslados;
     Boolean controlCalidad;
+    String area;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -199,4 +200,8 @@ public class FiltroMx {
     public void setControlCalidad(Boolean controlCalidad) {
         this.controlCalidad = controlCalidad;
     }
+
+    public String getArea() { return area; }
+
+    public void setArea(String area) { this.area = area; }
 }
