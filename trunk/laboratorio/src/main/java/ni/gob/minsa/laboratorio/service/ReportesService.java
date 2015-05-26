@@ -148,6 +148,7 @@ public class ReportesService {
         Criteria crit = session.createCriteria(DaSolicitudDx.class, "rutina");
         crit.createAlias("rutina.idTomaMx", "toma");
         crit.createAlias("toma.idNotificacion", "notif");
+        crit.createAlias("rutina.codDx", "dx");
 
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
@@ -225,6 +226,13 @@ public class ReportesService {
                 .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                 .setProjection(Property.forName("labautorizado.codigo"))));
 
+        //filtro x area
+        if(filtro.getArea() != null){
+            crit.createAlias("dx.area","area");
+            crit.add( Restrictions.and(
+                    Restrictions.eq("area.nombre",(filtro.getArea()))));
+        }
+
         return crit.list();
     }
 
@@ -234,6 +242,7 @@ public class ReportesService {
         Criteria crit = session.createCriteria(DaSolicitudEstudio.class, "estudio");
         crit.createAlias("estudio.idTomaMx", "toma");
         crit.createAlias("toma.idNotificacion", "notif");
+        crit.createAlias("estudio.tipoEstudio", "tEstudio");
 
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
@@ -301,6 +310,13 @@ public class ReportesService {
                 .setProjection(Property.forName("solicitudEstudio.idSolicitudEstudio"))));
 
         crit.addOrder(Order.asc("fechaAprobacion"));
+
+        //filtro x area
+        if(filtro.getArea() != null){
+            crit.createAlias("tEstudio.area","area");
+            crit.add( Restrictions.and(
+                    Restrictions.eq("area.nombre",(filtro.getArea()))));
+        }
 
         return crit.list();
     }
