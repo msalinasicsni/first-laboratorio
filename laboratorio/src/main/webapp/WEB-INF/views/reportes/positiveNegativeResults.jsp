@@ -252,11 +252,7 @@
                     </tr>
                     </thead>
                 </table>
-                <form id="printRequest-form" class="smart-form" autocomplete="off">
-                    <footer>
-                        <button type="button" id="posNegReqExport" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o "></i> <spring:message code="lbl.export.pdf" /></button>
-                    </footer>
-                </form>
+
             </div>
             <!-- end widget content -->
         </div>
@@ -289,10 +285,10 @@
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
 <script src="${dataTables}"></script>
-<%--<spring:url value="/resources/js/plugin/datatables/dataTables.colVis.min.js" var="dataTablesColVis" />
+<spring:url value="/resources/js/plugin/datatables/dataTables.colVis.min.js" var="dataTablesColVis" />
 <script src="${dataTablesColVis}"></script>
 <spring:url value="/resources/js/plugin/datatables/dataTables.tableTools.min.js" var="dataTablesTableTools" />
-<script src="${dataTablesTableTools}"></script>--%>
+<script src="${dataTablesTableTools}"></script>
 <spring:url value="/resources/js/plugin/datatables/dataTables.bootstrap.min.js" var="dataTablesBootstrap" />
 <script src="${dataTablesBootstrap}"></script>
 <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
@@ -306,6 +302,8 @@
 <spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
     <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
 <script src="${datePickerLoc}"></script>
+<!-- Table Tools Path-->
+<spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
 <!-- JQUERY VALIDATE -->
 <spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 <script src="${jqueryValidate}"></script>
@@ -330,6 +328,7 @@
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="searchPosNegReqUrl" value="/reports/searchPosNegRequest"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
+<c:url var="pdfUrl" value="/reports/posNegRequestToPDF"/>
 
 
 <script type="text/javascript">
@@ -337,7 +336,9 @@
         pageSetUp();
         var parametros = {searchPosNegReqUrl : "${searchPosNegReqUrl}",
             sUnidadesUrl : "${unidadesURL}",
-            blockMess: "${blockMess}"
+            blockMess: "${blockMess}",
+            sTableToolsPath : "${tabletools}",
+            pdfUrl : "${pdfUrl}"
 
 
         };

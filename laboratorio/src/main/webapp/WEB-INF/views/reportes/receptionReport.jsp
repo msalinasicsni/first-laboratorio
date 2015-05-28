@@ -256,11 +256,7 @@
                     </tr>
                     </thead>
                 </table>
-                <form id="printRequest-form" class="smart-form" autocomplete="off">
-                    <footer>
-                        <button type="button" id="export" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o "></i> <spring:message code="lbl.export.pdf" /></button>
-                    </footer>
-                </form>
+
             </div>
             <!-- end widget content -->
         </div>
@@ -293,10 +289,12 @@
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
 <script src="${dataTables}"></script>
-<%--<spring:url value="/resources/js/plugin/datatables/dataTables.colVis.min.js" var="dataTablesColVis" />
+<spring:url value="/resources/js/plugin/datatables/dataTables.colVis.min.js" var="dataTablesColVis" />
 <script src="${dataTablesColVis}"></script>
 <spring:url value="/resources/js/plugin/datatables/dataTables.tableTools.min.js" var="dataTablesTableTools" />
-<script src="${dataTablesTableTools}"></script>--%>
+<script src="${dataTablesTableTools}"></script>
+<!-- Table Tools Path-->
+<spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
 <spring:url value="/resources/js/plugin/datatables/dataTables.bootstrap.min.js" var="dataTablesBootstrap" />
 <script src="${dataTablesBootstrap}"></script>
 <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
@@ -343,7 +341,9 @@
         var parametros = {searchUrl : "${searchUrl}",
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}",
-            exportUrl: "${exportUrl}"
+            exportUrl: "${exportUrl}",
+            sTableToolsPath : "${tabletools}"
+
 
         };
         ReceptionReport.init(parametros);

@@ -40,6 +40,7 @@ public class ReportesService {
         crit.createAlias("recepcion.tomaMx", "toma");
         crit.createAlias("toma.idNotificacion", "notifi");
 
+
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
         }
@@ -136,7 +137,7 @@ public class ReportesService {
                     .setProjection(Property.forName("labautorizado.codigo"))));
         }
 
-        crit.addOrder(Order.asc("fechaHoraRecepcion"));
+            crit.addOrder(Order.asc("recepcion.fechaHoraRecepcion"));
 
        return crit.list();
     }
@@ -232,7 +233,6 @@ public class ReportesService {
             crit.add( Restrictions.and(
                     Restrictions.eq("area.nombre",(filtro.getArea()))));
         }
-
         return crit.list();
     }
 
