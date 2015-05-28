@@ -20,21 +20,29 @@ var ReceptionReport = function () {
 
 
             var table1 = $('#received-samples').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
-                    "t" +
-                    "<'dt-toolbar-footer'<'col-sm-5 col-xs-12 hidden'i><'col-xs-12 col-sm-6'p>>",
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
 
+                "oTableTools": {
+                    "aButtons": [
+                        {
+                            "sExtends": "xls",
+                            "sTitle": "Reporte de Muestras Recepcionadas"
+                        },
+                        {
+                            "sExtends": "pdf",
+                            "fnClick": function (){exportPDF1();}
+                        }
+
+                    ],
+                    "sSwfPath": parametros.sTableToolsPath
+                },
+
+                "aaSorting": [],
 
                 "autoWidth" : true,
-                "columns": [
-                    null,null,null,null,null,null, null,
-                    {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "data":           null,
-                        "defaultContent": ''
-                    }
-                ],
+
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -129,7 +137,7 @@ var ReceptionReport = function () {
                             //   var actionUrl = parametros.sActionUrl+idLoad;
                             //'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>'
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
+                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].solicitudes]);
 
                             if (i+1< len) {
                                 codigos += dataToLoad[i].codigoUnicoMx + ",";
@@ -139,6 +147,7 @@ var ReceptionReport = function () {
 
                             }
                         }
+
                         codigos = reemplazar(codigos,"-","*");
                     }else{
                         $.smallBox({
@@ -162,40 +171,6 @@ var ReceptionReport = function () {
                 codigos = "";
                 getMxs(true);
             });
-
-            /*PARA MOSTRAR TABLA DETALLE DX*/
-            function format (d,indice) {
-                // `d` is the original data object for the row
-                var texto = d[indice]; //indice donde esta el input hidden
-                var diagnosticos = $(texto).val();
-
-                var json =JSON.parse(diagnosticos);
-                var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_dx').val()+'</td><td style="font-weight: bold">'+$('#text_dx_date').val()+'</td></tr>';
-                for (var i = 1; i <= len; i++) {
-                    childTable =childTable +
-                        '<tr><td>'+json[i].nombre+'</td>'+
-                        '<td>'+json[i].fechaSolicitud+'</td></tr>';
-                }
-                childTable = childTable + '</table>';
-                return childTable;
-            }
-
-            $('#received-samples tbody').on('click', 'td.details-control', function () {
-                var tr = $(this).closest('tr');
-                var row = table1.api().row(tr);
-                if ( row.child.isShown() ) {
-                    // This row is already open - close it
-                    row.child.hide();
-                    tr.removeClass('shown');
-                }
-                else {
-                    // Open this row
-                    row.child( format(row.data(),7)).show();
-                    tr.addClass('shown');
-                }
-            } );
 
             <!-- al seleccionar SILAIS -->
             $('#codSilais').change(function(){
@@ -239,7 +214,7 @@ var ReceptionReport = function () {
             }
 
 
-            $("#export").click(function() {
+            function exportPDF1() {
                $.ajax(
                         {
                             url: parametros.exportUrl,
@@ -273,7 +248,7 @@ var ReceptionReport = function () {
                         });
 
 
-            });
+            }
 
 
             function b64toBlob(b64Data, contentType, sliceSize) {
@@ -307,9 +282,26 @@ var ReceptionReport = function () {
              ********************************************************************************************/
 
             var table2 = $('#positive_request').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
-                    "t" +
-                    "<'dt-toolbar-footer'<'col-sm-5 col-xs-12 hidden'i><'col-xs-12 col-sm-6'p>>",
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
+
+                "oTableTools": {
+                    "aButtons": [
+                        {
+                            "sExtends": "xls",
+                            "sTitle": "Solicitudes con Resultado Positivo"
+                        },
+                        {
+                            "sExtends": "pdf",
+                            "fnClick": function (){exportPDF2();}
+                        }
+
+                    ],
+                    "sSwfPath": parametros.sTableToolsPath
+                },
+
+                "aaSorting": [],
 
 
                 "autoWidth" : true,
@@ -424,7 +416,7 @@ var ReceptionReport = function () {
 
 
 
-            $("#posReqExport").click(function() {
+            function exportPDF2() {
                 $.ajax(
                     {
                         url: parametros.posReqExportUrl,
@@ -456,20 +448,33 @@ var ReceptionReport = function () {
                             alert("error: " + data + " status: " + status + " er:" + er);
                         }
                     });
-
-
-            });
-
-
+            }
 
             /********************************************************************************************
              Reporte Resultados Positivos y Negativos
              ********************************************************************************************/
-            var table3 = $('#pos_neg_request').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
-                    "t" +
-                    "<'dt-toolbar-footer'<'col-sm-5 col-xs-12 hidden'i><'col-xs-12 col-sm-6'p>>",
 
+
+            var table3 = $('#pos_neg_request').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
+                "aaSorting": [],
+
+                "oTableTools": {
+                    "aButtons": [
+                        {
+                            "sExtends": "xls",
+                            "sTitle": "Solicitudes con Resultado Positivo o Negativo"
+                        },
+                        {
+                            "sExtends": "pdf",
+                            "fnClick": function (){exportPDF();}
+                        }
+
+                    ],
+                    "sSwfPath": parametros.sTableToolsPath
+                },
 
                 "autoWidth" : true,
 
@@ -582,13 +587,13 @@ var ReceptionReport = function () {
 
 
 
-            $("#posNegReqExport").click(function() {
+            function exportPDF() {
                 $.ajax(
                     {
-                        url: parametros.posReqExportUrl,
+                        url: parametros.pdfUrl,
                         type: 'GET',
                         dataType: 'text',
-                        data: {codes: codigos, fromDate: $('#fecInicioAprob').val()  , toDate: $('#fecFinAprob').val()},
+                        data: {codes: codigos, fromDate: $('#inicioAprob').val()  , toDate: $('#finAprob').val()},
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
@@ -616,7 +621,7 @@ var ReceptionReport = function () {
                     });
 
 
-            });
+            }
 
         }
     };
