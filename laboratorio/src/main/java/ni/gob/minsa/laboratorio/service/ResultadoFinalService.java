@@ -131,7 +131,7 @@ public class ResultadoFinalService {
 
         // filtro examenes con resultado
         crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
-                .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
+                .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado",false)).add(Restrictions.eq("pasivo", false))
                 .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
 
         //se filtra por tipo de solicitud

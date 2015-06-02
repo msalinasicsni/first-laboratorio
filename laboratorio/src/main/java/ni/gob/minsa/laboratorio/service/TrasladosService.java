@@ -300,4 +300,22 @@ public class TrasladosService {
 
         return crit.list();
     }
+
+    /**
+     * utilizado en la recepción, para filtrar si se debe mostrar deacuerdo al traslado activo en el momento de la búsqueda
+     * @param idTomaMx
+     * @return
+     */
+    public TrasladoMx getTrasladoCCMx(String idTomaMx){
+        String query = "select t from TrasladoMx t inner join t.tomaMx mx " +
+                "where mx.idTomaMx = :idTomaMx and t.trasladoExterno = true order by t.fechaHoraRegistro asc" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        List<TrasladoMx> trasladoMxList = q.list();
+        if (trasladoMxList!=null && trasladoMxList.size() > 0)
+            return trasladoMxList.get(0);
+        else
+            return null;
+    }
 }

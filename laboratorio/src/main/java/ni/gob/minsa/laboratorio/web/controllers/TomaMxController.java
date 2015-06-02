@@ -230,7 +230,7 @@ public class TomaMxController {
 
         DaSolicitudDx soli = new DaSolicitudDx();
         String[] arrayDx = dx.split(",");
-
+        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         for (String anArrayDx : arrayDx) {
             soli.setCodDx(tomaMxService.getDxById(anArrayDx));
             soli.setFechaHSolicitud(new Timestamp(new Date().getTime()));
@@ -241,6 +241,7 @@ public class TomaMxController {
             }
             soli.setIdTomaMx(tomaMxService.getTomaMxById(idTomaMx));
             soli.setAprobada(false);
+            soli.setLabProcesa(laboratorio);
             tomaMxService.addSolicitudDx(soli);
         }
 

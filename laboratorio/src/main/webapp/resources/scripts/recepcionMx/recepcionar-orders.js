@@ -161,6 +161,7 @@ var ReceiptOrders = function () {
                 // Rules for form validation
                 rules: {
                     codCalidadMx: {required : true},
+                    condicionMx: {required : true},
                     causaRechazo: {required : true}
                 },
                 // Do not change code below
@@ -494,7 +495,7 @@ var ReceiptOrders = function () {
                 recepcionObj['idTomaMx']=$("#idTomaMx").val();
                 recepcionObj['verificaCantTb'] = $('input[name="rdCantTubos"]:checked', '#receiptOrders-form').val();
                 recepcionObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val();
-                recepcionObj['causaRechazo'] = $('#causaRechazo').val();
+                recepcionObj['causaRechazo'] = $('#causaRechazo').find('option:selected').val();//$('#causaRechazo').val();
                 recepcionObj['codigoUnicoMx'] = '';
 
                 $.ajax(
@@ -553,6 +554,7 @@ var ReceiptOrders = function () {
                 recepcionObj['mensaje'] = '';
                 recepcionObj['idRecepcion']=$("#idRecepcion").val();
                 recepcionObj['calidadMx'] = $('#codCalidadMx option:selected').val();
+                recepcionObj['condicionMx'] = $('#condicionMx option:selected').val();
                 recepcionObj['causaRechazo'] = $('#causaRechazo').val();
                 $.ajax(
                     {
@@ -688,10 +690,10 @@ var ReceiptOrders = function () {
             }
 
             <!--al seleccionar calidad de la muestra -->
-            $('#codCalidadMx').change(function(){
+            $('#condicionMx').change(function(){
                 $('#causaRechazo').val('');
                 if ($(this).val().length > 0) {
-                    if ($(this).val()=='CALIDMX|IDC'){
+                    if ($(this).val()=='CONDICIONMX|IDC'){
                         $("#dvCausa").show();
                     }else{
                         $("#dvCausa").hide();

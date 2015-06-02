@@ -76,6 +76,9 @@
                     <li class="workSheet">
                         <a href="<spring:url value="/workSheet/init" htmlEscape="true "/>" title="<spring:message code="menu.search.workSheet" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.search.workSheet" /></a>
                     </li>
+                    <li class="qualityControlReport">
+                        <a href="<spring:url value="/reports/qualityControl/init" htmlEscape="true "/>" title="<spring:message code="menu.qualityControlReport" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.qualityControlReport" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="laboratorio">

@@ -963,4 +963,49 @@ public class CatalogoService {
         //Retrieve all
         return  (TipoDatoCatalogo) query.uniqueResult();
     }
+
+    public List<CondicionMx> getCondicionesMx(){
+        //Retrieve session Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.createQuery("FROM CondicionMx where pasivo = false order by orden");
+        //retrieve all
+        return query.list();
+    }
+
+    public CondicionMx getCondicionMx(String codigo){
+        //Retrieve session from hibernated
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.getNamedQuery("getCondicionMxByCodigo").setString("pCodigo", codigo);
+        //Retrieve all
+        return (CondicionMx) query.uniqueResult();
+    }
+
+    public CausaRechazoMx getCausaRechazoMx(String codigo){
+        //Retrieve session from hibernated
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.getNamedQuery("getCausaRechazoMxByCodigo").setString("pCodigo", codigo);
+        //Retrieve all
+        return (CausaRechazoMx) query.uniqueResult();
+    }
+
+    public List<CausaRechazoMx> getCausaRechazoMxRecepGeneral(){
+        //Retrieve session from hibernated
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.getNamedQuery("getCausaRechazoMxRecepGeneral");
+        //Retrieve all
+        return query.list();
+    }
+
+    public List<CausaRechazoMx> getCausaRechazoMxRecepLab(){
+        //Retrieve session from hibernated
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.getNamedQuery("getCausaRechazoMxRecepLab");
+        //Retrieve all
+        return query.list();
+    }
 }

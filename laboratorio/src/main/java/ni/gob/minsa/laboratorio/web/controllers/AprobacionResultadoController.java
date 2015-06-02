@@ -65,6 +65,9 @@ public class AprobacionResultadoController {
     @Resource(name= "rechazoResultadoSolicitudService")
     private RechazoResultadoSolicitudService rechazoResultadoSolicitudService;
 
+    @Resource(name= "resultadosService")
+    private ResultadosService resultadosService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -537,26 +540,45 @@ public class AprobacionResultadoController {
         String resultado = "";
         String idSolicitud="";
         String causaRechazo = "";
+        String idOrdenes="";
+        Integer cantOrdenes;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             idSolicitud = jsonpObject.get("idSolicitud").getAsString();
+            idOrdenes = jsonpObject.get("idOrdenes").toString();
             causaRechazo = jsonpObject.get("causaRechazo").getAsString();
+            cantOrdenes = jsonpObject.get("cantOrdenes").getAsInt();
             DaSolicitudDx solicitudDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
             DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
 
             if (solicitudEstudio == null && solicitudDx == null){
                 throw new Exception(messageSource.getMessage("msg.approve.result.solic.not.found",null,null));
-            }else {
+            } else {
                 long idUsuario = seguridadService.obtenerIdUsuario(request);
                 Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
-                List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud);
-                for(OrdenExamen ordenExamen:ordenExamenList){
+                JsonObject jObjectOrdenes = new Gson().fromJson(idOrdenes, JsonObject.class);
+                //List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud);
+                //for(OrdenExamen ordenExamen:ordenExamenList){
+                for(int i = 0; i< cantOrdenes;i++) {
+                    String idOrden = jObjectOrdenes.get(String.valueOf(i)).getAsString();
+                    OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrden);
                     //se anula orden actual
                     ordenExamen.setAnulado(true);
                     ordenExamenMxService.updateOrdenExamen(ordenExamen);
+                    //se anulan resultado de la orden
+                    List<DetalleResultado> detalleResultados = resultadosService.getDetallesResultadoActivosByExamen(idOrden);
+
+                    for(DetalleResultado detalleResultado :detalleResultados){
+                        detalleResultado.setPasivo(true);
+                        detalleResultado.setRazonAnulacion(causaRechazo);
+                        detalleResultado.setUsuarioAnulacion(usuario);
+                        detalleResultado.setFechahAnulacion(new Timestamp(new Date().getTime()));
+                        resultadosService.updateDetalleResultado(detalleResultado);
+                    }
+
                     //se agrega nueva orden de examen
                     OrdenExamen nuevaOrdenExamen = new OrdenExamen();
                     nuevaOrdenExamen.setSolicitudEstudio(ordenExamen.getSolicitudEstudio());
@@ -722,5 +744,13 @@ public class AprobacionResultadoController {
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
+    }
+
+    @RequestMapping(value = "examenesRepetir", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<OrdenExamen> repeatExams(@RequestParam(value = "idSolicitud", required = true) String idSolicitud) throws Exception {
+        logger.info("Realizando búsqueda de Toma de Mx.");
+        return ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud);
     }
 }

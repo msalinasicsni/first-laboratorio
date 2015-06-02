@@ -340,7 +340,6 @@ public class SendMxReceiptController {
         filtroMx.setFechaFinRecep(fechaFinRecep);
         filtroMx.setNombreApellido(nombreApellido);
         filtroMx.setCodTipoMx(codTipoMx);
-        filtroMx.setIdAreaProcesa(idAreaProcesa);
         filtroMx.setCodTipoSolicitud(codTipoSolicitud);
         filtroMx.setNombreSolicitud(nombreSolicitud);
         filtroMx.setCodEstado("ESTDMX|RCP"); // sólo las recepcionadas

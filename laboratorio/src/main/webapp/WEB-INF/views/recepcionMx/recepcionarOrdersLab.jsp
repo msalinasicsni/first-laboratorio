@@ -326,25 +326,38 @@
                                             </header>
                                             <br>
                                             <div class="row">
-                                                <section class="col col-sm-12 col-md-6 col-lg-4">
+                                                <section class="col col-sm-12 col-md-6 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sample.quality" /> </label>
                                                     <div class="input-group">
                                                         <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                        <label for="codCalidadMx">
-                                                        </label><select id="codCalidadMx" name="codCalidadMx"
+                                                       <select id="codCalidadMx" name="codCalidadMx"
+                                                                        class="select2">
+                                                        <option value=""><spring:message code="lbl.select" />...</option>
+                                                        <c:forEach items="${calidadMx}" var="calidadMx">
+                                                            <option value="${calidadMx.codigo}">${calidadMx.valor}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                    </div>
+                                                </section>
+                                                <section class="col col-sm-12 col-md-6 col-lg-3">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sample.condition" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="condicionMx" name="condicionMx"
                                                                 class="select2">
                                                             <option value=""><spring:message code="lbl.select" />...</option>
-                                                            <c:forEach items="${calidadMx}" var="calidadMx">
-                                                                <option value="${calidadMx.codigo}">${calidadMx.valor}</option>
+                                                            <c:forEach items="${condicionesMx}" var="condicion">
+                                                                <option value="${condicion.codigo}">${condicion.valor}</option>
                                                             </c:forEach>
                                                         </select>
                                                     </div>
                                                 </section>
-                                                <div class="col col-sm-12 col-md-6 col-lg-8" id="dvCausa">
+                                                <div class="col col-sm-12 col-md-6 col-lg-6" id="dvCausa">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.cause.rejection" /> </label>
-                                                    <div class="">
+                                                    <!--<div class="">
                                                         <label class="textarea">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
                                                             <textarea class="form-control" rows="3" name="causaRechazo" id="causaRechazo"
@@ -353,23 +366,21 @@
                                                                     class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.cause.rejection"/>
                                                             </b>
                                                         </label>
+                                                    </div>-->
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="causaRechazo" name="causaRechazo"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${causasRechazo}" var="causa">
+                                                                <option value="${causa.codigo}">${causa.valor}</option>
+                                                            </c:forEach>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                                <!--<section class="col col-5">
-                                                <label class="text-left txt-color-blue font-md">
-                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>Tipo de Tubo
-                                                </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                    <select id="codTipoTubo" name="codTipoTubo"
-                                                            class="select2">
-                                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                                        <c:forEach items="${tipoTubo}" var="tipoTubo">
-                                                            <option value="${tipoTubo.codigo}">${tipoTubo.valor}</option>
-                                                        </c:forEach>
-                                                    </select>
-                                                </div>
-                                                </section>-->
+                                            </div>
+                                            <div class="row">
+
                                             </div>
                                         </fieldset>
                                         <footer>
@@ -556,7 +567,7 @@
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.receiptLab").parents("ul").slideDown(200);
 	    	}
-            $('#codCalidadMx').change();
+            $('#condicionMx').change();
 
         });
 	</script>

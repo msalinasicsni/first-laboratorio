@@ -28,9 +28,9 @@ public class RecepcionMx {
     CalidadMx calidadMx;
     boolean cantidadTubosCk;
     boolean tipoMxCk;
-    String causaRechazo;
+    CausaRechazoMx causaRechazo;
     Laboratorio labRecepcion;
-
+    CondicionMx condicionMx;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -130,13 +130,14 @@ public class RecepcionMx {
         this.tipoMxCk = tipoMxCk;
     }
 
-    @Basic
-    @Column(name = "CAUSA", nullable = true, insertable = true, updatable = true, length = 200)
-    public String getCausaRechazo() {
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
+    @JoinColumn(name = "CAUSA", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "RECEPCION_CAUSARECHAZOMX_FK")
+    public CausaRechazoMx getCausaRechazo() {
         return causaRechazo;
     }
 
-    public void setCausaRechazo(String causaRechazo) {
+    public void setCausaRechazo(CausaRechazoMx causaRechazo) {
         this.causaRechazo = causaRechazo;
     }
 
@@ -149,5 +150,16 @@ public class RecepcionMx {
 
     public void setLabRecepcion(Laboratorio labRecepcion) {
         this.labRecepcion = labRecepcion;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
+    @JoinColumn(name = "COD_CONDICIONMX", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "RECEPCION_CONDICIONMX_FK")
+    public CondicionMx getCondicionMx() {
+        return condicionMx;
+    }
+
+    public void setCondicionMx(CondicionMx condicionMx) {
+        this.condicionMx = condicionMx;
     }
 }
