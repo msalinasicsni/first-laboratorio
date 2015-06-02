@@ -360,7 +360,7 @@
                                                 <div class="col col-sm-12 col-md-6 col-lg-6" id="dvCausa">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.cause.rejection" /> </label>
-                                                    <div class="">
+                                                    <!--<div class="">
                                                         <label class="textarea">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
                                                             <textarea class="form-control" rows="3" name="causaRechazo" id="causaRechazo"
@@ -369,6 +369,16 @@
                                                                     class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.cause.rejection"/>
                                                             </b>
                                                         </label>
+                                                    </div>-->
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="causaRechazo" name="causaRechazo"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${causasRechazo}" var="causa">
+                                                                <option value="${causa.codigo}">${causa.valor}</option>
+                                                            </c:forEach>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -426,6 +436,9 @@
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
     <spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
+    <!-- jQuery Selecte2 Input -->
+    <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
+    <script src="${selectPlugin}"></script>
 	<!-- JQUERY VALIDATE -->
 	<spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 	<script src="${jqueryValidate}"></script>

@@ -321,4 +321,106 @@ public class ReportesService {
         return crit.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudDx> getQCRoutineRequestByFilter(FiltroMx filtro) throws UnsupportedEncodingException {
+        Session session = sessionFactory.getCurrentSession();
+        Criteria crit = session.createCriteria(DaSolicitudDx.class, "rutina");
+        crit.createAlias("rutina.idTomaMx", "toma");
+        crit.createAlias("toma.idNotificacion", "notif");
+        crit.createAlias("rutina.codDx", "dx");
+
+        if(filtro.getNombreSolicitud()!= null){
+            filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
+        }
+
+        //se filtra por SILAIS
+        if (filtro.getCodSilais()!=null){
+            crit.createAlias("notif.codSilaisAtencion","silais");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("silais.codigo", Long.valueOf(filtro.getCodSilais())))
+            );
+        }
+        //se filtra por unidad de salud
+        if (filtro.getCodUnidadSalud()!=null){
+            crit.createAlias("notif.codUnidadAtencion","unidadS");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
+            );
+        }
+        //Se filtra por rango de fecha de aprobacion
+        if (filtro.getFechaInicioAprob()!=null && filtro.getFechaFinAprob()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob()))
+            );
+        }
+
+        //se filtra por tipo de solicitud
+        if(filtro.getCodTipoSolicitud()!=null){
+            if(filtro.getCodTipoSolicitud().equals("Rutina")){
+                crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .createAlias("idTomaMx", "idTomaMx")
+                        .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+            }
+
+        }
+
+        //nombre solicitud
+        if (filtro.getNombreSolicitud() != null) {
+            if (filtro.getCodTipoSolicitud() != null) {
+                if (filtro.getCodTipoSolicitud().equals("Rutina")) {
+                    crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .createAlias("codDx", "dx")
+                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
+                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+                }
+            }
+        }
+        //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
+        if (filtro.getNombreUsuario()!=null) {
+            crit.createAlias("toma.envio","envioMx");
+            crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));
+        }
+
+        crit.add(Restrictions.and(
+                        Restrictions.eq("rutina.controlCalidad", true))
+        );
+
+        //filtro de resultados finales aprobados
+        crit.add(Restrictions.and(
+                        Restrictions.eq("rutina.aprobada", true))
+        );
+
+        //filtro de resultado final positivo
+        /*crit.add(Subqueries.propertyIn("rutina.idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
+                .setProjection(Property.forName("solicitudDx.idSolicitudDx"))));*/
+
+        //crit.addOrder(Order.asc("fechaAprobacion"));
+
+        crit.createAlias("rutina.labProcesa","labProcesa");
+        if (filtro.getCodLaboratio()!=null){
+            crit.add(Restrictions.eq("labProcesa.codigo",filtro.getCodLaboratio()));
+        }
+
+        /*crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                .createAlias("laboratorio", "labautorizado")
+                .createAlias("user", "usuario")
+                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                .setProjection(Property.forName("labautorizado.codigo"))));*/
+
+        //filtro x area
+        /*if(filtro.getArea() != null){
+            crit.createAlias("dx.area","area");
+            crit.add( Restrictions.and(
+                    Restrictions.eq("area.nombre",(filtro.getArea()))));
+        }*/
+
+        return crit.list();
+    }
+
 }

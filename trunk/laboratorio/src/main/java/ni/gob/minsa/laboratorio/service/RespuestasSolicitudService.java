@@ -139,4 +139,13 @@ public class RespuestasSolicitudService {
         q.setParameter("idEstudio", idEstudio);
         return q.list();
     }
+
+    public RespuestaSolicitud getRespuestaDefectoMxInadecuada(){
+        String query = "select a from RespuestaSolicitud as a, Parametro as p where p.nombre = :paramMxInadecuada and pasivo = false and a.idRespuesta = to_number(p.valor)";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("paramMxInadecuada", "RES_MX_INADECUADA");
+        return (RespuestaSolicitud) q.uniqueResult();
+    }
 }

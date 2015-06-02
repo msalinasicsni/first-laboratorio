@@ -398,6 +398,9 @@
                         <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                         <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                         <input id="msg_reject_cancel" type="hidden" value="<spring:message code="msg.reject.result.cancel"/>"/>
+                        <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
+                        <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
+                        <input id="msg_select_exam" type="hidden" value="<spring:message code="msg.select.exam"/>"/>
 
                         <table id="solicitudesList" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>
@@ -458,6 +461,26 @@
                             </div>
                         </div>
                         <div class="modal-body"> <!--  no-padding -->
+                            <form class="smart-form" novalidate="novalidate">
+                                <header>
+                                    <spring:message code="lbl.select.exams.to.repeat"/>
+                                </header>
+                                <fieldset>
+                                    <div class="row">
+
+                                    </div>
+                                </fieldset>
+                            </form>
+                            <div class="widget-body no-padding">
+                                <table id="examenes_repite" class="table table-striped table-bordered table-hover" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.test.name"/></th>
+                                        <th data-class="phone"><i class="fa fa-fw fa-file-text-o  text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
                             <form id="reject-result-form" class="smart-form" novalidate="novalidate">
                                 <fieldset>
                                     <div class="row">
@@ -553,6 +576,7 @@
 <c:url var="sApproveResult" value="/aprobacion/approveResult"/>
 <c:url var="sRejectResult" value="/aprobacion/rejectResult"/>
 <c:url var="sInitUrl" value="/aprobacion/init"/>
+<c:url var="sExamsRepeat" value="/aprobacion/examenesRepetir"/>
 
 
 <script type="text/javascript">
@@ -563,7 +587,9 @@
             searchUrl:"${searchUrl}",
             sApproveResult:"${sApproveResult}",
             sRejectResult : "${sRejectResult}",
-            sInitUrl : "${sInitUrl}"
+            sInitUrl : "${sInitUrl}",
+            sTableToolsPath : "${tabletools}",
+            sExamsRepeat : "${sExamsRepeat}"
         };
         ApproveResult.init(parametros);
 

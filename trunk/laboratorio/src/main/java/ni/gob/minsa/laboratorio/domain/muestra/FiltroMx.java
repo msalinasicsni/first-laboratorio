@@ -13,14 +13,12 @@ public class FiltroMx {
     String codUnidadSalud;
     String codTipoMx;
     String codEstado;
-    String idAreaProcesa;
     Date fechaInicioRecep;
     Date fechaFinRecep;
     Date fechaInicioRecepLab;
     Date fechaFinRecepLab;
     Boolean incluirMxInadecuada;
     String codigoUnicoMx;
-    String dx;
     String codTipoSolicitud;
     String nombreSolicitud;
     String resultado;
@@ -32,6 +30,7 @@ public class FiltroMx {
     Boolean incluirTraslados;
     Boolean controlCalidad;
     String area;
+    String codLaboratio;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -89,14 +88,6 @@ public class FiltroMx {
         this.codEstado = codEstado;
     }
 
-    public String getIdAreaProcesa() {
-        return idAreaProcesa;
-    }
-
-    public void setIdAreaProcesa(String idAreaProcesa) {
-        this.idAreaProcesa = idAreaProcesa;
-    }
-
     public Date getFechaInicioRecep() {
         return fechaInicioRecep;
     }
@@ -132,10 +123,6 @@ public class FiltroMx {
     public void setCodigoUnicoMx(String codigoUnicoMx) {
         this.codigoUnicoMx = codigoUnicoMx;
     }
-
-    public String getDx() { return dx; }
-
-    public void setDx(String dx) { this.dx = dx; }
 
     public String getCodTipoSolicitud() { return codTipoSolicitud; }
 
@@ -204,4 +191,12 @@ public class FiltroMx {
     public String getArea() { return area; }
 
     public void setArea(String area) { this.area = area; }
+
+    public String getCodLaboratio() {
+        return codLaboratio;
+    }
+
+    public void setCodLaboratio(String codLaboratio) {
+        this.codLaboratio = codLaboratio;
+    }
 }

@@ -47,6 +47,35 @@ var ApproveResult = function () {
                 }
             });
 
+            var text_selected_all = $("#text_selected_all").val();
+            var text_selected_none = $("#text_selected_none").val();
+            var table2 = $('#examenes_repite').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "T"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth" : true,
+                "searching": false,
+                "lengthChange": false,
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#orders_result'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                },
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                }
+            });
+
             <!-- formulario de búsqueda de resultados finales -->
             $('#approveResult-form').validate({
                 // Rules for form validation
@@ -75,7 +104,22 @@ var ApproveResult = function () {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
-                    rechazarResultado();
+                    var oTT = TableTools.fnGetInstance('examenes_repite');
+                    var aSelectedTrs = oTT.fnGetSelected();
+                    var len = aSelectedTrs.length;
+                    var opcSi = $("#confirm_msg_opc_yes").val();
+                    var opcNo = $("#confirm_msg_opc_no").val();
+                    if (len > 0) {
+                        rechazarResultado();
+                    }else{
+                        $.smallBox({
+                            title : $("#msg_select_exam").val(),
+                            content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                            color : "#C46A69",
+                            iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                            timeout : 4000
+                        });
+                    }
                 }
             });
 
@@ -88,6 +132,7 @@ var ApproveResult = function () {
                     buttons: '[' + opcSi + '][' + opcNo + ']'
                 }, function (ButtonPressed) {
                     if (ButtonPressed === opcSi) {
+                        getExamsToRepeat();
                         showModalReject();
                     }
                     if (ButtonPressed === opcNo) {
@@ -101,6 +146,38 @@ var ApproveResult = function () {
                     }
                 })
             });
+
+            function getExamsToRepeat () {
+                bloquearUI(parametros.blockMess);
+                var idSolicitud = $('#idSolicitud').val();
+                $.getJSON(parametros.sExamsRepeat, {
+                    idSolicitud: idSolicitud,
+                    ajax : 'true'
+                }, function(dataToLoad) {
+                    console.log(dataToLoad);
+                    table2.fnClearTable();
+                    var len = Object.keys(dataToLoad).length;
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            table2.fnAddData(
+                                [dataToLoad[i].codExamen.nombre+"<input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].codExamen.area.nombre]);
+                        }
+                    }else{
+                        $.smallBox({
+                            title: $("#msg_no_results_found").val() ,
+                            content: $("#disappear").val(),
+                            color: "#C79121",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
+                    desbloquearUI();
+                })
+                    .fail(function() {
+                        desbloquearUI();
+                        alert( "error" );
+                    });
+            }
 
             function showModalReject(){
                 $("#myModal").modal({
@@ -193,9 +270,22 @@ var ApproveResult = function () {
 
             function rechazarResultado(){
                 bloquearUI(parametros.blockMess);
+                var oTT = TableTools.fnGetInstance('examenes_repite');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var idOrdenesEx = {};
+                //el input hidden debe estar siempre en la primera columna
+                for (var i = 0; i < len; i++) {
+                    var texto = aSelectedTrs[i].firstChild.innerHTML;
+                    var input = texto.substring(texto.lastIndexOf("<"),texto.length);
+                    idOrdenesEx[i]=$(input).val();
+                }
+                console.log(idOrdenesEx);
                 var objResultado = {};
                 objResultado["idSolicitud"] = $("#idSolicitud").val();
                 objResultado["causaRechazo"] = $("#causaRechazo").val();
+                objResultado["idOrdenes"] = idOrdenesEx;
+                objResultado['cantOrdenes']=len;
                 objResultado["mensaje"] = '';
                 $.ajax(
                     {

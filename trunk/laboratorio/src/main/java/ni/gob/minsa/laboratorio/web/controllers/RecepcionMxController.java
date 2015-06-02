@@ -12,6 +12,8 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -94,6 +96,14 @@ public class RecepcionMxController {
     @Autowired
     @Qualifier(value = "trasladosService")
     private TrasladosService trasladosService;
+
+    @Autowired
+    @Qualifier(value = "respuestasSolicitudService")
+    private RespuestasSolicitudService respuestasSolicitudService;
+
+    @Autowired
+    @Qualifier(value = "resultadoFinalService")
+    private ResultadoFinalService resultadoFinalService;
 
     @Autowired
     MessageSource messageSource;
@@ -208,6 +218,9 @@ public class RecepcionMxController {
                     html = messageSource.getMessage("msg.mx.must.be.inadequate",null,null).replace("{0}",diasMinRecepMx.getValor()); //"La cantidad de días desde el inicio de síntomas no es mayor o igual a "+diasMinRecepMx.getValor()+", la muestra debería marcarse como inadecuada";
                 }
             }
+
+            List<CausaRechazoMx> causaRechazoMxList = catalogosService.getCausaRechazoMxRecepGeneral();
+
             mav.addObject("tomaMx",tomaMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -217,6 +230,7 @@ public class RecepcionMxController {
             mav.addObject("inadecuada",html);
             mav.addObject("dxList",solicitudDxList);
             mav.addObject("estudiosList",solicitudEstudioList);
+            mav.addObject("causasRechazo",causaRechazoMxList);
             mav.setViewName("recepcionMx/recepcionarOrders");
         }else
             mav.setViewName(urlValidacion);
@@ -253,6 +267,7 @@ public class RecepcionMxController {
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
+            List<CondicionMx> condicionesMx = catalogosService.getCondicionesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
             List<Unidades> unidades = null;
             List<Examen_Dx> examenesList = null;
@@ -384,6 +399,9 @@ public class RecepcionMxController {
                 mav.addObject("esEstudio",esEstudio);
             }
 
+
+            List<CausaRechazoMx> causaRechazoMxList = catalogosService.getCausaRechazoMxRecepLab();
+
             mav.addObject("recepcionMx",recepcionMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -391,7 +409,8 @@ public class RecepcionMxController {
             mav.addObject("laboratorios",laboratorioList);
             mav.addObject("calidadMx",calidadMx);
             //mav.addObject("examenesDfList",examenesList);
-
+            mav.addObject("condicionesMx",condicionesMx);
+            mav.addObject("causasRechazo",causaRechazoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
             mav.setViewName("recepcionMx/recepcionarOrdersLab");
         }else
@@ -447,6 +466,7 @@ public class RecepcionMxController {
         String idTomaMx = "";
         String codigoUnicoMx = "";
         String causaRechazo;
+        boolean mxInadecuada = false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -458,6 +478,7 @@ public class RecepcionMxController {
             causaRechazo = jsonpObject.get("causaRechazo").getAsString();
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+            Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             //Se obtiene estado recepcionado
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCP");
 
@@ -471,15 +492,19 @@ public class RecepcionMxController {
             RecepcionMx recepcionMx = new RecepcionMx();
 
             recepcionMx.setUsuarioRecepcion(usuario);
-            recepcionMx.setLabRecepcion(seguridadService.getLaboratorioUsuario(usuario.getUsername()));
+            recepcionMx.setLabRecepcion(labUsuario);
             recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
             recepcionMx.setTipoMxCk(Boolean.valueOf(verificaTipoMx));
             recepcionMx.setCantidadTubosCk(Boolean.valueOf(verificaCantTb));
             if (!causaRechazo.isEmpty()) {
-                recepcionMx.setCausaRechazo(causaRechazo);
+                CausaRechazoMx causaRechazoMx = catalogosService.getCausaRechazoMx(causaRechazo);
+                recepcionMx.setCausaRechazo(causaRechazoMx);
                 //se obtiene calidad de la muestra inadecuada
-                CalidadMx calidadMx = catalogosService.getCalidadMx("CALIDMX|IDC");
-                recepcionMx.setCalidadMx(calidadMx);
+                //CalidadMx calidadMx = catalogosService.getCalidadMx("CALIDMX|IDC");
+                CondicionMx condicionMx = catalogosService.getCondicionMx("CONDICIONMX|IDC");
+                //recepcionMx.setCalidadMx(calidadMx);
+                recepcionMx.setCondicionMx(condicionMx);
+                mxInadecuada = true;
             }
             recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
             recepcionMx.setTomaMx(tomaMx);
@@ -494,6 +519,36 @@ public class RecepcionMxController {
                             trasladoActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
                             trasladoActivo.setUsuarioRecepcion(usuario);
                             trasladosService.saveTrasladoMx(trasladoActivo);
+                        }
+                    }
+                }
+                //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
+                if (mxInadecuada){
+                    if (!esEstudio) {
+                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(idTomaMx, labUsuario.getCodigo());
+                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                            RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
+                            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+                            resultadoFinal.setPasivo(false);
+                            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setRespuesta(respuestaDefecto);
+                            resultadoFinal.setSolicitudDx(solicitudDx);
+                            resultadoFinal.setValor(respuestaDefecto.getNombre());
+                            resultadoFinalService.saveDetResFinal(resultadoFinal);
+                        }
+                    }else{
+                        List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(idTomaMx);
+                        for (DaSolicitudEstudio solicitudEst : solicitudEstudioList){
+                            RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
+                            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+                            resultadoFinal.setPasivo(false);
+                            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setRespuesta(respuestaDefecto);
+                            resultadoFinal.setSolicitudEstudio(solicitudEst);
+                            resultadoFinal.setValor(respuestaDefecto.getNombre());
+                            resultadoFinalService.saveDetResFinal(resultadoFinal);
                         }
                     }
                 }
@@ -548,6 +603,8 @@ public class RecepcionMxController {
         String idRecepcion = "";
         String causaRechazo = null;
         String codCalidadMx = "";
+        String codCondicionMx = "";
+        boolean mxInadecuada = false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -555,23 +612,33 @@ public class RecepcionMxController {
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             idRecepcion = jsonpObject.get("idRecepcion").getAsString();
             codCalidadMx = jsonpObject.get("calidadMx").getAsString();
+            codCondicionMx = jsonpObject.get("condicionMx").getAsString();
 
             if (jsonpObject.get("causaRechazo")!=null && !jsonpObject.get("causaRechazo").getAsString().isEmpty())
                 causaRechazo = jsonpObject.get("causaRechazo").getAsString();
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+            Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             //Se obtiene estado recepcionado en laboratorio
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCLAB");
             //se obtiene calidad de la muestra
             CalidadMx calidadMx = catalogosService.getCalidadMx(codCalidadMx);
+            //se obtiene condición de la muestra
+            CondicionMx condicionMx = catalogosService.getCondicionMx(codCondicionMx);
             //se obtiene recepción a actualizar
             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(idRecepcion);
+            //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
+            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
             //se setean valores a actualizar
             //recepcionMx.setUsuarioRecepcionLab(usuario);
             //recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
             recepcionMx.setCalidadMx(calidadMx);
-            recepcionMx.setCausaRechazo(causaRechazo);
-
+            recepcionMx.setCondicionMx(condicionMx);
+            if (causaRechazo!=null) {
+                CausaRechazoMx causaRechazoMx = catalogosService.getCausaRechazoMx(causaRechazo);
+                recepcionMx.setCausaRechazo(causaRechazoMx);
+                mxInadecuada = true;
+            }
             RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
             recepcionMxLab.setRecepcionMx(recepcionMx);
             recepcionMxLab.setUsuarioRecepcion(usuario);
@@ -608,6 +675,36 @@ public class RecepcionMxController {
                 recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                 if (actualizarTraslado)
                     trasladosService.saveTrasladoMx(trasladoMxActivo);
+                //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
+                if (mxInadecuada){
+                    if (!esEstudio) {
+                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
+                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                            RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
+                            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+                            resultadoFinal.setPasivo(false);
+                            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setRespuesta(respuestaDefecto);
+                            resultadoFinal.setSolicitudDx(solicitudDx);
+                            resultadoFinal.setValor(respuestaDefecto.getNombre());
+                            resultadoFinalService.saveDetResFinal(resultadoFinal);
+                        }
+                    }else{
+                        List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+                        for (DaSolicitudEstudio solicitudEst : solicitudEstudioList){
+                            RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
+                            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+                            resultadoFinal.setPasivo(false);
+                            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setRespuesta(respuestaDefecto);
+                            resultadoFinal.setSolicitudEstudio(solicitudEst);
+                            resultadoFinal.setValor(respuestaDefecto.getNombre());
+                            resultadoFinalService.saveDetResFinal(resultadoFinal);
+                        }
+                    }
+                }
             }catch (Exception ex){
                 resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
@@ -636,6 +733,7 @@ public class RecepcionMxController {
             map.put("idRecepcion",idRecepcion);
             map.put("mensaje",resultado);
             map.put("calidadMx", codCalidadMx);
+            map.put("condicionMx", codCondicionMx);
             map.put("causaRechazo", causaRechazo);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());

@@ -1063,11 +1063,11 @@ public class SearchMxController {
 
 
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.reception.datetime", null, null) + " ", inY, 310, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaRecepcion, inY, 435, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(fechaRecepcion!=null?fechaRecepcion:"", inY, 435, stream, 12, PDType1Font.HELVETICA);
             inY -= m;
 
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.finalResult.datetime", null, null) + " ", inY, 15, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaResultado, inY, 180, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(fechaResultado!=null?fechaResultado:"", inY, 180, stream, 12, PDType1Font.HELVETICA);
 
         }
 

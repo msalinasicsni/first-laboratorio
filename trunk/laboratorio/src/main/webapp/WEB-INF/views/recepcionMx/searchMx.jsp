@@ -372,9 +372,9 @@
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
 	    	$("li.recepcion").addClass("open");
-	    	$("li.receipt").addClass("active");
+	    	$("li.searchMx").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.receipt").parents("ul").slideDown(200);
+	    		$("li.searchMx").parents("ul").slideDown(200);
 	    	}
         });
 	</script>

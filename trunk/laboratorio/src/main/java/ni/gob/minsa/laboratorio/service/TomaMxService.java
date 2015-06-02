@@ -481,7 +481,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public DaSolicitudDx getSoliDxByCodigo(String codigoUnico, String userName){
         String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx like :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
         q.setParameter("userName",userName);
@@ -491,7 +491,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSolicitudesDxCodigo(String codigo, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx like :codigo ORDER BY sdx.fechaHSolicitud";
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx = :codigo ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigo",codigo);
         q.setParameter("userName",userName);
@@ -501,7 +501,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSoliDxAprobByTomaAndUser(String idToma, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx like :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idToma",idToma);
         q.setParameter("userName",userName);
@@ -511,7 +511,7 @@ public class TomaMxService {
 
     public DaSolicitudDx getSolicitudDxByIdSolicitudUser(String idSolicitud, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx like :idSolicitud ORDER BY sdx.fechaHSolicitud";
+                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx = :idSolicitud ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idSolicitud",idSolicitud);
         q.setParameter("userName",userName);
@@ -639,6 +639,19 @@ public class TomaMxService {
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idArea",idArea);
+        return q.list();
+    }
+
+    /**
+     * Método que obtiena las solicitudes de rutina por control de calidad para una muestra determinada, y que ya tenga resultado aprobado
+     * @param codigoMx
+     * @return
+     */
+    public List<DaSolicitudDx> getSolicitudesDxQCAprobByToma(String codigoMx){
+        String query = " select sdx from DaSolicitudDx sdx " +
+                "where sdx.idTomaMx.codigoUnicoMx = :codigoMx and sdx.aprobada = true and sdx.controlCalidad = true ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigoMx",codigoMx);
         return q.list();
     }
 }
