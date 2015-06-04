@@ -37,7 +37,7 @@ var SendOrdersReceipt = function () {
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true,
                 "columns": [
-                    null,null,null,null,null,null,null,null,null,null,
+                    null,null,null,null,null,null,null,null,null,
                     {
                         "className":      'details-control',
                         "orderable":      false,
@@ -124,7 +124,7 @@ var SendOrdersReceipt = function () {
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),10)).show();
+                    row.child( format(row.data(),9)).show();
                     tr.addClass('shown');
                 }
             } );
@@ -184,8 +184,8 @@ var SendOrdersReceipt = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].separadaMx, dataToLoad[i].cantidadTubos,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona," <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
+                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].urgente, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
                         }
                     }else{
                         $.smallBox({
