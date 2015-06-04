@@ -1,8 +1,10 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
+import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -653,5 +655,34 @@ public class TomaMxService {
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoMx",codigoMx);
         return q.list();
+    }
+
+    public String estaEmbarazada(String strIdNotificacion){
+        String embarazo = "No";
+        Session session = sessionFactory.getCurrentSession();
+        //IRAG
+        /*String query = "select irag from DaIrag as irag, DaCondicionesPreviasIrag cIrag where irag.idNotificacion.idNotificacion = cIrag.idNotificacion.idNotificacion.idNotificacion" +
+                " and irag.idNotificacion.idNotificacion = :idNotificacion" +
+                " and cIrag.codCondicion.codigo = :codCondicion";*/
+        String query = "from DaIrag where idNotificacion.idNotificacion = :idNotificacion and condiciones like :codCondicion";
+        Query q = session.createQuery(query);
+        q.setParameter("idNotificacion", strIdNotificacion);
+        q.setParameter("codCondicion","%"+"CONDPRE|EMB"+"%");//código para condición embarazo
+
+        //SINDROMES FEBRILES
+        String query2 = "from DaSindFebril where idNotificacion.idNotificacion = :idNotificacion" +
+                " and embarazo.codigo = :codigoEmb";
+        Query q2 = session.createQuery(query2);
+        q2.setParameter("idNotificacion", strIdNotificacion);
+        q2.setParameter("codigoEmb","RESP|S"); //respuesta afirmativa
+
+        DaIrag iragNoti= (DaIrag)q.uniqueResult();
+        DaSindFebril sinFebNoti= (DaSindFebril)q2.uniqueResult();
+        if(iragNoti!=null)
+            embarazo="Si";
+        else if(sinFebNoti!=null)
+            embarazo="Si";
+
+        return embarazo;
     }
 }

@@ -178,6 +178,7 @@ public class ReportesController {
         String codTipoSolicitud = null;
         String nombreSolicitud = null;
         String area = null;
+        String finalRes = null;
         String codLaboratorio = null;
 
         if (jObjectFiltro.get("fechaInicioRecepcion") != null && !jObjectFiltro.get("fechaInicioRecepcion").getAsString().isEmpty())
@@ -200,6 +201,8 @@ public class ReportesController {
             fechaFinAprob = DateUtil.StringToDate(jObjectFiltro.get("fechaFinAprob").getAsString() + " 23:59:59");
         if (jObjectFiltro.get("area") != null && !jObjectFiltro.get("area").getAsString().isEmpty())
             area = jObjectFiltro.get("area").getAsString();
+        if (jObjectFiltro.get("finalRes") != null && !jObjectFiltro.get("finalRes").getAsString().isEmpty())
+            finalRes = jObjectFiltro.get("finalRes").getAsString();
         if (jObjectFiltro.get("laboratorio") != null && !jObjectFiltro.get("laboratorio").getAsString().isEmpty())
             codLaboratorio = jObjectFiltro.get("laboratorio").getAsString();
 
@@ -214,6 +217,7 @@ public class ReportesController {
         filtroMx.setFechaInicioAprob(fechaInicioAprob);
         filtroMx.setFechaFinAprob(fechaFinAprob);
         filtroMx.setArea(area);
+        filtroMx.setResultadoFinal(finalRes);
         filtroMx.setCodLaboratio(codLaboratorio);
 
         return filtroMx;
@@ -1263,7 +1267,7 @@ public class ReportesController {
             positiveStudyReqList = reportesService.getPositiveStudyRequestByFilter(filtroMx);
         }
 
-        return requestPositiveNegativeToJson(positiveRoutineReqList, positiveStudyReqList);
+        return requestPositiveNegativeToJson(positiveRoutineReqList, positiveStudyReqList, filtroMx.getResultadoFinal());
     }
 
     /**
@@ -1272,7 +1276,7 @@ public class ReportesController {
      * @param posNegRoutineReqList lista con las mx recepcionadas a convertir
      * @return String
      */
-    private String requestPositiveNegativeToJson(List<DaSolicitudDx> posNegRoutineReqList, List<DaSolicitudEstudio> posNegStudyReqList) throws Exception {
+    private String requestPositiveNegativeToJson(List<DaSolicitudDx> posNegRoutineReqList, List<DaSolicitudEstudio> posNegStudyReqList, String filtroResu) throws Exception {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
@@ -1289,7 +1293,17 @@ public class ReportesController {
                 List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
                 for (DetalleResultadoFinal res : finalRes) {
 
-                    content = getResult(res);
+                    if(filtroResu != null){
+                        if(filtroResu.equals("Positivo")){
+                            content = getPositiveResult(res);
+                        }else{
+                            content = getNegativeResult(res);
+                        }
+
+                    }else{
+                        content = getResult(res);
+                    }
+
                     String[] arrayContent = content.split(",");
                     valorResultado = arrayContent[0];
                     mostrar = Boolean.parseBoolean(arrayContent[1]);
@@ -1351,7 +1365,18 @@ public class ReportesController {
                 List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(soliE.getIdSolicitudEstudio());
                 for (DetalleResultadoFinal res : finalRes) {
 
-                    content = getResult(res);
+
+                    if(filtroResu != null){
+                        if(filtroResu.equals("Positivo")){
+                            content = getPositiveResult(res);
+                        }else{
+                            content = getNegativeResult(res);
+                        }
+
+                    }else{
+                        content = getResult(res);
+                    }
+
                     String[] arrayContent = content.split(",");
                     valorResultado = arrayContent[0];
                     mostrar = Boolean.parseBoolean(arrayContent[1]);
@@ -1438,6 +1463,88 @@ public class ReportesController {
 
             } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
                 if (res.getValor().toLowerCase().equals("positivo") || res.getValor().toLowerCase().equals("negativo")) {
+                    mostrar = true;
+                    valorResultado = res.getValor();
+                }
+            }
+
+        }
+        return valorResultado + "," + mostrar;
+    }
+
+    private String getNegativeResult(DetalleResultadoFinal res) throws Exception {
+        boolean mostrar= false;
+        String valorResultado = null;
+
+        if (res.getRespuesta() != null) {
+            if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                Integer idLista = Integer.valueOf(res.getValor());
+                Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                if (valor.getValor().toLowerCase().equals("negativo") ) {
+                    mostrar = true;
+                    valorResultado = valor.getValor();
+                }
+
+            } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                if (res.getValor().toLowerCase().equals("negativo")) {
+                    mostrar = true;
+                    valorResultado = res.getValor();
+                }
+            }
+        } else if (res.getRespuestaExamen() != null) {
+            if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                Integer idLista = Integer.valueOf(res.getValor());
+                Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                if (valor.getValor().toLowerCase().equals("negativo") ) {
+                    mostrar = true;
+                    valorResultado = valor.getValor();
+                }
+
+            } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                if (res.getValor().toLowerCase().equals("negativo")) {
+                    mostrar = true;
+                    valorResultado = res.getValor();
+                }
+            }
+
+        }
+        return valorResultado + "," + mostrar;
+    }
+
+    private String getPositiveResult(DetalleResultadoFinal res) throws Exception {
+        boolean mostrar= false;
+        String valorResultado = null;
+
+        if (res.getRespuesta() != null) {
+            if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                Integer idLista = Integer.valueOf(res.getValor());
+                Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                if (valor.getValor().toLowerCase().equals("positivo") ) {
+                    mostrar = true;
+                    valorResultado = valor.getValor();
+                }
+
+            } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                if (res.getValor().toLowerCase().equals("positivo")) {
+                    mostrar = true;
+                    valorResultado = res.getValor();
+                }
+            }
+        } else if (res.getRespuestaExamen() != null) {
+            if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                Integer idLista = Integer.valueOf(res.getValor());
+                Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                if (valor.getValor().toLowerCase().equals("positivo")) {
+                    mostrar = true;
+                    valorResultado = valor.getValor();
+                }
+
+            } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                if (res.getValor().toLowerCase().equals("positivo")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }

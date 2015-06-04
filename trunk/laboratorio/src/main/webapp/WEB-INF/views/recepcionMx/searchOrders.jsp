@@ -252,13 +252,17 @@
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>
+                                            <%--<th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>--%>
+                                            <%--<th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>--%>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.cc"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.transfer.origin.lab"/></th>
+                                            <th data-hide="phone"><i class="fa fa-child fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.pregnant.short"/></th>
+                                            <th data-hide="phone"><i class="fa fa-hospital-o fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.hosp"/></th>
+                                            <th data-hide="phone"><i class="fa fa-exclamation-triangle fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.urgent"/></th>
+
                                             <th></th>
                                         </tr>
                                         </thead>

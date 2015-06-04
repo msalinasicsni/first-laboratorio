@@ -1,6 +1,8 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
+import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
+import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
@@ -33,6 +35,8 @@ public class DaTomaMx implements Serializable {
     private String codigoUnicoMx;
     private DaEnvioMx envio;
     private CategoriaMx categoriaMx;
+    private EntidadesAdtvas codSilaisAtencion;
+    private Unidades codUnidadAtencion;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -202,5 +206,27 @@ public class DaTomaMx implements Serializable {
 
     public void setCategoriaMx(CategoriaMx categoriaMx) {
         this.categoriaMx = categoriaMx;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "COD_SILAIS_ATENCION", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "COD_SILAIS_FK")
+    public EntidadesAdtvas getCodSilaisAtencion() {
+        return codSilaisAtencion;
+    }
+
+    public void setCodSilaisAtencion(EntidadesAdtvas codSilaisAtencion) {
+        this.codSilaisAtencion = codSilaisAtencion;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "COD_UNIDAD_ATENCION", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "COD_UNIDAD_FK")
+    public Unidades getCodUnidadAtencion() {
+        return codUnidadAtencion;
+    }
+
+    public void setCodUnidadAtencion(Unidades codUnidadAtencion) {
+        this.codUnidadAtencion = codUnidadAtencion;
     }
 }

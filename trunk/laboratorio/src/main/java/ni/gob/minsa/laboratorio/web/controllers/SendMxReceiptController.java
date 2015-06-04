@@ -214,6 +214,12 @@ public class SendMxReceiptController {
             Map<String, String> map = new HashMap<String, String>();
             //map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
+            //notificacion urgente
+            if(recepcion.getTomaMx().getIdNotificacion().getUrgente()!= null){
+                map.put("urgente", recepcion.getTomaMx().getIdNotificacion().getUrgente().getValor());
+            }else{
+                map.put("urgente", "--");
+            }
             map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
             //map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));

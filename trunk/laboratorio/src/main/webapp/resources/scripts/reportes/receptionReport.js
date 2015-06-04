@@ -361,13 +361,14 @@ var ReceptionReport = function () {
                     mxFiltros['nombreSolicitud'] = '';
                     mxFiltros['area'] = '';
 
+
                 }else {
 
                     mxFiltros['fechaInicioAprob'] = $('#fecInicioAprob').val();
                     mxFiltros['fechaFinAprob'] = $('#fecFinAprob').val();
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
-                    mxFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
+                    mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSoli').val());
                     mxFiltros['area'] = $('#area').find('option:selected').val();
 
@@ -531,6 +532,7 @@ var ReceptionReport = function () {
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
                     mxFiltros['area'] = '';
+                    mxFiltros['finalRes'] = '';
 
                 }else {
 
@@ -541,6 +543,7 @@ var ReceptionReport = function () {
                     mxFiltros['codTipoSolicitud'] = $('#tipoSol').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSol').val());
                     mxFiltros['area'] = $('#areaSol').find('option:selected').val();
+                    mxFiltros['finalRes'] = $('#finalRes').find('option:selected').val();
 
                 }
                 blockUI();

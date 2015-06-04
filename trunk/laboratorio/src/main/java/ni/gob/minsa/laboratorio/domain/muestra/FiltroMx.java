@@ -30,6 +30,7 @@ public class FiltroMx {
     Boolean incluirTraslados;
     Boolean controlCalidad;
     String area;
+    String resultadoFinal;
     String codLaboratio;
 
     public String getNombreApellido() {
@@ -199,4 +200,8 @@ public class FiltroMx {
     public void setCodLaboratio(String codLaboratio) {
         this.codLaboratio = codLaboratio;
     }
+
+    public String getResultadoFinal() { return resultadoFinal; }
+
+    public void setResultadoFinal(String resultadoFinal) { this.resultadoFinal = resultadoFinal; }
 }

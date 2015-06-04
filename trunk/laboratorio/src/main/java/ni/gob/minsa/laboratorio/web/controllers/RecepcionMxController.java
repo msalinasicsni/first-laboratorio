@@ -2,7 +2,6 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
@@ -1266,6 +1265,30 @@ public class RecepcionMxController {
             }else {
                 map.put("codUnidadSalud","");
             }
+            //notificacion urgente
+            if(tomaMx.getIdNotificacion().getUrgente()!= null){
+                map.put("urgente", tomaMx.getIdNotificacion().getUrgente().getValor());
+            }else{
+                map.put("urgente", "--");
+            }
+
+
+            //hospitalizado
+            String[] arrayHosp =  {"13", "17", "11", "16", "10", "12"};
+            boolean hosp = false;
+
+            if(tomaMx.getCodUnidadAtencion() != null){
+                int h =  Arrays.binarySearch(arrayHosp, String.valueOf(tomaMx.getCodUnidadAtencion().getTipoUnidad()));
+                hosp = h > 0;
+
+            }
+
+            if(hosp){
+                map.put("hospitalizado", messageSource.getMessage("lbl.yes",null,null));
+            }else{
+                map.put("hospitalizado", messageSource.getMessage("lbl.no",null,null));
+            }
+
             //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
             map.put("separadaMx",(tomaMx.getMxSeparada()!=null?(tomaMx.getMxSeparada()?"Si":"No"):""));
             map.put("cantidadTubos", (tomaMx.getCanTubos()!=null?String.valueOf(tomaMx.getCanTubos()):""));
@@ -1288,8 +1311,18 @@ public class RecepcionMxController {
                 if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
                     nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
+                //Se calcula la edad
+                int edad = DateUtil.calcularEdadAnios(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento());
+                map.put("edad",String.valueOf(edad));
+                //se obtiene el sexo
+                map.put("sexo",tomaMx.getIdNotificacion().getPersona().getSexo().getValor());
+                if(edad > 12 && tomaMx.getIdNotificacion().getPersona().isSexoFemenino()){
+                    map.put("embarazada", tomaMxService.estaEmbarazada(tomaMx.getIdNotificacion().getIdNotificacion()));
+                }else
+                    map.put("embarazada","--");
             }else{
                 map.put("persona"," ");
+                map.put("embarazada","--");
             }
 
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(tomaMx.getIdTomaMx(),true);
@@ -1367,6 +1400,30 @@ public class RecepcionMxController {
                     map.put("codSilais", "");
                 }
 
+                //notificacion urgente
+                if(recepcion.getTomaMx().getIdNotificacion().getUrgente()!= null){
+                    map.put("urgente", recepcion.getTomaMx().getIdNotificacion().getUrgente().getValor());
+                }else{
+                    map.put("urgente", "--");
+                }
+
+
+                //hospitalizado
+                String[] arrayHosp =  {"13", "17", "11", "16", "10", "12"};
+                boolean hosp = false;
+
+                if(recepcion.getTomaMx().getCodUnidadAtencion() != null){
+                    int h =  Arrays.binarySearch(arrayHosp, String.valueOf(recepcion.getTomaMx().getCodUnidadAtencion().getTipoUnidad()));
+                    hosp = h > 0;
+
+                }
+
+                if(hosp){
+                    map.put("hospitalizado", messageSource.getMessage("lbl.yes",null,null));
+                }else{
+                    map.put("hospitalizado", messageSource.getMessage("lbl.no",null,null));
+                }
+
                 if (recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
                     map.put("codUnidadSalud", recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
                 } else {
@@ -1395,8 +1452,18 @@ public class RecepcionMxController {
                     if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                         nombreCompleto = nombreCompleto + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                     map.put("persona", nombreCompleto);
+                    //Se calcula la edad
+                    int edad = DateUtil.calcularEdadAnios(recepcion.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento());
+                    map.put("edad",String.valueOf(edad));
+                    //se obtiene el sexo
+                    map.put("sexo",recepcion.getTomaMx().getIdNotificacion().getPersona().getSexo().getValor());
+                    if(edad > 12 && recepcion.getTomaMx().getIdNotificacion().getPersona().isSexoFemenino()){
+                        map.put("embarazada", tomaMxService.estaEmbarazada(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion()));
+                    }else
+                        map.put("embarazada","--");
                 } else {
                     map.put("persona", " ");
+                    map.put("embarazada","--");
                 }
                 map.put("traslado",traslado);
                 map.put("origen",areaOrigen);

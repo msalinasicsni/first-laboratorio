@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.domain.notificacion;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.irag.Respuesta;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
@@ -34,6 +35,7 @@ public class DaNotificacion {
     private Comunidades comunidadResidencia;
     private String direccionResidencia;
     private Date fechaInicioSintomas;
+    private Respuesta urgente;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -161,4 +163,13 @@ public class DaNotificacion {
     public void setFechaInicioSintomas(Date fechaInicioSintomas) {
         this.fechaInicioSintomas = fechaInicioSintomas;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
+    @JoinColumn(name = "URGENTE", referencedColumnName = "CODIGO", nullable = true)
+    @ForeignKey(name = "SF_URGENTE_FK")
+    public Respuesta getUrgente() { return urgente; }
+
+    public void setUrgente(Respuesta urgente) { this.urgente = urgente; }
 }
+
+
