@@ -122,10 +122,10 @@ public class ResultadoFinalService {
                     .setProjection(Property.forName("toma.idTomaMx"))));
 
         }
-
+        //se filtra por código de muestra(único o lab)
         if(filtro.getCodigoUnicoMx()!=null){
-            crit.add( Restrictions.and(
-                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
         }
 
@@ -342,10 +342,10 @@ public class ResultadoFinalService {
                     .setProjection(Property.forName("toma.idTomaMx"))));
 
         }
-
+        //se filtra por código de muestra(único o lab)
         if(filtro.getCodigoUnicoMx()!=null){
-            crit.add( Restrictions.and(
-                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
         }
         // examenes con resultado

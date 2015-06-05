@@ -147,8 +147,8 @@ public class TrasladosService {
                 .setProjection(Property.forName("idTomaMx.idTomaMx"))));
 
         if(filtro.getCodigoUnicoMx()!=null){
-            crit.add( Restrictions.and(
-                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
         }
         //nombre solicitud de rutina
@@ -260,7 +260,7 @@ public class TrasladosService {
 
         if(filtro.getCodigoUnicoMx()!=null){
             crit.add( Restrictions.and(
-                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+                            Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx()))
             );
         }
         //nombre solicitud de rutina

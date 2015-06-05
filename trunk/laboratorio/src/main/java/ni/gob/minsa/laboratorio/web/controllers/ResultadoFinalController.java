@@ -128,7 +128,7 @@ public class ResultadoFinalController {
         if(dxList != null){
             for(DaSolicitudDx diagnostico : dxList){
                 Map<String, String> map = new HashMap<String, String>();
-                map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoUnicoMx());
+                map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab());
                 map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
                 map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
                 if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
@@ -350,7 +350,7 @@ public class ResultadoFinalController {
                     map.put("idSolicitud", examen.getSolicitudDx().getIdSolicitudDx());
                     map.put("fechaSolicitud", DateUtil.DateToString(examen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     map.put("nombreSolicitud", examen.getSolicitudDx().getCodDx().getNombre());
-                    map.put("codigoUnicoMx", examen.getSolicitudDx().getIdTomaMx().getCodigoUnicoMx());
+                    map.put("codigoUnicoMx", examen.getSolicitudDx().getIdTomaMx().getCodigoLab());
                     map.put("tipoMx", examen.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
                     map.put("tipoNotificacion", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
                     map.put("idOrdenExamen", examen.getIdOrdenExamen());

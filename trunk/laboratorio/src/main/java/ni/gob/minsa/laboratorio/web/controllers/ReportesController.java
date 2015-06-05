@@ -234,9 +234,11 @@ public class ReportesController {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
+        boolean esEstudio;
         for (RecepcionMx receivedMx : receivedList) {
+            esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( receivedMx.getTomaMx().getIdTomaMx()).size() > 0;
             Map<String, String> map = new HashMap<String, String>();
-            map.put("codigoUnicoMx", receivedMx.getTomaMx().getCodigoUnicoMx());
+            map.put("codigoUnicoMx", esEstudio?receivedMx.getTomaMx().getCodigoUnicoMx():receivedMx.getTomaMx().getCodigoLab());
             map.put("fechaRecepcion", DateUtil.DateToString(receivedMx.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a"));
 
             if (receivedMx.getCalidadMx() != null) {
@@ -368,7 +370,7 @@ public class ReportesController {
                     String nombreSolitud = null;
                     String nombrePersona = null;
 
-                    List<DaSolicitudDx> listDx = tomaMxService.getSolicitudesDxCodigo(codigoUnico, seguridadService.obtenerNombreUsuario());
+                    List<DaSolicitudDx> listDx = tomaMxService.getSolicitudesDxCodigo(recepcion.getTomaMx().getCodigoUnicoMx(), seguridadService.obtenerNombreUsuario());
                     DaSolicitudEstudio soliE = tomaMxService.getSoliEstByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
 
                     if (!listDx.isEmpty()) {
@@ -394,7 +396,7 @@ public class ReportesController {
                         if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                             nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
 
-                        content[0] = recepcion.getTomaMx().getCodigoUnicoMx() != null ? recepcion.getTomaMx().getCodigoUnicoMx() : "";
+                        content[0] = recepcion.getTomaMx().getCodigoLab() != null ? recepcion.getTomaMx().getCodigoLab() : "";
                         content[1] = recepcion.getTomaMx().getCodTipoMx() != null ? recepcion.getTomaMx().getCodTipoMx().getNombre() : "";
                         content[2] = recepcion.getFechaHoraRecepcion() != null ? DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a") : "";
                         content[3] = recepcion.getCalidadMx() != null ? recepcion.getCalidadMx().getValor() : "";
@@ -455,7 +457,7 @@ public class ReportesController {
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
-            cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+            cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.lab.code.mx", null, null));
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
             cell.setFillColor(Color.LIGHT_GRAY);
@@ -521,7 +523,7 @@ public class ReportesController {
 
                     //Create Fact header row
                     factHeaderrow = table.createRow(15f);
-                    cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+                    cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.lab.code.mx", null, null));
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
                     cell.setFillColor(Color.LIGHT_GRAY);
@@ -792,7 +794,7 @@ public class ReportesController {
                     Map<String, String> map = new HashMap<String, String>();
                     map.put("solicitud", soli.getCodDx().getNombre());
                     map.put("idSolicitud", soli.getIdSolicitudDx());
-                    map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoUnicoMx());
+                    map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab());
                     map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
 
                     if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
@@ -1064,7 +1066,7 @@ public class ReportesController {
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
-            cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+            cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.lab.code.mx", null, null));
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
             cell.setFillColor(Color.LIGHT_GRAY);
@@ -1120,7 +1122,7 @@ public class ReportesController {
 
                     //Create Fact header row
                     factHeaderrow = table.createRow(15f);
-                    cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+                    cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.lab.code.mx", null, null));
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
                     cell.setFillColor(Color.LIGHT_GRAY);
@@ -1312,7 +1314,7 @@ public class ReportesController {
                         Map<String, String> map = new HashMap<String, String>();
                         map.put("solicitud", soli.getCodDx().getNombre());
                         map.put("idSolicitud", soli.getIdSolicitudDx());
-                        map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoUnicoMx());
+                        map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab());
                         map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
                         map.put("resultado", valorResultado);
 
@@ -1737,7 +1739,7 @@ public class ReportesController {
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
-            cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+            cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.lab.code.mx", null, null));
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
             cell.setFillColor(Color.LIGHT_GRAY);
@@ -1798,7 +1800,7 @@ public class ReportesController {
 
                     //Create Fact header row
                     factHeaderrow = table.createRow(15f);
-                    cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+                    cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.lab.code.mx", null, null));
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
                     cell.setFillColor(Color.LIGHT_GRAY);
@@ -1935,7 +1937,7 @@ public class ReportesController {
         Integer indice=0;
         for(DaSolicitudDx diagnostico : solicitudDxList){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoUnicoMx());
+            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab());
             map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
             map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {

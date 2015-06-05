@@ -16,7 +16,7 @@ import java.util.Date;
  * V1.0
  */
 @Entity
-@Table(name = "traslado_mx", schema = "alerta")
+@Table(name = "traslado_mx", schema = "laboratorio")
 public class TrasladoMx {
     String idTraslado;
     DaTomaMx tomaMx;

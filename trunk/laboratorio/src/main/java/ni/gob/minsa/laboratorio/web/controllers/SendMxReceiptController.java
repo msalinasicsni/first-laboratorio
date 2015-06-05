@@ -211,6 +211,7 @@ public class SendMxReceiptController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         for(RecepcionMx recepcion : recepcionMxList){
+            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( recepcion.getTomaMx().getIdTomaMx()).size() > 0;
             Map<String, String> map = new HashMap<String, String>();
             //map.put("idOrdenExamen", recepcion.getOrdenExamen().getIdOrdenExamen());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
@@ -220,7 +221,7 @@ public class SendMxReceiptController {
             }else{
                 map.put("urgente", "--");
             }
-            map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
+            map.put("codigoUnicoMx", esEstudio?recepcion.getTomaMx().getCodigoUnicoMx():recepcion.getTomaMx().getCodigoLab());
             //map.put("fechaHoraOrden",DateUtil.DateToString(recepcion.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaRecepcion", DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a"));

@@ -178,7 +178,7 @@ public class AprobacionResultadoController {
         Integer indice=0;
         for(DaSolicitudDx diagnostico : solicitudDxList){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoUnicoMx());
+            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab());
             map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
             map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
@@ -660,6 +660,7 @@ public class AprobacionResultadoController {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
+
         for(RechazoResultadoFinalSolicitud rechazo : rechazosList){
             Map<String, String> map = new HashMap<String, String>();
             DaTomaMx tomaMx;
@@ -669,13 +670,14 @@ public class AprobacionResultadoController {
                 map.put("nombreSolicitud", rechazo.getSolicitudDx().getCodDx().getNombre());
                 map.put("fechaSolicitud",DateUtil.DateToString(rechazo.getSolicitudDx().getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
                 idSolicitud = rechazo.getSolicitudDx().getIdSolicitudDx();
+                map.put("codigoUnicoMx", tomaMx.getCodigoLab());
             }else{
                 tomaMx = rechazo.getSolicitudEstudio().getIdTomaMx();
                 map.put("nombreSolicitud", rechazo.getSolicitudEstudio().getTipoEstudio().getNombre());
                 map.put("fechaSolicitud",DateUtil.DateToString(rechazo.getSolicitudEstudio().getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
                 idSolicitud = rechazo.getSolicitudEstudio().getIdSolicitudEstudio();
+                map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             }
-            map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
             map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             map.put("tipoMx", tomaMx.getCodTipoMx().getNombre());
             map.put("tipoNotificacion", tomaMx.getIdNotificacion().getCodTipoNotificacion().getValor());

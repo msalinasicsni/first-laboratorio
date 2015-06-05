@@ -463,7 +463,7 @@ public class RecepcionMxController {
         String verificaCantTb = "";
         String verificaTipoMx = "";
         String idTomaMx = "";
-        String codigoUnicoMx = "";
+        String codigoLabMx = "";
         String causaRechazo;
         boolean mxInadecuada = false;
         try {
@@ -508,6 +508,9 @@ public class RecepcionMxController {
             recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
             recepcionMx.setTomaMx(tomaMx);
             try {
+                //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas
+                if (!esEstudio)
+                    tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo()));
                 idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
                 //si tiene traslado activo marcarlo como recepcionado
                 TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
@@ -561,7 +564,7 @@ public class RecepcionMxController {
                 tomaMx.setEstadoMx(estadoMx);
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
-                    codigoUnicoMx = tomaMx.getCodigoUnicoMx();
+                    codigoLabMx = esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab();
                 }catch (Exception ex){
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
@@ -581,7 +584,7 @@ public class RecepcionMxController {
             map.put("idTomaMx", idTomaMx);
             map.put("verificaCantTb", verificaCantTb);
             map.put("verificaTipoMx", verificaTipoMx);
-            map.put("codigoUnicoMx",codigoUnicoMx);
+            map.put("codigoUnicoMx",codigoLabMx);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -863,7 +866,7 @@ public class RecepcionMxController {
         String json;
         String resultado = "";
         String strMuestras="";
-        String codigosUnicosMx="";
+        String codigosLabMx="";
         Integer cantMuestras = 0;
         Integer cantMxProc = 0;
         try {
@@ -875,6 +878,7 @@ public class RecepcionMxController {
             cantMuestras = jsonpObject.get("cantMuestras").getAsInt();
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+            Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(usuario.getUsername());
             //Se obtiene estado recepcionado
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCP");
             //se obtienen muestras a recepcionar
@@ -892,13 +896,16 @@ public class RecepcionMxController {
                 RecepcionMx recepcionMx = new RecepcionMx();
 
                 recepcionMx.setUsuarioRecepcion(usuario);
-                recepcionMx.setLabRecepcion(seguridadService.getLaboratorioUsuario(usuario.getUsername()));
+                recepcionMx.setLabRecepcion(labUsuario);
                 recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
                 recepcionMx.setTipoMxCk(true);
                 recepcionMx.setCantidadTubosCk(true);
                 recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
                 recepcionMx.setTomaMx(tomaMx);
                 try {
+                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas
+                    if (!esEstudio)
+                        tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo()));
                     idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
                     //si tiene traslado activo marcarlo como recepcionado
                     TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
@@ -924,9 +931,9 @@ public class RecepcionMxController {
                         tomaMxService.updateTomaMx(tomaMx);
                         cantMxProc++;
                         if(cantMxProc==1)
-                            codigosUnicosMx = tomaMx.getCodigoUnicoMx();
+                            codigosLabMx = esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab();
                         else
-                            codigosUnicosMx += ","+ tomaMx.getCodigoUnicoMx();
+                            codigosLabMx += ","+ (esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
                     } catch (Exception ex) {
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
@@ -947,7 +954,7 @@ public class RecepcionMxController {
             map.put("mensaje",resultado);
             map.put("cantMuestras", cantMuestras.toString());
             map.put("cantMxProc", cantMxProc.toString());
-            map.put("codigosUnicosMx",codigosUnicosMx);
+            map.put("codigosUnicosMx",codigosLabMx);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -1246,13 +1253,15 @@ public class RecepcionMxController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        boolean esEstudio;
         for(DaTomaMx tomaMx : tomaMxList){
+            esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
             String traslado = "No";
             Laboratorio labOrigen = null;
             Map<String, String> map = new HashMap<String, String>();
             //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
             map.put("idTomaMx", tomaMx.getIdTomaMx());
-            map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
+            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
             //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
             if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
@@ -1386,11 +1395,12 @@ public class RecepcionMxController {
                 }
             }
             if (mostrar) {
+                boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( recepcion.getTomaMx().getIdTomaMx()).size() > 0;
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("idRecepcion", recepcion.getIdRecepcion());
                 //map.put("idOrdenExamen", ordenExamen.getOrdenExamen().getIdOrdenExamen());
                 map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
-                map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
+                map.put("codigoUnicoMx", esEstudio?recepcion.getTomaMx().getCodigoUnicoMx():recepcion.getTomaMx().getCodigoLab());
                 //map.put("fechaHoraOrden",DateUtil.DateToString(ordenExamen.getOrdenExamen().getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("fechaRecepcion", DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a"));

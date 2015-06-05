@@ -97,7 +97,8 @@ public class SeparacionMxService {
     public List<AlicuotaRegistro> getAliquotsById(String id){
         Session session = sessionFactory.getCurrentSession();
         Criteria cr = session.createCriteria(AlicuotaRegistro.class, "reg");
-        cr.add(Restrictions.like("reg.idAlicuota", id + "%"));
+        //cr.add(Restrictions.like("reg.idAlicuota", id + "%"));
+        cr.add(Restrictions.eq("reg.codUnicoMx.codigoUnicoMx", id));
         cr.addOrder(Order.asc("reg.fechaHoraRegistro"));
         cr.add(Restrictions.eq("reg.pasivo", false));
         return cr.list();
