@@ -526,6 +526,8 @@ public class RecepcionMxController {
                 }
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
                 if (mxInadecuada){
+                    long idUsuario = seguridadService.obtenerIdUsuario(request);
+                    Usuarios usuApro = usuarioService.getUsuarioById((int) idUsuario);
                     if (!esEstudio) {
                         List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(idTomaMx, labUsuario.getCodigo());
                         for (DaSolicitudDx solicitudDx : solicitudDxList) {
@@ -538,6 +540,11 @@ public class RecepcionMxController {
                             resultadoFinal.setSolicitudDx(solicitudDx);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
                             resultadoFinalService.saveDetResFinal(resultadoFinal);
+
+                            solicitudDx.setAprobada(true);
+                            solicitudDx.setFechaAprobacion(new Timestamp(new Date().getTime()));
+                            solicitudDx.setUsuarioAprobacion(usuApro);
+                            tomaMxService.updateSolicitudDx(solicitudDx);
                         }
                     }else{
                         List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(idTomaMx);
@@ -551,6 +558,11 @@ public class RecepcionMxController {
                             resultadoFinal.setSolicitudEstudio(solicitudEst);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
                             resultadoFinalService.saveDetResFinal(resultadoFinal);
+
+                            solicitudEst.setAprobada(true);
+                            solicitudEst.setFechaAprobacion(new Timestamp(new Date().getTime()));
+                            solicitudEst.setUsuarioAprobacion(usuApro);
+                            tomaMxService.updateSolicitudEstudio(solicitudEst);
                         }
                     }
                 }
@@ -679,6 +691,8 @@ public class RecepcionMxController {
                     trasladosService.saveTrasladoMx(trasladoMxActivo);
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
                 if (mxInadecuada){
+                    long idUsuario = seguridadService.obtenerIdUsuario(request);
+                    Usuarios usuApro = usuarioService.getUsuarioById((int) idUsuario);
                     if (!esEstudio) {
                         List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
                         for (DaSolicitudDx solicitudDx : solicitudDxList) {
@@ -691,6 +705,11 @@ public class RecepcionMxController {
                             resultadoFinal.setSolicitudDx(solicitudDx);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
                             resultadoFinalService.saveDetResFinal(resultadoFinal);
+
+                            solicitudDx.setAprobada(true);
+                            solicitudDx.setFechaAprobacion(new Timestamp(new Date().getTime()));
+                            solicitudDx.setUsuarioAprobacion(usuApro);
+                            tomaMxService.updateSolicitudDx(solicitudDx);
                         }
                     }else{
                         List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
@@ -704,6 +723,11 @@ public class RecepcionMxController {
                             resultadoFinal.setSolicitudEstudio(solicitudEst);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
                             resultadoFinalService.saveDetResFinal(resultadoFinal);
+
+                            solicitudEst.setAprobada(true);
+                            solicitudEst.setFechaAprobacion(new Timestamp(new Date().getTime()));
+                            solicitudEst.setUsuarioAprobacion(usuApro);
+                            tomaMxService.updateSolicitudEstudio(solicitudEst);
                         }
                     }
                 }

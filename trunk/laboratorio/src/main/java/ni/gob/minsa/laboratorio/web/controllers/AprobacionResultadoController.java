@@ -527,7 +527,7 @@ public class AprobacionResultadoController {
     @RequestMapping(value = "searchApproved", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchAprovedResultsJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo los solicutdes con resultados rechazados");
+        logger.info("Obteniendo las solicitudes con resultados aprobados");
         FiltroMx filtroMx= jsonToFiltroDx(filtro);
         List<DaSolicitudDx> solicitudDxList = resultadoFinalService.getDxByFiltro(filtroMx);
         List<DaSolicitudEstudio> solicitudEstudioList = resultadoFinalService.getEstudioByFiltro(filtroMx);
