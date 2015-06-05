@@ -257,7 +257,7 @@
                 <table id="pos_neg_request" class="table table-striped table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
-                        <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.unique.code.mx.short"/></th>
+                        <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.lab.code.mx"/></th>
                        <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.approve.date"/></th>
                         <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                         <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>

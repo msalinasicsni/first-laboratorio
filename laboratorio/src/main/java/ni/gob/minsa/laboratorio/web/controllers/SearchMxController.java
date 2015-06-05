@@ -84,18 +84,6 @@ public class SearchMxController {
     private TomaMxService tomaMxService;
 
     @Autowired
-    @Qualifier(value = "unidadesService")
-    private UnidadesService unidadesService;
-
-    @Autowired
-    @Qualifier(value = "parametrosService")
-    private ParametrosService parametrosService;
-
-    @Autowired
-    @Qualifier(value = "examenesService")
-    private ExamenesService examenesService;
-
-    @Autowired
     @Qualifier(value = "ordenExamenMxService")
     private OrdenExamenMxService ordenExamenMxService;
 
@@ -106,10 +94,6 @@ public class SearchMxController {
     @Autowired
     @Qualifier(value = "resultadosService")
     private ResultadosService resultadosService;
-
-    @Autowired
-    @Qualifier(value = "rechazoResultadoSolicitudService")
-    private RechazoResultadoSolicitudService rechazoResultadoSolicitudService;
 
     @Autowired
     @Qualifier(value = "conceptoService")
@@ -264,12 +248,14 @@ public class SearchMxController {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
+        boolean esEstudio;
         Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         for (DaTomaMx tomaMx : tomaMxList) {
+            esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
             Map<String, String> map = new HashMap<String, String>();
             RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
             map.put("idTomaMx", tomaMx.getIdTomaMx());
-            map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
+            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
             map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
 
             if (rec != null) {

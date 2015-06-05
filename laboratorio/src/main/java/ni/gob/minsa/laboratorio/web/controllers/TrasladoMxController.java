@@ -442,10 +442,11 @@ public class TrasladoMxController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         for(DaTomaMx tomaMx : tomaMxList){
+            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( tomaMx.getIdTomaMx()).size() > 0;
             Map<String, String> map = new HashMap<String, String>();
             //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
             map.put("idTomaMx", tomaMx.getIdTomaMx());
-            map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
+            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
             //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
             map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
             if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {

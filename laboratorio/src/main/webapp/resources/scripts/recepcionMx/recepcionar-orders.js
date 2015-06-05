@@ -245,15 +245,20 @@ var ReceiptOrders = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
+                            var actionUrl = parametros.sActionUrl;
                             var idLoad;
                             if ($('#txtEsLaboratorio').val()=='true'){
                                 idLoad =dataToLoad[i]. idRecepcion;
+                                actionUrl=actionUrl+idLoad;
+                                table1.fnAddData(
+                                    [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+idLoad+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                             }else{
                                 idLoad = dataToLoad[i].idTomaMx;
+                                actionUrl=actionUrl+idLoad;
+                                table1.fnAddData(
+                                    [dataToLoad[i].tipoMuestra+" <input type='hidden' value='"+idLoad+"'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                             }
-                            var actionUrl = parametros.sActionUrl+idLoad;
-                            table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+idLoad+"'/>",dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+
 
                         }
                     }else{

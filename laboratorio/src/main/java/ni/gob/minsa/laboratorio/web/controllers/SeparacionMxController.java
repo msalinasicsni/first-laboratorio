@@ -117,8 +117,9 @@ public class SeparacionMxController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         for(RecepcionMx recepcion : recepcionMxList){
+            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( recepcion.getTomaMx().getIdTomaMx()).size() > 0;
             Map<String, String> map = new HashMap<String, String>();
-            map.put("codigoUnicoMx", recepcion.getTomaMx().getCodigoUnicoMx());
+            map.put("codigoUnicoMx", esEstudio?recepcion.getTomaMx().getCodigoUnicoMx():recepcion.getTomaMx().getCodigoLab());
             map.put("idRecepcion", recepcion.getIdRecepcion());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
             map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
@@ -601,8 +602,9 @@ public class SeparacionMxController {
                 }
             }
             //generar codigo unico
-            String idAlicuota = generarCodigoAlicuota(codigoUnico, alicuotaCat.getEtiquetaPara(), consecutivo);
             DaTomaMx tomaMx = tomaMxService.getTomaMxByCodUnicoMx(codigoUnico);
+            //sólo las rutinas tiene codigoLab
+            String idAlicuota = generarCodigoAlicuota(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx(), alicuotaCat.getEtiquetaPara(), consecutivo);
             alicuotaReg.setAlicuotaCatalogo(alicuotaCat);
             alicuotaReg.setCodUnicoMx(tomaMx);
             alicuotaReg.setIdAlicuota(idAlicuota);
@@ -1166,8 +1168,6 @@ public class SeparacionMxController {
         if(alicuotaSER != null){
             addAliq(request,1,alicuotaSER,codigo,null,soliDx);
         }
-
-
     }
 
     @RequestMapping(value = "impresionMasiva" ,method = RequestMethod.GET, produces = "application/json" )

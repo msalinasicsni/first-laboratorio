@@ -202,6 +202,12 @@ public class OrdenExamenMxService {
                 crit.add(conditionGroup);
             }
         }
+        //se filtra por código de muestra (único o lab)
+        if(filtro.getCodigoUnicoMx()!=null){
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
+            );
+        }
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){
             crit.createAlias("notifi.codSilaisAtencion","silais");
@@ -352,6 +358,12 @@ public class OrdenExamenMxService {
                         .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
                 crit.add(conditionGroup);
             }
+        }
+        //se filtra por código de muestra(único o lab)
+        if(filtro.getCodigoUnicoMx()!=null){
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
+            );
         }
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){

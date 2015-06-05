@@ -221,6 +221,7 @@ public class TomaMxController {
         tomaMx.setEstadoMx(catalogoService.getEstadoMx("ESTDMX|PEND"));
         String codigo = generarCodigoUnicoMx();
         tomaMx.setCodigoUnicoMx(codigo);
+        tomaMx.setCodigoLab(null);
         tomaMxService.addTomaMx(tomaMx);
         saveDxRequest(tomaMx.getIdTomaMx(), dx);
         return createJsonResponse(tomaMx);
@@ -361,6 +362,7 @@ public class TomaMxController {
             tomaMx.setEstadoMx(catalogoService.getEstadoMx("ESTDMX|ENV"));
             String codigo = generarCodigoUnicoMx();
             tomaMx.setCodigoUnicoMx(codigo);
+            tomaMx.setCodigoLab(null);
             tomaMx.setEnvio(envioOrden);
             tomaMxService.addTomaMx(tomaMx);
             saveDxRequest(tomaMx.getIdTomaMx(), dx);

@@ -104,7 +104,7 @@ public class RecepcionMxService {
     }
 
     public RecepcionMx getRecepcionMxByCodUnicoMx(String codigoUnicoMx, String codLaboratorio){
-        String query = "select a from RecepcionMx as a inner join a.tomaMx as t where t.codigoUnicoMx= :codigoUnicoMx " +
+        String query = "select a from RecepcionMx as a inner join a.tomaMx as t where (t.codigoUnicoMx= :codigoUnicoMx or t.codigoLab = :codigoUnicoMx) " +
                 "and a.labRecepcion.codigo = :codLaboratorio";
 
         Session session = sessionFactory.getCurrentSession();
@@ -222,8 +222,8 @@ public class RecepcionMxService {
             crit.add(Restrictions.or(Restrictions.isNull("recepcion.calidadMx.codigo")).add(Restrictions.or(Restrictions.ne("recepcion.calidadMx.codigo", "CALIDMX|IDC"))));
         }
         if(filtro.getCodigoUnicoMx()!=null){
-            crit.add( Restrictions.and(
-                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx()))
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
         }
 
@@ -370,5 +370,25 @@ public class RecepcionMxService {
             resultado = recepcionMxLabList.get(0);
         }
         return  resultado;
+    }
+
+    /**
+     * Método que genera
+     * @param codigoLaboratorio
+     * @return
+     */
+    public String obtenerCodigoLab(String codigoLaboratorio){
+        String codigoLab=null;
+        String query = "select concat(to_char((count(a.idRecepcion)+1)),concat('-',to_char(current_date,'YY'))) " +
+                "from RecepcionMx as a where a.labRecepcion.codigo = :codLab and a.tipoRecepcionMx.codigo = 'TPRECPMX|VRT'";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("codLab", codigoLaboratorio);
+        Object oNumero  = q.uniqueResult();
+        if (oNumero!=null){
+            codigoLab = oNumero.toString();
+            codigoLab = codigoLaboratorio.concat("-").concat(codigoLab);
+        }
+        return codigoLab;
     }
 }

@@ -153,7 +153,7 @@ public class WorkSheetController {
                     if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
                         fis = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
                     }
-                    content[0] = solicitudDx.getIdTomaMx().getCodigoUnicoMx();
+                    content[0] = solicitudDx.getIdTomaMx().getCodigoLab();
                     content[1] = solicitudDx.getCodDx().getNombre();
                     content[2] = solicitudDx.getCodDx().getArea().getNombre();
                     content[3] = DateUtil.DateToString(solicitudDx.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a");
@@ -199,7 +199,7 @@ public class WorkSheetController {
 
                 //Create Fact header row
                 Row factHeaderrow = table.createRow(15f);
-                cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.unique.code.mx.short", null, null));
+                cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.lab.code.mx", null, null));
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
                 cell.setFillColor(Color.LIGHT_GRAY);
@@ -309,7 +309,8 @@ public class WorkSheetController {
             Map<String, String> mapMx = new HashMap<String, String>();
             int subIndice=0;
             for (DaTomaMx tomaMx : tomaMxList){
-                mapMx.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
+                boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( tomaMx.getIdTomaMx()).size() > 0;
+                mapMx.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
                 mapMx.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
                 if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
                     mapMx.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());

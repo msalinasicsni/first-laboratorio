@@ -35,6 +35,7 @@ public class DaTomaMx implements Serializable {
     private String codigoUnicoMx;
     private DaEnvioMx envio;
     private CategoriaMx categoriaMx;
+    private String codigoLab;
     private EntidadesAdtvas codSilaisAtencion;
     private Unidades codUnidadAtencion;
 
@@ -206,6 +207,16 @@ public class DaTomaMx implements Serializable {
 
     public void setCategoriaMx(CategoriaMx categoriaMx) {
         this.categoriaMx = categoriaMx;
+    }
+
+    @Basic
+    @Column(name = "CODIGO_LAB", nullable = true, insertable = true, updatable = true, length = 16, unique=true)
+    public String getCodigoLab() {
+        return codigoLab;
+    }
+
+    public void setCodigoLab(String codigoLab) {
+        this.codigoLab = codigoLab;
     }
 
     @ManyToOne(optional = true)

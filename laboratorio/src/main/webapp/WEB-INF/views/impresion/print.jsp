@@ -121,9 +121,22 @@
             // Send characters/raw commands to qz using "append"
             // This example is for EPL.  Please adapt to your printer language
             // Hint:  Carriage Return = \r, New Line = \n, Escape Double Quotes= \"
+            var separar = false;
+            if (codigo.indexOf('-')>-1){
+                var tamanioCodigo = codigo.lastIndexOf('-')+3;
+                var tamanioTotal = codigo.length;
+                separar = tamanioTotal>tamanioCodigo;
+            }
             qz.append('\nN\n');
-            qz.append('b1,2,D,c16,r16,"'+codigo+'"\n');
-            qz.append('A100,20,0,2,1,1,N,"'+codigo+'"\n');
+            qz.append('b0,0,D,c18,r18,"'+codigo+'"\n');
+            if(separar){
+                var parte1 = codigo.substring(0,codigo.lastIndexOf('-')+3);
+                var parte2 = codigo.substring(codigo.lastIndexOf('-')+3,codigo.length);
+                qz.append('A100,20,0,2,1,1,N,"' + parte1 + '"\n');
+                qz.append('A100,40,0,2,1,1,N,"' + parte2 + '"\n');
+            }else {
+                qz.append('A100,20,0,2,1,1,N,"' + codigo + '"\n');
+            }
             qz.append('P1,1\n');
             // Tell the applet to print.
             qz.print();

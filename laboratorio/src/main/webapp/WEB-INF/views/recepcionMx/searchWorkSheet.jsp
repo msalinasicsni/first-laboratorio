@@ -90,7 +90,7 @@
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                                     <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
                                     <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
-                                    <input id="text_cod_mx" type="hidden" value="<spring:message code="lbl.unique.code.mx.short"/>"/>
+                                    <input id="text_cod_mx" type="hidden" value="<spring:message code="lbl.lab.code.mx"/>"/>
                                     <input id="text_fechaMx" type="hidden" value="<spring:message code="lbl.sampling.datetime"/>"/>
                                     <input id="text_silais" type="hidden" value="<spring:message code="lbl.silais"/>"/>
                                     <input id="text_unidadS" type="hidden" value="<spring:message code="lbl.health.unit"/>"/>
