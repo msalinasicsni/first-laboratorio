@@ -130,9 +130,11 @@ public class ResultadoFinalService {
         }
 
         // filtro examenes con resultado
-        crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
-                .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado",false)).add(Restrictions.eq("pasivo", false))
-                .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
+        if (filtro.getSolicitudAprobada()==null) {
+            crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
+                    .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado", false)).add(Restrictions.eq("pasivo", false))
+                    .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
+        }
 
         //se filtra por tipo de solicitud
         if(filtro.getCodTipoSolicitud()!=null){
@@ -348,10 +350,13 @@ public class ResultadoFinalService {
                             Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
         }
-        // examenes con resultado
-        crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultado.class)
-                .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
-                .setProjection(Property.forName("examen.solicitudEstudio.idSolicitudEstudio"))));
+        //sólo cuando se busca desde resultado final, este filtro es null
+        if (filtro.getSolicitudAprobada()==null) {
+            // examenes con resultado
+            crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultado.class)
+                    .createAlias("examen", "examen").add(Restrictions.eq("pasivo", false))
+                    .setProjection(Property.forName("examen.solicitudEstudio.idSolicitudEstudio"))));
+        }
 
         //se filtra por tipo de solicitud
         if(filtro.getCodTipoSolicitud()!=null){
