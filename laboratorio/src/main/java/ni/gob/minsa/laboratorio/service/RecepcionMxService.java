@@ -289,32 +289,36 @@ public class RecepcionMxService {
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
             */
-            if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepción en laboratorio
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
-                Junction conditGroup = Restrictions.disjunction();
-
-                conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                        .createAlias("tipoEstudio", "estudio")
-                        .createAlias("estudio.area", "area")
-                        .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
-                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
-                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
-                                .setProjection(Property.forName("area.idArea"))))
-                        .createAlias("idTomaMx", "toma")
-                        .setProjection(Property.forName("idTomaMx.idTomaMx"))))
-                        .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                                .createAlias("codDx", "dx")
-                                .createAlias("dx.area","area")
-                                .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
-                                        .add(Restrictions.eq("pasivo", false)) //autoridad area activa
-                                        .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
-                                        .setProjection(Property.forName("area.idArea"))))
-                                .createAlias("idTomaMx", "toma")
-                                .setProjection(Property.forName("toma.idTomaMx"))));
-
-                crit.add(conditGroup);
-            }
         }
+            if(filtro.getCodEstado() != null){
+                if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepción en laboratorio
+                    //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                    Junction conditGroup = Restrictions.disjunction();
+
+                    conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .createAlias("tipoEstudio", "estudio")
+                            .createAlias("estudio.area", "area")
+                            .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
+                                    .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                    .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                    .setProjection(Property.forName("area.idArea"))))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("idTomaMx.idTomaMx"))))
+                            .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                    .createAlias("codDx", "dx")
+                                    .createAlias("dx.area","area")
+                                    .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
+                                            .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                            .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                            .setProjection(Property.forName("area.idArea"))))
+                                    .createAlias("idTomaMx", "toma")
+                                    .setProjection(Property.forName("toma.idTomaMx"))));
+
+                    crit.add(conditGroup);
+                }
+            }
+
+
         //filtro que las rutinas pertenezcan al laboratorio del usuario que consulta
         crit.createAlias("recepcion.labRecepcion","labRecep");
         crit.add(Subqueries.propertyIn("labRecep.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)

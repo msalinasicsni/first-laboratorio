@@ -79,6 +79,9 @@
                     <li class="qualityControlReport">
                         <a href="<spring:url value="/reports/qualityControl/init" htmlEscape="true "/>" title="<spring:message code="menu.qualityControlReport" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.qualityControlReport" /></a>
                     </li>
+                    <li class="reprintLabCode">
+                        <a href="<spring:url value="/reprint/init" htmlEscape="true "/>" title="<spring:message code="lbl.reprint.codelab" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="lbl.reprint.codelab" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="laboratorio">
