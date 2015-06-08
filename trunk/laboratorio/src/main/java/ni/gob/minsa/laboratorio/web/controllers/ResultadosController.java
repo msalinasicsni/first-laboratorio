@@ -4,12 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
+import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
+import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
+import ni.gob.minsa.laboratorio.domain.muestra.TipoMx;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
-import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -33,7 +36,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by FIRSTICT on 1/9/2015.
@@ -429,7 +435,15 @@ public class ResultadosController {
                 }else {
                     if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty()) {
                         resultadosService.addDetalleResultado(detalleResultado);
-                        if(addTestVA(request, ordenExamen) ){
+
+                        //save final result in dengue IGM o PCR
+                        if(ordenExamen.getCodExamen().getNombre().equals("Dengue ELISA IgM") || ordenExamen.getCodExamen().getNombre().equals("Dengue PCR")){
+                            saveFinalResultToDengue(detalleResultado, ordenExamen, usuario);
+                            esResFinal = "NO";
+
+                        }
+
+                        if(addTestVA(request, ordenExamen)){
                             examenAgregado = true;
                         }
                         if(esResFinal.equalsIgnoreCase("SI")){
@@ -455,6 +469,79 @@ public class ResultadosController {
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
+        }
+    }
+
+    private void saveFinalResultToDengue(DetalleResultado detalleResultado, OrdenExamen orden, Usuarios usuario) throws Exception {
+        try {
+            //search amount of orders exams
+            List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(orden.getSolicitudDx().getIdSolicitudDx());
+            //in one order case
+            if (ordenes.size() == 1) {
+                //search response value
+                if (detalleResultado != null) {
+                    //in positive case
+
+                    if (detalleResultado.getRespuesta() != null) {
+                        if (detalleResultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Integer idLista = Integer.valueOf(detalleResultado.getValor());
+                            Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                            //in positive case
+                            if (valor.getValor().toLowerCase().equals("positivo")) {
+                                //save final Result
+                                guardarResultadoFinal(detalleResultado, orden, false);
+                            }
+                            //in positive case
+                        } else if (detalleResultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                            if (detalleResultado.getValor().toLowerCase().equals("positivo")) {
+                                //save final Result
+                                guardarResultadoFinal(detalleResultado, orden, false);
+                            }
+                        }
+                    }
+                }
+
+                //in two order case
+            } else if (ordenes.size() == 2) {
+                //search detail result for the different order to the order to save
+                for (OrdenExamen ord : ordenes) {
+
+                        if (orden.getCodExamen().getNombre().equals("Dengue ELISA IgM") || orden.getCodExamen().getNombre().equals("Dengue PCR")) {
+
+                            List<DetalleResultado> det = resultadosService.getDetallesResultadoActivosByExamen(ord.getIdOrdenExamen());
+
+                            for (DetalleResultado de : det) {
+
+                                //setting values
+                                DetalleResultado deta = new DetalleResultado();
+                                deta.setValor(de.getValor());
+                                deta.setRespuesta(de.getRespuesta());
+                                deta.setUsuarioRegistro(usuario);
+
+                                if (de.getRespuesta() != null) {
+                                    if (de.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                        Integer idLista = Integer.valueOf(de.getValor());
+                                        Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                                        //in positive case
+                                        if (valor.getValor().toLowerCase().equals("positivo")) {
+                                            guardarResultadoFinal(deta, ord, false);
+                                        }
+                                        //in positive case
+                                    } else if (de.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                                        if (de.getValor().toLowerCase().equals("positivo")) {
+                                            guardarResultadoFinal(deta, ord, false);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+            }
+        } catch (Exception ex) {
+            throw new Exception(ex);
         }
     }
 
