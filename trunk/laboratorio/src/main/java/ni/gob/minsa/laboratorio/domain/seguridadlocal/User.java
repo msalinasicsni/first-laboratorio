@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.seguridadlocal;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name = "usuarios_sistema", schema = "laboratorio")
-public class User {
+public class User implements Serializable {
     private String username;
     private Date created;
     private String password;

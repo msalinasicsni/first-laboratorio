@@ -1,10 +1,12 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
-import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
-import org.hibernate.annotations.NamedQueries;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by souyen-ics on 11-13-14.
@@ -18,9 +20,11 @@ import java.io.Serializable;
     Integer idTipoMx;
     String nombre;
     boolean pasivo;
+    private Date fechaRegistro;
+    private User usuarioRegistro;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_TIPOMX", nullable = false, insertable = true, updatable = true)
     public Integer getIdTipoMx() {
         return idTipoMx;
@@ -49,6 +53,28 @@ import java.io.Serializable;
     public void setPasivo(boolean pasivo) {
         this.pasivo = pasivo;
     }
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_REGISTRO", nullable = true)
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    @ManyToOne()
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=true)
+    @ForeignKey(name = "fk_tipoMx_usuarioregistro")
+    public User getUsuarioRegistro() {
+        return usuarioRegistro;
+    }
+
+    public void setUsuarioRegistro(User usuarioRegistro) {
+        this.usuarioRegistro = usuarioRegistro;
+    }
+
 }
 
 
