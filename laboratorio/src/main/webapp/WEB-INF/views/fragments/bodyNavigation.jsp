@@ -133,6 +133,13 @@
                     <li class="respuestaSolicitud">
                         <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.request.aswers" />"><i class="fa fa-lg fa-fw fa-list-alt "></i> <spring:message code="menu.admin.request.aswers" /></a>
                     </li>
+                    <li class="sampleTypes">
+                        <a href="<spring:url value="/sampleTypes/init" htmlEscape="true "/>" title="<spring:message code="lbl.sample.types" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="lbl.sample.types" /></a>
+                    </li>
+                   <%-- <li class="assocSamplesReq">
+                        <a href="<spring:url value="/associationSR/init" htmlEscape="true "/>" title="<spring:message code="lbl.association.samples.req" />"><i class="fa fa-lg fa-fw fa-link"></i> <spring:message code="lbl.association.samples.req" /></a>
+                    </li>--%>
+
                 </ul>
             </li>
 
