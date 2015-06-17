@@ -9,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -557,8 +558,8 @@ public class AprobacionResultadoController {
             if (solicitudEstudio == null && solicitudDx == null){
                 throw new Exception(messageSource.getMessage("msg.approve.result.solic.not.found",null,null));
             } else {
-                long idUsuario = seguridadService.obtenerIdUsuario(request);
-                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+                User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+                Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
                 JsonObject jObjectOrdenes = new Gson().fromJson(idOrdenes, JsonObject.class);
                 //List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud);
                 //for(OrdenExamen ordenExamen:ordenExamenList){
@@ -574,7 +575,7 @@ public class AprobacionResultadoController {
                     for(DetalleResultado detalleResultado :detalleResultados){
                         detalleResultado.setPasivo(true);
                         detalleResultado.setRazonAnulacion(causaRechazo);
-                        detalleResultado.setUsuarioAnulacion(usuario);
+                        detalleResultado.setUsuarioAnulacion(usuarioService.getUsuarioById(1));
                         detalleResultado.setFechahAnulacion(new Timestamp(new Date().getTime()));
                         resultadosService.updateDetalleResultado(detalleResultado);
                     }
@@ -586,6 +587,7 @@ public class AprobacionResultadoController {
                     nuevaOrdenExamen.setCodExamen(ordenExamen.getCodExamen());
                     nuevaOrdenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
                     nuevaOrdenExamen.setSolicitudDx(ordenExamen.getSolicitudDx());
+                    nuevaOrdenExamen.setLabProcesa(labUsuario);
                     ordenExamenMxService.addOrdenExamen(nuevaOrdenExamen);
                 }
                 //Se anula el detalle del resultado final para la solicitud

@@ -97,7 +97,10 @@
                         <a href="<spring:url value="/trasladoMx/init" htmlEscape="true "/>" title="<spring:message code="menu.transfer.internal.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.internal.mx" /></a>
                     </li>
                     <li class="trasladoMxCC">
-                        <a href="<spring:url value="/trasladoMx/initCC" htmlEscape="true "/>" title="<spring:message code="menu.transfer.quality.control.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.quality.control.mx" /></a>
+                        <a href="<spring:url value="/trasladoMx/initCC" htmlEscape="true "/>" title="<spring:message code="menu.transfer.qualitycontrol.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.qualitycontrol.mx" /></a>
+                    </li>
+                    <li class="trasladoMxEx">
+                        <a href="<spring:url value="/trasladoMx/initExternal" htmlEscape="true "/>" title="<spring:message code="menu.transfer.external.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.external.mx" /></a>
                     </li>
                 </ul>
             </li>

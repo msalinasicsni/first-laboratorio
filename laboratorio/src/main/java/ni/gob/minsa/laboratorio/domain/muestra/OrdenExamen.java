@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.domain.muestra;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,9 +22,10 @@ public class OrdenExamen {
     private DaSolicitudDx solicitudDx;
     private Timestamp fechaHOrden;
     private CatalogoExamenes codExamen;
-    private Usuarios usarioRegistro;
+    private User usarioRegistro;
     private boolean anulado;
     private DaSolicitudEstudio solicitudEstudio;
+    private Laboratorio labProcesa;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -70,13 +72,13 @@ public class OrdenExamen {
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "USUARIO", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_FK")
-    public Usuarios getUsarioRegistro() {
+    public User getUsarioRegistro() {
         return usarioRegistro;
     }
 
-    public void setUsarioRegistro(Usuarios usarioRegistro) {
+    public void setUsarioRegistro(User usarioRegistro) {
         this.usarioRegistro = usarioRegistro;
     }
 
@@ -99,5 +101,16 @@ public class OrdenExamen {
 
     public void setSolicitudEstudio(DaSolicitudEstudio solicitudEstudio) {
         this.solicitudEstudio = solicitudEstudio;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "LABORATORIO_PRC", referencedColumnName = "CODIGO")
+    @ForeignKey(name = "LABORATORIO_ORDEX_FK")
+    public Laboratorio getLabProcesa() {
+        return labProcesa;
+    }
+
+    public void setLabProcesa(Laboratorio labProcesa) {
+        this.labProcesa = labProcesa;
     }
 }

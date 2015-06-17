@@ -300,6 +300,8 @@
                                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
                                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.desc.request"/></th>
                                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.cc"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.transfer.external"/></th>
                                                             <th><spring:message code="act.cancel"/></th>
                                                         </tr>
                                                         </thead>

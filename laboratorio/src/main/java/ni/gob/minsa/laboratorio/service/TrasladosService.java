@@ -56,7 +56,7 @@ public class TrasladosService {
      */
     public TrasladoMx getTrasladoActivoMxRecepcion(String idTomaMx, boolean enRecepGral){
         String query = "select t from TrasladoMx t inner join t.tomaMx mx " +
-                "where mx.idTomaMx = :idTomaMx and t.recepcionado = false and t.trasladoExterno = :enRecepGral order by t.prioridad asc" ;
+                "where mx.idTomaMx = :idTomaMx and t.recepcionado = false and (t.trasladoExterno = :enRecepGral or t.controlCalidad = :enRecepGral) order by t.prioridad asc" ;
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -273,13 +273,13 @@ public class TrasladosService {
 
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {
-            /*crit.createAlias("tomaMx.envio","envioMx");
+            crit.createAlias("tomaMx.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))));*/
+                    .setProjection(Property.forName("labautorizado.codigo"))));
         }
 
         //filtro para solicitudes aprobadas

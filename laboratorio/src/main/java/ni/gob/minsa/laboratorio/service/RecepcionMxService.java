@@ -280,16 +280,16 @@ public class RecepcionMxService {
             }
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
-        if (filtro.getNombreUsuario()!=null) {
-            /*crit.createAlias("tomaMx.envio","envioMx");
+        /*if (filtro.getNombreUsuario()!=null) {
+            crit.createAlias("tomaMx.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
-            */
-        }
+
+        }*/
             if(filtro.getCodEstado() != null){
                 if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepción en laboratorio
                     //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
@@ -328,6 +328,14 @@ public class RecepcionMxService {
                         .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                         .setProjection(Property.forName("labautorizado.codigo"))));
 
+        //sólo la última recepción de cada muestra
+
+        DetachedCriteria maxDateQuery = DetachedCriteria.forClass(RecepcionMx.class);
+        maxDateQuery.createAlias("tomaMx","mx");
+        maxDateQuery.add(Restrictions.eqProperty("mx.idTomaMx","tomaMx.idTomaMx"));
+        maxDateQuery.setProjection(Projections.max("fechaHoraRecepcion"));
+        crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));
+
         //filtro sólo control calidad en el laboratio del usuario
         if (filtro.getControlCalidad()!=null) {
             if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", sólo incluir rutinas
@@ -358,6 +366,23 @@ public class RecepcionMxService {
                                 .setProjection(Property.forName("idTomaMx.idTomaMx")))));
                 crit.add(conditGroup);
             }
+        }
+        //filtro para sólo solicitudes aprobadas
+        if (filtro.getSolicitudAprobada() != null) {
+            Junction conditGroup = Restrictions.disjunction();
+            conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                    .createAlias("idTomaMx", "toma")
+                    .setProjection(Property.forName("toma.idTomaMx"))))
+                    .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                            //.add(Restrictions.eq("controlCalidad",false)) ¿¿¿¿¿¿¿¿¿?????????????
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+
+
+            crit.add(conditGroup);
+
         }
 
         return crit.list();

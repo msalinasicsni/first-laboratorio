@@ -89,7 +89,9 @@ var TrasladoMx = function () {
                     rdTransferType: {required : true},
                     txtNombreTransporta: {required : true},
                     txtTemperatura: {required : true},
-                    idDxSolicitado: {required : true}
+                    idDxSolicitado: {required : true},
+                    labDestino: {required : true},
+                    idExamenes: {required : true}
                 },
                 // Do not change code below
                 errorPlacement : function(error, element) {
@@ -226,11 +228,13 @@ var TrasladoMx = function () {
                             muestrasObj['mensaje'] = '';
                             muestrasObj['cantMuestras']=len;
                             muestrasObj['cantMxProc'] = '';
-                            muestrasObj['codigosUnicosMx'] = '';
+                            //muestrasObj['codigosUnicosMx'] = '';
                             muestrasObj['tipoTraslado'] = $("#tipoTraslado").val();
                             muestrasObj['idRutina'] =  $('#idDxSolicitado').find('option:selected').val();
                             muestrasObj['nombreTransporta'] = $("#txtNombreTransporta").val();
                             muestrasObj['temperaturaTermo'] = $("#txtTemperatura").val();
+                            muestrasObj['labDestino'] =  $('#labDestino').find('option:selected').val();
+                            muestrasObj['idExamenes'] = $('#idExamenes').val();
                             console.log(muestrasObj);
                             $.ajax(
                                 {
@@ -260,9 +264,9 @@ var TrasladoMx = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
-                                            var codUnicosFormat = reemplazar(data.codigosUnicosMx,".","*");
-                                            var loc = window.location;
-                                            urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+codUnicosFormat;
+                                            //var codUnicosFormat = reemplazar(data.codigosUnicosMx,".","*");
+                                            //var loc = window.location;
+                                            //urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+codUnicosFormat;
                                             getMxs(false);
                                         }
                                         desbloquearUI();
@@ -293,7 +297,7 @@ var TrasladoMx = function () {
                         timeout : 4000
                     });
                 }
-            };
+            }
 
             <!--al seleccionar calidad de la muestra -->
             $('#codCalidadMx').change(function(){
@@ -370,18 +374,37 @@ var TrasladoMx = function () {
                 }
             });
 
-            function reemplazar (texto, buscar, nuevo){
-                var temp = '';
-                var long = texto.length;
-                for (j=0; j<long; j++) {
-                    if (texto[j] == buscar)
-                    {
-                        temp += nuevo;
-                    } else
-                        temp += texto[j];
+
+            $('#cmbTipoTraslado').change(function(){
+                var valSeleccionado = $(this).val();
+                $('#tipoTraslado').val(valSeleccionado);
+                if (valSeleccionado!='cc')
+                    $('#divLabDestino').fadeIn("fast");
+                else
+                    $('#divLabDestino').fadeOut("fast");
+            });
+
+            <!-- Al seleccionar diagnóstico-->
+            $('#idDxSolicitado').change(function () {
+                if ($(this).val().length > 0){
+                    $.getJSON(parametros.sExamenesURL, {
+                        idDx: $(this).val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].idExamen + '">'
+                                + data[i].nombre
+                                + '</option>';
+                        }
+                        $('#idExamenes').html(html);
+                    });
+                }else {
+                    var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    $('#idExamenes').html(html);
                 }
-                return temp;
-            }
+            });
         }
     };
 

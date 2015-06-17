@@ -288,7 +288,7 @@ var ReceiptOrders = function () {
                     var len = Object.keys(response).length;
                     for (var i = 0; i < len; i++) {
                         table2.fnAddData(
-                            [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud,
+                            [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud,response[i].cc,response[i].externo,
                                     '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id='+response[i].idOrdenExamen+'><i class="fa fa-times"></i></a>']);
 
                     }
