@@ -86,12 +86,13 @@ public class TrasladoMxController {
     private UsuarioService usuarioService;
 
     @Autowired
-    @Qualifier(value = "resultadoFinalService")
-    private ResultadoFinalService resultadoFinalService;
+    @Qualifier(value = "resultadosService")
+    private ResultadosService resultadosService;
 
     @Autowired
-    @Qualifier(value = "respuestasExamenService")
-    private RespuestasExamenService respuestasExamenService;
+    @Qualifier(value = "ordenExamenMxService")
+    private OrdenExamenMxService ordenExamenMxService;
+
 
     @Autowired
     MessageSource messageSource;
@@ -116,18 +117,40 @@ public class TrasladoMxController {
 
     @RequestMapping(value = "initCC", method = RequestMethod.GET)
     public ModelAndView initSearchFormCC() throws Exception {
-        logger.debug("buscar ordenes para recepcion");
+        logger.debug("buscar mx para traslado cc");
 
         ModelAndView mav = new ModelAndView();
         List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
         List<Catalogo_Dx> catalogoDxList = trasladosService.getRutinas();
         List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
         List<Area> areaList = areaService.getAreas();
-        mav.addObject("entidades",entidadesAdtvases);
+        mav.addObject("entidades", entidadesAdtvases);
         mav.addObject("tipoMuestra", tipoMxList);
         mav.addObject("area",areaList);
         mav.addObject("rutinas",catalogoDxList);
         mav.setViewName("laboratorio/trasladoMx/trasladoMxCC");
+
+        return mav;
+    }
+
+    @RequestMapping(value = "initExternal", method = RequestMethod.GET)
+    public ModelAndView initSearchFormExt() throws Exception {
+        logger.debug("buscar mx para traslado externo");
+
+        ModelAndView mav = new ModelAndView();
+        List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+        List<Catalogo_Dx> catalogoDxList = trasladosService.getRutinas();
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        List<Area> areaList = areaService.getAreas();
+        List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosRegionales();
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        laboratorioList.remove(labUser);
+        mav.addObject("entidades", entidadesAdtvases);
+        mav.addObject("tipoMuestra", tipoMxList);
+        mav.addObject("area",areaList);
+        mav.addObject("rutinas",catalogoDxList);
+        mav.addObject("laboratorios",laboratorioList);
+        mav.setViewName("laboratorio/trasladoMx/trasladoMxExterno");
 
         return mav;
     }
@@ -164,19 +187,36 @@ public class TrasladoMxController {
         return tomaMxToJson(tomaMxList);
     }
 
+    /**
+     * Método para realizar la búsqueda de Mx para traslado de externo hacia otro LAB
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * @return String con las Recepciones encontradas
+     * @throws Exception
+     */
+    @RequestMapping(value = "searchMxExt", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    String fetchMxExternoJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo las mxs para cc según filtros en JSON");
+        FiltroMx filtroMx = jsonToFiltroMx(filtro);
+        List<DaTomaMx> tomaMxList = trasladosService.getTomaMxCCByFiltro(filtroMx);
+        return tomaMxToJson(tomaMxList);
+    }
 
     @RequestMapping(value = "realizarTrasladoMx", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected void realizarTraslado(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
         String strMuestras="";
-        String codigosUnicosMx="";
+        //String codigosUnicosMx="";
         String tipoTraslado="";
         String idRutina = "";
         String nombreTransporta = "";
         Float temperaturaTermo = null;
         Integer cantMuestras = 0;
         Integer cantMxProc = 0;
+        String codLabDestino = "";
+        String idExamenes="";
+        boolean procesarTraslado;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -195,6 +235,10 @@ public class TrasladoMxController {
             if (jsonpObject.get("temperaturaTermo")!=null && !jsonpObject.get("temperaturaTermo").toString().isEmpty())
                 temperaturaTermo = jsonpObject.get("temperaturaTermo").getAsFloat();
 
+            if (jsonpObject.get("idExamenes")!=null && !jsonpObject.get("idExamenes").toString().isEmpty())
+                idExamenes = jsonpObject.get("idExamenes").getAsString();
+
+
             //Se obtiene estado en que debe quedar la muestra (Trasladada)
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|TRAS");
             //EstadoMx estadoMx = catalogosService.getEstadoMx(tipoTraslado.equals("cc")?"ESTDMX|ENV":"ESTDMX|EPLAB");
@@ -207,8 +251,9 @@ public class TrasladoMxController {
             Laboratorio labDestino = null;//laboratoriosService.getLaboratorioByCodigo("LABCNDR");
             Laboratorio labOrigen = null;//seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             Catalogo_Dx dxTraslado = tomaMxService.getDxById(idRutina);
-            if (tipoTraslado.equals("cc")){
-                labDestino = laboratoriosService.getLaboratorioByCodigo("LABCNDR");
+            if (!tipoTraslado.equals("interno")){
+                //codLabDestino viene cuando es traslado externo, cuando no viene es porque es control de calidad y por defecto se toma el CNDR
+                labDestino = laboratoriosService.getLaboratorioByCodigo(!codLabDestino.isEmpty()?codLabDestino:"LBCNDR");
                 if (labDestino==null){
                     throw new Exception("No se logró recuperar laboratio destino");
                 }
@@ -218,6 +263,8 @@ public class TrasladoMxController {
             //se obtienen muestras a trasladar
             JsonObject jObjectRecepciones = new Gson().fromJson(strMuestras, JsonObject.class);
             for(int i = 0; i< cantMuestras;i++) {
+                //por defecto se procesa traslado
+                procesarTraslado = true;
                 boolean crearSolicitud = true;
                 Timestamp fhRegistro = new Timestamp(new Date().getTime());
                 String idTomaMx = jObjectRecepciones.get(String.valueOf(i)).getAsString();
@@ -231,13 +278,8 @@ public class TrasladoMxController {
                 trasladoMx.setRecepcionado(false);
                 trasladoMx.setUsuarioRegistro(seguridadService.obtenerNombreUsuario());
 
-                if (tipoTraslado.equals("cc")){
-                    trasladoMx.setTrasladoExterno(true);
-                    trasladoMx.setLaboratorioDestino(labDestino);
-                    trasladoMx.setLaboratorioOrigen(labOrigen);
-                    trasladoMx.setPrioridad(1);
-                }else {
-                    trasladoMx.setTrasladoExterno(false);
+                if (tipoTraslado.equals("interno")){
+                    trasladoMx.setTrasladoInterno(true);
                     if (dxTraslado!=null){
                         trasladoMx.setAreaDestino(dxTraslado.getArea());
                         trasladoMx.setPrioridad(dxTraslado.getPrioridad());
@@ -249,12 +291,21 @@ public class TrasladoMxController {
                     }else{//si no tien traslados, tomar el area del dx con mayor prioridad
                         trasladoMx.setAreaOrigen(solicitudDxList.get(0).getCodDx().getArea());
                     }
-
+                }else {
+                    if (tipoTraslado.equals("cc")) {
+                        trasladoMx.setControlCalidad(true);
+                    }else{
+                        trasladoMx.setTrasladoExterno(true);
+                    }
+                    trasladoMx.setLaboratorioDestino(labDestino);
+                    trasladoMx.setLaboratorioOrigen(labOrigen);
+                    trasladoMx.setPrioridad(1);
                 }
+
                 try {
 
                     //crear solicitud dx, sólo si no existe solicitud pendiente de traslado para el nuevo dx solicitado
-                    if (!tipoTraslado.equals("cc")){ //interno
+                    if (tipoTraslado.equals("interno")){ //interno
                         List<DaSolicitudDx> solicitudDxPendTrasladoList = tomaMxService.getSolicitudesDxSinTrasladoByIdToma(idTomaMx);
                         //determinar si existe una solicitud pendiente para el nuevo tipo de dx solicitado, en caso de existir no se va a registrar nueva solicitud
                         for (DaSolicitudDx solicitudDx : solicitudDxPendTrasladoList){
@@ -276,43 +327,76 @@ public class TrasladoMxController {
                             tomaMxService.addSolicitudDx(solicitudDx);
                         }
                         tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
-                    }else{// control de calidad //crear envio y solicitud dx
-
-                        DaSolicitudDx solicitudDx = new DaSolicitudDx();
-                        solicitudDx.setIdTomaMx(tomaMx);
-                        solicitudDx.setAprobada(false);
-                        solicitudDx.setCodDx(dxTraslado);
-                        solicitudDx.setFechaHSolicitud(fhRegistro);
-                        solicitudDx.setControlCalidad(true);
-                        solicitudDx.setUsarioRegistro(usurioRegistro);
-                        solicitudDx.setLabProcesa(labDestino);
-                        tomaMxService.addSolicitudDx(solicitudDx);
-                        tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
-
-                        DaEnvioMx envioMx = new DaEnvioMx();
-                        envioMx.setLaboratorioDestino(labDestino);
-                        envioMx.setUsarioRegistro(usurioRegistro);
-                        envioMx.setFechaHoraEnvio(fhRegistro);
-                        envioMx.setNombreTransporta(nombreTransporta);
-                        envioMx.setTemperaturaTermo(temperaturaTermo);
-
-                        try {
-                            tomaMxService.addEnvioOrden(envioMx);
-                        }catch (Exception ex){
-                            resultado = messageSource.getMessage("msg.sending.error.add",null,null);
-                            resultado=resultado+". \n "+ex.getMessage();
-                            ex.printStackTrace();
-                            throw new Exception(ex);
+                    }else{
+                        //se recupera la solicitud de dx existente para la muestra y el dx seleccionado por el usuario
+                        DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx,dxTraslado.getIdDiagnostico());
+                        if (solicitudDx!=null) {
+                            // control de calidad //crear envio y solicitud dx
+                            if (tipoTraslado.equals("cc")) {
+                                DaSolicitudDx solicitudDxCC = new DaSolicitudDx();
+                                solicitudDxCC.setIdTomaMx(tomaMx);
+                                solicitudDxCC.setAprobada(false);
+                                solicitudDxCC.setCodDx(dxTraslado);
+                                solicitudDxCC.setFechaHSolicitud(fhRegistro);
+                                solicitudDxCC.setControlCalidad(true);
+                                solicitudDxCC.setUsarioRegistro(usurioRegistro);
+                                solicitudDxCC.setLabProcesa(labDestino);
+                                tomaMxService.addSolicitudDx(solicitudDxCC);
+                            } else {
+                                //externo, validar si el dx tiene el examanen y el exámen sin resultado
+                                //si ya tiene registrado exámenes con resultado, no se va a trasladar
+                                String[] arrayExamenes = idExamenes.split(",");
+                                List<OrdenExamen> ordenExamenList;
+                                int contExamenesValidos = 0;
+                                for (String idExamen : arrayExamenes){
+                                    ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx,Integer.valueOf(idRutina),Integer.valueOf(idExamen),seguridadService.obtenerNombreUsuario());
+                                    if (ordenExamenList.size()>0){
+                                        if (resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
+                                            //solicitudDx.setSegundoLabProcesa2(labDestino);
+                                            //tomaMxService.updateSolicitudDx(solicitudDx);
+                                            OrdenExamen ordenProcesar = ordenExamenList.get(0);
+                                            ordenProcesar.setLabProcesa(labDestino);
+                                            ordenExamenMxService.updateOrdenExamen(ordenProcesar);
+                                            contExamenesValidos++;
+                                        }
+                                    }
+                                }
+                                //si ningún examen es válido para el traslado, no procesar traslado
+                                if (contExamenesValidos<=0)
+                                    procesarTraslado = false;
+                            }
+                        }else {//si no se encontró la solicitud, no se permite el traslado
+                            procesarTraslado = false;
+                            //throw new Exception("No se logró recuperar diagnóstico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
                         }
-                        //antes enviar a histórico relación mx y enviomx
-                        HistoricoEnvioMx historicoEnvioMx = new HistoricoEnvioMx();
-                        historicoEnvioMx.setEnvioMx(tomaMx.getEnvio());
-                        historicoEnvioMx.setTomaMx(tomaMx);
-                        historicoEnvioMx.setFechaHoraRegistro(fhRegistro);
-                        historicoEnvioMx.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                        trasladosService.saveHistoricoEnvioMx(historicoEnvioMx);
-                        //se setea nuevo envio
-                        tomaMx.setEnvio(envioMx);
+                        if (procesarTraslado) {
+                            tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
+
+                            DaEnvioMx envioMx = new DaEnvioMx();
+                            envioMx.setLaboratorioDestino(labDestino);
+                            envioMx.setUsarioRegistro(usurioRegistro);
+                            envioMx.setFechaHoraEnvio(fhRegistro);
+                            envioMx.setNombreTransporta(nombreTransporta);
+                            envioMx.setTemperaturaTermo(temperaturaTermo);
+
+                            try {
+                                tomaMxService.addEnvioOrden(envioMx);
+                            } catch (Exception ex) {
+                                resultado = messageSource.getMessage("msg.sending.error.add", null, null);
+                                resultado = resultado + ". \n " + ex.getMessage();
+                                ex.printStackTrace();
+                                throw new Exception(ex);
+                            }
+                            //antes enviar a histórico relación mx y enviomx
+                            HistoricoEnvioMx historicoEnvioMx = new HistoricoEnvioMx();
+                            historicoEnvioMx.setEnvioMx(tomaMx.getEnvio());
+                            historicoEnvioMx.setTomaMx(tomaMx);
+                            historicoEnvioMx.setFechaHoraRegistro(fhRegistro);
+                            historicoEnvioMx.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                            trasladosService.saveHistoricoEnvioMx(historicoEnvioMx);
+                            //se setea nuevo envio
+                            tomaMx.setEnvio(envioMx);
+                        }
                     }
 
                 } catch (Exception ex) {
@@ -321,22 +405,23 @@ public class TrasladoMxController {
                     ex.printStackTrace();
                     throw new Exception(ex);
                 }
-
+                if (procesarTraslado) {
                     //se tiene que actualizar la tomaMx (estado y Envio para cc)
-                       try {
+                    try {
                         trasladosService.saveTrasladoMx(trasladoMx);
                         tomaMxService.updateTomaMx(tomaMx);
                         cantMxProc++;
-                        if(cantMxProc==1)
+                        /*if(cantMxProc==1)
                             codigosUnicosMx = tomaMx.getCodigoUnicoMx();
                         else
-                            codigosUnicosMx += ","+ tomaMx.getCodigoUnicoMx();
+                            codigosUnicosMx += ","+ tomaMx.getCodigoUnicoMx();*/
                     } catch (Exception ex) {
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
                         ex.printStackTrace();
-                           throw new Exception(ex);
+                        throw new Exception(ex);
                     }
+                }
             }
 
         } catch (Exception ex) {
@@ -351,11 +436,12 @@ public class TrasladoMxController {
             map.put("mensaje",resultado);
             map.put("cantMuestras", cantMuestras.toString());
             map.put("cantMxProc", cantMxProc.toString());
-            map.put("codigosUnicosMx",codigosUnicosMx);
+            map.put("idExamenes",idExamenes);
             map.put("tipoTraslado",tipoTraslado);
             map.put("idRutina",idRutina);
             map.put("nombreTransporta",nombreTransporta);
             map.put("temperaturaTermo",(temperaturaTermo!=null?String.valueOf(temperaturaTermo):""));
+            map.put("labDestino",codLabDestino);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -426,8 +512,10 @@ public class TrasladoMxController {
         filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las enviadas
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
-        if (tipoTraslado.equals("cc")){ //sólo para traslado al CNDR la solicitud tiene que estar aprobada
+        if (tipoTraslado.equals("cc")){ //para traslado al CNDR la solicitud tiene que estar aprobada
             filtroMx.setSolicitudAprobada(true);
+        }else if(tipoTraslado.equals("externo")){ //para traslado externo la solicitud no tiene que estar aprobada
+            filtroMx.setSolicitudAprobada(false);
         }
         return filtroMx;
     }

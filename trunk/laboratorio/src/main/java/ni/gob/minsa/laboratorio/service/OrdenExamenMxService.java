@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.service;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadExamen;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -81,7 +82,7 @@ public class OrdenExamenMxService {
     }
 
     /**
-     * Método que obtiene las ordenes de exámenes generadas para la muestra, en las àreas a las que tiene autoridad el usuario que consulta
+     * Método que obtiene las ordenes de exámenes generadas para la muestra, en las àreas a las que tiene autoridad el usuario que consulta y el lab que las procesa
      * @param idTomaMx
      * @param username
      * @return
@@ -89,14 +90,20 @@ public class OrdenExamenMxService {
     public List<OrdenExamen> getOrdenesExamenByIdMxAndUser(String idTomaMx, String username){
         Session session = sessionFactory.getCurrentSession();
         List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
+        /*Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
                 "AutoridadArea as aa where dx.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username");
+        */
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
+                "AutoridadArea as aa, AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and  dx.area.idArea = aa.area.idArea " +
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username");
+
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("username",username);
         ordenExamenList = q.list();
         //se toman las que son de estudio
         Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx inner join oe.solicitudEstudio.tipoEstudio as es, " +
-                "AutoridadArea as aa where es.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username");
+                "AutoridadArea as aa,AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and es.area.idArea = aa.area.idArea " +
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username ");
         q2.setParameter("idTomaMx",idTomaMx);
         q2.setParameter("username",username);
         ordenExamenList.addAll(q2.list());
@@ -138,8 +145,8 @@ public class OrdenExamenMxService {
     public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdDxIdExamen(String idTomaMx, int idDx, int idExamen, String userName){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx, AutoridadLaboratorio as al " +
-                "where al.laboratorio.codigo = sdx.labProcesa.codigo and  mx.idTomaMx =:idTomaMx " +
-                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false ");
+                "where al.laboratorio.codigo = oe.labProcesa.codigo and  mx.idTomaMx =:idTomaMx " +
+                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false order by oe.fechaHOrden");
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idDx",idDx);
         q.setParameter("idExamen",idExamen);
@@ -306,6 +313,14 @@ public class OrdenExamenMxService {
                     .add(Restrictions.and(Restrictions.eq("autoridadArea.pasivo",false)))  //autoridad area que pertenece examen activa
                     .add(Restrictions.and(Restrictions.eq("autoridadArea.user.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("examen.idExamen"))));
+
+            crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));
+
         }
 
         return crit.list();
@@ -544,14 +559,16 @@ public class OrdenExamenMxService {
         List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
         //se toman las que son de diagnóstico.
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
-                "AutoridadArea as aa, AutoridadLaboratorio  al where sdx.labProcesa.codigo = al.laboratorio.codigo and  dx.area.idArea = aa.area.idArea " +
+                "AutoridadArea as aa, AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and  dx.area.idArea = aa.area.idArea " +
                 "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false");
+
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("username",username);
         ordenExamenList = q.list();
         //se toman las que son de estudio
         Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx inner join oe.solicitudEstudio.tipoEstudio as es, " +
-                "AutoridadArea as aa where es.area.idArea = aa.area.idArea and mx.idTomaMx =:idTomaMx and aa.user.username = :username and oe.anulado = false");
+                "AutoridadArea as aa,AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and es.area.idArea = aa.area.idArea " +
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false");
         q2.setParameter("idTomaMx",idTomaMx);
         q2.setParameter("username",username);
         ordenExamenList.addAll(q2.list());

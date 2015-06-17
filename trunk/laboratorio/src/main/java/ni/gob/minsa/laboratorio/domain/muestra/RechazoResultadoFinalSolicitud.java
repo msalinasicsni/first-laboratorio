@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -18,7 +19,7 @@ public class RechazoResultadoFinalSolicitud {
     private String idRechazo;
     private DaSolicitudDx solicitudDx;
     private Timestamp fechaHRechazo;
-    private Usuarios usarioRechazo;
+    private User usarioRechazo;
     private DaSolicitudEstudio solicitudEstudio;
     private String causaRechazo;
 
@@ -55,13 +56,13 @@ public class RechazoResultadoFinalSolicitud {
         this.fechaHRechazo = fechaHOrden;
     }
     @ManyToOne(optional = false)
-    @JoinColumn(name = "USUARIO", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_RECHAZO_FK")
-    public Usuarios getUsarioRechazo() {
+    public User getUsarioRechazo() {
         return usarioRechazo;
     }
 
-    public void setUsarioRechazo(Usuarios usarioRegistro) {
+    public void setUsarioRechazo(User usarioRegistro) {
         this.usarioRechazo = usarioRegistro;
     }
 

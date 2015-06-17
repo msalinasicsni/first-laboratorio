@@ -21,6 +21,8 @@ public class TrasladoMx {
     String idTraslado;
     DaTomaMx tomaMx;
     boolean trasladoExterno;
+    boolean trasladoInterno;
+    boolean controlCalidad;
     Laboratorio laboratorioOrigen;
     Laboratorio laboratorioDestino;
     Area areaOrigen;
@@ -56,7 +58,7 @@ public class TrasladoMx {
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name="AREA_ORI", referencedColumnName = "ID_AREA", nullable = false)
+    @JoinColumn(name="AREA_ORI", referencedColumnName = "ID_AREA", nullable = true)
     @ForeignKey(name = "TRASLADO_AREA_ORI_FK")
     public Area getAreaOrigen() {
         return areaOrigen;
@@ -67,7 +69,7 @@ public class TrasladoMx {
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name="AREA_DEST", referencedColumnName = "ID_AREA", nullable = false)
+    @JoinColumn(name="AREA_DEST", referencedColumnName = "ID_AREA", nullable = true)
     @ForeignKey(name = "TRASLADO_AREA_DEST_FK")
     public Area getAreaDestino() {
         return areaDestino;
@@ -138,8 +140,28 @@ public class TrasladoMx {
         this.trasladoExterno = trasladoExterno;
     }
 
+    @Basic
+    @Column(name = "TRASLADO_INTERNO", columnDefinition = "number(1,0) default 0", nullable = false, insertable = true, updatable = true)
+    public boolean isTrasladoInterno() {
+        return trasladoInterno;
+    }
+
+    public void setTrasladoInterno(boolean trasladoInterno) {
+        this.trasladoInterno = trasladoInterno;
+    }
+
+    @Basic
+    @Column(name = "TRASLADO_CC", columnDefinition = "number(1,0) default 0", nullable = false, insertable = true, updatable = true)
+    public boolean isControlCalidad() {
+        return controlCalidad;
+    }
+
+    public void setControlCalidad(boolean controlCalidad) {
+        this.controlCalidad = controlCalidad;
+    }
+
     @ManyToOne(optional = true)
-    @JoinColumn(name = "LABORATORIO_ORI", referencedColumnName = "CODIGO")
+    @JoinColumn(name = "LABORATORIO_ORI", referencedColumnName = "CODIGO", nullable = true)
     @ForeignKey(name = "TRASLADO_LABORATORIO_ORI_FK")
     public Laboratorio getLaboratorioOrigen() {
         return laboratorioOrigen;
@@ -150,7 +172,7 @@ public class TrasladoMx {
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "LABORATORIO_DEST", referencedColumnName = "CODIGO")
+    @JoinColumn(name = "LABORATORIO_DEST", referencedColumnName = "CODIGO", nullable = true)
     @ForeignKey(name = "TRASLADO_LABORATORIO_DEST_FK")
     public Laboratorio getLaboratorioDestino() {
         return laboratorioDestino;

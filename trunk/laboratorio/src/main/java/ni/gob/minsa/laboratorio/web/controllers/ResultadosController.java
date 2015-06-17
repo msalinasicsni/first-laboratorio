@@ -4,15 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
-import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
-import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
-import ni.gob.minsa.laboratorio.domain.muestra.TipoMx;
+import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -679,7 +677,9 @@ public class ResultadosController {
                                 //Buscar los resultados por el idOrdenExamen
                                 List<DetalleResultado> resultado = resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen());
                                 long idUsuario = seguridadService.obtenerIdUsuario(request);
-                                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+                                //Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+                                User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+                                Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
                                 for (DetalleResultado res : resultado) {
                                     Integer dias = DateUtil.CalcularDiferenciaDiasFechas(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), new Date());
                                     //en caso de ser la respuesta tipo texto buscar texto positivo
@@ -694,6 +694,7 @@ public class ResultadosController {
                                                 ordenExamen.setCodExamen(examen);
                                                 ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
                                                 ordenExamen.setUsarioRegistro(usuario);
+                                                ordenExamen.setLabProcesa(labUsuario);
                                                 try {
                                                     ordenExamenMxService.addOrdenExamen(ordenExamen);
                                                     examenAgregado = true;
@@ -717,6 +718,7 @@ public class ResultadosController {
                                                 ordenExamen.setCodExamen(examen);
                                                 ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
                                                 ordenExamen.setUsarioRegistro(usuario);
+                                                ordenExamen.setLabProcesa(labUsuario);
                                                 try {
                                                     ordenExamenMxService.addOrdenExamen(ordenExamen);
                                                     examenAgregado = true;
@@ -726,14 +728,9 @@ public class ResultadosController {
                                                 }
                                             }
                                         }
-
-
                                     }
-
-
                                 }
                             }
-
                         }
                     }
                 }

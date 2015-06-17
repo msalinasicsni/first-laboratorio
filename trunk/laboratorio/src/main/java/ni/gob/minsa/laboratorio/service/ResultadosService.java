@@ -148,4 +148,14 @@ public class ResultadosService {
         q.setParameter("tipo", tipo);
         return  (DetalleResultado)q.uniqueResult();
     }
+
+    public List<DetalleResultado> getDetallesResultadoActivosByIdSolicitud(String idSolicitud){
+        String query = "select a from DetalleResultado as a inner join a.examen as orden " +
+                "where a.pasivo = false and (orden.solicitudDx.idSolicitudDx = :idSolicitud or orden.solicitudEstudio.idSolicitudEstudio = :idSolicitud)";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
+        return  q.list();
+    }
 }

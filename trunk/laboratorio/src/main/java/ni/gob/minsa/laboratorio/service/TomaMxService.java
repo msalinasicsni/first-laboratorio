@@ -266,12 +266,13 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSolicitudesDxByIdToma(String idTomaMx, String codigoLab){
-        /*String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx inner join mx.envio en " +
-                "where mx.idTomaMx = :idTomaMx and en.laboratorioDestino.codigo = :codigoLab " +
-                "and sdx.labProcesa.codigo = :codigoLab ORDER BY sdx.fechaHSolicitud";*/
-        String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
+        String query = "select distinct sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
                 "where mx.idTomaMx = :idTomaMx " +
-                "and sdx.labProcesa.codigo = :codigoLab ORDER BY sdx.fechaHSolicitud";
+                "and (sdx.labProcesa.codigo = :codigoLab" +
+                " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
+                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) " +
+                "ORDER BY sdx.fechaHSolicitud ";
+
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("codigoLab",codigoLab);
@@ -635,9 +636,10 @@ public class TomaMxService {
         return q.list();
     }
 
-    public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea){
-        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx " +
-                "and codDx.area.idArea = :idArea ORDER BY fechaHSolicitud";
+    public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea, String userName){
+        String query = "from DaSolicitudDx sdx, AutoridadLaboratorio al where sdx.idTomaMx.idTomaMx = :idTomaMx " +
+                "and sdx.labProcesa.codigo = al.laboratorio.codigo and sdx.codDx.area.idArea = :idArea and al.user.username = :username " +
+                "ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idArea",idArea);
@@ -684,5 +686,22 @@ public class TomaMxService {
             embarazo="Si";
 
         return embarazo;
+    }
+
+    /**
+     *
+     * Método que obtiene las solicitudes dx de una muestra, que tenga examenes a procesar en un lab determinado
+     * @param idTomaMx toma a filtrar
+     * @param codigoLab laboratorio a filtrar
+     * @return List<DaSolicitudDx>
+     */
+    public List<DaSolicitudDx> getSolicitudesDxTrasladoExtByIdToma(String idTomaMx, String codigoLab){
+        String query = "select distinct sdx from OrdenExamen oe inner join oe.solicitudDx sdx inner join sdx.idTomaMx mx " +
+                "where mx.idTomaMx = :idTomaMx " +
+                "and oe.labProcesa.codigo = :codigoLab ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("codigoLab",codigoLab);
+        return q.list();
     }
 }
