@@ -339,6 +339,11 @@
             <artifactId>sis-persona-cliente</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>minsa</groupId>
+            <artifactId>sis-portal-cliente</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 	</dependencies>
 	<repositories>
 		<!-- For testing against latest Spring snapshots -->

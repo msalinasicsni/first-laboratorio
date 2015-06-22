@@ -704,4 +704,13 @@ public class TomaMxService {
         q.setParameter("codigoLab",codigoLab);
         return q.list();
     }
+
+    public DaSolicitudDx getSolicitudDxByMxDxNoCC(String idTomaMx,  Integer idDiagnostico){
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and controlCalidad = false  " +
+                "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("idDiagnostico",idDiagnostico);
+        return (DaSolicitudDx)q.uniqueResult();
+    }
 }

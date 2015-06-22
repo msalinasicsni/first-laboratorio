@@ -405,7 +405,8 @@ public class ResultadosController {
 
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            //Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             //se obtiene datos de los conceptos a registrar
 
             JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
@@ -470,7 +471,7 @@ public class ResultadosController {
         }
     }
 
-    private void saveFinalResultToDengue(DetalleResultado detalleResultado, OrdenExamen orden, Usuarios usuario) throws Exception {
+    private void saveFinalResultToDengue(DetalleResultado detalleResultado, OrdenExamen orden, User usuario) throws Exception {
         try {
             //search amount of orders exams
             List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(orden.getSolicitudDx().getIdSolicitudDx());
@@ -591,8 +592,8 @@ public class ResultadosController {
             idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
             causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+
+            User usuario =seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
 
             String idTomaMx = "";
             String idSolicitud = "";

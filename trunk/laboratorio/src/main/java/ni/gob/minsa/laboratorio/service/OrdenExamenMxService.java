@@ -575,5 +575,15 @@ public class OrdenExamenMxService {
         return ordenExamenList;
     }
 
-
+    public OrdenExamen getOrdExamenNoAnulByCodLabMxIdDxIdExamen(String codigoLab, int idDx, int idExamen, String userName){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx, AutoridadLaboratorio as al " +
+                "where al.laboratorio.codigo = oe.labProcesa.codigo and  mx.codigoLab =:codigoLab " +
+                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false order by oe.fechaHOrden");
+        q.setParameter("codigoLab",codigoLab);
+        q.setParameter("idDx",idDx);
+        q.setParameter("idExamen",idExamen);
+        q.setParameter("userName",userName);
+        return (OrdenExamen)q.uniqueResult();
+    }
 }

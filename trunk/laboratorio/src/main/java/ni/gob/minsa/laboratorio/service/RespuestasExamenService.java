@@ -115,4 +115,13 @@ public class RespuestasExamenService {
         q.setParameter("idLista",idLista);
         return (Catalogo_Lista) q.uniqueResult();
     }
+
+    public RespuestaExamen getRespuestaByNombre(String nombreRespuesta){
+        String query = "from RespuestaExamen as a where nombre =:nombreRespuesta";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("nombreRespuesta", nombreRespuesta);
+        return (RespuestaExamen)q.uniqueResult();
+    }
 }

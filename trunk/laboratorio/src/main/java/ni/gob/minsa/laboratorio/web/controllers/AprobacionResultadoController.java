@@ -575,7 +575,7 @@ public class AprobacionResultadoController {
                     for(DetalleResultado detalleResultado :detalleResultados){
                         detalleResultado.setPasivo(true);
                         detalleResultado.setRazonAnulacion(causaRechazo);
-                        detalleResultado.setUsuarioAnulacion(usuarioService.getUsuarioById(1));
+                        detalleResultado.setUsuarioAnulacion(usuario);
                         detalleResultado.setFechahAnulacion(new Timestamp(new Date().getTime()));
                         resultadosService.updateDetalleResultado(detalleResultado);
                     }

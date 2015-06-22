@@ -137,7 +137,7 @@ var QualityReport = function () {
                         codigos = "";
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].solicitud,dataToLoad[i].fechaSolicitud,dataToLoad[i].fechaAprobacion,dataToLoad[i].codigoUnicoMx,
+                                [dataToLoad[i].solicitud,dataToLoad[i].fechaSolicitud,dataToLoad[i].fechaAprobacion,dataToLoad[i].codigoLab,
                                     dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].laboratorio , " <input type='hidden' value='"+dataToLoad[i].resultados+"'/>"]);
                             if (i+1< len) {
                                 codigos += dataToLoad[i].codigoUnicoMx + ",";
