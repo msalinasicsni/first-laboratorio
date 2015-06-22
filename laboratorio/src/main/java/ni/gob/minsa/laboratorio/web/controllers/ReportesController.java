@@ -1937,7 +1937,8 @@ public class ReportesController {
         Integer indice=0;
         for(DaSolicitudDx diagnostico : solicitudDxList){
             Map<String, String> map = new HashMap<String, String>();
-            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab());
+            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoUnicoMx());
+            map.put("codigoLab", diagnostico.getIdTomaMx().getCodigoLab());
             map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
             map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
             if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
@@ -2045,10 +2046,10 @@ public class ReportesController {
 
         String fechaAprobacion = null;
         List<DetalleResultadoFinal> detalleResultado = null;
+        List<DetalleResultadoFinal> detalleResultadoNoCC = null;
         String fechaImpresion = null;
         PDDocument doc = new PDDocument();
         List<DaSolicitudDx> solicDx = null;
-        DaSolicitudDx detalleSoliDx = null;
         PDPageContentStream stream = null;
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
@@ -2057,16 +2058,15 @@ public class ReportesController {
 
         for (String codigoMx : tomasArray) {
             solicDx = tomaMxService.getSolicitudesDxQCAprobByToma(codigoMx);
-
             fechaAprobacion = null;
 
-
-                //Obtener las respuestas activas de la solicitud
+            //Obtener las respuestas activas de la solicitud
                 if (solicDx.size()>0) {
                     reporteCRes = true;
                     for (DaSolicitudDx solicitudDx : solicDx) {
-                        detalleSoliDx = solicitudDx;
+                        DaSolicitudDx solicitudNoCC = tomaMxService.getSolicitudDxByMxDxNoCC(solicitudDx.getIdTomaMx().getIdTomaMx(),solicitudDx.getCodDx().getIdDiagnostico());
                         detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
+                        detalleResultadoNoCC = resultadoFinalService.getDetResActivosBySolicitud(solicitudNoCC.getIdSolicitudDx());
                         fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
                         if (solicitudDx.getFechaAprobacion() != null) {
@@ -2075,6 +2075,7 @@ public class ReportesController {
 
 
                         if (detalleResultado != null) {
+                            boolean coincide = false;
 
                             //Prepare the document.
                             float y = 480;
@@ -2086,9 +2087,9 @@ public class ReportesController {
 
                             GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
                             drawInfoLabVertical(stream, page, labProcesa);
-                            drawReportHeader(stream, detalleSoliDx, null);
+                            drawReportHeader(stream, solicitudDx, null);
 
-                            drawInfoSample(stream, detalleSoliDx, null, y);
+                            drawInfoSample(stream, solicitudDx, null, y);
                             y -= m1;
 
 
@@ -2109,16 +2110,29 @@ public class ReportesController {
                                     lista = resul.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
                                 }
 
-                                if (lista) {
+                                for (DetalleResultadoFinal resultadoFinalNoCC : detalleResultadoNoCC){
+                                    if (!lista) {
+                                        if (resul.getValor().equalsIgnoreCase(resultadoFinalNoCC.getValor())) {
+                                            coincide = true;
+                                        }
+                                    }else {
+                                        Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
+                                        Catalogo_Lista catListaNoCC = conceptoService.getCatalogoListaById(Integer.valueOf(resultadoFinalNoCC.getValor()));
+                                        if (catLista.getValor().equalsIgnoreCase(catListaNoCC.getValor()))
+                                            coincide = true;
+                                    }
+                                }
+
+                                /*if (lista) {
                                     Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
                                     valor = catLista.getValor();
                                 } else {
                                     valor = resul.getValor();
-                                }
+                                }*/
 
 
                                 content[numFila][0] = respuesta;
-                                content[numFila][1] = valor;
+                                content[numFila][1] = (coincide?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)); //valor;
                                 numFila++;
 
                             }
@@ -2368,7 +2382,7 @@ public class ReportesController {
         cell.setFontSize(10);
         cell.setFillColor(Color.LIGHT_GRAY);
 
-        cell = factHeaderrow.createCell((50), messageSource.getMessage("lbl.value", null, null));
+        cell = factHeaderrow.createCell((50), messageSource.getMessage("lbl.match", null, null));
         cell.setFillColor(Color.lightGray);
         cell.setFont(PDType1Font.HELVETICA_BOLD);
         cell.setFontSize(10);

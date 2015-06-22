@@ -9,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -472,8 +473,7 @@ public class ResultadoFinalController {
             cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
             DaSolicitudDx solicitud = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
             DaSolicitudEstudio estudio = tomaMxService.getEstudioByIdSolicitud(idSolicitud);
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             //se obtiene datos de los conceptos a registrar
 
             JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
@@ -534,8 +534,7 @@ public class ResultadoFinalController {
             causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
             DaSolicitudDx soli = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
             DaSolicitudEstudio estudio = tomaMxService.getEstudioByIdSolicitud(idSolicitud);
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             //se obtiene datos de los resultados a registrar
             List<DetalleResultadoFinal> detResFinalActivos =  resultadoFinalService.getDetResActivosBySolicitud(idSolicitud);
             for(DetalleResultadoFinal detResFinal : detResFinalActivos) {

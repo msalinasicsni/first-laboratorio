@@ -543,7 +543,7 @@ public class RecepcionMxController {
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
                             resultadoFinal.setPasivo(false);
                             resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
                             resultadoFinal.setRespuesta(respuestaDefecto);
                             resultadoFinal.setSolicitudDx(solicitudDx);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
@@ -561,7 +561,7 @@ public class RecepcionMxController {
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
                             resultadoFinal.setPasivo(false);
                             resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
                             resultadoFinal.setRespuesta(respuestaDefecto);
                             resultadoFinal.setSolicitudEstudio(solicitudEst);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
@@ -708,7 +708,7 @@ public class RecepcionMxController {
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
                             resultadoFinal.setPasivo(false);
                             resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
                             resultadoFinal.setRespuesta(respuestaDefecto);
                             resultadoFinal.setSolicitudDx(solicitudDx);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());
@@ -726,7 +726,7 @@ public class RecepcionMxController {
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
                             resultadoFinal.setPasivo(false);
                             resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            resultadoFinal.setUsuarioRegistro(usuarioService.getUsuarioById(1));//ESTO SE DEBE CAMBIAR
+                            resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
                             resultadoFinal.setRespuesta(respuestaDefecto);
                             resultadoFinal.setSolicitudEstudio(solicitudEst);
                             resultadoFinal.setValor(respuestaDefecto.getNombre());

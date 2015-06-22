@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.domain.resultados;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.LazyCollection;
@@ -24,11 +25,11 @@ public class DetalleResultadoFinal implements Serializable{
     DaSolicitudDx solicitudDx;
     RespuestaSolicitud respuesta;
     RespuestaExamen respuestaExamen;
-    Usuarios usuarioRegistro;
+    User usuarioRegistro;
     Timestamp fechahRegistro;
     boolean pasivo;
     String razonAnulacion;
-    Usuarios usuarioAnulacion;
+    User usuarioAnulacion;
     Timestamp fechahAnulacion;
     DaSolicitudEstudio solicitudEstudio;
 
@@ -121,24 +122,24 @@ public class DetalleResultadoFinal implements Serializable{
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_REG_DR_FK")
-    public Usuarios getUsuarioRegistro() {
+    public User getUsuarioRegistro() {
         return usuarioRegistro;
     }
 
-    public void setUsuarioRegistro(Usuarios usuarioRegistro) {
+    public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_ANULACION", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO_ANULACION", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_ANUL_DR_FK")
-    public Usuarios getUsuarioAnulacion() {
+    public User getUsuarioAnulacion() {
         return usuarioAnulacion;
     }
 
-    public void setUsuarioAnulacion(Usuarios usuarioAnulacion) {
+    public void setUsuarioAnulacion(User usuarioAnulacion) {
         this.usuarioAnulacion = usuarioAnulacion;
     }
 
