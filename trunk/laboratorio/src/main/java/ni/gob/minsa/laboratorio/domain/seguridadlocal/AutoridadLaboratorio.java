@@ -21,7 +21,7 @@ public class AutoridadLaboratorio {
     Boolean pasivo;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_AUTORIDAD_LAB", nullable = false, insertable = true, updatable = true)
     public Integer getIdAutoridadLaboratorio() {
         return idAutoridadLaboratorio;
@@ -32,7 +32,7 @@ public class AutoridadLaboratorio {
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name="USUARIO", insertable = false, updatable = false)
+    @JoinColumn(name="USUARIO", referencedColumnName = "username", insertable = true, updatable = false)
     @ForeignKey(name = "AUTORIDADLABORATORIO_USUARIO_FK")
     public User getUser() {
         return user;
