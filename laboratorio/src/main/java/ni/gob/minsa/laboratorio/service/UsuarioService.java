@@ -1,9 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import ni.gob.minsa.laboratorio.domain.seguridadlocal.Authority;
-import ni.gob.minsa.laboratorio.domain.seguridadlocal.Rol;
-import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.*;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -135,6 +133,19 @@ public class UsuarioService {
     }
 
     /**
+     * Actualiza un user
+     *
+     *
+     */
+    public void deleteUser(User user) {
+        Session session = sessionFactory.getCurrentSession();
+        //UserLog uLog = new UserLog(new Date(), user.getUsername(), user.getPassword(),
+        //      user.getCompleteName(), user.getEmail(), user.getEnabled(), user.getUsuario());
+        session.delete(user);
+        //session.save(uLog);
+    }
+
+    /**
      * Regresa todos los niveles usuarios
      *
      * @return una lista de <code>Nivel</code>(es)
@@ -178,7 +189,7 @@ public class UsuarioService {
      *
      */
 
-    public Integer deleteRoleAdmin(String userName, String role) {
+    public Integer deleteRole(String userName, String role) {
         // Retrieve session from Hibernate
         Session s = sessionFactory.openSession();
         Transaction tx = s.beginTransaction();
@@ -192,5 +203,78 @@ public class UsuarioService {
         tx.commit();
         s.close();
         return deletedEntities;
+    }
+
+    public List<Authority> getAuthorities(String username) {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM Authority as a where a.user.username ='" + username + "'");
+        return query.list();
+    }
+
+    public List<Authority> getAuthorities() {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM Authority as a");
+        return query.list();
+    }
+
+    public void addAuthorityLab(AutoridadLaboratorio auth) {
+        Session session = sessionFactory.getCurrentSession();
+        /*RolLog authLog = new RolLog(new Date(), auth.getAuthId().getUsername(),
+                auth.getAuthId().getAuthority(), auth.getUser().getUsuario());*/
+        session.save(auth);
+        //session.save(authLog);
+    }
+
+    public List<AutoridadLaboratorio> getAutoridadesLab() {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM AutoridadLaboratorio as a");
+        return query.list();
+    }
+
+    public List<AutoridadArea> getAutoridadesArea(String userName) {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM AutoridadArea as a where a.pasivo = false and a.user.username = :userName");
+        query.setParameter("userName",userName);
+        return query.list();
+    }
+
+    public List<AutoridadExamen> getAutoridadesExamen(String userName) {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM AutoridadExamen as a where a.pasivo = false and a.autoridadArea.user.username = :userName");
+        query.setParameter("userName",userName);
+        return query.list();
+    }
+
+    public Integer bajaAutoridadAreas(String userName) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+
+        String hqlBaja = "update AutoridadArea set pasivo=true where user.username = :userName and pasivo = false ";
+        int updateEntities = s.createQuery(hqlBaja)
+                .setString("userName", userName)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return updateEntities;
+    }
+
+    public Integer bajaAutoridadExamenes(String userName) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+
+        String hqlBaja = "update AutoridadExamen set pasivo=true where autoridadArea.user.username = :userName and pasivo = false ";
+        int updateEntities = s.createQuery( hqlBaja )
+                .setString("userName", userName)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return updateEntities;
     }
 }
