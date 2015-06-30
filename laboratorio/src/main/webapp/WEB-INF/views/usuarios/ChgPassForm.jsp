@@ -226,10 +226,10 @@
             sUsuariosUrl : "${usuariosUrl}"
         };
         Users.init(parametros);
-        $("li.mantenimiento").addClass("open");
-        $("li.personas").addClass("active");
+        $("li.administracion").addClass("open");
+        $("li.users").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.personas").parents("ul").slideDown(200);
+            $("li.users").parents("ul").slideDown(200);
         }
         $('#fechaNacimiento').change();
     });

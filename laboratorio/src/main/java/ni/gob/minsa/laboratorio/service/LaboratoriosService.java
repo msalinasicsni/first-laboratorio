@@ -1,5 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.examen.Departamento;
+import ni.gob.minsa.laboratorio.domain.examen.Direccion;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -37,5 +39,19 @@ public class LaboratoriosService {
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codLaboratorio",codLaboratorio);
         return (Laboratorio)q.uniqueResult();
+    }
+
+    public Direccion getDireccionById(Integer idDireccion){
+        String query = "from Direccion where idDireccion = :idDireccion";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idDireccion",idDireccion);
+        return (Direccion)q.uniqueResult();
+    }
+
+    public Departamento getDepartamentoById(Integer idDepartamento){
+        String query = "from Departamento where idDepartamento = :idDepartamento";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idDepartamento",idDepartamento);
+        return (Departamento)q.uniqueResult();
     }
 }
