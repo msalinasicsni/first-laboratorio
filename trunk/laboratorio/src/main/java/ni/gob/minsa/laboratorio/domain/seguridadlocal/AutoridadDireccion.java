@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 @Table(name = "autoridad_direccion", schema = "laboratorio")
 public class AutoridadDireccion {
-    Integer idAutoridadDepa;
+    Integer idAutoridadDirec;
     User user;
     Direccion direccion;
     User usuarioRegistro;
@@ -21,18 +21,18 @@ public class AutoridadDireccion {
     Boolean pasivo;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_AUTORIDAD_DIR", nullable = false, insertable = true, updatable = true)
-    public Integer getIdAutoridadDepa() {
-        return idAutoridadDepa;
+    public Integer getIdAutoridadDirec() {
+        return idAutoridadDirec;
     }
 
-    public void setIdAutoridadDepa(Integer idAutoridadDepa) {
-        this.idAutoridadDepa = idAutoridadDepa;
+    public void setIdAutoridadDirec(Integer idAutoridadDirec) {
+        this.idAutoridadDirec = idAutoridadDirec;
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name="USUARIO", insertable = false, updatable = false)
+    @JoinColumn(name="USUARIO", insertable = true, updatable = false)
     @ForeignKey(name = "AUTORIDADDIREC_USUARIO_FK")
     public User getUser() {
         return user;

@@ -22,7 +22,7 @@ public class AutoridadDepartamento {
     Boolean pasivo;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_AUTORIDAD_DEPA", nullable = false, insertable = true, updatable = true)
     public Integer getIdAutoridadDepa() {
         return idAutoridadDepa;
@@ -33,7 +33,7 @@ public class AutoridadDepartamento {
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name="USUARIO", insertable = false, updatable = false)
+    @JoinColumn(name="USUARIO", insertable = true, updatable = false)
     @ForeignKey(name = "AUTORIDADDEPA_USUARIO_FK")
     public User getUser() {
         return user;

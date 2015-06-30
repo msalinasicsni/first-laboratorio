@@ -219,6 +219,11 @@
         pageSetUp();
         var parametros = {blockMess : $("#blockUI_message").val()};
         Users.init(parametros);
+        $("li.administracion").addClass("open");
+        $("li.users").addClass("active");
+        if("top"!=localStorage.getItem("sm-setmenu")){
+            $("li.users").parents("ul").slideDown(200);
+        }
     });
 </script>
 </body>

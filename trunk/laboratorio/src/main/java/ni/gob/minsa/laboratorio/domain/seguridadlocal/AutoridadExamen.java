@@ -22,7 +22,7 @@ public class AutoridadExamen {
     Boolean pasivo;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_AUTORIDAD_EXAMEM", nullable = false, insertable = true, updatable = true)
     public Integer getIdAutoridadExamen() {
         return idAutoridadExamen;
@@ -33,7 +33,7 @@ public class AutoridadExamen {
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name="ID_AUTORIDAD_AREA", referencedColumnName = "ID_AUTORIDAD_AREA", insertable = false, updatable = false)
+    @JoinColumn(name="ID_AUTORIDAD_AREA", referencedColumnName = "ID_AUTORIDAD_AREA", insertable = true, updatable = false)
     @ForeignKey(name = "AUTORIDADEXA_AUTOAREA_FK")
     public AutoridadArea getAutoridadArea() {
         return autoridadArea;

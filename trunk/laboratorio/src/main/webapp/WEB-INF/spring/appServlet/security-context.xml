@@ -51,8 +51,8 @@
         <access-denied-handler error-page="/403"/>
     </http>
 
-    <!--<beans:bean id="encoder"
-                class="org.springframework.security.crypto.password.StandardPasswordEncoder" />-->
+    <beans:bean id="encoder"
+                class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
 
     <authentication-manager alias="autmanager">
         <authentication-provider >
@@ -62,7 +62,7 @@
                 <user name="souyen" password="456789" authorities="ROLE_USER" />
             </user-service>
             -->
-            <!--<password-encoder ref="encoder" />-->
+            <password-encoder ref="encoder" />
             <jdbc-user-service data-source-ref="dataSource"
                                users-by-username-query="select username, password, enabled from usuarios_sistema  where username=?"
                                authorities-by-username-query="select u.username username, ur.authority authority from usuarios_sistema u, usuarios_roles ur where u.username = ur.username and u.username = ?" />

@@ -10,7 +10,7 @@
     <jsp:include page="../fragments/headTag.jsp" />
     <style>
         .modal .modal-dialog {
-            width: 75%;
+            width: 60%;
         }
         .styleButton {
             float: right;
@@ -153,6 +153,19 @@
                         <input id="msjMkNoRecept" type="hidden" value="<spring:message code="msg.user.mk.no.receptionist"/>"/>
                         <input id="msjMkAnalyst" type="hidden" value="<spring:message code="msg.user.mk.analyst"/>"/>
                         <input id="msjMkNoAnalyst" type="hidden" value="<spring:message code="msg.user.mk.no.analyst"/>"/>
+                        <input id="msjSuccessful1" type="hidden" value="<spring:message code="msg.user.add.authority.area"/>"/>
+                        <input id="msjSuccessful2" type="hidden" value="<spring:message code="msg.user.override.authority.area"/>"/>
+                        <input id="msjSuccessful3" type="hidden" value="<spring:message code="msg.user.add.authority.exam"/>"/>
+                        <input id="msjSuccessful4" type="hidden" value="<spring:message code="msg.user.override.authority.exam"/>"/>
+                        <input id="msjSuccessful5" type="hidden" value="<spring:message code="msg.user.add.authority.direct"/>"/>
+                        <input id="msjSuccessful6" type="hidden" value="<spring:message code="msg.user.override.authority.direct"/>"/>
+                        <input id="msjSuccessful7" type="hidden" value="<spring:message code="msg.user.add.authority.depart"/>"/>
+                        <input id="msjSuccessful8" type="hidden" value="<spring:message code="msg.user.override.authority.depart"/>"/>
+                        <input id="msjMkDirector" type="hidden" value="<spring:message code="msg.user.mk.director"/>"/>
+                        <input id="msjMkNoDirector" type="hidden" value="<spring:message code="msg.user.mk.no.director"/>"/>
+                        <input id="msjMkDepartmentHead" type="hidden" value="<spring:message code="msg.user.mk.departmentHead"/>"/>
+                        <input id="msjMkNoDepartmentHead" type="hidden" value="<spring:message code="msg.user.mk.no.departmentHead"/>"/>
+                        <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
 
                         <table class="table table-striped table-bordered table-hover"
                                id="tabla2">
@@ -172,30 +185,33 @@
                                             onclick="location.href='${fn:escapeXml(chgpassUrl)}'"
                                             class="btn btn-info">
                                         <spring:message code="act.change.pass" />
-                                    </button> <c:choose>
-                                    <c:when test="${user.enabled}">
-                                <td><spring:url value="{username}/disable"
-                                                var="disableUrl">
-                                        <spring:param name="username" value="${user.username}" />
-                                    </spring:url>
-                                    <button
-                                            onclick="location.href='${fn:escapeXml(disableUrl)}'"
-                                            class="btn btn-info">
-                                        <spring:message code="users.disable" />
                                     </button>
+                                <!--<c:choose>
+                                    <c:when test="${user.enabled}">
+                                        <td><spring:url value="{username}/disable"
+                                                        var="disableUrl">
+                                                <spring:param name="username" value="${user.username}" />
+                                            </spring:url>
+                                            <button
+                                                    onclick="location.href='${fn:escapeXml(disableUrl)}'"
+                                                    class="btn btn-info">
+                                                <spring:message code="users.disable" />
+                                            </button>
+                                        </td>
                                     </c:when>
                                     <c:otherwise>
-                                <td><spring:url value="{username}/enable"
-                                                var="enableUrl">
-                                        <spring:param name="username" value="${user.username}" />
-                                    </spring:url>
-                                    <button
-                                            onclick="location.href='${fn:escapeXml(enableUrl)}'"
-                                            class="btn btn-info">
-                                        <spring:message code="users.enabled" />
-                                    </button>
+                                        <td><spring:url value="{username}/enable"
+                                                    var="enableUrl">
+                                            <spring:param name="username" value="${user.username}" />
+                                        </spring:url>
+                                        <button
+                                                onclick="location.href='${fn:escapeXml(enableUrl)}'"
+                                                class="btn btn-info">
+                                            <spring:message code="users.enabled" />
+                                        </button>
+                                        </td>
                                     </c:otherwise>
-                                    </c:choose>
+                                    </c:choose>-->
                                 <td><spring:url value="/usuarios/list" var="listUrl"/>
                                     <button onclick="location.href='${fn:escapeXml(listUrl)}'"
                                             class="btn btn-info">
@@ -224,8 +240,11 @@
                                                 <spring:message code="users.noanalyst" />
                                             </button>
                                             <br/><br/>
-                                            <button id="btn-areaExam" type="button" class="btn btn-primary">
-                                                <spring:message code="act.admin.areas.and.exams" />
+                                            <button id="btn-Areas" type="button" class="btn btn-primary">
+                                                <spring:message code="act.admin.areas" />
+                                            </button>
+                                            <button id="btn-Examenes" type="button" class="btn btn-primary">
+                                                <spring:message code="act.admin.exams" />
                                             </button>
                                         </td>
                                     </c:when>
@@ -256,10 +275,7 @@
                                 <c:choose>
                                     <c:when test="${fn:contains(rolesString,'ROLE_DIR')}">
                                         <td>
-                                            <spring:url value="{username}/nosup"  var="nosupUrl">
-                                                <spring:param name="username" value="${user.username}" />
-                                            </spring:url>
-                                            <button onclick="location.href='${fn:escapeXml(nosupUrl)}'" class="btn btn-danger">
+                                            <button id="btn-mkNoDir" type="button" class="btn btn-danger">
                                                 <spring:message code="users.nodir" />
                                             </button>
                                             <br/><br/>
@@ -270,10 +286,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <td>
-                                            <spring:url value="{username}/mksup" var="supUrl">
-                                                <spring:param name="username" value="${user.username}" />
-                                            </spring:url>
-                                            <button onclick="location.href='${fn:escapeXml(supUrl)}'" class="btn btn-success">
+                                            <button id="btn-mkDir" type="button" class="btn btn-success">
                                                 <spring:message code="users.dir" />
                                             </button>
                                         </td>
@@ -282,10 +295,7 @@
                                 <c:choose>
                                     <c:when test="${fn:contains(rolesString,'ROLE_JEFE')}">
                                         <td>
-                                            <spring:url value="{username}/nosup"  var="nosupUrl">
-                                                <spring:param name="username" value="${user.username}" />
-                                            </spring:url>
-                                            <button onclick="location.href='${fn:escapeXml(nosupUrl)}'" class="btn btn-danger">
+                                            <button id="btn-mkNoJD" type="button" class="btn btn-danger">
                                                 <spring:message code="users.nodept" />
                                             </button>
                                             <br/><br/>
@@ -296,10 +306,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <td>
-                                            <spring:url value="{username}/mksup" var="supUrl">
-                                                <spring:param name="username" value="${user.username}" />
-                                            </spring:url>
-                                            <button onclick="location.href='${fn:escapeXml(supUrl)}'" class="btn btn-success">
+                                            <button id="btn-mkJD" type="button" class="btn btn-success">
                                                 <spring:message code="users.dept" />
                                             </button>
                                         </td>
@@ -325,28 +332,25 @@
     <!-- end row -->
 </section>
 <!-- end widget grid -->
-<!-- Modal -->
-<div class="modal fade" id="modalAreaExamen" aria-hidden="true" data-backdrop="static">
+<!-- Modal AREAS ROL ANALISTA-->
+<div class="modal fade" id="modalArea" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <!--<h4 class="modal-title">
-                    <spring:message code="lbl.response.header.modal.add" />
-                </h4>-->
                 <div class="alert alert-info">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         &times;
                     </button>
                     <h4 class="modal-title">
                         <i class="fa-fw fa fa-font"></i>
-                        <spring:message code="lbl.response.header.modal.add" />
+                        <spring:message code="lbl.user.header.modal.area" />
                     </h4>
                 </div>
             </div>
             <div class="modal-body"> <!--  no-padding -->
                 <div class="row">
-                    <div class="col col-sm-12 col-md-12 col-lg-6">
-                        <form id="area-examen-form" class="smart-form" novalidate="novalidate">
+                    <div class="col col-sm-12 col-md-12 col-lg-12">
+                        <form id="areas-form" class="smart-form" novalidate="novalidate">
                             <div class="row">
                                 <section class="col col-sm-12 col-md-9 col-lg-10">
                                     <label class="text-left txt-color-blue font-md">
@@ -365,15 +369,52 @@
                                     </div>
                                 </section>
                                 <section class="col col-sm-12 col-md-3 col-lg-2">
-                                    <button type="button" class="btn btn-primary styleButton" id="btnArea">
+                                    <button type="button" class="btn btn-primary styleButton" id="btnAddArea">
                                         <i class="fa fa-save"></i>
                                     </button>
                                 </section>
                             </div>
                         </form>
                     </div>
-                    <div class="col col-sm-12 col-md-12 col-lg-6">
-                        <form id="examen-form" class="smart-form" novalidate="novalidate">
+                </div>
+                    <div class="widget-body no-padding">
+                    <div class="row">
+                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                            <table class="table table-striped table-bordered table-hover" id="areas-list">
+                                <thead>
+                                <tr>
+                                    <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
+                                    <th><spring:message code="lbl.override"/></th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal EXAMENES ROL ANALISTA -->
+<div class="modal fade" id="modalExamen" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">
+                        <i class="fa-fw fa fa-font"></i>
+                        <spring:message code="lbl.user.header.modal.exam" />
+                    </h4>
+                </div>
+            </div>
+            <div class="modal-body"> <!--  no-padding -->
+                <div class="row">
+                    <div class="col col-sm-12 col-md-12 col-lg-12">
+                        <form id="examenes-form" class="smart-form" novalidate="novalidate">
                             <div class="row">
                                 <section class="col col-sm-12 col-md-9 col-lg-10">
                                     <label class="text-left txt-color-blue font-md">
@@ -384,15 +425,11 @@
                                         <i class="fa fa-location-arrow fa-fw"></i>
                                     </span>
                                         <select  class="select2" id="idExamen" name="idExamen" >
-                                            <option value=""><spring:message code="lbl.select" />...</option>
-                                            <c:forEach items="${areas}" var="area">
-                                                <option value="${area.idArea}">${area.nombre}</option>
-                                            </c:forEach>
                                         </select>
                                     </div>
                                 </section>
                                 <section class="col col-sm-12 col-md-3 col-lg-2">
-                                    <button type="button" class="btn btn-primary styleButton" id="btnExamen">
+                                    <button type="button" class="btn btn-primary styleButton" id="btnAddExamen">
                                         <i class="fa fa-save"></i>
                                     </button>
                                 </section>
@@ -400,10 +437,71 @@
                         </form>
                     </div>
                 </div>
-                    <div class="widget-body no-padding">
+                <div class="widget-body no-padding">
                     <div class="row">
-                                            <section class="col col-sm-12 col-md-6 col-lg-6">
-                            <table class="table table-striped table-bordered table-hover" id="areas-list">
+                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                            <table class="table table-striped table-bordered table-hover"   id="examenes-list">
+                                <thead>
+                                <tr>
+                                    <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
+                                    <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.area"/></th>
+                                    <th><spring:message code="lbl.override"/></th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal Direcciones ROL Director -->
+<div class="modal fade" id="modalDireccion" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">
+                        <i class="fa-fw fa fa-font"></i>
+                        <spring:message code="lbl.user.header.modal.direction" />
+                    </h4>
+                </div>
+            </div>
+            <div class="modal-body"> <!--  no-padding -->
+                <div class="row">
+                    <div class="col col-sm-12 col-md-12 col-lg-12">
+                        <form id="direccion-form" class="smart-form" novalidate="novalidate">
+                            <div class="row">
+                                <section class="col col-sm-12 col-md-9 col-lg-10">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.direction" />
+                                    </label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-location-arrow fa-fw"></i>
+                                    </span>
+                                        <select  class="select2" id="idDireccion" name="idDireccion" >
+                                        </select>
+                                    </div>
+                                </section>
+                                <section class="col col-sm-12 col-md-3 col-lg-2">
+                                    <button type="button" class="btn btn-primary styleButton" id="btnAddDireccion">
+                                        <i class="fa fa-save"></i>
+                                    </button>
+                                </section>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="widget-body no-padding">
+                    <div class="row">
+                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                            <table class="table table-striped table-bordered table-hover"   id="direccion-list">
                                 <thead>
                                 <tr>
                                     <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
@@ -412,12 +510,61 @@
                                 </thead>
                             </table>
                         </section>
-                        <section class="col col-sm-12 col-md-6 col-lg-6">
-                            <table class="table table-striped table-bordered table-hover"   id="examenes-list">
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal Departamento ROL JEFE -->
+<div class="modal fade" id="modalDepartamento" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">
+                        <i class="fa-fw fa fa-font"></i>
+                        <spring:message code="lbl.user.header.modal.department" />
+                    </h4>
+                </div>
+            </div>
+            <div class="modal-body"> <!--  no-padding -->
+                <div class="row">
+                    <div class="col col-sm-12 col-md-12 col-lg-12">
+                        <form id="departamento-form" class="smart-form" novalidate="novalidate">
+                            <div class="row">
+                                <section class="col col-sm-12 col-md-9 col-lg-10">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.department" />
+                                    </label>
+                                    <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-location-arrow fa-fw"></i>
+                                    </span>
+                                        <select  class="select2" id="idDepartamento" name="idDepartamento" >
+                                        </select>
+                                    </div>
+                                </section>
+                                <section class="col col-sm-12 col-md-3 col-lg-2">
+                                    <button type="button" class="btn btn-primary styleButton" id="btnAddDepartamento">
+                                        <i class="fa fa-save"></i>
+                                    </button>
+                                </section>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="widget-body no-padding">
+                    <div class="row">
+                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                            <table class="table table-striped table-bordered table-hover"   id="departamento-list">
                                 <thead>
                                 <tr>
                                     <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
-                                    <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.area"/></th>
                                     <th><spring:message code="lbl.override"/></th>
                                 </tr>
                                 </thead>
@@ -480,8 +627,26 @@
 <c:url var="mkNoReceptUrl" value="/usuarios/noReceptionistUser"/>
 <c:url var="mkAnalystUrl" value="/usuarios/analystUser"/>
 <c:url var="mkNoAnalystUrl" value="/usuarios/noAnalystUser"/>
+<c:url var="mkDirectorUrl" value="/usuarios/directorUser"/>
+<c:url var="mkNoDirectorUrl" value="/usuarios/noDirectorUser"/>
+<c:url var="mkDepartmentHeadUrl" value="/usuarios/departmentHeadUser"/>
+<c:url var="mkNoDepartmentHeadUrl" value="/usuarios/noDepartmentHeadUser"/>
 <c:url var="autoridadAreaUrl" value="/usuarios/getAutoridadAreaUsuario"/>
 <c:url var="autoridadExamenUrl" value="/usuarios/getAutoridadExamenUsuario"/>
+<c:url var="areaUsuarioUrl" value="/usuarios/asociarAreaUsuario"/>
+<c:url var="overrideAreaUsuarioUrl" value="/usuarios/overrideAreaUsuario"/>
+<c:url var="examenUsuarioUrl" value="/usuarios/asociarExamenUsuario"/>
+<c:url var="overrideExamenUsuarioUrl" value="/usuarios/overrideExamenUsuario"/>
+<c:url var="areasUrl" value="/usuarios/getAreasDispUsuario"/>
+<c:url var="examenesUrl" value="/usuarios/getExamenesDisponiblesUsuario"/>
+<c:url var="autoridadDireccionUrl" value="/usuarios/getAutoridadDireccionUsuario"/>
+<c:url var="direccionesUrl" value="/usuarios/getDireccionesDisponiblesUsuario"/>
+<c:url var="direccionUsuarioUrl" value="/usuarios/asociarDireccionUsuario"/>
+<c:url var="overrideDireccionUsuarioUrl" value="/usuarios/overrideDireccionUsuario"/>
+<c:url var="autoridadDepartaUrl" value="/usuarios/getAutoridadDepartaUsuario"/>
+<c:url var="departamentosUrl" value="/usuarios/getDepartaDisponiblesUsuario"/>
+<c:url var="departaUsuarioUrl" value="/usuarios/asociarDepartamentoUsuario"/>
+<c:url var="overrideDepartaUsuarioUrl" value="/usuarios/overrideDepartaUsuario"/>
 
 <c:url var="usuarioUrl" value="/usuarios/admin/"/>
 <script type="text/javascript">
@@ -496,13 +661,31 @@
             mkNoAnalystUrl : "${mkNoAnalystUrl}",
             autoridadAreaUrl : "${autoridadAreaUrl}",
             autoridadExamenUrl : "${autoridadExamenUrl}",
+            areaUsuarioUrl : "${areaUsuarioUrl}",
+            overrideAreaUsuarioUrl : "${overrideAreaUsuarioUrl}",
+            examenUsuarioUrl : "${examenUsuarioUrl}",
+            overrideExamenUsuarioUrl : "${overrideExamenUsuarioUrl}",
+            examenesUrl : "${examenesUrl}",
+            autoridadDireccionUrl : "${autoridadDireccionUrl}",
+            direccionesUrl : "${direccionesUrl}",
+            direccionUsuarioUrl : "${direccionUsuarioUrl}",
+            overrideDireccionUsuarioUrl : "${overrideDireccionUsuarioUrl}",
+            areasUrl : "${areasUrl}",
+            autoridadDepartaUrl : "${autoridadDepartaUrl}",
+            departamentosUrl : "${departamentosUrl}",
+            departaUsuarioUrl : "${departaUsuarioUrl}",
+            overrideDepartaUsuarioUrl : "${overrideDepartaUsuarioUrl}",
+            mkDirectorUrl : "${mkDirectorUrl}",
+            mkNoDirectorUrl : "${mkNoDirectorUrl}",
+            mkDepartmentHeadUrl : "${mkDepartmentHeadUrl}",
+            mkNoDepartmentHeadUrl : "${mkNoDepartmentHeadUrl}",
             blockMess: "${blockMess}"
         };
         Users.init(parametros);
-        $("li.mantenimiento").addClass("open");
-        $("li.personas").addClass("active");
+        $("li.administracion").addClass("open");
+        $("li.users").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.personas").parents("ul").slideDown(200);
+            $("li.users").parents("ul").slideDown(200);
         }
     });
 </script>

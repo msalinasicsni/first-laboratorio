@@ -40,4 +40,14 @@ public class AreaService {
         q.setParameter("idArea", idArea);
         return  (Area)q.uniqueResult();
     }
+
+    public List<Area> getAreasDisponiblesUser(String userName){
+        String query = "select aa from Area as aa " +
+                "where aa.idArea not in (select a.area.idArea from AutoridadArea as a where a.pasivo = false and a.user.username = :userName) order by nombre";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("userName",userName);
+        return  q.list();
+    }
 }
