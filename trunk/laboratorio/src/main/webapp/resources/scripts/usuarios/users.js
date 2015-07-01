@@ -968,14 +968,54 @@ var Users = function () {
 
             function overrideHandler(){
                 var idAutoridadArea = $(this.innerHTML).data('id');
-                if (idAutoridadArea != null)
-                    deshabilitarAreaUsuario(idAutoridadArea);
+                if (idAutoridadArea != null) {
+                    var opcSi = $("#confirm_msg_opc_yes").val();
+                    var opcNo = $("#confirm_msg_opc_no").val();
+                    $.SmartMessageBox({
+                        title: $("#msjConfirm").val(),
+                        content: $("#msjOverride").val(),
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            deshabilitarAreaUsuario(idAutoridadArea);
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msjOverrideC").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                                color: "#3276B1",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 3000
+                            });
+                        }
+                    })
+                }
             }
 
             function overrideHandlerEx(){
                 var idAutoridadExamen = $(this.innerHTML).data('id');
-                if (idAutoridadExamen != null)
-                    deshabilitarExamenUsuario(idAutoridadExamen);
+                if (idAutoridadExamen != null) {
+                    var opcSi = $("#confirm_msg_opc_yes").val();
+                    var opcNo = $("#confirm_msg_opc_no").val();
+                    $.SmartMessageBox({
+                        title: $("#msjConfirm").val(),
+                        content: $("#msjOverride").val(),
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            deshabilitarExamenUsuario(idAutoridadExamen);
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msjOverrideC").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                                color: "#3276B1",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 3000
+                            });
+                        }
+                    })
+                }
             }
 
             $('#btnAddArea').click(function() {
@@ -1285,8 +1325,28 @@ var Users = function () {
 
             function overrideHandlerDir(){
                 var idAutoridadDirec = $(this.innerHTML).data('id');
-                if (idAutoridadDirec != null)
-                    deshabilitarDireccionUsuario(idAutoridadDirec);
+                if (idAutoridadDirec != null) {
+                    var opcSi = $("#confirm_msg_opc_yes").val();
+                    var opcNo = $("#confirm_msg_opc_no").val();
+                    $.SmartMessageBox({
+                        title: $("#msjConfirm").val(),
+                        content: $("#msjOverride").val(),
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            deshabilitarDireccionUsuario(idAutoridadDirec);
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msjOverrideC").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                                color: "#3276B1",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 3000
+                            });
+                        }
+                    })
+                }
             }
 
             $('#btnAddDireccion').click(function() {
@@ -1584,8 +1644,28 @@ var Users = function () {
 
             function overrideHandlerDepa(){
                 var idAutoridadDepa = $(this.innerHTML).data('id');
-                if (idAutoridadDepa != null)
-                    deshabilitarDepartaUsuario(idAutoridadDepa);
+                if (idAutoridadDepa != null) {
+                    var opcSi = $("#confirm_msg_opc_yes").val();
+                    var opcNo = $("#confirm_msg_opc_no").val();
+                    $.SmartMessageBox({
+                        title: $("#msjConfirm").val(),
+                        content: $("#msjOverride").val(),
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            deshabilitarDepartaUsuario(idAutoridadDepa);
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msjOverrideC").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                                color: "#3276B1",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 3000
+                            });
+                        }
+                    })
+                }
             }
 
             $('#btnAddDepartamento').click(function() {

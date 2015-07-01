@@ -107,8 +107,6 @@ var ApproveResult = function () {
                     var oTT = TableTools.fnGetInstance('examenes_repite');
                     var aSelectedTrs = oTT.fnGetSelected();
                     var len = aSelectedTrs.length;
-                    var opcSi = $("#confirm_msg_opc_yes").val();
-                    var opcNo = $("#confirm_msg_opc_no").val();
                     if (len > 0) {
                         rechazarResultado();
                     }else{
