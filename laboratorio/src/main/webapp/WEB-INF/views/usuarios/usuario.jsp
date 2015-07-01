@@ -166,6 +166,11 @@
                         <input id="msjMkDepartmentHead" type="hidden" value="<spring:message code="msg.user.mk.departmentHead"/>"/>
                         <input id="msjMkNoDepartmentHead" type="hidden" value="<spring:message code="msg.user.mk.no.departmentHead"/>"/>
                         <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
+                        <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                        <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                        <input id="msjOverride" type="hidden" value="<spring:message code="msg.confirm.override"/>"/>
+                        <input id="msjOverrideC" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
+                        <input id="msjConfirm" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
 
                         <table class="table table-striped table-bordered table-hover"
                                id="tabla2">
