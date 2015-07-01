@@ -141,7 +141,7 @@ public class SampleTypesController {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             ex.printStackTrace();
-            resultado = messageSource.getMessage("msg.dataType.error", null, null);
+            resultado = messageSource.getMessage("msg.sampleType.error", null, null);
             resultado = resultado + ". \n " + ex.getMessage();
 
         } finally {

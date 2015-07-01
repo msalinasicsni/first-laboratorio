@@ -124,7 +124,7 @@ var SampleTypes  = function () {
             }
 
 
-            <!-- Validacion formulario de generacion de alicuotas -->
+            <!-- Validacion formulario -->
             var $validator = $("#sample-type-form").validate({
                 // Rules for form validation
                 rules: {

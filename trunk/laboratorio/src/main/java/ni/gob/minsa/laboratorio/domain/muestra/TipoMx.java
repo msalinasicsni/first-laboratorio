@@ -55,7 +55,7 @@ import java.util.Date;
     }
 
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @Column(name = "FECHA_REGISTRO", nullable = true)
+    @Column(name = "FECHA_REGISTRO", nullable = false)
     public Date getFechaRegistro() {
         return fechaRegistro;
     }
@@ -65,7 +65,7 @@ import java.util.Date;
     }
 
     @ManyToOne()
-    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=true)
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
     @ForeignKey(name = "fk_tipoMx_usuarioregistro")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
