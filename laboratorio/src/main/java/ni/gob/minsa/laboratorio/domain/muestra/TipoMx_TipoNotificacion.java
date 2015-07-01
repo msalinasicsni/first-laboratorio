@@ -2,23 +2,28 @@ package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by FIRSTICT on 12/15/2014.
  */
 @Entity
-@Table(name = "tipomx_tiponotifi", schema = "alerta",uniqueConstraints=@UniqueConstraint(columnNames={"COD_TIPONOTI", "ID_TIPOMX"}))
+@Table(name = "tipomx_tiponotifi", schema = "alerta")
 public class TipoMx_TipoNotificacion {
     Integer id;
     TipoNotificacion tipoNotificacion;
     TipoMx tipoMx;
     boolean pasivo;
+    Date fechaRegistro;
+    User usuarioRegistro;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_TIPOMX_NOTIFI", nullable = false, updatable = true, insertable = true, precision = 0)
     public Integer getId() {
         return id;
@@ -58,5 +63,26 @@ public class TipoMx_TipoNotificacion {
 
     public void setPasivo(boolean pasivo) {
         this.pasivo = pasivo;
+    }
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_REGISTRO", nullable = true)
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    @ManyToOne()
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=true)
+    @ForeignKey(name = "fk_TMxNoti_usuario")
+    public User getUsuarioRegistro() {
+        return usuarioRegistro;
+    }
+
+    public void setUsuarioRegistro(User usuarioRegistro) {
+        this.usuarioRegistro = usuarioRegistro;
     }
 }

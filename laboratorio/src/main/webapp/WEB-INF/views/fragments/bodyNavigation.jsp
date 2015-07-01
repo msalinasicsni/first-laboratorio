@@ -139,12 +139,13 @@
                     <li class="sampleTypes">
                         <a href="<spring:url value="/sampleTypes/init" htmlEscape="true "/>" title="<spring:message code="lbl.sample.types" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="lbl.sample.types" /></a>
                     </li>
+                   <li class="assocSamplesReq">
                     <li class="users">
                         <a href="<spring:url value="/usuarios/list" htmlEscape="true "/>" title="<spring:message code="lbl.admin.users" />"><i class="fa fa-lg fa-fw fa-users"></i> <spring:message code="menu.admin.users" /></a>
                     </li>
                    <%-- <li class="assocSamplesReq">
                         <a href="<spring:url value="/associationSR/init" htmlEscape="true "/>" title="<spring:message code="lbl.association.samples.req" />"><i class="fa fa-lg fa-fw fa-link"></i> <spring:message code="lbl.association.samples.req" /></a>
-                    </li>--%>
+                    </li>
 
                 </ul>
             </li>

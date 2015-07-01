@@ -1,8 +1,11 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by souyen-ics.
@@ -15,9 +18,11 @@ public class Estudio_TipoMx_TipoNoti {
     Catalogo_Estudio estudio;
     TipoMx_TipoNotificacion tipoMx_tipoNotificacion;
     Boolean pasivo;
+    Date fechaRegistro;
+    User usuarioRegistro;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_EST_TPMX_NOTI", nullable = false, insertable = true, updatable = false)
     public Integer getIdEstTipoMxNt() {
         return idEstTipoMxNt;
@@ -61,5 +66,27 @@ public class Estudio_TipoMx_TipoNoti {
     public void setPasivo(Boolean pasivo) {
         this.pasivo = pasivo;
     }
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_REGISTRO", nullable = false)
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    @ManyToOne()
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
+    @ForeignKey(name = "fk_estTMxNoti_usuario")
+    public User getUsuarioRegistro() {
+        return usuarioRegistro;
+    }
+
+    public void setUsuarioRegistro(User usuarioRegistro) {
+        this.usuarioRegistro = usuarioRegistro;
+    }
+
 }
 
