@@ -1,10 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.*;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +50,7 @@ public class AssociationSamplesRequestService {
         Criteria cr = session.createCriteria(Dx_TipoMx_TipoNoti.class, "dx");
         cr.add(Restrictions.eq("dx.pasivo", false));
         cr.createAlias("dx.tipoMx_tipoNotificacion", "tipoMxNoti");
+        cr.add(Restrictions.eq("tipoMxNoti.pasivo", false));
         cr.add(Restrictions.eq("tipoMxNoti.id", idTipoMxNoti));
         return cr.list();
     }
@@ -67,6 +65,7 @@ public class AssociationSamplesRequestService {
         Criteria cr = session.createCriteria(Estudio_TipoMx_TipoNoti.class, "est");
         cr.add(Restrictions.eq("est.pasivo", false));
         cr.createAlias("est.tipoMx_tipoNotificacion", "tipoMxNoti");
+        cr.add(Restrictions.eq("tipoMxNoti.pasivo", false));
         cr.add(Restrictions.eq("tipoMxNoti.id", idTipoMxNoti));
         return cr.list();
     }
@@ -222,8 +221,36 @@ public class AssociationSamplesRequestService {
         Query q = session.createQuery(query);
         q.setInteger("id", id);
         return (TipoMx_TipoNotificacion) q.uniqueResult();
+
+
     }
 
+    public Integer overrideRequestsByidMxNoti(Integer idMxNoti) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
 
+        String hql = "update Dx_TipoMx_TipoNoti set pasivo=true where tipoMx_tipoNotificacion.id= :idMxNoti and pasivo = false ";
+        int updateEntities = s.createQuery( hql )
+                .setParameter("idMxNoti", idMxNoti)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return updateEntities;
+    }
+
+    public Integer overrideStudiesByidMxNoti(Integer idMxNoti) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+
+        String hql = "update Estudio_TipoMx_TipoNoti set pasivo=true where tipoMx_tipoNotificacion.id= :idMxNoti and pasivo = false ";
+        int updateEntities = s.createQuery( hql )
+                .setParameter("idMxNoti", idMxNoti)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return updateEntities;
+    }
 
 }

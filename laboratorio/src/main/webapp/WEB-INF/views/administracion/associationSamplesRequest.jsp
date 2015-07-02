@@ -202,8 +202,8 @@
                                     <tr>
                                         <th data-class="expand"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.request.name"/></th>
                                         <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.request.type"/></th>
-                                        <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                                         <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
+                                        <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
                                         <th><spring:message code="act.override"/></th>
 
                                     </tr>
@@ -434,11 +434,11 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="getNoti" value="/associationSR/getNotif"/>
-<c:url var="getMxNoti" value="/associationSR/getMxNoti"/>
-<c:url var="saveRequest" value="/associationSR/addUpdateRequest"/>
-<c:url var="getRoutinesAndStudies" value="/associationSR/getRoutinesAndStudies"/>
-<c:url var="saveTipoMx" value="/associationSR/addUpdateTipoMxAss"/>
+<c:url var="getNoti" value="/administracion/associationSR/getNotif"/>
+<c:url var="getMxNoti" value="/administracion/associationSR/getMxNoti"/>
+<c:url var="saveRequest" value="/administracion/associationSR/addUpdateRequest"/>
+<c:url var="getRoutinesAndStudies" value="/administracion/associationSR/getRoutinesAndStudies"/>
+<c:url var="saveTipoMx" value="/administracion/associationSR/addUpdateTipoMxAss"/>
 
 
 
@@ -460,9 +460,9 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.administracion").addClass("open");
-        $("li.assocSamplesReq").addClass("active");
+        $("li.assocSamplesRequest").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.assocSamplesReq").parents("ul").slideDown(200);
+            $("li.assocSamplesRequest").parents("ul").slideDown(200);
         }
     });
 </script>

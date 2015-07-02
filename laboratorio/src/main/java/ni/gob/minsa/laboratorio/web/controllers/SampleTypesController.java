@@ -35,7 +35,7 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("sampleTypes")
+@RequestMapping("/administracion/sampleTypes")
 public class SampleTypesController {
 
     private static final Logger logger = LoggerFactory.getLogger(SampleTypesController.class);
