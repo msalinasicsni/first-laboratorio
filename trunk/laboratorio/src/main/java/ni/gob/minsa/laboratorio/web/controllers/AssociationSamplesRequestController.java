@@ -41,7 +41,7 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("associationSR")
+@RequestMapping("administracion/associationSR")
 public class AssociationSamplesRequestController {
 
     private static final Logger logger = LoggerFactory.getLogger(AssociationSamplesRequestController.class);
@@ -224,6 +224,14 @@ public class AssociationSamplesRequestController {
                 if (rec != null) {
                     rec.setPasivo(true);
                     associationSR.addOrUpdateTMxNoti(rec);
+                    try {
+                        associationSR.overrideRequestsByidMxNoti(idRecord);
+                        associationSR.overrideStudiesByidMxNoti(idRecord);
+                    }catch (Exception ex) {
+                        rec.setPasivo(false);
+                        associationSR.addOrUpdateTMxNoti(rec);
+                        throw new Exception(messageSource.getMessage("msg.user.override.tipoMx.request.error",null,null));
+                    }
                 }
             }
 

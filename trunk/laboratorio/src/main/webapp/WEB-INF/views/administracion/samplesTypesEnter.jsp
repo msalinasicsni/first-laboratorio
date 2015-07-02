@@ -249,8 +249,8 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="getSampleTypes" value="/sampleTypes/getSampleTypes"/>
-<c:url var="addUpdateUrl" value="/sampleTypes/addUpdateSampleTypes"/>
+<c:url var="getSampleTypes" value="/administracion/sampleTypes/getSampleTypes"/>
+<c:url var="addUpdateUrl" value="/administracion/sampleTypes/addUpdateSampleTypes"/>
 
 
 <script type="text/javascript">
