@@ -144,9 +144,20 @@
                                                     <button type="submit" class="btn btn-success">
                                                         <i class="icon-ok"> <fmt:message key="users.save" /></i>
                                                     </button>
-                                                <spring:url value="/usuarios/list" var="usuariosUrl"/>
+                                                <c:choose>
+                                                    <c:when test="${origen == 'usuario'}">
+                                                        <spring:url value="/usuarios/admin/{username}"
+                                                                    var="cancelUrl">
+                                                            <spring:param name="username" value="${user.username}" />
+                                                        </spring:url>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <spring:url value="/usuarios/list"
+                                                                    var="cancelUrl"/>
+                                                    </c:otherwise>
+                                                </c:choose>
                                                     <button type="reset"
-                                                            onclick="location.href='${fn:escapeXml(usuariosUrl)}'"
+                                                            onclick="location.href='${fn:escapeXml(cancelUrl)}'"
                                                             class="btn btn-danger">
                                                         <i class="icon-remove"> <fmt:message key="users.cancel" /></i>
                                                     </button>

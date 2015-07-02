@@ -27,6 +27,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
@@ -74,8 +76,9 @@ public class UsuariosController {
     MessageSource messageSource;
 
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public String obtenerUsuarios(Model model) throws ParseException {
+    public String obtenerUsuarios(Model model, HttpServletRequest request) throws ParseException {
         logger.debug("Mostrando Usuarios en JSP");
+        request.getSession().setAttribute("origen","lista");
         List<User> usuarios = usuarioService.getUsers();
         List<AutoridadLaboratorio> autoridadLaboratorios = autoridadesService.getAutoridadesLab();
         model.addAttribute("usuarios", usuarios);
@@ -91,8 +94,8 @@ public class UsuariosController {
      * @return a ModelMap with the model attributes for the view
      */
     @RequestMapping("/admin/{username}")
-    public ModelAndView showUser(@PathVariable("username") String username) {
-
+    public ModelAndView showUser(@PathVariable("username") String username, HttpServletRequest request) {
+        request.getSession().setAttribute("origen","usuario");
         List<AutoridadLaboratorio> autoridadLaboratorios = autoridadesService.getAutoridadesLab();
         ModelAndView mav = new ModelAndView("usuarios/usuario");
         mav.addObject("user",this.usuarioService.getUser(username));
@@ -488,13 +491,14 @@ public class UsuariosController {
     }
 
     @RequestMapping(value = "/admin/{username}/edit", method = RequestMethod.GET)
-    public String initUpdateUserForm(@PathVariable("username") String username, Model model) {
+    public String initUpdateUserForm(@PathVariable("username") String username, Model model, HttpServletRequest request) {
         User user = this.usuarioService.getUser(username);
         List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosRegionales();
         Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(username);
         model.addAttribute("laboratorios",laboratorioList);
         model.addAttribute("user",user);
         model.addAttribute("labUser",laboratorio);
+        model.addAttribute("origen",request.getSession().getAttribute("origen").toString());
         return "usuarios/UpdateUserForm";
     }
 
@@ -544,9 +548,10 @@ public class UsuariosController {
     }
 
     @RequestMapping(value = "/admin/{username}/chgpass", method = RequestMethod.GET)
-    public String initChgPassUserForm(@PathVariable("username") String username, Model model) {
+    public String initChgPassUserForm(@PathVariable("username") String username, Model model, HttpServletRequest request) {
         User user = this.usuarioService.getUser(username);
         model.addAttribute("user",user);
+        model.addAttribute("origen",request.getSession().getAttribute("origen").toString());
         return "usuarios/ChgPassForm";
     }
 
