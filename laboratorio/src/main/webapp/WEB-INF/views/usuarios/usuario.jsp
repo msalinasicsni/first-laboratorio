@@ -161,6 +161,8 @@
                         <input id="msjSuccessful6" type="hidden" value="<spring:message code="msg.user.override.authority.direct"/>"/>
                         <input id="msjSuccessful7" type="hidden" value="<spring:message code="msg.user.add.authority.depart"/>"/>
                         <input id="msjSuccessful8" type="hidden" value="<spring:message code="msg.user.override.authority.depart"/>"/>
+                        <input id="msjSuccessful9" type="hidden" value="<spring:message code="msg.user.enabled"/>"/>
+                        <input id="msjSuccessful10" type="hidden" value="<spring:message code="msg.user.disabled"/>"/>
                         <input id="msjMkDirector" type="hidden" value="<spring:message code="msg.user.mk.director"/>"/>
                         <input id="msjMkNoDirector" type="hidden" value="<spring:message code="msg.user.mk.no.director"/>"/>
                         <input id="msjMkDepartmentHead" type="hidden" value="<spring:message code="msg.user.mk.departmentHead"/>"/>
@@ -171,6 +173,8 @@
                         <input id="msjOverride" type="hidden" value="<spring:message code="msg.confirm.override"/>"/>
                         <input id="msjOverrideC" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
                         <input id="msjConfirm" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                        <input id="msjDisable" type="hidden" value="<spring:message code="msg.confirm.disable"/>"/>
+                        <input id="msjCanceled" type="hidden" value="<spring:message code="msg.action.canceled"/>"/>
 
                         <table class="table table-striped table-bordered table-hover"
                                id="tabla2">
@@ -191,32 +195,22 @@
                                             class="btn btn-info">
                                         <spring:message code="act.change.pass" />
                                     </button>
-                                <!--<c:choose>
+                                <c:choose>
                                     <c:when test="${user.enabled}">
-                                        <td><spring:url value="{username}/disable"
-                                                        var="disableUrl">
-                                                <spring:param name="username" value="${user.username}" />
-                                            </spring:url>
-                                            <button
-                                                    onclick="location.href='${fn:escapeXml(disableUrl)}'"
-                                                    class="btn btn-info">
+                                        <td>
+                                            <button id="btn-Disable" class="btn btn-info">
                                                 <spring:message code="users.disable" />
                                             </button>
                                         </td>
                                     </c:when>
                                     <c:otherwise>
-                                        <td><spring:url value="{username}/enable"
-                                                    var="enableUrl">
-                                            <spring:param name="username" value="${user.username}" />
-                                        </spring:url>
-                                        <button
-                                                onclick="location.href='${fn:escapeXml(enableUrl)}'"
-                                                class="btn btn-info">
-                                            <spring:message code="users.enabled" />
+                                        <td>
+                                            <button id="btn-Enable" class="btn btn-info">
+                                            <spring:message code="users.enable" />
                                         </button>
                                         </td>
                                     </c:otherwise>
-                                    </c:choose>-->
+                                </c:choose>
                                 <td><spring:url value="/usuarios/list" var="listUrl"/>
                                     <button onclick="location.href='${fn:escapeXml(listUrl)}'"
                                             class="btn btn-info">
@@ -652,6 +646,8 @@
 <c:url var="departamentosUrl" value="/usuarios/getDepartaDisponiblesUsuario"/>
 <c:url var="departaUsuarioUrl" value="/usuarios/asociarDepartamentoUsuario"/>
 <c:url var="overrideDepartaUsuarioUrl" value="/usuarios/overrideDepartaUsuario"/>
+<c:url var="enableUrl" value="/usuarios/enable"/>
+<c:url var="disableUrl" value="/usuarios/disable"/>
 
 <c:url var="usuarioUrl" value="/usuarios/admin/"/>
 <script type="text/javascript">
@@ -684,6 +680,8 @@
             mkNoDirectorUrl : "${mkNoDirectorUrl}",
             mkDepartmentHeadUrl : "${mkDepartmentHeadUrl}",
             mkNoDepartmentHeadUrl : "${mkNoDepartmentHeadUrl}",
+            enableUrl : "${enableUrl}",
+            disableUrl : "${disableUrl}",
             blockMess: "${blockMess}"
         };
         Users.init(parametros);

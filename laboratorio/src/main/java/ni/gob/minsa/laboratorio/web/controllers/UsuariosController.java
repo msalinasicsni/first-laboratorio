@@ -106,40 +106,79 @@ public class UsuariosController {
     }
 
     /**
-     * Custom handler for enabling an user.
+     * Custom handler for enabling an user.     *
      *
-     * @param username the ID of the user to enable
      * @return a String
      */
-    @RequestMapping("/admin/{username}/enable")
-    public String enableUser(@PathVariable("username") String username, RedirectAttributes redirectAttributes) {
-        /*User user = this.usuarioService.getUser(username);
-        user.setCreated(new Date());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        user.setUsuario(authentication.getName());
-        user.setEnabled(true);
-        this.usuarioService.updateUser(user);
-        */
-        redirectAttributes.addFlashAttribute("SUCCESS", "Usuario se encuentra activo!");
-        return "redirect:/usuarios/admin/{username}";
+    @RequestMapping(value = "enable", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void enableUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String userName="";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            userName = jsonpObject.get("userName").getAsString();
+            User user = this.usuarioService.getUser(userName);
+            user.setCreated(new Date());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            user.setUsuario(authentication.getName());
+            user.setEnabled(true);
+            this.usuarioService.updateUser(user);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.user.enable.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("userName",userName);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
     }
 
     /**
-     * Custom handler for disabling an user.
+     * Custom handler for disabling an user.     *
      *
-     * @param username the ID of the user to disable
      * @return a String
      */
-    @RequestMapping("/admin/{username}/disable")
-    public String disableUser(@PathVariable("username") String username, RedirectAttributes redirectAttributes) {
-        /*User user = this.usuarioService.getUser(username);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        user.setUsuario(authentication.getName());
-        user.setCreated(new Date());
-        user.setEnabled(false);
-        this.usuarioService.updateUser(user);*/
-        redirectAttributes.addFlashAttribute("SUCCESS", "Usuario se encuentra inactivo!");
-        return "redirect:/usuarios/admin/{username}";
+    @RequestMapping(value = "disable", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void disableUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String userName="";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            userName = jsonpObject.get("userName").getAsString();
+            User user = this.usuarioService.getUser(userName);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            user.setUsuario(authentication.getName());
+            user.setCreated(new Date());
+            user.setEnabled(false);
+            this.usuarioService.updateUser(user);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.user.disable.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("userName",userName);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
     }
 
     @RequestMapping(value = "adminUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
