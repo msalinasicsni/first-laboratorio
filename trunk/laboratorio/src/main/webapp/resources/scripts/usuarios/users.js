@@ -1677,6 +1677,129 @@ var Users = function () {
                     agregarDepartamentoUsuario();
                 }
             });
+
+            /****************************************************/
+            /******************HABILITAR - DESHABILITAR*********************/
+            /****************************************************/
+
+            function enableUser() {
+                var valueObj = {};
+                valueObj['mensaje'] = '';
+                valueObj['userName'] = $('#username').val();
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.enableUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(valueObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#disappear").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 3000
+                                });
+                                desbloquearUI();
+                            }else{
+                                var msg = $("#msjSuccessful9").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#disappear").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 3000
+                                });
+                                setTimeout(function () {
+                                    desbloquearUI();
+                                    window.location.href = parametros.sUsuarioUrl+$('#username').val();
+                                }, 3000);
+                            }
+
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
+            function disableUser() {
+                var valueObj = {};
+                valueObj['mensaje'] = '';
+                valueObj['userName'] = $('#username').val();
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.disableUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(valueObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#disappear").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 3000
+                                });
+                                desbloquearUI();
+                            }else{
+                                var msg = $("#msjSuccessful10").val();
+                                $.smallBox({
+                                    title: msg ,
+                                    content: $("#disappear").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 3000
+                                });
+                                setTimeout(function () {
+                                    desbloquearUI();
+                                    window.location.href = parametros.sUsuarioUrl+$('#username').val();
+                                }, 3000);
+                            }
+
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
+            $('#btn-Enable').click(function() {
+                enableUser();
+            });
+
+            $('#btn-Disable').click(function() {
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                $.SmartMessageBox({
+                    title: $("#msjConfirm").val(),
+                    content: $("#msjDisable").val(),
+                    buttons: '[' + opcSi + '][' + opcNo + ']'
+                }, function (ButtonPressed) {
+                    if (ButtonPressed === opcSi) {
+                        disableUser();
+                    }
+                    if (ButtonPressed === opcNo) {
+                        $.smallBox({
+                            title: $("#msjCanceled").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                            color: "#3276B1",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 3000
+                        });
+                    }
+                })
+            });
         }
     };
 }();
