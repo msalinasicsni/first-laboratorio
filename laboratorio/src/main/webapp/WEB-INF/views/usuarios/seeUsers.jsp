@@ -92,7 +92,7 @@
                                         <th><spring:message code="users.enabled" /></th>
                                         <th><spring:message code="users.roles" /></th>
                                         <th><spring:message code="users.lab" /></th>
-                                        <th><spring:message code="lbl.actions" /></th>
+                                        <th style="width: 10%"><spring:message code="lbl.actions" /></th>
                                     </tr>
                                     </thead>
                                     <tbody>
