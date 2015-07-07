@@ -142,6 +142,9 @@
                     <li class="assocSamplesRequest">
                         <a href="<spring:url value="/administracion/associationSR/init" htmlEscape="true "/>" title="<spring:message code="lbl.association.samples.req" />"><i class="fa fa-lg fa-fw fa-link"></i> <spring:message code="lbl.association.samples.req" /></a>
                     </li>
+                    <li class="testsRequest">
+                        <a href="<spring:url value="/administracion/testsRequest/init" htmlEscape="true "/>" title="<spring:message code="lbl.association.samples.req" />"><i class="fa fa-lg fa-fw fa-link"></i> <spring:message code="lbl.tests.Request" /></a>
+                    </li>
                     <li class="users">
                         <a href="<spring:url value="/usuarios/list" htmlEscape="true "/>" title="<spring:message code="lbl.admin.users" />"><i class="fa fa-lg fa-fw fa-users"></i> <spring:message code="menu.admin.users" /></a>
                     </li>
