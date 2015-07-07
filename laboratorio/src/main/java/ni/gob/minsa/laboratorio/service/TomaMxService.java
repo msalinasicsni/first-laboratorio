@@ -296,10 +296,14 @@ public class TomaMxService {
         return q.list();
     }
 
-    public List<DaSolicitudEstudio> getSolicitudesEstudioByMx(String idTomaMx){
-        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
+    public List<DaSolicitudEstudio> getSolicitudesEstudioByIdMxUser(String idTomaMx, String username){
+        String query = "select sde from DaSolicitudEstudio sde, AutoridadArea aa " +
+                "where sde.idTomaMx.idTomaMx = :idTomaMx " +
+                "and aa.user.username = :username and aa.area.idArea = sde.tipoEstudio.area.idArea " +
+                "ORDER BY sde.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("username",username);
         return q.list();
     }
 
