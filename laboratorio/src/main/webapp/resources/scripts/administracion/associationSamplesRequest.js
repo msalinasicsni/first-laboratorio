@@ -70,9 +70,6 @@ var AssociationSamplesReq  = function () {
                 }
             });
 
-            function overrideNotif(){
-
-            }
 
            function addCHandler(){
                 var data =  $(this.innerHTML).data('id');

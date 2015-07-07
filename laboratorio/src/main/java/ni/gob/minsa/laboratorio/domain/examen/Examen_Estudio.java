@@ -1,10 +1,12 @@
 package ni.gob.minsa.laboratorio.domain.examen;
 
-import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by FIRSTICT on 12/2/2014.
@@ -13,21 +15,20 @@ import javax.persistence.*;
 @Table(name = "examen_estudio", schema = "laboratorio", uniqueConstraints = @UniqueConstraint(columnNames = {"ID_ESTUDIO","ID_EXAMEN"}))
 public class Examen_Estudio {
 
-    Integer idExamen_Dx;
+    Integer idExamen_Estudio;
     Catalogo_Estudio estudio;
     CatalogoExamenes examen;
     private boolean pasivo;
+    Date fechaRegistro;
+    User usuarioRegistro;
+
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "ID_EXAMEN_EST", nullable = false, insertable = true, updatable = true)
-    public Integer getIdExamen_Dx() {
-        return idExamen_Dx;
-    }
+    public Integer getIdExamen_Estudio() { return idExamen_Estudio; }
 
-    public void setIdExamen_Dx(Integer idExamen_Dx) {
-        this.idExamen_Dx = idExamen_Dx;
-    }
+    public void setIdExamen_Estudio(Integer idExamen_Estudio) { this.idExamen_Estudio = idExamen_Estudio; }
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_ESTUDIO", referencedColumnName = "ID_ESTUDIO",nullable = false)
@@ -60,4 +61,26 @@ public class Examen_Estudio {
     public void setPasivo(boolean pasivo) {
         this.pasivo = pasivo;
     }
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_REGISTRO", nullable = false)
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    @ManyToOne()
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
+    @ForeignKey(name = "fk_estTMxNoti_usuario")
+    public User getUsuarioRegistro() {
+        return usuarioRegistro;
+    }
+
+    public void setUsuarioRegistro(User usuarioRegistro) {
+        this.usuarioRegistro = usuarioRegistro;
+    }
+
 }
