@@ -243,6 +243,7 @@ public class TomaMxController {
             soli.setIdTomaMx(tomaMxService.getTomaMxById(idTomaMx));
             soli.setAprobada(false);
             soli.setLabProcesa(laboratorio);
+            soli.setControlCalidad(false);
             tomaMxService.addSolicitudDx(soli);
         }
 

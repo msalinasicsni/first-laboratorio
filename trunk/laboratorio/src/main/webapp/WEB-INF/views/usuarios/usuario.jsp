@@ -10,7 +10,7 @@
     <jsp:include page="../fragments/headTag.jsp" />
     <style>
         .modal .modal-dialog {
-            width: 60%;
+            width: 50%;
         }
         .styleButton {
             float: right;
@@ -76,8 +76,8 @@
             <!-- Widget ID (each widget will need unique ID)-->
             <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
                 <header>
-                    <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
-                    <h2><spring:message code="users.user" /> </h2>
+                        <span class="widget-icon"> <i class="fa fa-edit"></i> </span>
+                        <h2><spring:message code="users.user" /> </h2>
                 </header>
                 <!-- widget div-->
                 <div>
@@ -341,7 +341,7 @@
                         &times;
                     </button>
                     <h4 class="modal-title">
-                        <i class="fa-fw fa fa-font"></i>
+                        <i class="fa-fw fa fa-users"></i>
                         <spring:message code="lbl.user.header.modal.area" />
                     </h4>
                 </div>
@@ -405,7 +405,7 @@
                         &times;
                     </button>
                     <h4 class="modal-title">
-                        <i class="fa-fw fa fa-font"></i>
+                        <i class="fa-fw fa fa-users"></i>
                         <spring:message code="lbl.user.header.modal.exam" />
                     </h4>
                 </div>
@@ -466,7 +466,7 @@
                         &times;
                     </button>
                     <h4 class="modal-title">
-                        <i class="fa-fw fa fa-font"></i>
+                        <i class="fa-fw fa fa-users"></i>
                         <spring:message code="lbl.user.header.modal.direction" />
                     </h4>
                 </div>
@@ -526,7 +526,7 @@
                         &times;
                     </button>
                     <h4 class="modal-title">
-                        <i class="fa-fw fa fa-font"></i>
+                        <i class="fa-fw fa fa-users"></i>
                         <spring:message code="lbl.user.header.modal.department" />
                     </h4>
                 </div>

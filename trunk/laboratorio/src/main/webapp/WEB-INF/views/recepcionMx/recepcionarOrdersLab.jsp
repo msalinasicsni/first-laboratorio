@@ -286,13 +286,69 @@
                                             <div>
                                                 <header>
                                                     <label class="text-left txt-color-blue" style="font-weight: bold">
+                                                        <spring:message code="lbl.requests" />
+                                                    </label>
+                                                </header>
+                                                <br/>
+                                                <br/>
+                                                <div class="widget-body no-padding">
+                                                    <table id="solicitudes_list" class="table table-striped table-bordered table-hover" width="100%">
+                                                        <thead>
+                                                        <tr>
+                                                            <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.desc.request"/></th>
+                                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.solic.area.prc"/></th>
+                                                            <th data-hide="phone"><spring:message code="lbl.cc"/></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <c:choose>
+                                                            <c:when test="${not empty dxList}">
+                                                                <c:forEach items="${dxList}" var="record">
+                                                                    <tr>
+                                                                        <td><spring:message code="lbl.routine" /></td>
+                                                                        <td><c:out value="${record.codDx.nombre}" /></td>
+                                                                        <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
+                                                                        <td><c:out value="${record.codDx.area.nombre}" /></td>
+                                                                        <c:choose>
+                                                                            <c:when test="${record.controlCalidad}">
+                                                                                <td><spring:message code="lbl.yes" /></td>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <td><spring:message code="lbl.no" /></td>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <c:forEach items="${estudiosList}" var="record">
+                                                                    <tr>
+                                                                        <td><spring:message code="lbl.study" /></td>
+                                                                        <td><c:out value="${record.tipoEstudio.nombre}" /></td>
+                                                                        <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
+                                                                        <td><c:out value="${record.tipoEstudio.area.nombre}" /></td>
+                                                                        <td><spring:message code="lbl.no" /></td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:otherwise>
+                                                        </c:choose>
+
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <header>
+                                                    <label class="text-left txt-color-blue" style="font-weight: bold">
                                                         <spring:message code="lbl.header.receipt.lab" />
                                                     </label>
                                                 </header>
                                                 <br/>
                                                 <br/>
                                                 <div class="widget-body no-padding">
-                                                    <table id="dx_list" class="table table-striped table-bordered table-hover" width="100%">
+                                                    <table id="examenes_list" class="table table-striped table-bordered table-hover" width="100%">
                                                         <thead>
                                                         <tr>
                                                             <th data-class="expand"><spring:message code="lbl.receipt.test"/></th>
@@ -531,6 +587,8 @@
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />
 	<script src="${receiptOrders}"></script>
+    <spring:url value="/resources/scripts/utilidades/unicodeEscaper.js" var="unicodeEscaper" />
+    <script src="${unicodeEscaper}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>

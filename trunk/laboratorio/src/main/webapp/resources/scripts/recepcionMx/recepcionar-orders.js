@@ -56,7 +56,7 @@ var ReceiptOrders = function () {
 			});
             var table2;
             if ($("esEstudio").val()=='true') {
-                table2 = $('#dx_list').dataTable({
+                table2 = $('#examenes_list').dataTable({
                     "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
                         "t" +
                         "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
@@ -75,7 +75,7 @@ var ReceiptOrders = function () {
                     "preDrawCallback": function () {
                         // Initialize the responsive datatables helper once.
                         if (!responsiveHelper_dt_basic) {
-                            responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#dx_list'), breakpointDefinition);
+                            responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#examenes_list'), breakpointDefinition);
                         }
                     },
                     "rowCallback": function (nRow) {
@@ -86,7 +86,7 @@ var ReceiptOrders = function () {
                     }
                 });
             }else{
-                table2 = $('#dx_list').dataTable({
+                table2 = $('#examenes_list').dataTable({
                     "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
                         "t" +
                         "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
@@ -98,7 +98,7 @@ var ReceiptOrders = function () {
                     "preDrawCallback": function () {
                         // Initialize the responsive datatables helper once.
                         if (!responsiveHelper_dt_basic) {
-                            responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#dx_list'), breakpointDefinition);
+                            responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#examenes_list'), breakpointDefinition);
                         }
                     },
                     "rowCallback": function (nRow) {
@@ -109,6 +109,29 @@ var ReceiptOrders = function () {
                     }
                 });
             }
+
+            var table3 = $('#solicitudes_list').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth" : true,
+                "paging": false,
+                "ordering": false,
+                "searching": false,
+                "lengthChange": false,
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#solicitudes_list'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                }
+            });
             if($("#txtEsLaboratorio").val()=='true') {
                 getOrdersReview();
             }
@@ -667,7 +690,7 @@ var ReceiptOrders = function () {
                         success: function (data) {
                             if (data.mensaje.length > 0){
                                 $.smallBox({
-                                    title: data.mensaje ,
+                                    title: unicodeEscape(data.mensaje) ,
                                     content: $("#smallBox_content").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",

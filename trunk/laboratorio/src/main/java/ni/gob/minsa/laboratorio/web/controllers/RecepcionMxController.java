@@ -404,6 +404,8 @@ public class RecepcionMxController {
                     //mav.addObject("examenesList",ordenExamenList);
                 //}
                 mav.addObject("esEstudio",esEstudio);
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
+                mav.addObject("dxList",solicitudDxList);
             }
 
 
@@ -415,7 +417,6 @@ public class RecepcionMxController {
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("laboratorios",laboratorioList);
             mav.addObject("calidadMx",calidadMx);
-            //mav.addObject("examenesDfList",examenesList);
             mav.addObject("condicionesMx",condicionesMx);
             mav.addObject("causasRechazo",causaRechazoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
@@ -1229,20 +1230,27 @@ public class RecepcionMxController {
             Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             OrdenExamen ordenExamen = new OrdenExamen();
             DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
-            ordenExamen.setSolicitudDx(solicitudDx);
-            ordenExamen.setCodExamen(examen);
-            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-            ordenExamen.setUsarioRegistro(usuario);
-            ordenExamen.setLabProcesa(labUsuario);
-            try {
-                ordenExamenMxService.addOrdenExamen(ordenExamen);
-            } catch (Exception ex) {
-                resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
-                resultado = resultado + ". \n " + ex.getMessage();
-                ex.printStackTrace();
+            if (solicitudDx!=null){
+                ordenExamen.setSolicitudDx(solicitudDx);
+                ordenExamen.setCodExamen(examen);
+                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                ordenExamen.setUsarioRegistro(usuario);
+                ordenExamen.setLabProcesa(labUsuario);
+                try {
+                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                } catch (Exception ex) {
+                    resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
+                    resultado = resultado + ". \n " + ex.getMessage();
+                    ex.printStackTrace();
+                }
+            }else{
+                Catalogo_Dx dx = tomaMxService.getDxById(String.valueOf(idDiagnostico));
+                resultado = messageSource.getMessage("msg.receipt.add.test.error2", null, null);
+                resultado = resultado.replace("{0}", dx.getNombre());
             }
         }
-        return resultado;
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(resultado);
     }
 
     private String agregarOrdenExamenEstudio(JsonObject jsonpObject, HttpServletRequest request) throws Exception {
@@ -1263,20 +1271,27 @@ public class RecepcionMxController {
             Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             OrdenExamen ordenExamen = new OrdenExamen();
             DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudesEstudioByMxEst(idTomaMx, idEstudio);
-            ordenExamen.setSolicitudEstudio(solicitudEstudio);
-            ordenExamen.setCodExamen(examen);
-            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-            ordenExamen.setUsarioRegistro(usuario);
-            ordenExamen.setLabProcesa(labUsuario);
-            try {
-                ordenExamenMxService.addOrdenExamen(ordenExamen);
-            } catch (Exception ex) {
-                resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
-                resultado = resultado + ". \n " + ex.getMessage();
-                ex.printStackTrace();
+            if (solicitudEstudio!=null) {
+                ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                ordenExamen.setCodExamen(examen);
+                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                ordenExamen.setUsarioRegistro(usuario);
+                ordenExamen.setLabProcesa(labUsuario);
+                try {
+                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                } catch (Exception ex) {
+                    resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
+                    resultado = resultado + ". \n " + ex.getMessage();
+                    ex.printStackTrace();
+                }
+            }else{
+                Catalogo_Estudio est = tomaMxService.getEstudioById(idEstudio);
+                resultado = messageSource.getMessage("msg.receipt.add.test.error2", null, null);
+                resultado = resultado.replace("{0}",est.getNombre());
             }
         }
-        return resultado;
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(resultado);
     }
 
     /**

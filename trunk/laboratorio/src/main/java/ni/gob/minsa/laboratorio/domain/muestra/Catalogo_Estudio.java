@@ -63,7 +63,7 @@ public class Catalogo_Estudio implements Serializable {
     }
 
     @Basic
-    @Column(name = "CODIGO", nullable = true, insertable = true, updatable = true, length = 16)
+    @Column(name = "CODIGO", nullable = false, insertable = true, updatable = true, length = 16)
     public String getCodigo() {
         return codigo;
     }

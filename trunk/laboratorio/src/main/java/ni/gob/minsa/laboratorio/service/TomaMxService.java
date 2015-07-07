@@ -279,6 +279,23 @@ public class TomaMxService {
         return q.list();
     }
 
+    public List<DaSolicitudDx> getSolicitudesDxByIdTomaAreaLabUser(String idTomaMx, String username){
+        String query = "select distinct sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx ," +
+                "AutoridadLaboratorio al, AutoridadArea aa " +
+                "where mx.idTomaMx = :idTomaMx " +
+                "and al.user.username = :username and aa.user.username = :username " +
+                "and (sdx.labProcesa.codigo = al.laboratorio.codigo" +
+                " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
+                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo )) " +
+                "and sdx.codDx.area.idArea = aa.area.idArea " +
+                "ORDER BY sdx.fechaHSolicitud ";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("username",username);
+        return q.list();
+    }
+
     public List<DaSolicitudEstudio> getSolicitudesEstudioByMx(String idTomaMx){
         String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
@@ -636,13 +653,14 @@ public class TomaMxService {
         return q.list();
     }
 
-    public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea, String userName){
-        String query = "from DaSolicitudDx sdx, AutoridadLaboratorio al where sdx.idTomaMx.idTomaMx = :idTomaMx " +
+    public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea, String username){
+        String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al where sdx.idTomaMx.idTomaMx = :idTomaMx " +
                 "and sdx.labProcesa.codigo = al.laboratorio.codigo and sdx.codDx.area.idArea = :idArea and al.user.username = :username " +
-                "ORDER BY fechaHSolicitud";
+                "ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idArea",idArea);
+        q.setParameter("username",username);
         return q.list();
     }
 

@@ -103,8 +103,9 @@
                         <input id="text_value" type="hidden" value="<spring:message code="lbl.result.value"/>"/>
                         <input id="text_date" type="hidden" value="<spring:message code="lbl.result.date"/>"/>
                         <input id="study_not_answers" type="hidden" value="<spring:message code="msg.study.not.answers.found"/>"/>
-                        <input hidden="hidden" id="rutina" value="${rutina}"/>
-                        <input hidden="hidden" id="estudio" value="${estudio}"/>
+                        <input id="text_response" type="hidden" value="<spring:message code="lbl.approve.response"/>"/>
+                        <input type="hidden" id="rutina" value="${rutina}"/>
+                        <input type="hidden" id="estudio" value="${estudio}"/>
 
                         <table id="records_exa" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>

@@ -66,7 +66,7 @@ public class TipoMx_TipoNotificacion {
     }
 
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @Column(name = "FECHA_REGISTRO", nullable = true)
+    @Column(name = "FECHA_REGISTRO", nullable = false)
     public Date getFechaRegistro() {
         return fechaRegistro;
     }
@@ -76,7 +76,7 @@ public class TipoMx_TipoNotificacion {
     }
 
     @ManyToOne()
-    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=true)
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
     @ForeignKey(name = "fk_TMxNoti_usuario")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
