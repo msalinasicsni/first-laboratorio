@@ -435,8 +435,8 @@ public class ResultadosController {
                     if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty()) {
                         resultadosService.addDetalleResultado(detalleResultado);
 
-                        //save final result in dengue IGM o PCR
-                        if(ordenExamen.getCodExamen().getNombre().equals("Dengue ELISA IgM") || ordenExamen.getCodExamen().getNombre().equals("Dengue PCR")){
+                        //save final result in dengue IGM o PCR, sólo para rutinas
+                        if(ordenExamen.getSolicitudDx()!=null && (ordenExamen.getCodExamen().getNombre().equals("Dengue ELISA IgM") || ordenExamen.getCodExamen().getNombre().equals("Dengue PCR"))){
                             boolean procesado = saveFinalResultToDengue(detalleResultado, ordenExamen, usuario);
                             if (procesado) esResFinal = "NO";
 

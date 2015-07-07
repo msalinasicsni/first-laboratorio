@@ -405,7 +405,9 @@ public class RecepcionMxController {
                 //}
                 mav.addObject("esEstudio",esEstudio);
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
+                List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdMxUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                 mav.addObject("dxList",solicitudDxList);
+                mav.addObject("estudiosList",solicitudEstudios);
             }
 
 
