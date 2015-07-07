@@ -106,10 +106,11 @@ var enterFinalResult = function(){
                 var json =JSON.parse(resultado);
                 var len = Object.keys(json).length;
                 var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_value').val()+'</td><td style="font-weight: bold">'+$('#text_date').val()+'</td></tr>';
+                    '<tr><td style="font-weight: bold">'+$('#text_response').val()+'</td><td style="font-weight: bold">'+$('#text_value').val()+'</td><td style="font-weight: bold">'+$('#text_date').val()+'</td></tr>';
                 for (var i = 1; i <= len; i++) {
                     childTable =childTable +
-                        '<tr></tr><td>'+json[i].valor+'</td>'+
+                        '<td>'+json[i].respuesta+'</td>'+
+                        '<td>'+json[i].valor+'</td>'+
                         '<td>'+json[i].fechaResultado+'</td></tr>';
                 }
                 childTable = childTable + '</table>';

@@ -437,8 +437,8 @@ public class ResultadosController {
 
                         //save final result in dengue IGM o PCR
                         if(ordenExamen.getCodExamen().getNombre().equals("Dengue ELISA IgM") || ordenExamen.getCodExamen().getNombre().equals("Dengue PCR")){
-                            saveFinalResultToDengue(detalleResultado, ordenExamen, usuario);
-                            esResFinal = "NO";
+                            boolean procesado = saveFinalResultToDengue(detalleResultado, ordenExamen, usuario);
+                            if (procesado) esResFinal = "NO";
 
                         }
 
@@ -471,7 +471,8 @@ public class ResultadosController {
         }
     }
 
-    private void saveFinalResultToDengue(DetalleResultado detalleResultado, OrdenExamen orden, User usuario) throws Exception {
+    private boolean saveFinalResultToDengue(DetalleResultado detalleResultado, OrdenExamen orden, User usuario) throws Exception {
+        boolean procesado = false;
         try {
             //search amount of orders exams
             List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(orden.getSolicitudDx().getIdSolicitudDx());
@@ -490,12 +491,14 @@ public class ResultadosController {
                             if (valor.getValor().toLowerCase().equals("positivo")) {
                                 //save final Result
                                 guardarResultadoFinal(detalleResultado, orden, false);
+                                procesado=true;
                             }
                             //in positive case
                         } else if (detalleResultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
                             if (detalleResultado.getValor().toLowerCase().equals("positivo")) {
                                 //save final Result
                                 guardarResultadoFinal(detalleResultado, orden, false);
+                                procesado=true;
                             }
                         }
                     }
@@ -526,22 +529,24 @@ public class ResultadosController {
                                         //in positive case
                                         if (valor.getValor().toLowerCase().equals("positivo")) {
                                             guardarResultadoFinal(deta, ord, false);
+                                            procesado = true;
                                         }
                                         //in positive case
                                     } else if (de.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
                                         if (de.getValor().toLowerCase().equals("positivo")) {
                                             guardarResultadoFinal(deta, ord, false);
+                                            procesado = true;
                                         }
                                     }
                                 }
                             }
-
                         }
                     }
             }
         } catch (Exception ex) {
             throw new Exception(ex);
         }
+        return procesado;
     }
 
     private void guardarResultadoFinal(DetalleResultado detalleResultado, OrdenExamen ordenExamen, boolean esUpdate) throws Exception {

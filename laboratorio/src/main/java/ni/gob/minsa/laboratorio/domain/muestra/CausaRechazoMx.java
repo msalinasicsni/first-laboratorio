@@ -16,11 +16,11 @@ import javax.persistence.*;
         ),
         @NamedQuery(
                 name = "getCausaRechazoMxRecepGeneral",
-                query = "select causa from CausaRechazoMx causa where causa.codigo like '%|GRAL|%'"
+                query = "select causa from CausaRechazoMx causa where causa.codigo like '%|GRAL|%' order by orden"
         ),
         @NamedQuery(
                 name = "getCausaRechazoMxRecepLab",
-                query = "select causa from CausaRechazoMx causa where causa.codigo like '%|LAB|%'"
+                query = "select causa from CausaRechazoMx causa where causa.codigo like '%|LAB|%' order by orden asc "
         )
 })
 

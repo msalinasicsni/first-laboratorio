@@ -411,10 +411,17 @@ public class ResultadoFinalController {
                         if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                             Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
                             mapRes.put("valor", cat_lista.getValor());
-                        } else {
+                        }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")){
+                            if (res.getValor().equals("false")){
+                                mapRes.put("valor", messageSource.getMessage("lbl.no",null,null));
+                            }else{
+                                mapRes.put("valor", messageSource.getMessage("lbl.yes",null,null));
+                            }
+                        }
+                        else {
                             mapRes.put("valor", res.getValor());
                         }
-
+                        mapRes.put("respuesta",res.getRespuesta().getNombre());
                         mapRes.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
                         subIndice++;
                         mapResList.put(subIndice, mapRes);
