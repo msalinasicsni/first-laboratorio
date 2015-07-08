@@ -1653,7 +1653,7 @@ public class ReportesController {
                                 unidadSalud = soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
                             }
 
-                            content[0] = soli.getIdTomaMx() != null ? soli.getIdTomaMx().getCodigoUnicoMx() : "";
+                            content[0] = soli.getIdTomaMx() != null ? (soli.getIdTomaMx().getCodigoLab()!=null?soli.getIdTomaMx().getCodigoLab():soli.getIdTomaMx().getCodigoUnicoMx()) : "";
                             content[1] = fechaAprob != null ? fechaAprob : "";
                             content[2] = silais != null ? silais : "";
                             content[3] = unidadSalud != null ? unidadSalud : "";

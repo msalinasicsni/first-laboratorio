@@ -538,8 +538,8 @@ var ReceptionReport = function () {
 
                     mxFiltros['fechaInicioAprob'] = $('#inicioAprob').val();
                     mxFiltros['fechaFinAprob'] = $('#finAprob').val();
-                    mxFiltros['codSilais'] = $('#silais').find('option:selected').val();
-                    mxFiltros['codUnidadSalud'] = $('#us').find('option:selected').val();
+                    mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
+                    mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipoSol').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSol').val());
                     mxFiltros['area'] = $('#areaSol').find('option:selected').val();
