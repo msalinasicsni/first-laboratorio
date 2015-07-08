@@ -185,7 +185,7 @@
                                     <spring:message code="lbl.silais" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="silais" name="silais"
+                                    <select id="codSilais" name="codSilais"
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
                                         <c:forEach items="${entidades}" var="entidad">
@@ -199,7 +199,7 @@
                                     <spring:message code="lbl.health.unit" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="us" name="us"
+                                    <select id="codUnidadSalud" name="codUnidadSalud"
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
                                     </select>

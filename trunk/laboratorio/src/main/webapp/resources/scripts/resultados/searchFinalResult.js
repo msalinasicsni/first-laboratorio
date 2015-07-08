@@ -126,6 +126,33 @@ return {
                     alert( "error" );
                 });
         }
+
+        <!-- al seleccionar SILAIS -->
+        $('#codSilais').change(function(){
+            bloquearUI(parametros.blockMess);
+            if ($(this).val().length > 0) {
+                $.getJSON(parametros.sUnidadesUrl, {
+                    codSilais: $(this).val(),
+                    ajax: 'true'
+                }, function (data) {
+                    var html = null;
+                    var len = data.length;
+                    html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + data[i].codigo + '">'
+                            + data[i].nombre
+                            + '</option>';
+                        // html += '</option>';
+                    }
+                    $('#codUnidadSalud').html(html);
+                })
+            }else{
+                var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                $('#codUnidadSalud').html(html);
+            }
+            $('#codUnidadSalud').val('').change();
+            desbloquearUI();
+        });
     }
 };
 
