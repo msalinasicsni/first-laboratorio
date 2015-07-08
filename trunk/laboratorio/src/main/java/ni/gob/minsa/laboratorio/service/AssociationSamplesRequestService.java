@@ -170,7 +170,7 @@ public class AssociationSamplesRequestService {
 
 
     public Dx_TipoMx_TipoNoti getDxByidDxMxNoti(Integer id){
-        String query = "from Dx_TipoMx_TipoNoti dx where dx.idDxTipoMxNt = :id";
+        String query = "from Dx_TipoMx_TipoNoti dx where dx.idDxTipoMxNt = :id and dx.pasivo = false";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("id", id);
@@ -178,7 +178,7 @@ public class AssociationSamplesRequestService {
     }
 
     public Estudio_TipoMx_TipoNoti getEstByidEstMxNoti(Integer id){
-        String query = "from Estudio_TipoMx_TipoNoti est where est.idEstTipoMxNt = :id";
+        String query = "from Estudio_TipoMx_TipoNoti est where est.idEstTipoMxNt = :id and est.pasivo = false";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("id", id);
@@ -216,7 +216,7 @@ public class AssociationSamplesRequestService {
 
 
     public TipoMx_TipoNotificacion getTipoMxNotiById(Integer id){
-        String query = "from TipoMx_TipoNotificacion mxNoti where mxNoti.id = :id";
+        String query = "from TipoMx_TipoNotificacion mxNoti where mxNoti.id = :id and mxNoti.pasivo = false";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("id", id);

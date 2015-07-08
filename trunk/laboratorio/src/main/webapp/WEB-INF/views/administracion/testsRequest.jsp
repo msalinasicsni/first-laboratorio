@@ -69,9 +69,7 @@
             <!-- PAGE HEADER -->
             <i class="fa-fw fa fa-link"></i>
             <spring:message code="lbl.tests.Request" />
-						<span> <i class="fa fa-angle-right"></i>
-							<spring:message code="lbl.add.edit" />
-						</span>
+
         </h1>
     </div>
     <!-- end col -->
@@ -107,7 +105,12 @@
                     <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.sampleTypes.added"/>"/>
                     <input id="msg_conc_cancel" type="hidden" value="<spring:message code="msg.sampleTypes.successfully.cancel"/>"/>
                     <input id="succ" type="hidden" value="<spring:message code="msg.associate.test.added"/>"/>
-
+                    <input id="msg_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                    <input id="msg_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                    <input id="msg_conf" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                    <input id="msg_overrideT_confirm_c" type="hidden" value="<spring:message code="msg.overrideT.confirm.content"/>"/>
+                    <input id="msg_succOverrideT" type="hidden" value="<spring:message code="msg.successfully.overrideT"/>"/>
+                    <input id="msg_overrideT_cancel" type="hidden" value="<spring:message code="msg.override.test.cancel"/>"/>
 
                     <table id="records" class="table table-striped table-bordered table-hover" width="75%">
                         <thead>
@@ -116,7 +119,6 @@
                             <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
                             <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.area"/></th>
                             <th><spring:message code="lbl.tests"/></th>
-                            <th><spring:message code="lbl.override"/></th>
 
                         </tr>
                         </thead>
