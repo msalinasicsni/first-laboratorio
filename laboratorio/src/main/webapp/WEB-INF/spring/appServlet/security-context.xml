@@ -42,6 +42,13 @@
         <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/associationSR/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/sampleTypes/*" access="ROLE_ADMIN" />
+        <intercept-url pattern="/reports/reception/*" access="ROLE_RECEPCION" />
+        <intercept-url pattern="/reports/reception/*" access="ROLE_RECEPCION" />
+        <intercept-url pattern="/reports/positiveResults/*" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/posNegResults/*" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+
+
+
 
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
