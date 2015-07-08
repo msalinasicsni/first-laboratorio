@@ -83,7 +83,7 @@ public class ExamenesSolicitudService {
         return (Examen_Dx) q.uniqueResult();
     }
 
-    public Examen_Estudio getEstudioTestRecord(Integer idEstudio, Integer idExamen){
+    public Examen_Estudio getStudyTestRecord(Integer idEstudio, Integer idExamen){
         String query = "from Examen_Estudio est where est.estudio.id = :idEstudio and est.examen.id = :idExamen and est.pasivo = false";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -130,5 +130,21 @@ public class ExamenesSolicitudService {
             logger.error("Error al agregar o actualizar asociacion examen",ex);
             throw ex;
         }
+    }
+
+    public Examen_Dx getRoutineTestById(Integer id){
+        String query = "from Examen_Dx dx where dx.idExamen_Dx = :id and dx.pasivo = false";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("id", id);
+        return (Examen_Dx) q.uniqueResult();
+    }
+
+    public Examen_Estudio getStudyTestById(Integer id){
+        String query = "from Examen_Estudio est where est.idExamen_Estudio = :id and est.pasivo = false";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("id", id);
+        return (Examen_Estudio) q.uniqueResult();
     }
 }

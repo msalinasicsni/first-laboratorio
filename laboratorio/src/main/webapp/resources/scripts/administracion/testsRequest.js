@@ -44,12 +44,9 @@ var TestsRequest  = function () {
                     {
                         "className":      'detail',
                         "orderable":      false
-                    },
-
-                    {
-                        "className":      'override',
-                        "orderable":      false
                     }
+
+
                 ],
 
                 "preDrawCallback" : function() {
@@ -116,7 +113,7 @@ var TestsRequest  = function () {
                 "columns": [
                     null,
                     {
-                        "className":      'overrideTest',
+                        "className":      'overrideT',
                         "orderable":      false
                     }
 
@@ -133,15 +130,15 @@ var TestsRequest  = function () {
                 },
                 "drawCallback" : function(oSettings) {
                     responsiveHelper_dt_basic.respond();
+                },
+
+
+                fnDrawCallback : function() {
+                    $('.overrideT')
+                        .off("click", overrideTe)
+                        .on("click", overrideTe);
+
                 }
-
-
-              /*  fnDrawCallback : function() {
-                    $('.overrideTest')
-                        .off("click", overrideCHandler)
-                        .on("click", overrideCHandler);
-
-                }*/
 
             });
 
@@ -160,11 +157,8 @@ var TestsRequest  = function () {
                         var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "," + data[i].tipo + "," + data[i].nombre + ","+ data[i].idArea +
                             '" > <i class="fa fa-list"></i>' ;
 
-                        var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].id+ data[i].tipo+
-                            '"> <i class="fa fa-times"></i>';
-
                         catalogueTable.fnAddData(
-                            [data[i].nombre, data[i].tipo, data[i].area, btnDetail, btnOverride ]);
+                            [data[i].nombre, data[i].tipo, data[i].area, btnDetail]);
 
 
                     }
@@ -240,6 +234,11 @@ var TestsRequest  = function () {
                 }
             });
 
+            function overrideTe(){
+                var data =  $(this.innerHTML).data('id');
+                 overrideTest(data);
+            }
+
 
 
             function addTest() {
@@ -289,6 +288,75 @@ var TestsRequest  = function () {
                             alert("error: " + data + " status: " + status + " er:" + er);
                         }
                     });
+            }
+
+            function overrideTest(idRecord) {
+                var obj = {};
+                obj['mensaje'] = '';
+                obj['idSolicitud'] = $('#idSolicitud').val();
+                obj['idExamen'] = '';
+                obj['pasivo'] = '';
+                obj['idRecord'] = idRecord;
+                obj['tipo'] = $('#tipo').val();
+
+                var opcSi = $("#msg_yes").val();
+                var opcNo = $("#msg_no").val();
+
+                $.SmartMessageBox({
+                    title: $("#msg_conf").val(),
+                    content: $("#msg_overrideT_confirm_c").val(),
+                    buttons: '['+opcSi+']['+opcNo+']'
+                }, function (ButtonPressed) {
+                    if (ButtonPressed === opcSi) {
+
+                        blockUI(parametros.blockMess);
+                        $.ajax(
+                            {
+                                url: parametros.saveTestUrl,
+                                type: 'POST',
+                                dataType: 'json',
+                                data: JSON.stringify(obj),
+                                contentType: 'application/json',
+                                mimeType: 'application/json',
+                                success: function (data) {
+                                    if (data.mensaje.length > 0){
+                                        $.smallBox({
+                                            title: data.mensaje ,
+                                            content: $("#disappear").val(),
+                                            color: "#C46A69",
+                                            iconSmall: "fa fa-warning",
+                                            timeout: 4000
+                                        });
+                                    }else{
+                                        getExams($('#idSolicitud').val(), $('#tipo').val());
+                                        var msg = $("#msg_succOverrideT").val();
+                                        $.smallBox({
+                                            title: msg ,
+                                            content: $("#disappear").val(),
+                                            color: "#739E73",
+                                            iconSmall: "fa fa-success",
+                                            timeout: 4000
+                                        });
+                                    }
+                                    unBlockUI();
+                                },
+                                error: function (data, status, er) {
+                                    unBlockUI();
+                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                }
+                            });
+
+                    }
+                    if (ButtonPressed === opcNo) {
+                        $.smallBox({
+                            title: $("#msg_overrideT_cancel").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
+                            color: "#C46A69",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 4000
+                        });
+                    }
+                });
             }
 
 

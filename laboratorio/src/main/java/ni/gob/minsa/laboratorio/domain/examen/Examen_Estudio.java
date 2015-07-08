@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by FIRSTICT on 12/2/2014.
  */
 @Entity
-@Table(name = "examen_estudio", schema = "laboratorio", uniqueConstraints = @UniqueConstraint(columnNames = {"ID_ESTUDIO","ID_EXAMEN"}))
+@Table(name = "examen_estudio", schema = "laboratorio")
 public class Examen_Estudio {
 
     Integer idExamen_Estudio;

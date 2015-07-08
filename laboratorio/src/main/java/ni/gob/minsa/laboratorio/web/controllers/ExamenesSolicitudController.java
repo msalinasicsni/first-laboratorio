@@ -260,7 +260,7 @@ public class ExamenesSolicitudController {
 
                     } else {
                         //search log
-                        Examen_Estudio record = testsRequestService.getEstudioTestRecord(idSolicitud, idExamen);
+                        Examen_Estudio record = testsRequestService.getStudyTestRecord(idSolicitud, idExamen);
 
                         if (record == null) {
                             Examen_Estudio exa = new Examen_Estudio();
@@ -276,6 +276,22 @@ public class ExamenesSolicitudController {
                         }
                     }
 
+                }
+            }else{
+                if(tipo!= null ){
+                    if (tipo.equals("Rutina")) {
+                        Examen_Dx rec = testsRequestService.getRoutineTestById(idRecord);
+                        if (rec != null) {
+                            rec.setPasivo(true);
+                            testsRequestService.addOrUpdateTest(rec);
+                        }
+                    } else if (tipo.equals("Estudio")) {
+                        Examen_Estudio rec1 = testsRequestService.getStudyTestById(idRecord);
+                        if (rec1 != null) {
+                            rec1.setPasivo(true);
+                            testsRequestService.addOrUpdateTestE(rec1);
+                        }
+                    }
                 }
             }
 
