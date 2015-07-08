@@ -193,19 +193,19 @@ var Concepts  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEditC = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
-                            ' > <i class="fa fa-edit"></i>' ;
+                        var btnEditC = '<button type="button" class="btn btn-default btn-xs" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
+                            ' "> <i class="fa fa-edit"></i>' ;
 
-                        var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id='+data[i].idConcepto+' ' +
-                            '> <i class="fa fa-list-ol"></i>';
-
-
-                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-default btn-xs " data-id='+data[i].idConcepto+' ' +
-                            '> <i class="fa fa-list-ol"></i>';
+                        var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id="'+data[i].idConcepto+' ' +
+                            '"> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idConcepto+' ' +
-                            '> <i class="fa fa-times"></i>';
+                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-default btn-xs " data-id="'+data[i].idConcepto+' ' +
+                            '"> <i class="fa fa-list-ol"></i>';
+
+
+                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idConcepto+' ' +
+                            '"> <i class="fa fa-times"></i>';
 
 
                         if(data[i].tipo.valor == "Lista"){
@@ -330,11 +330,11 @@ var Concepts  = function () {
                     valuesTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs" data-id='+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+' ' +
-                                    ' > <i class="fa fa-edit"></i>' ;
+                        var btnEdit = '<button type="button" class="btn btn-default btn-xs" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+' ' +
+                                    '" > <i class="fa fa-edit"></i>' ;
 
-                        var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idCatalogoLista+ ' ' +
-                            ' > <i class="fa fa-times"></i>' ;
+                        var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ ' ' +
+                            '" > <i class="fa fa-times"></i>' ;
 
                           valuesTable.fnAddData(
 
