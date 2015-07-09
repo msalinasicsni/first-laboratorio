@@ -404,9 +404,20 @@ public class RecepcionMxController {
                     //mav.addObject("examenesList",ordenExamenList);
                 //}
                 mav.addObject("esEstudio",esEstudio);
+                TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(recepcionMx.getTomaMx().getIdTomaMx());
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdMxUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
-                mav.addObject("dxList",solicitudDxList);
+                List<DaSolicitudDx> dxMostrar = new ArrayList<DaSolicitudDx>();
+                if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
+                    for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                        if (trasladoActivo.getAreaDestino().getIdArea().equals(solicitudDx.getCodDx().getArea().getIdArea())){
+                            dxMostrar.add(solicitudDx);
+                        }
+                    }
+                }else{
+                    dxMostrar = solicitudDxList;
+                }
+                mav.addObject("dxList",dxMostrar);
                 mav.addObject("estudiosList",solicitudEstudios);
             }
 
@@ -790,8 +801,9 @@ public class RecepcionMxController {
     String getOrdenesExamen(@RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
         logger.info("antes getOrdenesExamen");
         List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMxAndUser(idTomaMx, seguridadService.obtenerNombreUsuario());
+        TrasladoMx trasladoMx = trasladosService.getTrasladoActivoMx(idTomaMx);
         logger.info("despues getOrdenesExamen");
-        return OrdenesExamenToJson(ordenExamenList);
+        return OrdenesExamenToJson(ordenExamenList, trasladoMx);
     }
 
     /**
@@ -1546,31 +1558,43 @@ public class RecepcionMxController {
      * @return String
      * @throws UnsupportedEncodingException
      */
-    private String OrdenesExamenToJson(List<OrdenExamen> ordenesExamenList) throws UnsupportedEncodingException {
+    private String OrdenesExamenToJson(List<OrdenExamen> ordenesExamenList, TrasladoMx trasladoMx) throws UnsupportedEncodingException {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
+        boolean agregarExamenDx = true;
         for(OrdenExamen ordenExamen : ordenesExamenList){
             Map<String, String> map = new HashMap<String, String>();
             if (ordenExamen.getSolicitudDx()!=null) {
-                map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
-                map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
-                map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
-                map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
-                map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
-                map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                map.put("tipo","Rutina");
-                if (ordenExamen.getSolicitudDx().getControlCalidad())
-                    map.put("cc",messageSource.getMessage("lbl.yes",null,null));
-                else
-                    map.put("cc",messageSource.getMessage("lbl.no",null,null));
+                //si hay traslado interno, mostrar los examenes que corresponden al area destino del traslado
+                if (trasladoMx!=null && trasladoMx.isTrasladoInterno()){
+                    if (!trasladoMx.getAreaDestino().getIdArea().equals(ordenExamen.getSolicitudDx().getCodDx().getArea().getIdArea())){
+                        agregarExamenDx = false;
+                    }
+                }
 
-                if (!ordenExamen.getLabProcesa().getCodigo().equals(ordenExamen.getSolicitudDx().getLabProcesa().getCodigo()))
-                    map.put("externo",messageSource.getMessage("lbl.yes",null,null));
-                else
-                    map.put("externo",messageSource.getMessage("lbl.no",null,null));
+                if (agregarExamenDx) {
+                    map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+                    map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                    map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
+                    map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
+                    map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
+                    map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    map.put("tipo", "Rutina");
+                    if (ordenExamen.getSolicitudDx().getControlCalidad())
+                        map.put("cc", messageSource.getMessage("lbl.yes", null, null));
+                    else
+                        map.put("cc", messageSource.getMessage("lbl.no", null, null));
 
-                mapResponse.put(indice, map);
+                    if (!ordenExamen.getLabProcesa().getCodigo().equals(ordenExamen.getSolicitudDx().getLabProcesa().getCodigo()))
+                        map.put("externo", messageSource.getMessage("lbl.yes", null, null));
+                    else
+                        map.put("externo", messageSource.getMessage("lbl.no", null, null));
+
+                    mapResponse.put(indice, map);
+                    indice ++;
+                }
+                agregarExamenDx = true;
             }else{
                 map.put("idTomaMx", ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
                 map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
@@ -1582,8 +1606,8 @@ public class RecepcionMxController {
                 map.put("cc",messageSource.getMessage("lbl.no",null,null));
                 map.put("externo",messageSource.getMessage("lbl.no",null,null));
                 mapResponse.put(indice, map);
+                indice ++;
             }
-            indice ++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
