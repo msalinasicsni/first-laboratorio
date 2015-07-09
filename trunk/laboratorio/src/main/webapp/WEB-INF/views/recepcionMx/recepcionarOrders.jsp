@@ -316,7 +316,7 @@
                                             </header>
                                             <br/>
                                             <div class="row">
-                                                <section class="col col-sm-12 col-md-6 col-lg-2">
+                                                <section class="col col-sm-12 col-md-6 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.check.quantity.tubes"/>
                                                     </label>
@@ -357,7 +357,7 @@
                                                             <i></i><spring:message code="lbl.no"/></label>
                                                     </div>
                                                 </section>
-                                                <div class="col col-sm-12 col-md-6 col-lg-6" id="dvCausa">
+                                                <div class="col col-sm-12 col-md-6 col-lg-5" id="dvCausa">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.cause.rejection" /> </label>
                                                     <!--<div class="">
