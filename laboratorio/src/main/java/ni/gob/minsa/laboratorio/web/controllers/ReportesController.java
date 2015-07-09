@@ -7,7 +7,6 @@ import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -457,7 +456,7 @@ public class ReportesController {
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
-            cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.lab.code.mx", null, null));
+            cell = factHeaderrow.createCell(13, messageSource.getMessage("lbl.lab.code.mx", null, null));
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
             cell.setFillColor(Color.LIGHT_GRAY);
@@ -472,17 +471,17 @@ public class ReportesController {
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.sample.quality", null, null));
+            cell = factHeaderrow.createCell(11, messageSource.getMessage("lbl.sample.quality", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.silais", null, null));
+            cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.silais", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.health.unit", null, null));
+            cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.health.unit", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
@@ -523,7 +522,7 @@ public class ReportesController {
 
                     //Create Fact header row
                     factHeaderrow = table.createRow(15f);
-                    cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.lab.code.mx", null, null));
+                    cell = factHeaderrow.createCell(13, messageSource.getMessage("lbl.lab.code.mx", null, null));
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
                     cell.setFillColor(Color.LIGHT_GRAY);
@@ -538,17 +537,17 @@ public class ReportesController {
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.sample.quality", null, null));
+                    cell = factHeaderrow.createCell(11, messageSource.getMessage("lbl.sample.quality", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.silais", null, null));
+                    cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.silais", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.health.unit", null, null));
+                    cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.health.unit", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
@@ -568,7 +567,7 @@ public class ReportesController {
                 }
 
                 row = table.createRow(15);
-                cell = row.createCell(10, fact[0]);
+                cell = row.createCell(13, fact[0]);
                 cell.setFont(PDType1Font.HELVETICA);
                 cell.setFontSize(10);
                 y -= 15;
@@ -583,7 +582,7 @@ public class ReportesController {
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
                     } else if (i == 5) {
-                        cell = row.createCell(17, fact[i]);
+                        cell = row.createCell(16, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
@@ -593,7 +592,7 @@ public class ReportesController {
                         cell.setFontSize(10);
 
                     } else if (i == 4) {
-                        cell = row.createCell(17, fact[i]);
+                        cell = row.createCell(16, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
@@ -604,7 +603,7 @@ public class ReportesController {
 
 
                     } else {
-                        cell = row.createCell(12, fact[i]);
+                        cell = row.createCell(11, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
                     }
@@ -1086,7 +1085,7 @@ public class ReportesController {
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(20, messageSource.getMessage("lbl.receipt.person.name", null, null));
+            cell = factHeaderrow.createCell(19, messageSource.getMessage("lbl.receipt.person.name", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
@@ -1142,7 +1141,7 @@ public class ReportesController {
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(20, messageSource.getMessage("lbl.receipt.person.name", null, null));
+                    cell = factHeaderrow.createCell(19, messageSource.getMessage("lbl.receipt.person.name", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
@@ -1176,7 +1175,7 @@ public class ReportesController {
                         cell.setFontSize(10);
 
                     } else if (i == 4) {
-                        cell = row.createCell(20, fact[i]);
+                        cell = row.createCell(19, fact[i]);
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
 
