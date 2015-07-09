@@ -781,7 +781,7 @@ var ReceiptOrders = function () {
             <!-- cargar dx -->
             function getDiagnosticos(idTipoMx, codTipoNoti) {
                 $.getJSON(parametros.sDxURL, {
-                    codMx: idTipoMx, tipoNoti : codTipoNoti,
+                    codMx: idTipoMx, tipoNoti : codTipoNoti, idTomaMx : $("#idTomaMx").val(),
                     ajax: 'true'
                 }, function (data) {
                     var html = null;

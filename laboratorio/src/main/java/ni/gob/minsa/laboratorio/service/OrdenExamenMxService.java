@@ -586,4 +586,18 @@ public class OrdenExamenMxService {
         q.setParameter("userName",userName);
         return (OrdenExamen)q.uniqueResult();
     }
+
+    public List<OrdenExamen> getOrdenesExamenByIdSolicitud(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx where sdx.idSolicitudDx =:idSolicitud ");
+        q.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud ");
+        q2.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
+    }
 }

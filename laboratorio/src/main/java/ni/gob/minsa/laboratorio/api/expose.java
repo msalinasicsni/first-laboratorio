@@ -7,6 +7,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.muestra.Dx_TipoMx_TipoNoti;
 import ni.gob.minsa.laboratorio.domain.muestra.Estudio_TipoMx_TipoNoti;
+import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.poblacion.Sectores;
@@ -75,6 +76,10 @@ public class expose {
     @Autowired
     @Qualifier(value = "examenesService")
     private ExamenesService examenesService;
+
+    @Autowired
+    @Qualifier(value = "trasladosService")
+    private TrasladosService trasladosService;
 
     @RequestMapping(value = "unidades", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public
@@ -214,11 +219,23 @@ public class expose {
     @RequestMapping(value = "getDiagnosticos", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<Dx_TipoMx_TipoNoti> getDiagnosticos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
+    List<Dx_TipoMx_TipoNoti> getDiagnosticos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti,
+                                             @RequestParam(value = "idTomaMx", required = true)String idTomaMx) throws Exception {
         logger.info("Obteniendo los dx por tipo mx en JSON");
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Dx_TipoMx_TipoNoti>();
+        List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotisPermitidos = new ArrayList<Dx_TipoMx_TipoNoti>();
         dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
-        return dxTipoMxTipoNotis;
+        TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
+
+        if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
+            for (Dx_TipoMx_TipoNoti dxTipoMxTipoNoti : dxTipoMxTipoNotis){
+                if (dxTipoMxTipoNoti.getDiagnostico().getArea().getIdArea().equals(trasladoActivo.getAreaDestino().getIdArea()))
+                    dxTipoMxTipoNotisPermitidos.add(dxTipoMxTipoNoti);
+            }
+            return dxTipoMxTipoNotisPermitidos;
+        }else{
+            return dxTipoMxTipoNotis;
+        }
     }
 
     @RequestMapping(value = "getExamenes", method = RequestMethod.GET, produces = "application/json")

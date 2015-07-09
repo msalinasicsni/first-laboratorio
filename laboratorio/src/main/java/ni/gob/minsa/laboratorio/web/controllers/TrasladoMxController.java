@@ -291,6 +291,7 @@ public class TrasladoMxController {
                     }else{//si no tien traslados, tomar el area del dx con mayor prioridad
                         trasladoMx.setAreaOrigen(solicitudDxList.get(0).getCodDx().getArea());
                     }
+                    estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
                 }else {
                     if (tipoTraslado.equals("cc")) {
                         trasladoMx.setControlCalidad(true);

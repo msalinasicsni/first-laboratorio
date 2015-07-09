@@ -260,7 +260,7 @@
                                                 <br/>
                                                 <br/>
                                                 <div class="widget-body no-padding">
-                                                    <table id="dx_list" class="table table-striped table-bordered table-hover" width="100%">
+                                                    <table id="solicitudes_list" class="table table-striped table-bordered table-hover" width="100%">
                                                         <thead>
                                                         <tr>
                                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
