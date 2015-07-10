@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.domain.examen;
 
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
+import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,47 +13,47 @@ import java.util.Date;
  * Created by FIRSTICT on 12/2/2014.
  */
 @Entity
-@Table(name = "examen_dx", schema = "laboratorio")
-public class Examen_Dx {
+@Table(name = "direccion_laboratorio", schema = "laboratorio")
+public class DireccionLaboratorio {
 
-    Integer idExamen_Dx;
-    Catalogo_Dx diagnostico;
-    CatalogoExamenes examen;
+    Integer idDireccionLab;
+    Laboratorio laboratorio;
+    Direccion direccion;
     private boolean pasivo;
     Date fechaRegistro;
     User usuarioRegistro;
 
     @Id
     @GeneratedValue(strategy= GenerationType.TABLE)
-    @Column(name = "ID_EXAMEN_DX", nullable = false, insertable = true, updatable = true)
-    public Integer getIdExamen_Dx() {
-        return idExamen_Dx;
+    @Column(name = "ID_DIRECCION_LAB", nullable = false, insertable = true, updatable = true)
+    public Integer getIdDireccionLab() {
+        return idDireccionLab;
     }
 
-    public void setIdExamen_Dx(Integer idExamen_Dx) {
-        this.idExamen_Dx = idExamen_Dx;
-    }
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_DIAGNOSTICO", referencedColumnName = "ID_DIAGNOSTICO",nullable = false)
-    @ForeignKey(name="EXAMENDX_DX_FK")
-    public Catalogo_Dx getDiagnostico() {
-        return diagnostico;
-    }
-
-    public void setDiagnostico(Catalogo_Dx diagnostico) {
-        this.diagnostico = diagnostico;
+    public void setIdDireccionLab(Integer idDireccionLab) {
+        this.idDireccionLab = idDireccionLab;
     }
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_EXAMEN", referencedColumnName = "ID_EXAMEN",nullable = false)
-    @ForeignKey(name="EXAMENDX_EXAMEN_FK")
-    public CatalogoExamenes getExamen() {
-        return examen;
+    @JoinColumn(name = "CODIGO_LAB", referencedColumnName = "CODIGO",nullable = false)
+    @ForeignKey(name="DIRECCIONLAB_LAB_FK")
+    public Laboratorio getLaboratorio() {
+        return laboratorio;
     }
 
-    public void setExamen(CatalogoExamenes examen) {
-        this.examen = examen;
+    public void setLaboratorio(Laboratorio laboratorio) {
+        this.laboratorio = laboratorio;
+    }
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ID_DIRECCION", referencedColumnName = "ID_DIRECCION",nullable = false)
+    @ForeignKey(name="DIRECCIONLAB_DIRECCION_FK")
+    public Direccion getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(Direccion direccion) {
+        this.direccion = direccion;
     }
 
     @Basic
@@ -77,7 +78,7 @@ public class Examen_Dx {
 
     @ManyToOne()
     @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
-    @ForeignKey(name = "fk_estTMxNoti_usuario")
+    @ForeignKey(name = "DIRECCIONLAB_USUARIO_FK")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
     }

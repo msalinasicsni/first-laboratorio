@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.Area;
+import ni.gob.minsa.laboratorio.domain.examen.AreaDepartamento;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -49,5 +50,25 @@ public class AreaService {
         Query q = session.createQuery(query);
         q.setParameter("userName",userName);
         return  q.list();
+    }
+
+    public List<Area> getAreasByDepartamento(Integer idDepartamento){
+        String query = "select aa from Area aa, AreaDepartamento ad " +
+                "where aa.idArea = ad.area.idArea and ad.departamento.idDepartamento = :idDepartamento " +
+                "order by aa.nombre";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idDepartamento",idDepartamento);
+        return  q.list();
+    }
+
+    public AreaDepartamento getAreaDepartamento(Integer idAreaDepartamento){
+        String query = "from AreaDepartamento as a where idAreaDepartamento= :idAreaDepartamento";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idAreaDepartamento", idAreaDepartamento);
+        return  (AreaDepartamento)q.uniqueResult();
     }
 }

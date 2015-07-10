@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,6 +24,11 @@ public class ExamenesService {
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
+
+    public void addExamen(CatalogoExamenes examen) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(examen);
+    }
 
     /**
      *
@@ -135,6 +141,16 @@ public class ExamenesService {
                 "and aa.user.username = :userName and ex.idExamen not in (select aex.examen.idExamen from AutoridadExamen as aex " +
                 "where aex.pasivo = false and aex.autoridadArea.pasivo = false and aex.autoridadArea.user.username = :userName)");
         q.setParameter("userName",userName);
+        return q.list();
+    }
+
+    /**
+     * Obtiene lista de todos los examenes registrados
+     * @return List<CatalogoExamenes>
+     */
+    public List<CatalogoExamenes> getExamenes(){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select ex from CatalogoExamenes ex");
         return q.list();
     }
 }
