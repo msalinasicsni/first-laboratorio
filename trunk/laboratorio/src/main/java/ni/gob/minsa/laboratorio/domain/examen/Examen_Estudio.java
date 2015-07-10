@@ -24,7 +24,7 @@ public class Examen_Estudio {
 
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_EXAMEN_EST", nullable = false, insertable = true, updatable = true)
     public Integer getIdExamen_Estudio() { return idExamen_Estudio; }
 
