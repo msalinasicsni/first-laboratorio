@@ -1,8 +1,11 @@
 package ni.gob.minsa.laboratorio.domain.examen;
 
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Created by FIRSTICT on 12/2/2014.
@@ -13,7 +16,9 @@ public class Departamento {
 
     Integer idDepartamento;
     String nombre;
-    Direccion direccion;
+    private boolean pasivo;
+    Date fechaRegistro;
+    User usuarioRegistro;
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -36,14 +41,34 @@ public class Departamento {
         this.nombre = nombre;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_DIRECCION",referencedColumnName = "ID_DIRECCION", nullable = false)
-    @ForeignKey(name="DEPART_DIRECCION_FK")
-    public Direccion getDireccion() {
-        return direccion;
+    @Basic
+    @Column(name = "PASIVO", nullable = false, insertable = true, updatable = true)
+    public boolean isPasivo() {
+        return pasivo;
     }
 
-    public void setDireccion(Direccion direccion) {
-        this.direccion = direccion;
+    public void setPasivo(boolean pasivo) {
+        this.pasivo = pasivo;
+    }
+
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_REGISTRO", nullable = false)
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    @ManyToOne()
+    @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
+    @ForeignKey(name = "fk_estTMxNoti_usuario")
+    public User getUsuarioRegistro() {
+        return usuarioRegistro;
+    }
+
+    public void setUsuarioRegistro(User usuarioRegistro) {
+        this.usuarioRegistro = usuarioRegistro;
     }
 }
