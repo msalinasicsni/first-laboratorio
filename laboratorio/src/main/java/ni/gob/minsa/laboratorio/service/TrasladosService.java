@@ -68,6 +68,25 @@ public class TrasladosService {
             return null;
     }
 
+    /**
+     * utilizado en la recepción, para filtrar si se debe mostrar deacuerdo al traslado activo en el momento de la búsqueda
+     * @param idTomaMx
+     * @return
+     */
+    public TrasladoMx getTrasladoInternoActivoMxRecepcion(String idTomaMx){
+        String query = "select t from TrasladoMx t inner join t.tomaMx mx " +
+                "where mx.idTomaMx = :idTomaMx and t.recepcionado = false and t.trasladoInterno = true " +
+                "order by t.prioridad asc" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        List<TrasladoMx> trasladoMxList = q.list();
+        if (trasladoMxList!=null && trasladoMxList.size() > 0)
+            return trasladoMxList.get(0);
+        else
+            return null;
+    }
+
     public List<Catalogo_Dx> getRutinas() throws Exception {
         String query = "select distinct dx from Dx_TipoMx_TipoNoti dxrel inner join dxrel.diagnostico dx " +
                 "where dxrel.pasivo = false" ;

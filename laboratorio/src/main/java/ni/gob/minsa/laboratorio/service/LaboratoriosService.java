@@ -22,22 +22,22 @@ public class LaboratoriosService {
 
     public void saveDireccion(Direccion direccion) {
         Session session = sessionFactory.getCurrentSession();
-        session.save(direccion);
+        session.saveOrUpdate(direccion);
     }
 
     public void saveDepartamento(Departamento departamento) {
         Session session = sessionFactory.getCurrentSession();
-        session.save(departamento);
+        session.saveOrUpdate(departamento);
     }
 
     public void saveDireccionLaboratorio(DireccionLaboratorio direccionLaboratorio) {
         Session session = sessionFactory.getCurrentSession();
-        session.save(direccionLaboratorio);
+        session.saveOrUpdate(direccionLaboratorio);
     }
 
     public void saveDepartamentoDireccion(DepartamentoDireccion departamentoDireccion) {
         Session session = sessionFactory.getCurrentSession();
-        session.save(departamentoDireccion);
+        session.saveOrUpdate(departamentoDireccion);
     }
 
     public List<Laboratorio> getLaboratoriosInternos(){
@@ -75,20 +75,32 @@ public class LaboratoriosService {
         return (Departamento)q.uniqueResult();
     }
 
+    public List<Direccion> getDirecciones(){
+        String query = "select dir from Direccion dir order by dir.nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        return q.list();
+    }
+
     public List<Direccion> getDireccionesByLab(String codLaboratorio){
         String query = "select dir from Direccion dir, DireccionLaboratorio  dirLab " +
                 "where dir.idDireccion = dirLab.direccion.idDireccion and " +
-                "dirLab.pasivo = false and " +
+                "dirLab.pasivo = false and dir.pasivo = false and " +
                 "dirLab.laboratorio.codigo = :codLaboratorio order by dir.nombre";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codLaboratorio",codLaboratorio);
         return q.list();
     }
 
+    public List<Departamento> getDepartamentos(){
+        String query = "from Departamento dep order by dep.nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        return q.list();
+    }
+
     public List<Departamento> getDepartamentosByDireccion(Integer idDireccion){
         String query = "from Departamento dep, DepartamentoDireccion depDir " +
                 "where dep.idDepartamento = depDir.departamento.idDepartamento and " +
-                "depDir.pasivo = false and " +
+                "depDir.pasivo = false and dep.pasivo = false and " +
                 "depDir.direccion.idDireccion = :idDireccion order by dep.nombre";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idDireccion",idDireccion);

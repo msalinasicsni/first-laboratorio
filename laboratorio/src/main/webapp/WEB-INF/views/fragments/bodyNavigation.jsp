@@ -65,11 +65,9 @@
                     <li class="sendReceipt">
                         <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>" title="<spring:message code="menu.send.receipt.orders" />"><i class="fa fa-lg fa-fw fa-shopping-cart "></i> <spring:message code="menu.send.receipt.orders" /></a>
                     </li>
-
                     <li class="searchMx">
                         <a href="<spring:url value="/searchMx/init" htmlEscape="true "/>" title="<spring:message code="menu.search.mx" />"><i class="fa fa-lg fa-fw fa-search"></i> <spring:message code="menu.search.mx" /></a>
                     </li>
-
                     <li class="tomaMx">
                         <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.taking.sample" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.taking.sample" /></a>
                     </li>
@@ -127,6 +125,23 @@
             <li class="administracion">
                 <a href="#" title="<spring:message code="menu.administration" />"><i class="fa fa-lg fa-fw fa-cogs"></i> <span class="menu-item-parent"><spring:message code="menu.administration" /></span></a>
                 <ul>
+                    <li class="catalogos">
+                        <a href="#" title="<spring:message code="menu.catalogs" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <span class="menu-item-parent"><spring:message code="menu.catalogs" /></span></a>
+                        <ul>
+                            <li class="direccion">
+                                <a href="<spring:url value="/administracion/direccion/list" htmlEscape="true "/>" title="<spring:message code="menu.management" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.management" /></a>
+                            </li>
+                            <li class="departamento">
+                                <a href="<spring:url value="/administracion/departamento/list" htmlEscape="true "/>" title="<spring:message code="menu.department" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.department" /></a>
+                            </li>
+                            <li class="area">
+                                <a href="<spring:url value="/administracion/area/list" htmlEscape="true "/>" title="<spring:message code="menu.area" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.area" /></a>
+                            </li>
+                            <li class="examen">
+                                <a href="<spring:url value="/administracion/examenes/list" htmlEscape="true "/>" title="<spring:message code="menu.test" />"><i class="fa fa-lg fa-fw fa-medkit"></i> <spring:message code="menu.test" /></a>
+                            </li>
+                        </ul>
+                    </li>
                     <li class="concepto">
                         <a href="<spring:url value="/administracion/conceptos/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.concept" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.admin.concept" /></a>
                     </li>

@@ -679,7 +679,7 @@ public class RecepcionMxController {
             recepcionMxLab.setRecepcionMx(recepcionMx);
             recepcionMxLab.setUsuarioRecepcion(usuario);
             recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-            TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx(),false);
+            TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
             boolean actualizarTraslado = false;
             if (trasladoMxActivo!=null) {
                 if (!trasladoMxActivo.isTrasladoExterno()) {
@@ -1044,7 +1044,7 @@ public class RecepcionMxController {
                 recepcionMxLab.setRecepcionMx(recepcionMx);
                 recepcionMxLab.setUsuarioRecepcion(user);
                 recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-                TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx(),false);
+                TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
                 boolean actualizarTraslado = false;
                 if (trasladoMxActivo!=null) {
                     if (!trasladoMxActivo.isTrasladoExterno()) {
