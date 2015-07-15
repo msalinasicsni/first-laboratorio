@@ -10,7 +10,7 @@ import java.io.Serializable;
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "catalogo_dx", schema = "alerta")
+@Table(name = "catalogo_dx", schema = "laboratorio")
 public class Catalogo_Dx implements Serializable {
 
     private static final long serialVersionUID = 7177495708144097064L;

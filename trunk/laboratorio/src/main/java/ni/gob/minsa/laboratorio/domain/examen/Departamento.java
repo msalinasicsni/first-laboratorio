@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by FIRSTICT on 12/2/2014.
  */
 @Entity
-@Table(name = "catalogo_departamento", schema = "alerta")
+@Table(name = "catalogo_departamento", schema = "laboratorio")
 public class Departamento {
 
     Integer idDepartamento;
@@ -21,7 +21,7 @@ public class Departamento {
     User usuarioRegistro;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_DEPARTAMENTO", nullable = false, insertable = true, updatable = true, precision = 0)
     public Integer getIdDepartamento() {
         return idDepartamento;
@@ -63,7 +63,7 @@ public class Departamento {
 
     @ManyToOne()
     @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
-    @ForeignKey(name = "fk_estTMxNoti_usuario")
+    @ForeignKey(name = "departamento_usuario_fk")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
     }

@@ -25,9 +25,9 @@ public class ExamenesService {
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
 
-    public void addExamen(CatalogoExamenes examen) {
+    public void saveExamen(CatalogoExamenes examen) {
         Session session = sessionFactory.getCurrentSession();
-        session.save(examen);
+        session.saveOrUpdate(examen);
     }
 
     /**

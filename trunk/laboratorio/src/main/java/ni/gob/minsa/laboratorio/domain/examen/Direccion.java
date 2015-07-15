@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by FIRSTICT on 12/2/2014.
  */
 @Entity
-@Table(name = "catalogo_direccion", schema = "alerta")
+@Table(name = "catalogo_direccion", schema = "laboratorio")
 public class Direccion {
 
     Integer idDireccion;
@@ -22,7 +22,7 @@ public class Direccion {
     User usuarioRegistro;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_DIRECCION", nullable = false, insertable = true, updatable = true)
     public Integer getIdDireccion() {
         return idDireccion;
@@ -64,7 +64,7 @@ public class Direccion {
 
     @ManyToOne()
     @JoinColumn(name="USUARIO_REGISTRO", referencedColumnName="username", nullable=false)
-    @ForeignKey(name = "fk_estTMxNoti_usuario")
+    @ForeignKey(name = "direccion_usuario_fk")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
     }

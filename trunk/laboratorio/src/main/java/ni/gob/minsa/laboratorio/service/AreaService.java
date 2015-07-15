@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.AreaDepartamento;
+import ni.gob.minsa.laboratorio.domain.examen.Direccion;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -24,6 +25,11 @@ public class AreaService {
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
+
+    public void saveArea(Area area) {
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(area);
+    }
 
     public List<Area> getAreas(){
         String query = "from Area order by nombre";
