@@ -200,7 +200,7 @@ public class ExamenesSolicitudController {
     }
 
     @RequestMapping(value = "addUpdateTest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    protected void addUpdateRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected void addUpdateTest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String json = "";
         String resultado = "";
         Integer idRecord = 0;
