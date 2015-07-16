@@ -46,8 +46,13 @@ public class AreaService {
     }
 
     public List<Area> getAreasDisponiblesUser(String userName){
-        String query = "select aa from Area as aa " +
-                "where aa.idArea not in (select a.area.idArea from AutoridadArea as a where a.pasivo = false and a.user.username = :userName) order by nombre";
+        String query = "select aa from Area as aa, AreaDepartamento ad, DepartamentoDireccion dd, DireccionLaboratorio dl, AutoridadLaboratorio al " +
+                "where aa.idArea not in (select a.area.idArea from AutoridadArea as a where a.pasivo = false and a.user.username = :userName) " +
+                "and aa.idArea = ad.area.idArea " +
+                "and ad.departamento.idDepartamento = dd.departamento.idDepartamento " +
+                "and dd.direccion.idDireccion = dl.direccion.idDireccion " +
+                "and dl.laboratorio.codigo = al.laboratorio.codigo " +
+                "and al.user.username = :userName order by nombre";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
