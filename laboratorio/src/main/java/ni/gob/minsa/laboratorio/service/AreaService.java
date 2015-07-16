@@ -2,8 +2,6 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.AreaDepartamento;
-import ni.gob.minsa.laboratorio.domain.examen.Direccion;
-import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,7 +31,6 @@ public class AreaService {
 
     public List<Area> getAreas(){
         String query = "from Area order by nombre";
-
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         return  q.list();
