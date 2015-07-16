@@ -113,9 +113,11 @@ var Request  = function () {
                     var len = Object.keys(dataToLoad).length;
 
                     if (len > 0) {
+                        var tipo = $('#tipo');
                         $('#id').val(id);
                         $('#nombre').val(dataToLoad[0].nombre);
-                        $('#tipo').val(dataToLoad[0].tipo).change();
+                        tipo.val(dataToLoad[0].tipo).change();
+                        tipo.prop('disabled', true);
                         $('#area').val(dataToLoad[0].area).change();
                         $('#prioridad').val(dataToLoad[0].prioridad);
                         $('#codigo').val(dataToLoad[0].codigo);
