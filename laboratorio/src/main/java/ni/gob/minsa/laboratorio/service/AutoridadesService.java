@@ -222,9 +222,12 @@ public class AutoridadesService {
     public List<Direccion> getDireccionesDisponiblesUsuario(String userName) {
         // Retrieve session from Hibernate
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select d from Direccion d, AutoridadLaboratorio al where d.idDireccion not in " +
-                                        "(select a.direccion.idDireccion FROM AutoridadDireccion as a where a.pasivo = false and a.user.username = :userName) " +
-                "and d.laboratorio.codigo = al.laboratorio.codigo and al.user.username = :userName");
+        Query query = session.createQuery("select d from Direccion d, AutoridadLaboratorio al, DireccionLaboratorio dl " +
+                "where d.idDireccion not in " +
+                "(select a.direccion.idDireccion FROM AutoridadDireccion as a where a.pasivo = false and a.user.username = :userName) " +
+                "and dl.laboratorio.codigo = al.laboratorio.codigo " +
+                "and dl.direccion.idDireccion = d.idDireccion " +
+                "and al.user.username = :userName");
 
         query.setParameter("userName",userName);
         return query.list();
@@ -233,9 +236,13 @@ public class AutoridadesService {
     public List<Departamento> getDepartDisponiblesUsuario(String userName) {
         // Retrieve session from Hibernate
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select d from Departamento d, AutoridadLaboratorio al where d.idDepartamento not in " +
+        Query query = session.createQuery("select d from Departamento d, AutoridadLaboratorio al, DireccionLaboratorio dl, DepartamentoDireccion dd " +
+                "where d.idDepartamento not in " +
                 "(select a.departamento.idDepartamento FROM AutoridadDepartamento as a where a.pasivo = false and a.user.username = :userName) " +
-                "and d.direccion.laboratorio.codigo = al.laboratorio.codigo and al.user.username = :userName");
+                "and dl.laboratorio.codigo = al.laboratorio.codigo " +
+                "and dl.direccion.idDireccion = dd.direccion.idDireccion " +
+                "and dd.departamento.idDepartamento = d.idDepartamento " +
+                "and al.user.username = :userName");
 
         query.setParameter("userName",userName);
         return query.list();
