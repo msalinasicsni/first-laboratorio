@@ -133,9 +133,13 @@ var Concepts  = function () {
 
             function overrideHandler(){
                 var idCatalogoLista = $(this.innerHTML).data('id');
-                overrideValue(idCatalogoLista);
-
-
+                if (idCatalogoLista != null) {
+                    var disabled = this.innerHTML;
+                    var n2 = (disabled.indexOf("disabled") > -1);
+                    if (!n2) {
+                        overrideValue(idCatalogoLista);
+                    }
+                }
             }
 
             function editHandler(){
@@ -179,9 +183,15 @@ var Concepts  = function () {
 
             function addListHandler(){
                 var data =  $(this.innerHTML).data('id');
-                $('#idC').val(data);
-                getValues(data);
-                showModalValues();
+                if (data != null) {
+                    var disabled = this.innerHTML;
+                    var n2 = (disabled.indexOf("disabled") > -1);
+                    if (!n2) {
+                        $('#idC').val(data);
+                        getValues(data);
+                        showModalValues();
+                    }
+                }
 
             }
 
@@ -193,7 +203,7 @@ var Concepts  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEditC = '<button type="button" class="btn btn-default btn-xs" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
+                        var btnEditC = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
                             ' "> <i class="fa fa-edit"></i>' ;
 
                         var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id="'+data[i].idConcepto+' ' +
@@ -330,7 +340,7 @@ var Concepts  = function () {
                     valuesTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+' ' +
+                        var btnEdit = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+' ' +
                                     '" > <i class="fa fa-edit"></i>' ;
 
                         var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ ' ' +

@@ -142,7 +142,7 @@
                                                 <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
                                                 <input type="hidden" value="${user.username}" id="username" />
                                                     <button type="submit" class="btn btn-success">
-                                                        <i class="icon-ok"> <fmt:message key="users.save" /></i>
+                                                        <i class="fa fa-save"></i>  <spring:message code="users.save" />
                                                     </button>
                                                 <c:choose>
                                                     <c:when test="${origen == 'usuario'}">
@@ -159,7 +159,7 @@
                                                     <button type="reset"
                                                             onclick="location.href='${fn:escapeXml(cancelUrl)}'"
                                                             class="btn btn-danger">
-                                                        <i class="icon-remove"> <fmt:message key="users.cancel" /></i>
+                                                        <i class="fa fa-times"></i>  <spring:message code="users.cancel" />
                                                     </button>
 											</footer>
 

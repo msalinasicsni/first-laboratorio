@@ -88,14 +88,12 @@
                             <!-- end widget edit box -->
                             <!-- widget content -->
                             <div class="widget-body no-padding">
-                                <form id="tests-form" class="smart-form" autocomplete="off">
-                                    <footer>
-                                        <button type="button" id="btnAddTest" class="btn btn-primary pull-right">
-                                            <i class="fa fa-plus"></i>
-                                            <spring:message code="lbl.test2" />
-                                        </button>
-                                    </footer>
-                                </form>
+                                <p class="alert alert-info">
+                                    <button type="button" id="btnAddTest" class="btn btn-primary">
+                                        <i class="fa fa-plus"></i>
+                                        <spring:message code="lbl.test2" />
+                                    </button>
+                                </p>
                                 <input id="blockUI_message" type="hidden" value="<spring:message code="blockUI.message"/>"/>
                                 <table class="table table-striped table-bordered table-hover" width="100%" id="test-list">
                                     <thead>
@@ -210,11 +208,11 @@
 
                                         <input id="idExamen" type="hidden" value="" />
 
-                                        <button type="submit" class="btn btn-primary styleButton">
-                                            <i class="fa fa-save"></i>
+                                        <button type="submit" class="btn btn-success styleButton">
+                                            <i class="fa fa-save"></i>  <spring:message code="act.save" />
                                         </button>
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                                            <spring:message code="act.end" />
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                            <i class="fa fa-times"></i>  <spring:message code="act.end" />
                                         </button>
                                     </footer>
                                 </form>

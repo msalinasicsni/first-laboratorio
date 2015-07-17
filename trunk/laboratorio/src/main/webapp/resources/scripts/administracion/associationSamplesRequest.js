@@ -73,11 +73,13 @@ var AssociationSamplesReq  = function () {
 
            function addCHandler(){
                 var data =  $(this.innerHTML).data('id');
-                $('#dNoti').hide();
-                getMxNoti(data);
-               $('#noti').val(data);
-                $('#dMx-noti').fadeIn('slow');
-               $('#dBack1').show();
+               if (data != null) {
+                   $('#dNoti').hide();
+                   getMxNoti(data);
+                   $('#noti').val(data);
+                   $('#dMx-noti').fadeIn('slow');
+                   $('#dBack1').show();
+               }
             }
 
 

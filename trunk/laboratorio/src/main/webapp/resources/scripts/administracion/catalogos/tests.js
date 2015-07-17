@@ -118,11 +118,11 @@ var Tests = function () {
                     for (var i = 0; i < len; i++) {
                         var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idExamen+' ' +
                             '> <i class="fa fa-times"></i>';
-                        var btnEditar = ' <button type="button" class="btn btn-default btn-xs btn-warning" data-id='+data[i].idExamen+' ' +
-                            '> <i class="fa fa-pencil"></i>';
-                        var pasivo = '<span class="label label-success"><i class="fa fa-check"></i></span>';
+                        var btnEditar = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+' ' +
+                            '> <i class="fa fa-edit"></i>';
+                        var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
                         if (data[i].pasivo==true){
-                            pasivo = '<span class="label label-danger"><i class="fa fa-times"></i></span>';
+                            pasivo = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
                             btnOverride = ' <button type="button" disabled class="btn btn-default btn-xs btn-danger" data-id='+data[i].idExamen+' ' +
                                 '> <i class="fa fa-times"></i>';
                         }
@@ -205,26 +205,30 @@ var Tests = function () {
             function overrideHandler(){
                 var idExamen = $(this.innerHTML).data('id');
                 if (idExamen != null) {
-                    var opcSi = $("#confirm_msg_opc_yes").val();
-                    var opcNo = $("#confirm_msg_opc_no").val();
-                    $.SmartMessageBox({
-                        title: $("#msjConfirm").val(),
-                        content: $("#msjOverride").val(),
-                        buttons: '[' + opcSi + '][' + opcNo + ']'
-                    }, function (ButtonPressed) {
-                        if (ButtonPressed === opcSi) {
-                            deshabilitarExamen(idExamen);
-                        }
-                        if (ButtonPressed === opcNo) {
-                            $.smallBox({
-                                title: $("#msjOverrideC").val(),
-                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
-                                color: "#3276B1",
-                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
-                                timeout: 3000
-                            });
-                        }
-                    })
+                    var disabled = this.innerHTML;
+                    var n2 = (disabled.indexOf("disabled") > -1);
+                    if (!n2) {
+                        var opcSi = $("#confirm_msg_opc_yes").val();
+                        var opcNo = $("#confirm_msg_opc_no").val();
+                        $.SmartMessageBox({
+                            title: $("#msjConfirm").val(),
+                            content: $("#msjOverride").val(),
+                            buttons: '[' + opcSi + '][' + opcNo + ']'
+                        }, function (ButtonPressed) {
+                            if (ButtonPressed === opcSi) {
+                                deshabilitarExamen(idExamen);
+                            }
+                            if (ButtonPressed === opcNo) {
+                                $.smallBox({
+                                    title: $("#msjOverrideC").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                                    color: "#3276B1",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 3000
+                                });
+                            }
+                        })
+                    }
                 }
             }
 

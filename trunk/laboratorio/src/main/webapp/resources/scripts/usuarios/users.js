@@ -1181,7 +1181,7 @@ var Users = function () {
                     var len = data.length;
                     direcTable.fnClearTable();
                     for (var i = 0; i < len; i++) {
-                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idAutoridadDirec+' ' +
+                        var btnOverrideC = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idAutoridadDirec+' ' +
                             '> <i class="fa fa-times"></i>';
                         direcTable.fnAddData(
                             [data[i].direccion.nombre, btnOverrideC ]);

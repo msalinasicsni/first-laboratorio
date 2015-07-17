@@ -218,8 +218,8 @@
                                 <th data-hide="phone"><spring:message code="lbl.response.minvalue"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.response.maxvalue"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.response.description"/></th>
-                                <th><spring:message code="act.override"/></th>
                                 <th><spring:message code="act.edit"/></th>
+                                <th><spring:message code="act.override"/></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -384,11 +384,11 @@
                         </div>
                     </fieldset>
                     <footer>
-                        <button type="submit" class="btn btn-primary" id="btnAgregarRespuesta">
-                            <spring:message code="act.save" />
+                        <button type="submit" class="btn btn-success" id="btnAgregarRespuesta">
+                            <i class="fa fa-save"></i>  <spring:message code="act.save" />
                         </button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            <spring:message code="act.end" />
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            <i class="fa fa-times"></i>  <spring:message code="act.end" />
                         </button>
 
                     </footer>
@@ -460,9 +460,9 @@
         DxAnswers.init(parametros);
         $("#divNumerico").hide();
         $("li.administracion").addClass("open");
-        $("li.respuestaDx").addClass("active");
+        $("li.respuestaSolicitud").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.respuestaDx").parents("ul").slideDown(200);
+            $("li.respuestaSolicitud").parents("ul").slideDown(200);
         }
         handleInputMasks();
 
