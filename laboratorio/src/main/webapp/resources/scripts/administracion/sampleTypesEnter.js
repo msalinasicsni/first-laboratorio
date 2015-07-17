@@ -81,17 +81,20 @@ var SampleTypes  = function () {
 
             function overrideCHandler(){
                 var idSample = $(this.innerHTML).data('id');
-                overrideSampleType(idSample)
-
+                if (idSample != null) {
+                    overrideSampleType(idSample)
+                }
 
             }
 
             function editCHandler(){
                 var data =  $(this.innerHTML).data('id');
-                var detalle = data.split(",");
-                $('#idTipoMx').val(detalle[0]);
-                $('#nombre').val(detalle[1]);
-                showModalSampleType();
+                if (data != null) {
+                    var detalle = data.split(",");
+                    $('#idTipoMx').val(detalle[0]);
+                    $('#nombre').val(detalle[1]);
+                    showModalSampleType();
+                }
             }
 
 
@@ -109,7 +112,7 @@ var SampleTypes  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs" data-id="'+data[i].idTipoMx+ "," + data[i].nombre +
+                        var btnEdit = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idTipoMx+ "," + data[i].nombre +
                             '" > <i class="fa fa-edit"></i>' ;
 
                        var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idTipoMx+

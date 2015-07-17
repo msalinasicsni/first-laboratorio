@@ -103,7 +103,7 @@ var DxAnswers = function(){
                             var actionUrl = parametros.sActionUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
 
                             table1.fnAddData(
-                                [dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a>']);
+                                [dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, '<a href=' + actionUrl + ' class="btn btn-default btn-xs btn-primary"><i class="fa fa-list"></i></a>']);
                         }
                     } else {
                         $.smallBox({
@@ -141,11 +141,11 @@ var DxAnswers = function(){
                 "columns": [
                     null,null,null,null,null,null,null,null,
                     {
-                        "className":      'anularConcepto',
+                        "className":      'editarConcepto',
                         "orderable":      false
                     },
                     {
-                        "className":      'editarConcepto',
+                        "className":      'anularConcepto',
                         "orderable":      false
                     }
                 ],
@@ -175,18 +175,20 @@ var DxAnswers = function(){
 
             function anularHandler(){
                 var id = $(this.innerHTML).data('id');
-                var disabled = this.innerHTML;
-                var n2 = (disabled.indexOf("disabled") > -1);
-                if (!n2) anularRespuesta(id);
-
-
+                if (id != null) {
+                    var disabled = this.innerHTML;
+                    var n2 = (disabled.indexOf("disabled") > -1);
+                    if (!n2) anularRespuesta(id);
+                }
             }
 
             function editarHandler(){
                 var id = $(this.innerHTML).data('id');
-                $("#idRespuestaEdit").val(id);
-                getResponse(id);
-                showModalConcept();
+                if (id != null) {
+                    $("#idRespuestaEdit").val(id);
+                    getResponse(id);
+                    showModalConcept();
+                }
             }
 
             jQuery.validator.addClassRules("valPrueba", {
@@ -243,8 +245,8 @@ var DxAnswers = function(){
                             }
                             table2.fnAddData(
                                 [dataToLoad[i].nombre,dataToLoad[i].concepto.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo,dataToLoad[i].descripcion,
-                                    botonEditar,
-                                        '<a data-toggle="modal" class="btn btn-default btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-edit"></i></a>']);
+                                        '<a data-toggle="modal" class="btn btn-default btn-xs btn-primary" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-edit"></i></a>',
+                                    botonEditar]);
                         }
                     }else{
                         $.smallBox({

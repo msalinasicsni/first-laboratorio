@@ -236,7 +236,9 @@ var TestsRequest  = function () {
 
             function overrideTe(){
                 var data =  $(this.innerHTML).data('id');
-                 overrideTest(data);
+                if (data != null) {
+                    overrideTest(data);
+                }
             }
 
 

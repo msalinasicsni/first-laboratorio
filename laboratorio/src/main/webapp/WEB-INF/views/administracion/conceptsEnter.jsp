@@ -102,9 +102,9 @@
                     <!-- widget content -->
                     <div class="widget-body no-padding">
 
-                        <p class="alert alert-info" >
+                        <p class="alert alert-info">
 
-                            <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-default"><i class="fa fa-plus"></i> <spring:message code="lbl.concept" /></button>
+                            <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.concept" /></button>
                         </p>
 
                         <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
@@ -202,8 +202,10 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
-
+                            <button type="submit" id="btnAdd" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                <i class="fa fa-times"></i>  <spring:message code="act.end" />
+                            </button>
                         </div>
                     </div>
                     <!-- /.modal-content -->
@@ -252,7 +254,7 @@
 
                                     <section style="padding-top: 10px" class="col col-sm-6 col-md-3 col-lg-3">
 
-                                        <button type="button" id="btnAddValue" class="btn btn-primary styleButton"><i class="fa fa-save"></i></button>
+                                        <button type="button" id="btnAddValue" class="btn btn-success styleButton"><i class="fa fa-save"></i></button>
 
                                     </section>
                                 </div>

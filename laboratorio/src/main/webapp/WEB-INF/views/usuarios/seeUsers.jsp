@@ -72,16 +72,13 @@
                             <!-- end widget edit box -->
                             <!-- widget content -->
                             <div class="widget-body no-padding">
-                                <form id="sendOrders-form" class="smart-form" autocomplete="off">
-                                    <footer>
-
+                                <p class="alert alert-info">
                                         <spring:url value="/usuarios/admin/new" var="addUserUrl"/>
-                                        <button type="button" class="btn btn-primary pull-right"
+                                        <button type="button" class="btn btn-primary"
                                                 onclick="location.href='${fn:escapeXml(addUserUrl)}'">
-                                            <spring:message code="users.add" />
+                                            <i class="fa fa-plus"></i>  <spring:message code="users.user" />
                                         </button>
-                                    </footer>
-                                </form>
+                                </p>
                                 <input id="blockUI_message" type="hidden" value="<spring:message code="blockUI.message"/>"/>
                                 <table class="table table-striped table-bordered table-hover" width="100%" id="users-list">
                                     <thead>
@@ -122,12 +119,12 @@
                                             <c:choose>
                                                 <c:when test="${usuario.enabled}">
                                                     <td align="center">
-                                                        <span class="label label-success"><i class="fa fa-check"></i></span>
+                                                        <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
                                                     </td>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <td align="center">
-                                                        <span class="label label-danger"><i class="fa fa-times"></i></span>
+                                                        <span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>
                                                     </td>
                                                 </c:otherwise>
                                             </c:choose>
@@ -152,8 +149,8 @@
                                                     </button>
                                                     <button title="<spring:message code="act.edit" />"
                                                             onclick="location.href='${fn:escapeXml(editUrl)}'"
-                                                            class="btn btn-xs btn-warning">
-                                                        <i class="fa fa-pencil"></i>
+                                                            class="btn btn-xs btn-primary">
+                                                        <i class="fa fa-edit"></i>
                                                     </button>
                                                     <button title="<spring:message code="act.change.pass" />"
                                                             onclick="location.href='${fn:escapeXml(chgpassUrl)}'"

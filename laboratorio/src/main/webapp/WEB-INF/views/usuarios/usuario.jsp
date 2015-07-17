@@ -15,7 +15,7 @@
         .styleButton {
             float: right;
             height: 31px;
-            margin: 10px 0px 0px 5px;
+            margin: 27px 0px 0px 5px;
             padding: 0px 22px;
             font: 300 15px/29px "Open Sans", Helvetica, Arial, sans-serif;
             cursor: pointer;
@@ -110,12 +110,12 @@
                             <c:choose>
                                 <c:when test="${user.enabled}">
                                     <td>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span>
+                                        <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
                                     </td>
                                 </c:when>
                                 <c:otherwise>
                                     <td>
-                                        <span class="label label-danger"><i class="fa fa-times"></i></span>
+                                        <span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>
                                     </td>
                                 </c:otherwise>
                             </c:choose>
@@ -368,7 +368,7 @@
                                     </div>
                                 </section>
                                 <section class="col col-sm-12 col-md-3 col-lg-2">
-                                    <button type="button" class="btn btn-primary styleButton" id="btnAddArea">
+                                    <button type="button" class="btn btn-success styleButton" id="btnAddArea">
                                         <i class="fa fa-save"></i>
                                     </button>
                                 </section>
@@ -428,7 +428,7 @@
                                     </div>
                                 </section>
                                 <section class="col col-sm-12 col-md-3 col-lg-2">
-                                    <button type="button" class="btn btn-primary styleButton" id="btnAddExamen">
+                                    <button type="button" class="btn btn-success styleButton" id="btnAddExamen">
                                         <i class="fa fa-save"></i>
                                     </button>
                                 </section>
@@ -489,7 +489,7 @@
                                     </div>
                                 </section>
                                 <section class="col col-sm-12 col-md-3 col-lg-2">
-                                    <button type="button" class="btn btn-primary styleButton" id="btnAddDireccion">
+                                    <button type="button" class="btn btn-success styleButton" id="btnAddDireccion">
                                         <i class="fa fa-save"></i>
                                     </button>
                                 </section>
@@ -549,7 +549,7 @@
                                     </div>
                                 </section>
                                 <section class="col col-sm-12 col-md-3 col-lg-2">
-                                    <button type="button" class="btn btn-primary styleButton" id="btnAddDepartamento">
+                                    <button type="button" class="btn btn-success styleButton" id="btnAddDepartamento">
                                         <i class="fa fa-save"></i>
                                     </button>
                                 </section>
