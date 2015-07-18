@@ -4,7 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.muestra.TipoMx;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
-import ni.gob.minsa.laboratorio.service.*;
+import ni.gob.minsa.laboratorio.service.SampleTypesService;
+import ni.gob.minsa.laboratorio.service.SeguridadService;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class SampleTypesController {
         if (urlValidacion.isEmpty()) {
             List<TipoMx> samplesList =  getSampleTypes();
             mav.addObject("samplesList",samplesList);
-            mav.setViewName("administracion/samplesTypesEnter");
+            mav.setViewName("administracion/catalogos/samplesTypesEnter");
         }else
             mav.setViewName(urlValidacion);
 
@@ -81,7 +82,7 @@ public class SampleTypesController {
     List<TipoMx> getSampleTypes() throws Exception {
         logger.info("Obteniendo los tipos de muestra");
         List<TipoMx> samplesList = null;
-        samplesList = sampleTypesService.getSamplesList();
+        samplesList = sampleTypesService.getAllSamplesList();
         return samplesList;
     }
 
@@ -91,7 +92,7 @@ public class SampleTypesController {
         String resultado = "";
         String nombre = "";
         Integer idTipoMx = null;
-        String pasivo = "";
+        boolean pasivo = false;
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
@@ -101,10 +102,7 @@ public class SampleTypesController {
 
             nombre = jsonpObject.get("nombre").getAsString();
 
-
-            if(!jsonpObject.get("pasivo").getAsString().isEmpty()){
-                pasivo = jsonpObject.get("pasivo").getAsString();
-            }
+            pasivo = jsonpObject.get("pasivo").getAsBoolean();
 
             if(!jsonpObject.get("idTipoMx").getAsString().isEmpty() ){
                 idTipoMx = jsonpObject.get("idTipoMx").getAsInt();
@@ -112,28 +110,25 @@ public class SampleTypesController {
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
 
-
-
             //se obtiene el tipo de dato segun id
             TipoMx tipo;
             if(idTipoMx != null){
-               tipo = sampleTypesService.getTipoMxById(idTipoMx);
-
-                if(!pasivo.isEmpty()){
-                    tipo.setPasivo(true);
-
+                tipo = sampleTypesService.getTipoMxById(idTipoMx);
+                if(!nombre.equals("")){
+                    tipo.setNombre(nombre);
+                    tipo.setPasivo(!pasivo);
                 }else{
-                    tipo.setPasivo(false);
+                    tipo.setPasivo(true);
                 }
+
+
 
             }else{
                 tipo = new TipoMx();
                 tipo.setFechaRegistro(new Timestamp(new Date().getTime()));
                 tipo.setUsuarioRegistro(usuario);
-            }
-
-            if(!nombre.isEmpty()){
                 tipo.setNombre(nombre);
+                tipo.setPasivo(!pasivo);
             }
 
             sampleTypesService.addOrUpdateSampleTypes(tipo);

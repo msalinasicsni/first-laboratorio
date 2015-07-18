@@ -140,6 +140,12 @@
                             <li class="examen">
                                 <a href="<spring:url value="/administracion/examenes/list" htmlEscape="true "/>" title="<spring:message code="menu.test" />"><i class="fa fa-lg fa-fw fa-medkit"></i> <spring:message code="menu.test" /></a>
                             </li>
+                            <li class="request">
+                                <a href="<spring:url value="/administracion/request/init" htmlEscape="true "/>" title="<spring:message code="lbl.admon.request" />"><i class="fa fa-lg fa-fw fa-file-text-o"></i> <spring:message code="lbl.admon.request" /></a>
+                            </li>
+                            <li class="sampleTypes">
+                                <a href="<spring:url value="/administracion/sampleTypes/init" htmlEscape="true "/>" title="<spring:message code="lbl.sample.types" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="lbl.sample.types" /></a>
+                            </li>
                         </ul>
                     </li>
                     <li class="concepto">
@@ -151,9 +157,6 @@
                     <li class="respuestaSolicitud">
                         <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.request.aswers" />"><i class="fa fa-lg fa-fw fa-list-alt "></i> <spring:message code="menu.admin.request.aswers" /></a>
                     </li>
-                    <li class="sampleTypes">
-                        <a href="<spring:url value="/administracion/sampleTypes/init" htmlEscape="true "/>" title="<spring:message code="lbl.sample.types" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="lbl.sample.types" /></a>
-                    </li>
                     <li class="assocSamplesRequest">
                         <a href="<spring:url value="/administracion/associationSR/init" htmlEscape="true "/>" title="<spring:message code="lbl.association.samples.req" />"><i class="fa fa-lg fa-fw fa-link"></i> <spring:message code="lbl.association.samples.req" /></a>
                     </li>
@@ -163,9 +166,7 @@
                     <li class="users">
                         <a href="<spring:url value="/usuarios/list" htmlEscape="true "/>" title="<spring:message code="lbl.admin.users" />"><i class="fa fa-lg fa-fw fa-users"></i> <spring:message code="menu.admin.users" /></a>
                     </li>
-                    <li class="request">
-                        <a href="<spring:url value="/administracion/request/init" htmlEscape="true "/>" title="<spring:message code="lbl.admon.request" />"><i class="fa fa-lg fa-fw fa-file-text-o"></i> <spring:message code="lbl.admon.request" /></a>
-                    </li>
+
                 </ul>
             </li>
 

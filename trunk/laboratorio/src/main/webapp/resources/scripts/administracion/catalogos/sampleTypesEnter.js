@@ -1,15 +1,15 @@
 /**
  * Created by souyen-ics on 06-09-15.
  */
-var SampleTypes  = function () {
+var SampleTypes = function () {
 
     return {
         init: function (parametros) {
             getSampleTypes();
 
-            function blockUI(){
+            function blockUI() {
                 var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+                var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
                 //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
                 var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
                 $.blockUI({ message: mess,
@@ -30,43 +30,43 @@ var SampleTypes  = function () {
 
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
-                tablet : 1024,
-                phone : 480
+                tablet: 1024,
+                phone: 480
             };
             var sampleTypesTable = $('#sample-types-records').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true,
+                "autoWidth": true,
 
                 "columns": [
                     null, null,
                     {
-                        "className":      'editSample',
-                        "orderable":      false
+                        "className": 'editSample',
+                        "orderable": false
                     },
 
                     {
-                        "className":      'overrideSample',
-                        "orderable":      false
+                        "className": 'overrideSample',
+                        "orderable": false
                     }
                 ],
 
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#sample-types-records'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 },
 
 
-                fnDrawCallback : function() {
+                fnDrawCallback: function () {
                     $('.editSample')
                         .off("click", editCHandler)
                         .on("click", editCHandler);
@@ -79,26 +79,29 @@ var SampleTypes  = function () {
 
             });
 
-            function overrideCHandler(){
+            function overrideCHandler() {
                 var idSample = $(this.innerHTML).data('id');
                 if (idSample != null) {
                     overrideSampleType(idSample)
                 }
 
+
             }
 
-            function editCHandler(){
-                var data =  $(this.innerHTML).data('id');
+            function editCHandler() {
+                var data = $(this.innerHTML).data('id');
                 if (data != null) {
                     var detalle = data.split(",");
                     $('#idTipoMx').val(detalle[0]);
                     $('#nombre').val(detalle[1]);
+                    $("#checkbox-enable").prop('checked', !detalle[2]);
                     showModalSampleType();
                 }
+
             }
 
 
-            function showModalSampleType(){
+            function showModalSampleType() {
                 $("#myModal").modal({
                     show: true
                 });
@@ -112,14 +115,22 @@ var SampleTypes  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idTipoMx+ "," + data[i].nombre +
-                            '" > <i class="fa fa-edit"></i>' ;
+                        var btnEdit = '<button type="button" class="btn btn-primary btn-xs" data-id="' + data[i].idTipoMx + "," + data[i].nombre + "," + data[i].pasivo +
+                            '" > <i class="fa fa-edit"></i>';
 
-                       var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idTipoMx+
+                        var btnOverride = ' <button type="button" class="btn btn-xs btn-danger" data-id="' + data[i].idTipoMx +
                             '"> <i class="fa fa-times"></i>';
 
-                            sampleTypesTable.fnAddData(
-                                [data[i].idTipoMx, data[i].nombre, btnEdit, btnOverride ]);
+                        var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
+                        if (data[i].pasivo == true) {
+                            pasivo = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
+
+                            btnOverride = ' <button type="button" disabled class="btn btn-xs btn-danger" data-id="' + data[i].idTipoMx +
+                                '"> <i class="fa fa-times"></i>';
+                        }
+
+                        sampleTypesTable.fnAddData(
+                            [data[i].nombre, pasivo, btnEdit, btnOverride ]);
 
 
                     }
@@ -131,15 +142,15 @@ var SampleTypes  = function () {
             var $validator = $("#sample-type-form").validate({
                 // Rules for form validation
                 rules: {
-                   nombre: {required : true}
+                    nombre: {required: true}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 }
             });
 
-            $('#btnAdd').click(function() {
+            $('#btnSave').click(function () {
                 var $validarModal = $("#sample-type-form").valid();
                 if (!$validarModal) {
                     $validator.focusInvalid();
@@ -150,6 +161,12 @@ var SampleTypes  = function () {
                 }
             });
 
+            $('#btnAdd').click(function () {
+                $('#nombre').val('');
+                $('#idTipoMx').val('');
+                $('#checkbox').val('');
+                showModalSampleType();
+            });
 
 
             function addUpdateSampleType() {
@@ -158,7 +175,8 @@ var SampleTypes  = function () {
                 obj['mensaje'] = '';
                 obj['nombre'] = $('#nombre').val();
                 obj['idTipoMx'] = $('#idTipoMx').val();
-                obj['pasivo'] = '';
+                obj['pasivo'] = ($('#checkbox').is(':checked'));
+
                 $.ajax(
                     {
                         url: parametros.addUpdateUrl,
@@ -190,6 +208,7 @@ var SampleTypes  = function () {
 
                                 obj['nombre'] = $('#nombre').val('');
                                 obj['idTipoMx'] = $('#idTipoMx').val('');
+                                obj['pasivo'] = $('#checkbox').val('');
                             }
                             unBlockUI();
                         },
@@ -204,45 +223,69 @@ var SampleTypes  = function () {
             function overrideSampleType(idTipoMx) {
                 var sampleTypeObj = {};
                 sampleTypeObj['mensaje'] = '';
-                sampleTypeObj['nombre'] = $('#nombre').val();
-                sampleTypeObj['idTipoMx'] = $('#idTipoMx').val();
+                sampleTypeObj['nombre'] = '';
+                sampleTypeObj['idTipoMx'] = idTipoMx;
                 sampleTypeObj['pasivo'] = 'true';
-                blockUI(parametros.blockMess);
-                $.ajax(
-                    {
-                        url: parametros.addUpdateUrl,
-                        type: 'POST',
-                        dataType: 'json',
-                        data: JSON.stringify(sampleTypeObj),
-                        contentType: 'application/json',
-                        mimeType: 'application/json',
-                        success: function (data) {
-                            if (data.mensaje.length > 0){
-                                $.smallBox({
-                                    title: data.mensaje ,
-                                    content: $("#disappear").val(),
-                                    color: "#C46A69",
-                                    iconSmall: "fa fa-warning",
-                                    timeout: 4000
-                                });
-                            }else{
-                                getSampleTypes();
-                                var msg = $("#msg_conc_cancel").val();
-                                $.smallBox({
-                                    title: msg ,
-                                    content: $("#disappear").val(),
-                                    color: "#739E73",
-                                    iconSmall: "fa fa-success",
-                                    timeout: 4000
-                                });
-                            }
-                            unBlockUI();
-                        },
-                        error: function (data, status, er) {
-                            unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
-                        }
-                    });
+
+                var opcSi = $('#yes').val();
+                var opcNo = $('#no').val();
+
+                $.SmartMessageBox({
+                    title: $("#confirmation").val(),
+                    content: $("#confirm_c").val(),
+                    buttons: '[' + opcSi + '][' + opcNo + ']'
+                }, function (ButtonPressed) {
+                    if (ButtonPressed === opcSi) {
+
+                        blockUI(parametros.blockMess);
+                        $.ajax(
+                            {
+                                url: parametros.addUpdateUrl,
+                                type: 'POST',
+                                dataType: 'json',
+                                data: JSON.stringify(sampleTypeObj),
+                                contentType: 'application/json',
+                                mimeType: 'application/json',
+                                success: function (data) {
+                                    if (data.mensaje.length > 0) {
+                                        $.smallBox({
+                                            title: data.mensaje,
+                                            content: $("#disappear").val(),
+                                            color: "#C46A69",
+                                            iconSmall: "fa fa-warning",
+                                            timeout: 4000
+                                        });
+                                    } else {
+                                        getSampleTypes();
+                                        var msg = $("#msg_conc_cancel").val();
+                                        $.smallBox({
+                                            title: msg,
+                                            content: $("#disappear").val(),
+                                            color: "#739E73",
+                                            iconSmall: "fa fa-success",
+                                            timeout: 4000
+                                        });
+                                    }
+                                    unBlockUI();
+                                },
+                                error: function (data, status, er) {
+                                    unBlockUI();
+                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                }
+                            });
+
+                    }
+                    if (ButtonPressed === opcNo) {
+                        $.smallBox({
+                            title: $("#cancel").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                            color: "#C46A69",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 4000
+                        });
+                    }
+                });
+
             }
 
 

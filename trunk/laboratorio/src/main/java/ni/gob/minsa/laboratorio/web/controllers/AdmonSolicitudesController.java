@@ -76,11 +76,61 @@ public class AdmonSolicitudesController {
         if (urlValidacion.isEmpty()) {
               List<Area> areaList =  areaService.getAreas();
               mav.addObject("areaList",areaList);
-            mav.setViewName("administracion/request");
+            mav.setViewName("administracion/catalogos/request");
         }else
             mav.setViewName(urlValidacion);
 
         return mav;
+    }
+
+    //Load Routines and Studies list
+    @RequestMapping(value = "getRoutinesAndStudies", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    String getRoutinesAndStudies() throws Exception {
+        logger.info("Obteniendo las rutinas y estudios asociados al tipoMxNoti");
+
+        List<Catalogo_Dx> dxList = admonRequestService.getAllDxs();
+        List<Catalogo_Estudio> estudioList = admonRequestService.getAllStudies();
+
+        return listToJson(dxList, estudioList);
+    }
+
+
+    private String listToJson(List<Catalogo_Dx> dxList, List<Catalogo_Estudio> estudioList) {
+        String jsonResponse = "";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice = 0;
+
+        if (dxList != null) {
+            for (Catalogo_Dx dx : dxList) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("nombre", dx.getNombre());
+                map.put("id", dx.getIdDiagnostico().toString());
+                map.put("idArea", dx.getArea().getIdArea().toString());
+                map.put("area", dx.getArea().getNombre());
+                map.put("tipo",messageSource.getMessage("lbl.routine", null, null));
+                map.put("pasivo", String.valueOf(dx.isPasivo()));
+                mapResponse.put(indice, map);
+                indice++;
+            }
+        }
+
+        if (estudioList != null) {
+            for (Catalogo_Estudio estudio : estudioList) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("nombre", estudio.getNombre());
+                map.put("id", estudio.getIdEstudio().toString());
+                map.put("idArea", estudio.getArea().getIdArea().toString());
+                map.put("area", estudio.getArea().getNombre());
+                map.put("tipo",messageSource.getMessage("lbl.study", null, null));
+                map.put("pasivo", String.valueOf(estudio.isPasivo()));
+                mapResponse.put(indice, map);
+                indice++;
+            }
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        UnicodeEscaper escaper = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
     }
 
     @RequestMapping(value = "addUpdateRequest", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -88,8 +138,8 @@ public class AdmonSolicitudesController {
         String json = "";
         String resultado = "";
         Integer id = 0;
-        String nombre = null;
-        String pasivo = null;
+        String nombre = "";
+        boolean pasivo = false;
         String tipo ="";
         Integer area = 0;
         Integer prioridad = 0;
@@ -126,9 +176,7 @@ public class AdmonSolicitudesController {
                 codigo = jsonpObject.get("codigo").getAsString();
             }
 
-            if (jsonpObject.get("pasivo") != null && !jsonpObject.get("pasivo").getAsString().isEmpty()) {
-                pasivo = jsonpObject.get("pasivo").getAsString();
-            }
+            pasivo = jsonpObject.get("pasivo").getAsBoolean();
 
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
@@ -145,7 +193,7 @@ public class AdmonSolicitudesController {
                             dx.setUsuarioRegistro(usuario);
                             dx.setArea(areaService.getArea(area));
                             dx.setPrioridad(prioridad);
-                            dx.setPasivo(false);
+                            dx.setPasivo(!pasivo);
                             dx.setNombre(nombre);
                             admonRequestService.addOrUpdateDx(dx);
                         } else {
@@ -175,35 +223,36 @@ public class AdmonSolicitudesController {
 
                 }
             } else {
-                if (pasivo == null) {
+
                     if (tipo.equals("Rutina")) {
                         Catalogo_Dx rec = admonRequestService.getDxRecordById(id);
 
-                        if (pasivo == null) {
-                            rec.setNombre(nombre);
-                            rec.setPrioridad(prioridad);
-                            rec.setArea(areaService.getArea(area));
-                        } else {
-                            rec.setPasivo(true);
-                        }
+                            if(!nombre.equals("")){
+                                rec.setNombre(nombre);
+                                rec.setPrioridad(prioridad);
+                                rec.setArea(areaService.getArea(area));
+                                rec.setPasivo(!pasivo);
+                            }else{
+                                rec.setPasivo(true);
+                            }
+
                         admonRequestService.addOrUpdateDx(rec);
 
                     } else if (tipo.equals("Estudio")) {
                         Catalogo_Estudio rec = admonRequestService.getStudyRecordById(id);
 
-                        if (pasivo == null) {
-                            rec.setArea(areaService.getArea(area));
-                            rec.setNombre(nombre);
-                            rec.setCodigo(codigo);
-                        } else {
-                            rec.setPasivo(true);
-                        }
+                            if(!nombre.equals("")){
+                                rec.setArea(areaService.getArea(area));
+                                rec.setNombre(nombre);
+                                rec.setCodigo(codigo);
+                                rec.setPasivo(!pasivo);
+                            }else{
+                                rec.setPasivo(true);
+                            }
 
                         admonRequestService.addOrUpdateStudy(rec);
                     }
                 }
-
-            }
 
 
         } catch (Exception ex) {
@@ -254,29 +303,32 @@ public class AdmonSolicitudesController {
 
         if (dx != null) {
 
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("id", dx.getIdDiagnostico().toString());
-                map.put("nombre", dx.getNombre());
-                map.put("tipo", messageSource.getMessage("lbl.routine", null, null));
-                map.put("idArea", dx.getArea().getIdArea().toString());
-                map.put("prioridad", dx.getPrioridad().toString());
-                map.put("codigo", "");
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", dx.getIdDiagnostico().toString());
+            map.put("nombre", dx.getNombre());
+            map.put("tipo", messageSource.getMessage("lbl.routine", null, null));
+            map.put("idArea", dx.getArea().getIdArea().toString());
+            map.put("prioridad", dx.getPrioridad().toString());
+            map.put("codigo", "");
+            map.put("pasivo", String.valueOf(dx.isPasivo()));
 
             mapResponse.put(indice, map);
 
 
-        } else if(estudio != null){
+        } else if (estudio != null) {
 
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("id", estudio.getIdEstudio().toString());
-                map.put("nombre", estudio.getNombre());
-                map.put("tipo", messageSource.getMessage("lbl.study", null, null));
-                map.put("idArea", estudio.getArea().getIdArea().toString());
-                map.put("prioridad", "");
-                map.put("codigo", estudio.getCodigo());
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", estudio.getIdEstudio().toString());
+            map.put("nombre", estudio.getNombre());
+            map.put("tipo", messageSource.getMessage("lbl.study", null, null));
+            map.put("idArea", estudio.getArea().getIdArea().toString());
+            map.put("prioridad", "");
+            map.put("codigo", estudio.getCodigo());
+            map.put("pasivo", String.valueOf(estudio.isPasivo()));
+
             mapResponse.put(indice, map);
 
-            }
+        }
 
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
