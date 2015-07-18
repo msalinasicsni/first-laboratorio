@@ -14,7 +14,7 @@
 <html>
 <!-- BEGIN HEAD -->
 <head>
-    <jsp:include page="../fragments/headTag.jsp" />
+    <jsp:include page="../../fragments/headTag.jsp" />
     <style>
         textarea {
             resize: none;
@@ -39,9 +39,9 @@
 <!-- BEGIN BODY -->
 <body class="">
 <!-- #HEADER -->
-<jsp:include page="../fragments/bodyHeader.jsp" />
+<jsp:include page="../../fragments/bodyHeader.jsp" />
 <!-- #NAVIGATION -->
-<jsp:include page="../fragments/bodyNavigation.jsp" />
+<jsp:include page="../../fragments/bodyNavigation.jsp" />
 <!-- MAIN PANEL -->
 <div id="main" data-role="main">
 <!-- RIBBON -->
@@ -56,7 +56,7 @@
         <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/sampleTypes/init" htmlEscape="true "/>"><spring:message code="lbl.sample.types" /></a></li>
     </ol>
     <!-- end breadcrumb -->
-    <jsp:include page="../fragments/layoutOptions.jsp" />
+    <jsp:include page="../../fragments/layoutOptions.jsp" />
 </div>
 <!-- END RIBBON -->
 <!-- MAIN CONTENT -->
@@ -103,7 +103,7 @@
 
                     <p class="alert alert-info" >
 
-                        <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-default"><i class="fa fa-plus"></i> <spring:message code="lbl.request.large" /></button>
+                        <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.request.large" /></button>
                     </p>
 
                     <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
@@ -117,14 +117,15 @@
 
 
 
-                    <table id="records" class="table table-striped table-bordered table-hover" width="75%">
+                    <table id="records" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
                         <tr>
-                            <th data-class="expand" width="15%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
-                            <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
-                            <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.area"/></th>
-                            <th><spring:message code="act.edit"/></th>
-                            <th><spring:message code="act.override"/></th>
+                            <th data-class="expand" width="25%"><spring:message code="lbl.name"/></th>
+                            <th data-hide="phone"><spring:message code="lbl.solic.type"/></th>
+                            <th data-hide="phone"><spring:message code="lbl.area"/></th>
+                            <th width="10%"><spring:message code="lbl.enabled"/></th>
+                            <th width="10%"><spring:message code="act.edit"/></th>
+                            <th width="10%"><spring:message code="act.override"/></th>
                         </tr>
                         </thead>
                     </table>
@@ -246,8 +247,23 @@
                                                     </b>
                                                 </label>
                                             </section>
+
+
                                     </div>
 
+                            <div class="row">
+                                <section class="col col-sm-12 col-md-4 col-lg-4">
+                                    <label class="text-left txt-color-blue font-md"><spring:message code="lbl.enabled"/></label>
+                                    <div class="row">
+                                        <div class="col col-4">
+                                            <label class="checkbox">
+                                                <input type="checkbox" name="checkbox" id="checkbox" checked>
+                                                <i></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
 
 
 
@@ -256,10 +272,11 @@
 
                     <div class="modal-footer">
 
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            <i class="fa fa-times"></i>
                             <spring:message code="act.end" />
                         </button>
-                        <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                        <button type="submit" id="btnSave" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
 
                     </div>
                 </div>
@@ -279,10 +296,10 @@
 </div>
 <!-- END MAIN PANEL -->
 <!-- BEGIN FOOTER -->
-<jsp:include page="../fragments/footer.jsp" />
+<jsp:include page="../../fragments/footer.jsp" />
 <!-- END FOOTER -->
 <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
-<jsp:include page="../fragments/corePlugins.jsp" />
+<jsp:include page="../../fragments/corePlugins.jsp" />
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
 <script src="${dataTables}"></script>
@@ -318,7 +335,7 @@
 <script src="${jqueryInputMask}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/administracion/request.js" var="requestJS" />
+<spring:url value="/resources/scripts/administracion/catalogos/request.js" var="requestJS" />
 <script src="${requestJS}"></script>
 <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 <script src="${handleDatePickers}"></script>
@@ -326,7 +343,7 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="catalogueUrl" value="/administracion/testsRequest/getRoutinesAndStudies"/>
+<c:url var="catalogueUrl" value="/administracion/request/getRoutinesAndStudies"/>
 <c:url var="addUpdateUrl" value="/administracion/request/addUpdateRequest"/>
 <c:url var="getRequestById" value="/administracion/request/getRequestById"/>
 
@@ -347,9 +364,10 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.administracion").addClass("open");
-        $("li.sampleTypes").addClass("active");
+        $("li.catalogos").addClass("open");
+        $("li.request").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.sampleTypes").parents("ul").slideDown(200);
+            $("li.request").parents("ul").slideDown(200);
         }
     });
 </script>

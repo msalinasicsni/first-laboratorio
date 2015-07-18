@@ -14,7 +14,7 @@
 <html>
 <!-- BEGIN HEAD -->
 <head>
-    <jsp:include page="../fragments/headTag.jsp" />
+    <jsp:include page="../../fragments/headTag.jsp" />
     <style>
         textarea {
             resize: none;
@@ -39,9 +39,9 @@
 <!-- BEGIN BODY -->
 <body class="">
 <!-- #HEADER -->
-<jsp:include page="../fragments/bodyHeader.jsp" />
+<jsp:include page="../../fragments/bodyHeader.jsp" />
 <!-- #NAVIGATION -->
-<jsp:include page="../fragments/bodyNavigation.jsp" />
+<jsp:include page="../../fragments/bodyNavigation.jsp" />
 <!-- MAIN PANEL -->
 <div id="main" data-role="main">
 <!-- RIBBON -->
@@ -56,7 +56,7 @@
         <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/sampleTypes/init" htmlEscape="true "/>"><spring:message code="lbl.sample.types" /></a></li>
     </ol>
     <!-- end breadcrumb -->
-    <jsp:include page="../fragments/layoutOptions.jsp" />
+    <jsp:include page="../../fragments/layoutOptions.jsp" />
 </div>
 <!-- END RIBBON -->
 <!-- MAIN CONTENT -->
@@ -104,20 +104,26 @@
 
                     <p class="alert alert-info" >
 
-                        <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-default"><i class="fa fa-plus"></i> <spring:message code="lbl.sample.type1" /></button>
+                        <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.sample.type1" /></button>
                     </p>
 
                     <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
                     <input id="msjSuccessful" type="hidden" value="<spring:message code="msg.sampleTypes.added"/>"/>
                     <input id="msg_conc_cancel" type="hidden" value="<spring:message code="msg.sampleTypes.successfully.cancel"/>"/>
+                    <input id="yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                    <input id="no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                    <input id="confirmation" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                    <input id="confirm_c" type="hidden" value="<spring:message code="msg.overrideTMx.confirm.content"/>"/>
+                    <input id="cancel" type="hidden" value="<spring:message code="msg.override.tMx.cancel"/>"/>
+
 
                     <table id="sample-types-records" class="table table-striped table-bordered table-hover" width="75%">
                         <thead>
                         <tr>
-                            <th data-class="expand" width="15%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type.id"/></th>
-                            <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
-                            <th><spring:message code="act.edit"/></th>
-                            <th><spring:message code="lbl.override"/></th>
+                            <th data-hide="expand"><spring:message code="lbl.name"/></th>
+                            <th width="10%"><spring:message code="lbl.enabled"/></th>
+                            <th width="10%"><spring:message code="act.edit"/></th>
+                            <th width="10%"><spring:message code="lbl.override"/></th>
 
                         </tr>
                         </thead>
@@ -178,11 +184,30 @@
 
                             </div>
 
+                            <div class="row">
+                                <section class="col col-sm-12 col-md-4 col-lg-4">
+                                    <label class="text-left txt-color-blue font-md"><spring:message code="lbl.enabled"/></label>
+                                    <div class="row">
+                                        <div class="col col-4">
+                                            <label class="checkbox">
+                                                <input type="checkbox" name="checkbox" id="checkbox" checked>
+                                                <i></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
                         </form>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                            <i class="fa fa-times"></i>
+                            <spring:message code="act.end" />
+                        </button>
+
+                        <button type="submit" id="btnSave" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
 
                     </div>
                 </div>
@@ -202,10 +227,10 @@
 </div>
 <!-- END MAIN PANEL -->
 <!-- BEGIN FOOTER -->
-<jsp:include page="../fragments/footer.jsp" />
+<jsp:include page="../../fragments/footer.jsp" />
 <!-- END FOOTER -->
 <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
-<jsp:include page="../fragments/corePlugins.jsp" />
+<jsp:include page="../../fragments/corePlugins.jsp" />
 <!-- BEGIN PAGE LEVEL PLUGINS -->
 <spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
 <script src="${dataTables}"></script>
@@ -241,7 +266,7 @@
 <script src="${jqueryInputMask}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/administracion/sampleTypesEnter.js" var="sampleTypesJS" />
+<spring:url value="/resources/scripts/administracion/catalogos/sampleTypesEnter.js" var="sampleTypesJS" />
 <script src="${sampleTypesJS}"></script>
 <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 <script src="${handleDatePickers}"></script>
@@ -267,6 +292,7 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.administracion").addClass("open");
+        $("li.catalogos").addClass("open");
         $("li.sampleTypes").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.sampleTypes").parents("ul").slideDown(200);

@@ -29,7 +29,20 @@ public class SampleTypesService {
     public SampleTypesService() {}
 
     /**
-     * Obtiene una lista de los conceptos
+     * Obtiene una lista completa de los tipos de Mx
+     */
+
+    @SuppressWarnings("unchecked")
+    public List<TipoMx> getAllSamplesList() throws Exception {
+        String query = "from TipoMx as t order by t.nombre";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+
+        return q.list();
+    }
+
+    /**
+     * Obtiene una lista de tipos de Mx
      */
 
     @SuppressWarnings("unchecked")

@@ -39,7 +39,7 @@ var Request  = function () {
                 "autoWidth" : true,
 
                 "columns": [
-                    null, null, null,
+                    null, null, null, null,
                     {
                         "className":      'edit',
                         "orderable":      false
@@ -49,8 +49,6 @@ var Request  = function () {
                         "className":      'override',
                         "orderable":      false
                     }
-
-
                 ],
 
                 "preDrawCallback" : function() {
@@ -79,21 +77,27 @@ var Request  = function () {
 
             });
 
-            function editS(){
-                var data =  $(this.innerHTML).data('id');
-                var detalle = data.split(",");
-                var id= detalle[0];
-                var tipo = detalle[1];
-                getRequest(id,tipo);
-                showModal();
+            function editS() {
+                var data = $(this.innerHTML).data('id');
+                if (data != null) {
+                    var detalle = data.split(",");
+                    var id = detalle[0];
+                    var tipo = detalle[1];
+                    getRequest(id, tipo);
+                    showModal();
+                }
+
             }
 
-            function overrideS(){
-                var data =  $(this.innerHTML).data('id');
-                var detalle = data.split(",");
-                var id= detalle[0];
-                var tipo = detalle[1];
-                overrideRequest(id,tipo);
+            function overrideS() {
+                var data = $(this.innerHTML).data('id');
+                if (data != null) {
+                    var detalle = data.split(",");
+                    var id = detalle[0];
+                    var tipo = detalle[1];
+                    overrideRequest(id, tipo);
+                }
+
 
             }
 
@@ -102,6 +106,7 @@ var Request  = function () {
                     show: true
                 });
             }
+
 
             function getRequest(id, tipo) {
                 blockUI(parametros.blockMess);
@@ -113,12 +118,19 @@ var Request  = function () {
                     var len = Object.keys(dataToLoad).length;
 
                     if (len > 0) {
+
                         var tipo = $('#tipo');
                         $('#id').val(id);
                         $('#nombre').val(dataToLoad[0].nombre);
                         tipo.val(dataToLoad[0].tipo).change();
                         tipo.prop('disabled', true);
-                        $('#area').val(dataToLoad[0].area).change();
+                        if(dataToLoad[0].pasivo =='true'){
+                            $('#checkbox').prop('checked',false);
+                        }else{
+                            $('#checkbox').prop('checked',true);
+                        }
+
+                        $('#area').val(dataToLoad[0].idArea).change();
                         $('#prioridad').val(dataToLoad[0].prioridad);
                         $('#codigo').val(dataToLoad[0].codigo);
 
@@ -137,6 +149,7 @@ var Request  = function () {
                 }, function (data) {
                     catalogueTable.fnClearTable();
                     var len = Object.keys(data).length;
+
                     for (var i = 0; i < len; i++) {
 
                         var btnEdit = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "," + data[i].tipo  +
@@ -145,8 +158,16 @@ var Request  = function () {
                         var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+data[i].id+ "," + data[i].tipo + "," +
                             '" > <i class="fa fa-times"></i>' ;
 
-                        catalogueTable.fnAddData(
-                            [data[i].nombre, data[i].tipo, data[i].area, btnEdit, btnOverride]);
+                        var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
+                        if (data[i].pasivo=='true') {
+                            pasivo = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
+                            btnOverride = '<button type="button" disabled class="btn btn-danger btn-xs" data-id="'+data[i].id+ "," + data[i].tipo + "," +
+                                '" > <i class="fa fa-times"></i>' ;
+
+                        }
+
+                            catalogueTable.fnAddData(
+                            [data[i].nombre, data[i].tipo, data[i].area, pasivo, btnEdit, btnOverride]);
 
 
                     }
@@ -170,7 +191,7 @@ var Request  = function () {
                 }
             });
 
-            $('#btnAdd').click(function() {
+            $('#btnSave').click(function() {
                 var $validarModal = $("#request-form").valid();
                 if (!$validarModal) {
                     $validator.focusInvalid();
@@ -180,12 +201,28 @@ var Request  = function () {
                 }
             });
 
+            $('#btnAdd').click(function(){
+                var tipo = $('#tipo');
+                tipo.val('').change();
+                tipo.prop('disabled', false);
+                $('#nombre').val('');
+                $('#area').val('').change();
+                $('#prioridad').val('');
+                $('#codigo').val('');
+                $('#id').val('');
+                $('#checkbox').val('');
+                showModal();
+
+            });
+
+
             $('#tipo').change(function() {
-                if($('#tipo').val() == ("Rutina")){
+                var tipo = $('#tipo');
+                if(tipo.val() == ("Rutina")){
                     $('#sPriority').fadeIn('slow');
-                    $('#sCodigo').fadeOut('slow');
-                }else{
-                    $('#sPriority').fadeOut('slow');
+                    $('#sCodigo').hide();
+                }else if(tipo.val() == ("Estudio")){
+                    $('#sPriority').hide();
                     $('#sCodigo').fadeIn('slow');
                 }
             });
@@ -195,7 +232,7 @@ var Request  = function () {
                 obj['mensaje'] = '';
                 obj['id'] = $('#id').val();
                 obj['nombre'] = $('#nombre').val();
-                obj['pasivo'] = '';
+                obj['pasivo']= ($('#checkbox').is(':checked'));
                 obj['tipo'] = $('#tipo').val();
                 obj['area'] = $('#area').val();
                 obj['prioridad'] = $('#prioridad').val();
@@ -222,12 +259,16 @@ var Request  = function () {
                                 });
                             } else {
                                 getRequests();
+                                var tipo = $('#tipo');
+                                tipo.val('').change();
+                                tipo.prop('disabled', false);
                                 $('#nombre').val('');
-                                $('#tipo').val('').change();
                                 $('#area').val('').change();
                                 $('#prioridad').val('');
                                 $('#codigo').val('');
                                 $('#id').val('');
+                                $('#checkbox').val('');
+
                                 var msg = $("#msjSucc").val();
                                 $.smallBox({
                                     title: msg,
@@ -252,7 +293,7 @@ var Request  = function () {
                 obj['mensaje'] = '';
                 obj['id'] = id;
                 obj['nombre'] = '';
-                obj['pasivo'] = '';
+                obj['pasivo'] = 'true';
                 obj['tipo'] = tipo;
                 obj['area'] = '';
                 obj['prioridad'] = '';

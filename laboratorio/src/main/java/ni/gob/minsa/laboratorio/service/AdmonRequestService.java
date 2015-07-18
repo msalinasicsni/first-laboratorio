@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by souyen-ics.
@@ -88,7 +89,7 @@ public class AdmonRequestService {
     }
 
     public Catalogo_Dx getDxRecordById(Integer id){
-        String query = "from Catalogo_Dx dx where  dx.id = :id and dx.pasivo = false";
+        String query = "from Catalogo_Dx dx where  dx.id = :id ";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("id", id);
@@ -96,10 +97,26 @@ public class AdmonRequestService {
     }
 
     public Catalogo_Estudio getStudyRecordById(Integer id){
-        String query = "from Catalogo_Estudio est where  est.id = :id and est.pasivo = false";
+        String query = "from Catalogo_Estudio est where  est.id = :id ";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("id", id);
         return (Catalogo_Estudio) q.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Catalogo_Estudio> getAllStudies() throws Exception {
+        String query = "from Catalogo_Estudio" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Catalogo_Dx> getAllDxs() throws Exception {
+        String query = "from Catalogo_Dx dx " ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        return q.list();
     }
 }
