@@ -202,9 +202,11 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="submit" id="btnAdd" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
                             <button type="button" class="btn btn-danger" data-dismiss="modal">
                                 <i class="fa fa-times"></i>  <spring:message code="act.end" />
+                            </button>
+                            <button type="submit" id="btnAdd" class="btn btn-success">
+                                <i class="fa fa-save"></i> <spring:message code="act.save" />
                             </button>
                         </div>
                     </div>

@@ -281,10 +281,10 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                                        <spring:message code="act.end" />
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.end" />
                                     </button>
-                                    <button type="submit" id="btnSaveAssTipoMx" class="btn btn-primary"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                                    <button type="submit" id="btnSaveAssTipoMx" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
 
                                 </div>
                             </div>
@@ -364,10 +364,10 @@
                                 </div>
 
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                                        <spring:message code="act.end" />
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.end" />
                                     </button>
-                                    <button type="submit" id="btnSaveRequest" class="btn btn-primary"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                                    <button type="submit" id="btnSaveRequest" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
 
                                 </div>
                             </div>

@@ -588,7 +588,7 @@
                                         </div>
                                         </fieldset>
 										<footer>
-                                            <button type="submit" id="create-person" class="btn btn-info"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
+                                            <button type="submit" id="create-person" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save" /></button>
                                         </footer>
 									</form>
 								</div>

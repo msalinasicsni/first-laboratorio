@@ -206,11 +206,11 @@ var Concepts  = function () {
                         var btnEditC = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
                             ' "> <i class="fa fa-edit"></i>' ;
 
-                        var btnAddList = ' <button type="button" class="btn btn-default btn-xs " data-id="'+data[i].idConcepto+' ' +
+                        var btnAddList = ' <button type="button" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+' ' +
                             '"> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-default btn-xs " data-id="'+data[i].idConcepto+' ' +
+                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+' ' +
                             '"> <i class="fa fa-list-ol"></i>';
 
 
