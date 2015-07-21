@@ -254,8 +254,8 @@
                                             </section>
                                         </div>
                                         <footer style="background-color:white;">
-                                            <button type="button" id="submit" class="btn btn-primary fc-header-center">
-                                                <spring:message code="act.save"  />
+                                            <button type="button" id="submit" class="btn btn-success fc-header-center">
+                                                <i class="fa fa-save"></i> <spring:message code="act.save"  />
                                             </button>
                                         </footer>
                                     </fieldset>

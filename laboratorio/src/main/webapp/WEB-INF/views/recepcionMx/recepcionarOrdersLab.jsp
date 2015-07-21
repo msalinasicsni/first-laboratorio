@@ -535,11 +535,11 @@
             </fieldset>
 
             <footer>
-                <button type="submit" class="btn btn-primary" id="btnAgregarExamen">
-                    <spring:message code="act.save" />
+                <button type="submit" class="btn btn-success" id="btnAgregarExamen">
+                    <i class="fa fa-save"></i> <spring:message code="act.save" />
                 </button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">
-                    <spring:message code="act.end" />
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    <i class="fa fa-times"></i> <spring:message code="act.end" />
                 </button>
 
             </footer>
