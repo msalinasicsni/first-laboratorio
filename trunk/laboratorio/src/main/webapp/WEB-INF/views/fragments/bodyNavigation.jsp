@@ -128,6 +128,9 @@
                     <li class="catalogos">
                         <a href="#" title="<spring:message code="menu.catalogs" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <span class="menu-item-parent"><spring:message code="menu.catalogs" /></span></a>
                         <ul>
+                            <li class="laboratorio">
+                                <a href="<spring:url value="/administracion/laboratorio/list" htmlEscape="true "/>" title="<spring:message code="menu.catalog.lab" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.catalog.lab" /></a>
+                            </li>
                             <li class="direccion">
                                 <a href="<spring:url value="/administracion/direccion/list" htmlEscape="true "/>" title="<spring:message code="menu.management" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.management" /></a>
                             </li>
