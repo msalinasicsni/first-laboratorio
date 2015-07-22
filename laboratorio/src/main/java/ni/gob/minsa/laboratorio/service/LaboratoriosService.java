@@ -20,6 +20,11 @@ public class LaboratoriosService {
     @Resource(name = "sessionFactory")
     private SessionFactory sessionFactory;
 
+    public void saveLaboratorio(Laboratorio laboratorio){
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(laboratorio);
+    }
+
     public void saveDireccion(Direccion direccion) {
         Session session = sessionFactory.getCurrentSession();
         session.saveOrUpdate(direccion);
