@@ -15,7 +15,7 @@ import java.util.Date;
 public class AreaDepartamento {
 
     Integer idAreaDepartamento;
-    Departamento departamento;
+    DepartamentoDireccion depDireccion;
     Area area;
     private boolean pasivo;
     Date fechaRegistro;
@@ -43,16 +43,14 @@ public class AreaDepartamento {
         this.area = area;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_DEPARTAMENTO", referencedColumnName = "ID_DEPARTAMENTO",nullable = false)
-    @ForeignKey(name="AREADEPARTAMENTO_DEPA_FK")
-    public Departamento getDepartamento() {
-        return departamento;
-    }
 
-    public void setDepartamento(Departamento departamento) {
-        this.departamento = departamento;
-    }
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ID_DEPART_DIRECCION", referencedColumnName = "ID_DEPART_DIRECCION",nullable = false)
+    @ForeignKey(name="AREADEPARTAMENTO_DEPA_FK")
+    public DepartamentoDireccion getDepDireccion() { return depDireccion; }
+
+    public void setDepDireccion(DepartamentoDireccion depDireccion) { this.depDireccion = depDireccion; }
 
     @Basic
     @Column(name = "PASIVO", nullable = false, insertable = true, updatable = true)

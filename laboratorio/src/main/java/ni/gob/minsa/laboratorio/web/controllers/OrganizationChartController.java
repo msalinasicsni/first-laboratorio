@@ -2,12 +2,10 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import ni.gob.minsa.laboratorio.domain.examen.Departamento;
-import ni.gob.minsa.laboratorio.domain.examen.DepartamentoDireccion;
-import ni.gob.minsa.laboratorio.domain.examen.Direccion;
-import ni.gob.minsa.laboratorio.domain.examen.DireccionLaboratorio;
+import ni.gob.minsa.laboratorio.domain.examen.*;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.service.AreaService;
 import ni.gob.minsa.laboratorio.service.LaboratoriosService;
 import ni.gob.minsa.laboratorio.service.OrganizationChartService;
 import ni.gob.minsa.laboratorio.service.SeguridadService;
@@ -58,6 +56,10 @@ public class OrganizationChartController {
     private OrganizationChartService organizationChartService;
 
     @Autowired
+    @Qualifier(value = "areaService")
+    private AreaService areaService;
+
+    @Autowired
     MessageSource messageSource;
 
     @RequestMapping(value = "init", method = RequestMethod.GET)
@@ -77,9 +79,11 @@ public class OrganizationChartController {
         if (urlValidacion.isEmpty()) {
             List<Direccion> managmentList =  laboratoriosService.getDireccionesActivas();
             List<Departamento> departmentList = laboratoriosService.getDepartamentosActivos();
+            List<Area> areasList = laboratoriosService.getAreasActivas();
+
             mav.addObject("managmentList",managmentList);
             mav.addObject("departmentList",departmentList);
-
+            mav.addObject("areasList",areasList);
             mav.setViewName("administracion/organizationChart");
         }else
             mav.setViewName(urlValidacion);
@@ -103,7 +107,7 @@ public class OrganizationChartController {
     public @ResponseBody List<DireccionLaboratorio> getManagementAssociated(@RequestParam(value = "lab", required = true) String lab) {
         logger.info("Obteniendo las direcciones asociados a un laboratorio");
         List<DireccionLaboratorio> managementList = null;
-        managementList = organizationChartService.getManagmentLabAssociated(lab);
+        managementList = organizationChartService.getAssociatedManagement(lab);
         return managementList;
     }
 
@@ -115,7 +119,6 @@ public class OrganizationChartController {
         String idLab = null;
         Integer management = 0;
         Integer idRecord = 0;
-        String pasivo = "";
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
@@ -135,11 +138,6 @@ public class OrganizationChartController {
             if (jsonpObject.get("idRecord") != null && !jsonpObject.get("idRecord").getAsString().isEmpty()) {
                 idRecord = jsonpObject.get("idRecord").getAsInt();
             }
-
-            if (jsonpObject.get("pasivo") != null && !jsonpObject.get("pasivo").getAsString().isEmpty()) {
-                pasivo = jsonpObject.get("pasivo").getAsString();
-            }
-
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
 
@@ -186,7 +184,6 @@ public class OrganizationChartController {
             map.put("mensaje", resultado);
             map.put("idRecord", "");
             map.put("management", "");
-            map.put("pasivo", "");
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -198,7 +195,173 @@ public class OrganizationChartController {
     public @ResponseBody List<DepartamentoDireccion> getDepartmentAssociated(@RequestParam(value = "idManagementLab", required = true) Integer idManagementLab) {
         logger.info("Obteniendo los departamentos asociados a una asociacion de direccion lab");
         List<DepartamentoDireccion> depaList = null;
-        depaList = organizationChartService.getDepartmentAssociated(idManagementLab);
+        depaList = organizationChartService.getAssociatedDepartment(idManagementLab);
         return depaList;
+    }
+
+    //Add or update association managment to lab
+    @RequestMapping(value = "addUpdateDepartment", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void addUpdateDepartment(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String json = "";
+        String resultado = "";
+        Integer idManagLab = 0;
+        Integer department = 0;
+        Integer idRecord = 0;
+
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+
+            if(jsonpObject.get("idManagLab") != null && !jsonpObject.get("idManagLab").getAsString().isEmpty() ) {
+                idManagLab = jsonpObject.get("idManagLab").getAsInt();
+            }
+
+            if (jsonpObject.get("department") != null && !jsonpObject.get("department").getAsString().isEmpty()) {
+                department = jsonpObject.get("department").getAsInt();
+            }
+
+
+            if (jsonpObject.get("idRecord") != null && !jsonpObject.get("idRecord").getAsString().isEmpty()) {
+                idRecord = jsonpObject.get("idRecord").getAsInt();
+            }
+
+
+
+
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+
+            if (idRecord == 0) {
+                if (department != 0 && idManagLab!= 0) {
+
+                    //search record
+                    DepartamentoDireccion record = organizationChartService.getDepManagementRecord(idManagLab, department);
+
+                    if (record == null) {
+                        DepartamentoDireccion dep = new DepartamentoDireccion();
+                        dep.setFechaRegistro(new Timestamp(new Date().getTime()));
+                        dep.setUsuarioRegistro(usuario);
+                        dep.setDepartamento(laboratoriosService.getDepartamentoById(department));
+                        dep.setDireccionLab(organizationChartService.getManagmentLabById(idManagLab));
+                        dep.setPasivo(false);
+                        organizationChartService.addOrUpdateDepManagement(dep);
+                    } else {
+                        resultado = messageSource.getMessage("msg.existing.record.error", null, null);
+                        throw new Exception(resultado);
+                    }
+
+                }
+            } else {
+                DepartamentoDireccion rec = organizationChartService.getDepManagementById(idRecord);
+                if (rec != null) {
+                    rec.setPasivo(true);
+                    organizationChartService.addOrUpdateDepManagement(rec);
+                }
+            }
+
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            ex.printStackTrace();
+            resultado = messageSource.getMessage("msg.add.depManag.error", null, null);
+            resultado = resultado + ". \n " + ex.getMessage();
+
+        } finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idManagLab", idManagLab.toString());
+            map.put("mensaje", resultado);
+            map.put("idRecord", "");
+            map.put("department", "");
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    //Load Areas Associated to Department-Management
+    @RequestMapping(value = "getAreaDep", method = RequestMethod.GET)
+    public @ResponseBody List<AreaDepartamento> getAreaDepAssociated(@RequestParam(value = "id", required = true) Integer id) {
+        logger.info("Obteniendo las areas asociados a un departamento-direccion");
+        List<AreaDepartamento> areasList = null;
+        areasList = organizationChartService.getAssociatedAreas(id);
+        return areasList;
+    }
+
+    //Add or update association area to department management
+    @RequestMapping(value = "addUpdateArea", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void addUpdateArea(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String json = "";
+        String resultado = "";
+        Integer idDepManag = 0;
+        Integer area = 0;
+        Integer idRecord = 0;
+
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+
+            if(jsonpObject.get("idDepManag") != null && !jsonpObject.get("idDepManag").getAsString().isEmpty() ) {
+                idDepManag = jsonpObject.get("idDepManag").getAsInt();
+            }
+
+            if (jsonpObject.get("area") != null && !jsonpObject.get("area").getAsString().isEmpty()) {
+                area = jsonpObject.get("area").getAsInt();
+            }
+
+            if (jsonpObject.get("idRecord") != null && !jsonpObject.get("idRecord").getAsString().isEmpty()) {
+                idRecord = jsonpObject.get("idRecord").getAsInt();
+            }
+
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+
+            if (idRecord == 0) {
+                if (area != 0 && idDepManag!= 0) {
+
+                    //search record
+                    AreaDepartamento record = organizationChartService.getAreaDepRecord(idDepManag, area);
+
+                    if (record == null) {
+                        AreaDepartamento areaD = new AreaDepartamento();
+                        areaD.setFechaRegistro(new Timestamp(new Date().getTime()));
+                        areaD.setUsuarioRegistro(usuario);
+                        areaD.setDepDireccion(organizationChartService.getDepManagementById(idDepManag));
+                        areaD.setArea(areaService.getArea(area));
+                        areaD.setPasivo(false);
+                        organizationChartService.addOrUpdateArea(areaD);
+                    } else {
+                        resultado = messageSource.getMessage("msg.existing.record.error", null, null);
+                        throw new Exception(resultado);
+                    }
+                }
+            } else {
+                AreaDepartamento rec = organizationChartService.getAreaDepById(idRecord);
+                if (rec != null) {
+                    rec.setPasivo(true);
+                    organizationChartService.addOrUpdateArea(rec);
+                }
+            }
+
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            ex.printStackTrace();
+            resultado = messageSource.getMessage("msg.add.area.error", null, null);
+            resultado = resultado + ". \n " + ex.getMessage();
+
+        } finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idDepManag", idDepManag.toString());
+            map.put("mensaje", resultado);
+            map.put("idRecord", "");
+            map.put("area", "");
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
     }
 }

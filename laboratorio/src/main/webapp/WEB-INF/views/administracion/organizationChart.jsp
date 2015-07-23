@@ -108,6 +108,14 @@
                                 <input id="confirm_content" type="hidden" value="<spring:message code="msg.management.override.conf.content"/>"/>
                                 <input id="override_cancel" type="hidden" value="<spring:message code="msg.management.override.cancel"/>"/>
                                 <input id="msjSuccManagment" type="hidden" value="<spring:message code="msg.associate.managment.added"/>"/>
+                                <input id="msjSuccDep" type="hidden" value="<spring:message code="msg.associate.dep.added"/>"/>
+                                <input id="confirm_content_dep" type="hidden" value="<spring:message code="msg.dep.override.conf.content"/>"/>
+                                <input id="succesfulDepOverride" type="hidden" value="<spring:message code="msg.successfully.dep.override"/>"/>
+                                <input id="depOverride_cancel" type="hidden" value="<spring:message code="msg.dep.override.cancel"/>"/>
+                                <input id="msjSuccArea" type="hidden" value="<spring:message code="msg.associate.area.added"/>"/>
+                                <input id="confirm_content_area" type="hidden" value="<spring:message code="msg.area.override.conf.content"/>"/>
+                                <input id="areaOverride_cancel" type="hidden" value="<spring:message code="msg.area.override.cancel"/>"/>
+                                <input id="succesfulAreaOverride" type="hidden" value="<spring:message code="msg.successfully.area.override"/>"/>
 
 
                                 <table  id="labs-records" class="table table-striped table-bordered table-hover" width="100%">
@@ -129,7 +137,7 @@
                     <div hidden="hidden" class="jarviswidget jarviswidget-color-darken" id="div2">
                         <header>
                             <span class="widget-icon"> <i class="fa fa-reorder"></i> </span>
-                            <h2><spring:message code="lbl.associatedManagement.to.lab" /> </h2>
+                            <h2><i class="fa fa-angle-right"></i> </h2>
                             <h2 id="managementName" ></h2>
                         </header>
                         <!-- widget div-->
@@ -179,8 +187,10 @@
                     <div hidden="hidden" class="jarviswidget jarviswidget-color-darken" id="div3">
                         <header>
                             <span class="widget-icon"> <i class="fa fa-reorder"></i> </span>
-                            <h2><spring:message code="lbl.associatedDepartment.to.management" /> </h2>
+                            <h2><i class="fa fa-angle-right"></i> </h2>
                             <h2 id="managementLab" ></h2>
+                            <h2><i class="fa fa-angle-right"></i> </h2>
+                            <h2 id="lab" ></h2>
                         </header>
                         <!-- widget div-->
                         <div>
@@ -197,6 +207,7 @@
                                     <thead>
                                     <tr>
                                         <th data-class="expand" style="width: 25%"><spring:message code="lbl.department"/></th>
+                                        <th style="width: 25%"><spring:message code="lbl.associated.area"/></th>
                                         <th width="25%"><spring:message code="act.override"/></th>
                                     </tr>
                                     </thead>
@@ -225,6 +236,58 @@
                     </div>
                     <!-- end widget -->
 
+                    <div hidden="hidden" class="jarviswidget jarviswidget-color-darken" id="div4">
+                        <header>
+                            <span class="widget-icon"> <i class="fa fa-reorder"></i> </span>
+                            <h2><i class="fa fa-angle-right"></i> </h2>
+                            <h2 id="dep" ></h2>
+                            <h2><i class="fa fa-angle-right"></i> </h2>
+                            <h2 id="dir" ></h2>
+                            <h2><i class="fa fa-angle-right"></i></h2>
+                            <h2 id="labo" ></h2>
+                        </header>
+                        <!-- widget div-->
+                        <div>
+                            <!-- widget edit box -->
+                            <div class="jarviswidget-editbox">
+                                <!-- This area used as dropdown edit box -->
+                                <input class="form-control" type="text">
+                            </div>
+                            <!-- end widget edit box -->
+                            <!-- widget content -->
+                            <div class="widget-body no-padding">
+
+                                <table  id="areas-records" class="table table-striped table-bordered table-hover" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th data-class="expand" style="width: 25%"><spring:message code="lbl.area"/></th>
+                                        <th width="25%"><spring:message code="act.override"/></th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <!-- end widget content -->
+                        </div>
+                        <!-- end widget div -->
+
+                        <div hidden="hidden" id="dBack3" class="row" style="border: none">
+                            <section class="col col-sm-12 col-md-6 col-lg-6">
+                                <div style="border: none" class="pull-left">
+                                    <button type="button" id="btnBack3" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <spring:message code="lbl.back" /></button>
+                                </div>
+                            </section>
+
+                            <section class="col col-sm-12 col-md-6 col-lg-6">
+                                <div style="border: none" class="pull-right">
+                                    <button type="button" id="btnAddArea" class="btn btn-primary"><i class="fa fa-link"></i> <spring:message code="lbl.associate.area" /></button>
+                                </div>
+
+                            </section>
+
+                        </div>
+
+                    </div>
+
 
                 </article>
                 <!-- WIDGET END -->
@@ -235,7 +298,7 @@
                 <!-- a blank row to get started -->
                 <div class="col-sm-12">
                     <!-- your contents here -->
-                    <!-- Modal Request -->
+                    <!-- Modal -->
                     <div class="modal fade" id="myModal1" aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -289,7 +352,7 @@
                     <!-- /.modal -->
 
 
-                    <!-- Modal Request -->
+                    <!-- Modal -->
                     <div class="modal fade" id="myModal2" aria-hidden="true" data-backdrop="static">
                         <div class="modal-dialog">
                             <div class="modal-content">
@@ -308,8 +371,7 @@
                                 <div class="modal-body">
                                     <form id="department-form" class="smart-form" autocomplete="off">
                                         <div class="row">
-                                            <input id="idManagementLab" hidden="hidden" type="text" name="idManagementLab"/>
-                                            <input id="idRecord" hidden="hidden" type="text" name="idRecord"/>
+                                            <input id="idManagLab" hidden="hidden" type="text" name="idManagLab"/>
                                             <section class="col col-sm-12 col-md-8 col-lg-8">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <spring:message code="lbl.departments" /> </label>
@@ -334,6 +396,59 @@
                                         <spring:message code="act.end" />
                                     </button>
                                     <button type="submit" id="btnSave2" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save"/></button>
+
+                                </div>
+                            </div>
+                            <!-- /.modal-content -->
+                        </div>
+                        <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal3" aria-hidden="true" data-backdrop="static">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="alert alert-info">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                            &times;
+                                        </button>
+                                        <h4 class="modal-title">
+                                            <i class="fa-fw fa fa-list-ul"></i>
+                                            <spring:message code="lbl.associate.area"/>
+                                        </h4>
+                                    </div>
+                                </div>
+
+                                <div class="modal-body">
+                                    <form id="areas-form" class="smart-form" autocomplete="off">
+                                        <div class="row">
+                                            <input id="idDepManag" hidden="hidden" type="text" name="idDepManag"/>
+                                            <section class="col col-sm-12 col-md-8 col-lg-8">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.areas" /> </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"><i class="fa fa-list fa-fw"></i></span>
+                                                    <select id="area" name="area"
+                                                            class="select2">
+                                                        <option value=""><spring:message code="lbl.select" />...</option>
+                                                        <c:forEach items="${areasList}" var="area">
+                                                            <option value="${area.idArea}">${area.nombre}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+                                            </section>
+
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i>
+                                        <spring:message code="act.end" />
+                                    </button>
+                                    <button type="submit" id="btnSave3" class="btn btn-success"><i class="fa fa-save"></i> <spring:message code="act.save"/></button>
 
                                 </div>
                             </div>
@@ -404,8 +519,9 @@
 <c:url var="getManagement" value="/administracion/organizationChart/getManagementAssociated"/>
 <c:url var="saveManagment" value="/administracion/organizationChart/addUpdateManagment"/>
 <c:url var="getDepartments" value="/administracion/organizationChart/getDepartmentAssociated"/>
-
-
+<c:url var="saveDepartment" value="/administracion/organizationChart/addUpdateDepartment"/>
+<c:url var="getAreas" value="/administracion/organizationChart/getAreaDep"/>
+<c:url var="saveArea" value="/administracion/organizationChart/addUpdateArea"/>
 
 
 
@@ -416,7 +532,10 @@
             labsUrl : "${getLabs}",
             managementUrl: "${getManagement}",
             saveManagmentUrl:"${saveManagment}",
-            departmentsUrl: "${getDepartments}"
+            departmentsUrl: "${getDepartments}",
+            saveDepartmentUrl: "${saveDepartment}",
+            areasUrl: "${getAreas}",
+            saveAreaUrl: "${saveArea}"
 
 
 
