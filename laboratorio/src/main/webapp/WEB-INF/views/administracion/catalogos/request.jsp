@@ -53,7 +53,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/sampleTypes/init" htmlEscape="true "/>"><spring:message code="lbl.sample.types" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/request/init" htmlEscape="true "/>"><spring:message code="lbl.request.large" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../../fragments/layoutOptions.jsp" />
