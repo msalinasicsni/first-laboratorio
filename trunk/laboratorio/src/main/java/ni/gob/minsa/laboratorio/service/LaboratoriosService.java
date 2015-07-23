@@ -145,4 +145,11 @@ public class LaboratoriosService {
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         return q.list();
     }
+
+    @SuppressWarnings("unchecked")
+    public List<Area> getAreasActivas(){
+        String query = "from Area area where area.pasivo = false order by area.nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        return q.list();
+    }
 }

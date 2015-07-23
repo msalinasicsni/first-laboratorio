@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.examen.AreaDepartamento;
 import ni.gob.minsa.laboratorio.domain.examen.DepartamentoDireccion;
 import ni.gob.minsa.laboratorio.domain.examen.DireccionLaboratorio;
 import org.hibernate.Criteria;
@@ -38,7 +39,7 @@ public class OrganizationChartService {
      */
 
     @SuppressWarnings("unchecked")
-    public List<DireccionLaboratorio> getManagmentLabAssociated(String codLab){
+    public List<DireccionLaboratorio> getAssociatedManagement(String codLab){
         Session session = sessionFactory.getCurrentSession();
         Criteria cr = session.createCriteria(DireccionLaboratorio.class, "direcciones");
         cr.add(Restrictions.eq("direcciones.pasivo", false));
@@ -103,7 +104,7 @@ public class OrganizationChartService {
      */
 
     @SuppressWarnings("unchecked")
-    public List<DepartamentoDireccion> getDepartmentAssociated(Integer id){
+    public List<DepartamentoDireccion> getAssociatedDepartment(Integer id){
         Session session = sessionFactory.getCurrentSession();
         Criteria cr = session.createCriteria(DepartamentoDireccion.class, "dep");
         cr.add(Restrictions.eq("dep.pasivo", false));
@@ -111,6 +112,118 @@ public class OrganizationChartService {
         // cr.add(Restrictions.eq("lab.pasivo", false));
         cr.add(Restrictions.eq("dirLab.idDireccionLab", id));
         return cr.list();
+    }
+
+    /**
+     * Obtiene un registro de Departamento-Direccion
+     * @param idManageLab
+     * @param idDepartment
+     */
+
+    public DepartamentoDireccion getDepManagementRecord(Integer idManageLab, Integer idDepartment){
+        String query = "from DepartamentoDireccion dep where dep.departamento.id = :idDepartment and dep.direccionLab.idDireccionLab = :idManageLab and dep.pasivo = false";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("idDepartment", idDepartment);
+        q.setInteger("idManageLab", idManageLab);
+        return (DepartamentoDireccion) q.uniqueResult();
+    }
+
+    /**
+     * Actualiza o agrega una asociación Departamento-Direccion
+     *
+     * @param dto Objeto a actualizar o agregar
+     * @throws Exception
+     */
+    public void addOrUpdateDepManagement(DepartamentoDireccion dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.saveOrUpdate(dto);
+            }
+            else
+                throw new Exception("Objeto NULL");
+        }catch (Exception ex){
+            logger.error("Error al agregar o actualizar una asociación Departamento-Direccion",ex);
+            throw ex;
+        }
+    }
+
+    /**
+     * Obtiene un registro de DepartamentoDireccion por id
+     * @param id
+     */
+
+    public DepartamentoDireccion getDepManagementById(Integer id){
+        String query = "from DepartamentoDireccion dep where dep.idDepartDireccion = :id";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("id", id);
+        return (DepartamentoDireccion) q.uniqueResult();
+    }
+
+    /**
+     * Obtiene una lista de las areas asociadas a un departamento-direccion
+     * @param id
+     */
+
+    @SuppressWarnings("unchecked")
+    public List<AreaDepartamento> getAssociatedAreas(Integer id){
+        Session session = sessionFactory.getCurrentSession();
+        Criteria cr = session.createCriteria(AreaDepartamento.class, "areas");
+        cr.add(Restrictions.eq("areas.pasivo", false));
+        cr.createAlias("areas.depDireccion", "dep");
+        // cr.add(Restrictions.eq("lab.pasivo", false));
+        cr.add(Restrictions.eq("dep.idDepartDireccion", id));
+        return cr.list();
+    }
+
+    /**
+     * Obtiene un registro de Area-Departamento
+     * @param idDepManag
+     * @param idArea
+     */
+
+    public AreaDepartamento getAreaDepRecord(Integer idDepManag, Integer idArea){
+        String query = "from AreaDepartamento area where area.depDireccion.id = :idDepManag and area.area.id = :idArea and area.pasivo = false";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("idDepManag", idDepManag);
+        q.setInteger("idArea", idArea);
+        return (AreaDepartamento) q.uniqueResult();
+    }
+
+    /**
+     * Actualiza o agrega una asociación Area-Departamento
+     *
+     * @param dto Objeto a actualizar o agregar
+     * @throws Exception
+     */
+    public void addOrUpdateArea(AreaDepartamento dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.saveOrUpdate(dto);
+            }
+            else
+                throw new Exception("Objeto NULL");
+        }catch (Exception ex){
+            logger.error("Error al agregar o actualizar una asociación Area-Departamento",ex);
+            throw ex;
+        }
+    }
+
+    /**
+     * Obtiene un registro de AreaDepartamento por id
+     * @param id
+     */
+
+    public AreaDepartamento getAreaDepById(Integer id){
+        String query = "from AreaDepartamento area where area.idAreaDepartamento = :id";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setInteger("id", id);
+        return (AreaDepartamento) q.uniqueResult();
     }
 
 }
