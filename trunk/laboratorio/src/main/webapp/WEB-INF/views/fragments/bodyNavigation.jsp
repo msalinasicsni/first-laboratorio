@@ -169,6 +169,10 @@
                     <li class="users">
                         <a href="<spring:url value="/usuarios/list" htmlEscape="true "/>" title="<spring:message code="lbl.admin.users" />"><i class="fa fa-lg fa-fw fa-users"></i> <spring:message code="menu.admin.users" /></a>
                     </li>
+                    <li class="organizationChart">
+                        <a href="<spring:url value="/administracion/organizationChart/init" htmlEscape="true "/>" title="<spring:message code="lbl.admin.users" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="lbl.organizationchart" /></a>
+                    </li>
+
 
                 </ul>
             </li>

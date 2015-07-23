@@ -45,6 +45,12 @@ public class LaboratoriosService {
         session.saveOrUpdate(departamentoDireccion);
     }
 
+    public List<Laboratorio> getAllLaboratories(){
+        String query = "from Laboratorio order by nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        return q.list();
+    }
+
     public List<Laboratorio> getLaboratoriosInternos(){
         String query = "from Laboratorio where codTipo =:codTipo order by nombre";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
@@ -124,5 +130,19 @@ public class LaboratoriosService {
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idDepartDireccion",idDepartDireccion);
         return (DepartamentoDireccion)q.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Direccion> getDireccionesActivas(){
+        String query = "select dir from Direccion dir where dir.pasivo = false order by dir.nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Departamento> getDepartamentosActivos(){
+        String query = "from Departamento dep where dep.pasivo = false order by dep.nombre";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        return q.list();
     }
 }

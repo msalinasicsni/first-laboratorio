@@ -1,11 +1,11 @@
 /**
- * Created by souyen-ics on 07-02-15.
+ * Created by souyen-ics on 07-21-15.
  */
+var OrganizationChart  = function () {
 
-var TestsRequest  = function () {
     return {
         init: function (parametros) {
-            getTestsRequest();
+            getLabs();
 
             function blockUI(){
                 var loc = window.location;
@@ -33,98 +33,24 @@ var TestsRequest  = function () {
                 tablet : 1024,
                 phone : 480
             };
-            var catalogueTable = $('#records').dataTable({
+            var table1 = $('#labs-records').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
                     "t"+
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth" : true,
 
                 "columns": [
-                    null, null, null,
+                    null, null,
                     {
-                        "className":      'detail',
+                        "className":      'detailLab',
                         "orderable":      false
                     }
-
-
                 ],
 
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
-                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#records'), breakpointDefinition);
-                    }
-                },
-                "rowCallback" : function(nRow) {
-                    responsiveHelper_dt_basic.createExpandIcon(nRow);
-                },
-                "drawCallback" : function(oSettings) {
-                    responsiveHelper_dt_basic.respond();
-                },
-
-
-               fnDrawCallback : function() {
-                    $('.detail')
-                        .off("click", detailExa)
-                        .on("click", detailExa);
-
-
-                }
-
-            });
-
-            function detailExa(){
-                var data =  $(this.innerHTML).data('id');
-                if(data != null){
-                    var detalle = data.split(",");
-                    var id= detalle[0];
-                    var tipo = detalle[1];
-                    var nombre = detalle[2];
-                    var area = detalle[3];
-                    var soli = nombre;
-
-                    $('#sol').html(soli);
-                    $('#div1').hide();
-                    $('#div2').fadeIn('slow');
-                    $('#dBack').show();
-                    getExams(id, tipo);
-                    getTestsByArea(area);
-                    $('#idSolicitud').val(id);
-                    $('#tipo').val(tipo);
-                }
-
-            }
-
-            $('#btnBack').click(function() {
-                $('#dBack').hide();
-                $('#sol').html("");
-                $('#div2').hide();
-                $('#id').val('');
-                $('#div1').fadeIn('slow');
-                $('#idSolicitud').val('');
-                $('#tipo').val('');
-
-            });
-
-            var testsTable = $('#tests').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "t"+
-                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true,
-
-                "columns": [
-                    null,
-                    {
-                        "className":      'overrideT',
-                        "orderable":      false
-                    }
-
-                ],
-
-                "preDrawCallback" : function() {
-                    // Initialize the responsive datatables helper once.
-                    if (!responsiveHelper_dt_basic) {
-                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#tests'), breakpointDefinition);
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#labs-records'), breakpointDefinition);
                     }
                 },
                 "rowCallback" : function(nRow) {
@@ -136,89 +62,223 @@ var TestsRequest  = function () {
 
 
                 fnDrawCallback : function() {
-                    $('.overrideT')
-                        .off("click", overrideTe)
-                        .on("click", overrideTe);
+                    $('.detailLab')
+                        .off("click", detailHandler)
+                        .on("click", detailHandler);
+
 
                 }
+            });
+
+            var table2 = $('#management-records').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth" : true,
+
+                "columns": [
+                    null,
+                    {
+                        "className":      'detailD',
+                        "orderable":      false
+                    },
+                    {
+                        "className":      'overrideM',
+                        "orderable":      false
+                    }
+                ],
+
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#management-records'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                },
+
+
+                fnDrawCallback : function() {
+                    $('.detailD')
+                        .off("click", detailDHandler)
+                        .on("click", detailDHandler);
+                    $('.overrideM')
+                        .off("click", overrideHandler)
+                        .on("click", overrideHandler);
+
+
+                }
+            });
+
+            var table3 = $('#depart-manag-lab').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth" : true,
+
+                "columns": [
+                    null,
+                    {
+                        "className":      'overrideD',
+                        "orderable":      false
+                    }
+                ],
+
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#depart-manag-lab'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                }
+
+
+               /* fnDrawCallback : function() {
+                    $('.overrideD')
+                        .off("click", overrideD)
+                        .on("click", overrideD);
+
+
+                }*/
+            });
+
+
+            function detailHandler(){
+                var data =  $(this.innerHTML).data('id');
+                if (data != null) {
+                    var detalle = data.split(",");
+                    var id= detalle[0];
+                    var name = detalle[1];
+                    $('#managementName').html(name);
+                    $('#div1').hide();
+                    getManagement(id);
+                    $('#idLab').val(id);
+                    $('#div2').fadeIn('slow');
+                    $('#dBack1').show();
+                }
+            }
+
+            function detailDHandler(){
+                var data =  $(this.innerHTML).data('id');
+                if (data != null) {
+                    var detalle = data.split(",");
+                    var id= detalle[0];
+                    var name = detalle[1];
+                    $('#managementLab').html(name);
+                    $('#div1').hide();
+                    $('#div2').hide();
+                    $('#idManagementLab').val(id);
+                    $('#div3').fadeIn('slow');
+                    $('#dBack2').show();
+                    $('#dBack1').hide();
+                    getDepartments(id);
+                }
+            }
+
+
+
+            function getLabs() {
+                $.getJSON(parametros.labsUrl, {
+                    ajax: 'true'
+                }, function (data) {
+                    table1.fnClearTable();
+                    var len = data.length;
+                    for (var i = 0; i < len; i++) {
+
+                        var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].codigo + "," + data[i].nombre +
+                            '" > <i class="fa fa-list"></i>' ;
+
+                       table1.fnAddData(
+                            [data[i].codigo, data[i].nombre, btnAdd]);
+                    }
+                })
+            }
+
+            $('#btnBack1').click(function() {
+                $('#div1').show();
+                $('#div2').hide();
+                $('#managementName').html('');
+                $('#idLab').val('');
+            });
+
+            $('#btnBack2').click(function() {
+                $('#div2').show();
+                $('#div3').hide();
+                $('#managementLab').html('');
+                $('#idManagementLab').val('');
+                $('#dBack1').show();
 
             });
 
 
 
+            function overrideHandler(){
+                var data =  $(this.innerHTML).data('id');
+
+                if(data != null){
+                    overrideMLab(data);
+                }
 
 
-            function getTestsRequest() {
-                $.getJSON(parametros.catalogueUrl, {
-                    ajax: 'true'
-                }, function (data) {
-                    catalogueTable.fnClearTable();
-                    var len = Object.keys(data).length;
-                    for (var i = 0; i < len; i++) {
-
-                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "," + data[i].tipo + "," + data[i].nombre + ","+ data[i].idArea +
-                            '" > <i class="fa fa-list"></i>' ;
-
-                        catalogueTable.fnAddData(
-                            [data[i].nombre, data[i].tipo, data[i].area, btnDetail]);
-
-
-                    }
-                })
             }
 
-            function getExams(id, tipo) {
-                $.getJSON(parametros.testsUrl, {
-                    ajax: 'true',
-                    id: id,
-                    tipo:tipo
-                }, function (dataToLoad) {
-                    testsTable.fnClearTable();
-                    var len = Object.keys(dataToLoad).length;
-                    for (var i = 0; i < len; i++) {
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id +
-                            '" > <i class="fa fa-times"></i>' ;
-
-                       testsTable.fnAddData(
-                            [dataToLoad[i].nombreExamen, btnOverride]);
-                    }
-                })
-            }
-
-            function showModal(){
-                $("#myModal").modal({
+            function showModal1(){
+                $("#myModal1").modal({
                     show: true
                 });
             }
 
-            $('#btnAddExa').click(function() {
-                showModal();
+            function showModal2(){
+                $("#myModal2").modal({
+                    show: true
+                });
+            }
+
+
+            function getManagement(lab) {
+                $.getJSON(parametros.managementUrl, {
+                    ajax: 'true',
+                    lab: lab
+                }, function (data) {
+                    table2.fnClearTable();
+                    var len = data.length;
+                    for (var i = 0; i < len; i++) {
+
+                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].idDireccionLab + "," + data[i].direccion.nombre +
+                            '" > <i class="fa fa-list"></i>' ;
+
+                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+data[i].idDireccionLab +
+                            '" > <i class="fa fa-times"></i>' ;
+                        table2.fnAddData(
+                            [data[i].direccion.nombre,btnDetail, btnOverride]);
+
+                    }
+                })
+            }
+
+           $('#btnAddManagement').click(function() {
+               showModal1();
+            });
+
+            $('#btnAddDepartment').click(function() {
+                showModal2();
             });
 
 
-            function getTestsByArea(idArea){
-                    $.getJSON(parametros.testsAreaUrl, {
-                        idArea: idArea,
-                        ajax: 'true'
-                    }, function (data) {
-                        var html = null;
-                        var len = data.length;
-                        html += '<option value="">' + $("#opt_select").val() + '...</option>';
-                        for (var i = 0; i < len; i++) {
-                            html += '<option value="' + data[i].idExamen + '">'
-                                + data[i].nombre
-                                + '</option>';
-                            // html += '</option>';
-                        }
-                        $('#examen').html(html);
-                    })
-                }
-
             <!-- Validacion formulario -->
-            var $validator = $("#form").validate({
+            var $validator = $('#ass-managment-form').validate({
                 // Rules for form validation
                 rules: {
-                    examen: {required : true}
+                    management: {required : true}
                 },
                 // Do not change code below
                 errorPlacement : function(error, element) {
@@ -226,38 +286,28 @@ var TestsRequest  = function () {
                 }
             });
 
-            $('#btnAddTest').click(function() {
-                var $validarModal = $("#form").valid();
+            $('#btnSave1').click(function() {
+                var $validarModal = $('#ass-managment-form').valid();
                 if (!$validarModal) {
                     $validator.focusInvalid();
                     return false;
                 } else {
-                    addTest();
+                    addManagment();
                 }
             });
 
-            function overrideTe(){
-                var data =  $(this.innerHTML).data('id');
-                if (data != null) {
-                    overrideTest(data);
-                }
-            }
-
-
-
-            function addTest() {
+            function addManagment() {
                 var obj = {};
                 obj['mensaje'] = '';
-                obj['idSolicitud'] = $('#idSolicitud').val();
-                obj['idExamen'] = $('#examen').val();
+                obj['idLab'] = $('#idLab').val();
+                obj['management'] = $('#management').val();
                 obj['pasivo'] = '';
                 obj['idRecord'] = '';
-                obj['tipo'] = $('#tipo').val();
 
                 blockUI(parametros.blockMess);
                 $.ajax(
                     {
-                        url: parametros.saveTestUrl,
+                        url: parametros.saveManagmentUrl,
                         type: 'POST',
                         dataType: 'json',
                         data: JSON.stringify(obj),
@@ -273,9 +323,8 @@ var TestsRequest  = function () {
                                     timeout: 4000
                                 });
                             } else {
-                                getExams($('#idSolicitud').val(), $('#tipo').val());
-                                $('#examen').val('');
-                                var msg = $("#succ").val();
+                                getManagement($('#idLab').val());
+                                var msg = $("#msjSuccManagment").val();
                                 $.smallBox({
                                     title: msg,
                                     content: $("#disappear").val(),
@@ -283,6 +332,7 @@ var TestsRequest  = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
+                                $('#managment').val('').change();
 
                             }
                             unBlockUI();
@@ -294,21 +344,21 @@ var TestsRequest  = function () {
                     });
             }
 
-            function overrideTest(idRecord) {
+
+            function overrideMLab(idRecord) {
                 var obj = {};
                 obj['mensaje'] = '';
-                obj['idSolicitud'] = $('#idSolicitud').val();
-                obj['idExamen'] = '';
-                obj['pasivo'] = '';
+                obj['idLab'] = '';
+                obj['managment'] = '';
+                obj['pasivo'] = 'true';
                 obj['idRecord'] = idRecord;
-                obj['tipo'] = $('#tipo').val();
 
-                var opcSi = $("#msg_yes").val();
-                var opcNo = $("#msg_no").val();
+                var opcSi = $("#yes").val();
+                var opcNo = $("#no").val();
 
                 $.SmartMessageBox({
-                    title: $("#msg_conf").val(),
-                    content: $("#msg_overrideT_confirm_c").val(),
+                    title: $("#confirmation").val(),
+                    content: $("#confirm_content").val(),
                     buttons: '['+opcSi+']['+opcNo+']'
                 }, function (ButtonPressed) {
                     if (ButtonPressed === opcSi) {
@@ -316,7 +366,7 @@ var TestsRequest  = function () {
                         blockUI(parametros.blockMess);
                         $.ajax(
                             {
-                                url: parametros.saveTestUrl,
+                                url: parametros.saveManagmentUrl,
                                 type: 'POST',
                                 dataType: 'json',
                                 data: JSON.stringify(obj),
@@ -332,8 +382,8 @@ var TestsRequest  = function () {
                                             timeout: 4000
                                         });
                                     }else{
-                                        getExams($('#idSolicitud').val(), $('#tipo').val());
-                                        var msg = $("#msg_succOverrideT").val();
+                                        getManagement($('#idLab').val());
+                                        var msg = $("#succesfulOverride").val();
                                         $.smallBox({
                                             title: msg ,
                                             content: $("#disappear").val(),
@@ -353,7 +403,7 @@ var TestsRequest  = function () {
                     }
                     if (ButtonPressed === opcNo) {
                         $.smallBox({
-                            title: $("#msg_overrideT_cancel").val(),
+                            title: $("#override_cancel").val(),
                             content: "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
                             color: "#C46A69",
                             iconSmall: "fa fa-times fa-2x fadeInRight animated",
@@ -363,9 +413,25 @@ var TestsRequest  = function () {
                 });
             }
 
+            function getDepartments(idManagementLab) {
+                $.getJSON(parametros.departmentsUrl, {
+                    ajax: 'true',
+                    idManagementLab: idManagementLab
+                }, function (data) {
+                    table3.fnClearTable();
+                    var len = data.length;
+                    for (var i = 0; i < len; i++) {
+
+                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+data[i].idDepartDireccion +
+                            '" > <i class="fa fa-times"></i>' ;
+                        table3.fnAddData(
+                            [data[i].departamento.nombre, btnOverride]);
+
+                    }
+                })
+            }
 
         }
-
     };
 
 }();
