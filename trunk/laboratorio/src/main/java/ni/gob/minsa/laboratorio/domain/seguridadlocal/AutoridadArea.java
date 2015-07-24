@@ -14,7 +14,7 @@ import java.util.Date;
 @Table(name = "autoridad_area", schema = "laboratorio")
 public class AutoridadArea {
     Integer idAutoridadArea;
-    private User user;
+    User user;
     Area area;
     User usuarioRegistro;
     Date fechaRegistro;

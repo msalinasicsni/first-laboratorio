@@ -240,7 +240,7 @@ public class AutoridadesService {
                 "where d.idDepartamento not in " +
                 "(select a.departamento.idDepartamento FROM AutoridadDepartamento as a where a.pasivo = false and a.user.username = :userName) " +
                 "and dl.laboratorio.codigo = al.laboratorio.codigo " +
-                "and dl.direccion.idDireccion = dd.direccion.idDireccion " +
+                "and dl.idDireccionLab = dd.direccionLab.idDireccionLab " +
                 "and dd.departamento.idDepartamento = d.idDepartamento " +
                 "and al.user.username = :userName");
 

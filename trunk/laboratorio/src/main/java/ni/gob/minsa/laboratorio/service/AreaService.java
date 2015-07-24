@@ -49,8 +49,8 @@ public class AreaService {
         String query = "select aa from Area as aa, AreaDepartamento ad, DepartamentoDireccion dd, DireccionLaboratorio dl, AutoridadLaboratorio al " +
                 "where aa.idArea not in (select a.area.idArea from AutoridadArea as a where a.pasivo = false and a.user.username = :userName) " +
                 "and aa.idArea = ad.area.idArea " +
-                "and ad.departamento.idDepartamento = dd.departamento.idDepartamento " +
-                "and dd.direccion.idDireccion = dl.direccion.idDireccion " +
+                "and ad.depDireccion.idDepartDireccion = dd.idDepartDireccion " +
+                "and dd.direccionLab.idDireccionLab = dl.idDireccionLab " +
                 "and dl.laboratorio.codigo = al.laboratorio.codigo " +
                 "and al.user.username = :userName order by nombre";
 
@@ -62,7 +62,7 @@ public class AreaService {
 
     public List<Area> getAreasByDepartamento(Integer idDepartamento){
         String query = "select aa from Area aa, AreaDepartamento ad " +
-                "where aa.idArea = ad.area.idArea and ad.departamento.idDepartamento = :idDepartamento " +
+                "where aa.idArea = ad.area.idArea and ad.depDireccion.departamento.idDepartamento = :idDepartamento " +
                 "order by aa.nombre";
 
         Session session = sessionFactory.getCurrentSession();
