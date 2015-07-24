@@ -255,17 +255,17 @@ public class SearchMxController {
             Map<String, String> map = new HashMap<String, String>();
             RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
             map.put("idTomaMx", tomaMx.getIdTomaMx());
-            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
+            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():(messageSource.getMessage("lbl.not.generated", null, null))));
             map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
 
             if (rec != null) {
                 if (rec.getCalidadMx() != null) {
                     map.put("calidad", rec.getCalidadMx().getValor());
                 } else {
-                    map.put("calidad", "Sin definir");
+                    map.put("calidad", (messageSource.getMessage("lbl.undefined", null, null)));
                 }
             } else {
-                map.put("calidad", "Sin definir");
+                map.put("calidad", (messageSource.getMessage("lbl.undefined", null, null)));
             }
 
             if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
@@ -281,8 +281,8 @@ public class SearchMxController {
 
             //laboratorio y area
              if(tomaMx.getEstadoMx().getCodigo().equals("ESTDMX|ENV")){
-                map.put("area", "No recepcionada");
-                map.put("laboratorio", "No recepcionada");
+                map.put("area", (messageSource.getMessage("lbl.not.received", null, null)));
+                map.put("laboratorio", (messageSource.getMessage("lbl.not.received", null, null)));
             }else{
                 //Search transferred assets
                 DaSolicitudEstudio estudio = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
