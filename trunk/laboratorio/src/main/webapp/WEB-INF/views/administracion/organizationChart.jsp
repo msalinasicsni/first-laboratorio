@@ -187,10 +187,9 @@
                     <div hidden="hidden" class="jarviswidget jarviswidget-color-darken" id="div3">
                         <header>
                             <span class="widget-icon"> <i class="fa fa-reorder"></i> </span>
+                            <h2 id="lab" ></h2>
                             <h2><i class="fa fa-angle-right"></i> </h2>
                             <h2 id="managementLab" ></h2>
-                            <h2><i class="fa fa-angle-right"></i> </h2>
-                            <h2 id="lab" ></h2>
                         </header>
                         <!-- widget div-->
                         <div>
@@ -239,12 +238,12 @@
                     <div hidden="hidden" class="jarviswidget jarviswidget-color-darken" id="div4">
                         <header>
                             <span class="widget-icon"> <i class="fa fa-reorder"></i> </span>
+
+                            <h2 id="labo" ></h2>
+                            <h2><i class="fa fa-angle-right"></i></h2>
+                            <h2 id="dir" ></h2>
                             <h2><i class="fa fa-angle-right"></i> </h2>
                             <h2 id="dep" ></h2>
-                            <h2><i class="fa fa-angle-right"></i> </h2>
-                            <h2 id="dir" ></h2>
-                            <h2><i class="fa fa-angle-right"></i></h2>
-                            <h2 id="labo" ></h2>
                         </header>
                         <!-- widget div-->
                         <div>
