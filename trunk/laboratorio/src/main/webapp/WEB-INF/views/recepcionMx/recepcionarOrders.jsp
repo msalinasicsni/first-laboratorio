@@ -25,14 +25,14 @@
 	<div id="main" data-role="main">
 		<!-- RIBBON -->
 		<div id="ribbon">
-			<span class="ribbon-button-alignment"> 
+			<span class="ribbon-button-alignment">
 				<span id="refresh" class="btn btn-ribbon" data-action="resetWidgets" data-placement="bottom" data-original-title="<i class='text-warning fa fa-warning'></i> <spring:message code="msg.reset" />" data-html="true">
 					<i class="fa fa-refresh"></i>
-				</span> 
+				</span>
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>"><spring:message code="menu.receipt.orders" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>"><spring:message code="lbl.check-in.samples.from.alerta" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -47,8 +47,8 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-eyedropper"></i>
-							<spring:message code="lbl.receipt.orders.title" />
-						<span> <i class="fa fa-angle-right"></i>  
+							<spring:message code="lbl.check-in.samples.from.alerta" />
+						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.receipt.orders" />
 						</span>
 					</h1>
@@ -474,7 +474,7 @@
             };
 			ReceiptOrders.init(parametros);
 	    	$("li.recepcion").addClass("open");
-	    	$("li.receipt").addClass("active");
+            $("li.receipt").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.receipt").parents("ul").slideDown(200);
 	    	}

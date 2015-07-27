@@ -86,7 +86,7 @@ public class WorkSheetController {
         mav.addObject("entidades",entidadesAdtvases);
         mav.addObject("tipoMuestra", tipoMxList);
         mav.addObject("area",areaList);
-        mav.setViewName("recepcionMx/searchWorkSheet");
+        mav.setViewName("reportes/searchWorkSheet");
 
         return mav;
     }
