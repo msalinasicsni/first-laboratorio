@@ -53,7 +53,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/request/init" htmlEscape="true "/>"><spring:message code="lbl.request.large" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/request/init" htmlEscape="true "/>"><spring:message code="lbl.dx.large" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../../fragments/layoutOptions.jsp" />
@@ -68,7 +68,7 @@
         <h1 class="page-title txt-color-blueDark">
             <!-- PAGE HEADER -->
             <i class="fa-fw fa fa-file-text-o"></i>
-            <spring:message code="lbl.admon.request"/>
+            <spring:message code="lbl.dx.large"/>
 						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.add.edit"/>
 						</span>
@@ -103,7 +103,7 @@
 
                     <p class="alert alert-info" >
 
-                        <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.request.large" /></button>
+                        <button type="submit" id="btnAdd" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.dxs.large" /></button>
                     </p>
 
                     <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>

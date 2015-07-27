@@ -439,7 +439,7 @@ var OrganizationChart = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
-                                $('#managment').val('').change();
+                                $('#management').val('').change();
                             }
                             unBlockUI();
                         },
