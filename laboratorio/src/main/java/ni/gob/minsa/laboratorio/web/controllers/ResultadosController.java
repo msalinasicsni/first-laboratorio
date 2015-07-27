@@ -488,7 +488,7 @@ public class ResultadosController {
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
                             //in positive case
-                            if (valor.getValor().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().toLowerCase().trim().equals("positivo")) {
                                 //save final Result
                                 guardarResultadoFinal(detalleResultado, orden, false);
                                 procesado=true;

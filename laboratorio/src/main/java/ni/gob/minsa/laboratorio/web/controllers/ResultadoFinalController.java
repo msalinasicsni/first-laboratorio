@@ -487,7 +487,10 @@ public class ResultadoFinalController {
             for(int i = 0; i< cantRespuestas;i++) {
                 String respuesta = jObjectRespuestas.get(String.valueOf(i)).toString();
                 JsonObject jsRespuestaObject = new Gson().fromJson(respuesta, JsonObject.class);
+
                 Integer idRespuesta = jsRespuestaObject.get("idRespuesta").getAsInt();
+                Integer idConcepto = jsRespuestaObject.get("idConcepto").getAsInt();
+
                 RespuestaSolicitud conceptoTmp =  respuestasSolicitudService.getRespuestaDxById(idRespuesta);
                 String valor = jsRespuestaObject.get("valor").getAsString();
                 DetalleResultadoFinal detResFinal = new DetalleResultadoFinal();
@@ -497,13 +500,24 @@ public class ResultadoFinalController {
                 detResFinal.setSolicitudDx(solicitud);
                 detResFinal.setSolicitudEstudio(estudio);
                 detResFinal.setUsuarioRegistro(usuario);
+                //validar respuesta solicitud
                 DetalleResultadoFinal resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuesta(idSolicitud,idRespuesta);
                 if (resFinalRegistrado!=null){
                     detResFinal.setIdDetalle(resFinalRegistrado.getIdDetalle());
                     resultadoFinalService.updateDetResFinal(detResFinal);
                 }else {
-                    if (detResFinal.getValor() != null && !detResFinal.getValor().isEmpty()) {
-                        resultadoFinalService.saveDetResFinal(detResFinal);
+                    //validar respuesta examen como respuesta solicitud
+                    resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuestaExa(idSolicitud,idRespuesta);
+                    if (resFinalRegistrado!=null){
+                        detResFinal.setIdDetalle(resFinalRegistrado.getIdDetalle());
+                        resultadoFinalService.updateDetResFinal(detResFinal);
+                    }else {
+                        //validar si hay respuesta examen con el concetpo a registrar
+                        if (resultadoFinalService.getDetResBySolicitudAndConceptoRespuestaExa(idSolicitud,idConcepto).size()<=0){
+                            if (detResFinal.getValor() != null && !detResFinal.getValor().isEmpty()) {
+                                resultadoFinalService.saveDetResFinal(detResFinal);
+                            }
+                        }
                     }
                 }
             }
