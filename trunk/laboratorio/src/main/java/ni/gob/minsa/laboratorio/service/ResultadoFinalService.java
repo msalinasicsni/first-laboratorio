@@ -559,13 +559,23 @@ public class ResultadoFinalService {
      * @return DetalleResultadoFinal
      */
     public DetalleResultadoFinal getDetResBySolicitudAndRespuesta(String idSolicitud, int idRespuesta){
+        DetalleResultadoFinal resultadoFinal;
         String query = "Select a from DetalleResultadoFinal as a inner join a.solicitudDx as ex inner join a.respuesta as re " +
                 "where ex.idSolicitudDx = :idSolicitud and re.idRespuesta = :idRespuesta and a.pasivo = false ";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idSolicitud", idSolicitud);
         q.setParameter("idRespuesta", idRespuesta);
-        return  (DetalleResultadoFinal)q.uniqueResult();
+        resultadoFinal = (DetalleResultadoFinal)q.uniqueResult();
+        if (resultadoFinal==null) {
+            String query2 = "Select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as ex inner join a.respuesta as re " +
+                    "where ex.idSolicitudEstudio = :idSolicitud and re.idRespuesta = :idRespuesta and a.pasivo = false ";
+            Query q2 = session.createQuery(query2);
+            q2.setParameter("idSolicitud", idSolicitud);
+            q2.setParameter("idRespuesta", idRespuesta);
+            resultadoFinal = (DetalleResultadoFinal)q2.uniqueResult();
+        }
+        return  resultadoFinal;
     }
 
     /**
@@ -590,6 +600,32 @@ public class ResultadoFinalService {
             q2.setParameter("idSolicitud", idSolicitud);
             q2.setParameter("idRespuesta", idRespuesta);
             resultadoFinal = (DetalleResultadoFinal)q2.uniqueResult();
+        }
+        return  resultadoFinal;
+    }
+
+    /**
+     * Verifica si existe registrado un resultado para la respuesta y dx indicado, siempre y cuando el registro este activo
+     * @param idSolicitud solicitud a verificar
+     * @param idConcepto concepto a verificar
+     * @return DetalleResultadoFinal
+     */
+    public List<DetalleResultadoFinal> getDetResBySolicitudAndConceptoRespuestaExa(String idSolicitud, int idConcepto){
+        List<DetalleResultadoFinal> resultadoFinal;
+        Session session = sessionFactory.getCurrentSession();
+        String query = "Select a from DetalleResultadoFinal as a inner join a.solicitudDx as ex inner join a.respuestaExamen as re " +
+                "where ex.idSolicitudDx = :idSolicitud and re.concepto.idConcepto = :idConcepto and a.pasivo = false ";
+        Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
+        q.setParameter("idConcepto", idConcepto);
+        resultadoFinal = q.list();
+        if (resultadoFinal==null) {
+            String query2 = "Select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as ex inner join a.respuestaExamen as re " +
+                    "where ex.idSolicitudEstudio = :idSolicitud and re.concepto.idConcepto = :idConcepto and a.pasivo = false ";
+            Query q2 = session.createQuery(query2);
+            q2.setParameter("idSolicitud", idSolicitud);
+            q2.setParameter("idConcepto", idConcepto);
+            resultadoFinal = q2.list();
         }
         return  resultadoFinal;
     }

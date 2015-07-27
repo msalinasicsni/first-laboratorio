@@ -203,20 +203,26 @@ var enterFinalResult = function(){
                                     '</section>';
                                 //se busca si existe valor registrado para la respuesta
                                 var valor = '';
+                                var deshabilitar = '';
+                                var esRespuestaExamen = false;
                                 if (lenDetRes > 0) {
                                     for (var j = 0; j < lenDetRes; j++) {
-                                        console.log(detaResultados[j]);
-                                        console.log(dataToLoad[i]);
+                                        //console.log(detaResultados[j]);
+                                        //console.log(dataToLoad[i]);
                                         var respExistente;
-                                        if (detaResultados[j].respuesta != null)
+                                        if (detaResultados[j].respuesta != null) {
                                             respExistente = detaResultados[j].respuesta;
+                                        }
                                         else {
                                             respExistente = detaResultados[j].respuestaExamen;
+                                            esRespuestaExamen = true;
                                         }
                                         if (respExistente.concepto.idConcepto == dataToLoad[i].concepto.idConcepto) {
 
                                             valor = detaResultados[j].valor;
-                                            console.log('se encontró valor: ' + valor);
+                                            //console.log('se encontró valor: ' + valor);
+                                            if (esRespuestaExamen)
+                                                deshabilitar = 'disabled';
                                             break;
                                         }
                                     }
@@ -231,12 +237,12 @@ var enterFinalResult = function(){
                                             '</label>'+
                                             '<label class="checkbox">';
                                         if(lenDetRes <= 0) {
-                                            contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '">';
+                                            contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" '+deshabilitar+'>';
                                         }else{
                                             if (valor=='true'){
-                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" checked>';
+                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" checked '+deshabilitar+'>';
                                             }else{
-                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '">';
+                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" '+deshabilitar+'>';
                                             }
                                         }
                                         contenidoControl = contenidoControl + '<i></i>'+
@@ -259,10 +265,10 @@ var enterFinalResult = function(){
 
                                         //si la respuesta es requerida
                                         if (dataToLoad[i].requerido) {
-                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="requiredConcept" style="width: 100%;">';
+                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="requiredConcept" style="width: 100%;" '+deshabilitar+'>';
                                         }
                                         else{
-                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="" style="width: 100%;">';
+                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="" style="width: 100%;" '+deshabilitar+'>';
                                         }
                                         contenidoControl = contenidoControl + '<option value="">...</option>';
                                         for (var ii = 0; ii < lenListas; ii++) {
@@ -292,9 +298,9 @@ var enterFinalResult = function(){
                                             '<div class="">'+
                                             '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>';
                                         if (dataToLoad[i].requerido){
-                                            contenidoControl = contenidoControl + '<input class="form-control requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                            contenidoControl = contenidoControl + '<input class="form-control requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" '+deshabilitar+'>';
                                         }else{
-                                            contenidoControl = contenidoControl + '<input class="form-control" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                            contenidoControl = contenidoControl + '<input class="form-control" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" '+deshabilitar+'>';
                                         }
 
                                         contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
@@ -314,9 +320,9 @@ var enterFinalResult = function(){
                                             '<div class="">'+
                                             '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>';
                                         if (dataToLoad[i].requerido){
-                                            contenidoControl = contenidoControl + '<input class="form-control decimal requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                            contenidoControl = contenidoControl + '<input class="form-control decimal requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" '+deshabilitar+'>';
                                         }else{
-                                            contenidoControl = contenidoControl + '<input class="form-control decimal" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'">';
+                                            contenidoControl = contenidoControl + '<input class="form-control decimal" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" '+deshabilitar+'>';
                                         }
 
                                         contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
@@ -379,6 +385,7 @@ var enterFinalResult = function(){
                         for (var i = 0; i < len; i++) {
                             var idControlRespuesta;
                             var valorControlRespuesta;
+                            var idConcepto = dataToLoad[i].concepto.idConcepto;
                             switch (dataToLoad[i].concepto.tipo.codigo) {
                                 case 'TPDATO|LOG':
                                     idControlRespuesta = dataToLoad[i].idRespuesta;
@@ -403,6 +410,7 @@ var enterFinalResult = function(){
                             var objConcepto = {};
                             objConcepto["idRespuesta"] = idControlRespuesta;
                             objConcepto["valor"]=valorControlRespuesta;
+                            objConcepto["idConcepto"] = idConcepto;
                             console.log(objConcepto);
                             objDetalle[i] = objConcepto;
                             cantRespuestas ++;
