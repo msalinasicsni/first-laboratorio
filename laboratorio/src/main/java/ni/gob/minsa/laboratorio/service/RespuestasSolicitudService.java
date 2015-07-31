@@ -2,7 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
-import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import org.hibernate.Query;
 import org.hibernate.Session;

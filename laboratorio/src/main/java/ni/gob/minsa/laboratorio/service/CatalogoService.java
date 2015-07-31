@@ -6,7 +6,7 @@ import ni.gob.minsa.laboratorio.domain.irag.*;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.persona.*;
-import ni.gob.minsa.laboratorio.domain.resultados.TipoDatoCatalogo;
+import ni.gob.minsa.laboratorio.domain.concepto.TipoDatoCatalogo;
 import ni.gob.minsa.laboratorio.domain.vih.*;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.Animales;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.EnfAgudas;

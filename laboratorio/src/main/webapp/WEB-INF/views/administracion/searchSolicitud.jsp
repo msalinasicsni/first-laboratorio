@@ -39,7 +39,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>"><spring:message code="menu.admin.request.aswers" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>"><spring:message code="menu.admin.request.concepts" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -54,7 +54,7 @@
             <h1 class="page-title txt-color-blueDark">
                 <!-- PAGE HEADER -->
                 <i class="fa-fw fa fa-list-alt"></i>
-                <spring:message code="menu.admin.request.aswers" />
+                <spring:message code="menu.admin.request.concepts" />
 						<span> <i class="fa fa-angle-right"></i>
 							<spring:message code="lbl.diagnostic.search" />
 						</span>
@@ -157,6 +157,7 @@
                                     <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.desc.request"/></th>
                                     <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.pcr.area"/></th>
                                     <th><spring:message code="lbl.response.title"/></th>
+                                    <th><spring:message code="lbl.data"/></th>
                                 </tr>
                                 </thead>
                             </table>
@@ -225,16 +226,17 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="sCreateConceptUrl" value="/administracion/respuestasSolicitud/create/"/>
+<c:url var="sDataConcepstUrl" value="/administracion/datosSolicitud/create/"/>
 <c:url var="searchDxUrl" value="/administracion/respuestasSolicitud/getDx"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
         var parametros = {blockMess: "${blockMess}",
             sActionUrl : "${sCreateConceptUrl}",
+            sDataConcepstUrl : "${sDataConcepstUrl}",
             searchDxUrl : "${searchDxUrl}"
-
-
         };
+
         DxAnswers.init(parametros);
 
         $("li.administracion").addClass("open");

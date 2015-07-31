@@ -244,10 +244,10 @@
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
                                                             <c:choose>
                                                                 <c:when test="${not empty ordenExamen.solicitudDx}">
-                                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${ordenExamen.solicitudDx.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />">
+                                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${ordenExamen.solicitudDx.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${ordenExamen.solicitudEstudio.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />">
+                                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${ordenExamen.solicitudEstudio.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                                                 </c:otherwise>
                                                             </c:choose>
                                                                    placeholder=" <spring:message code="lbl.sampling.datetime" />">

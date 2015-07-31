@@ -297,7 +297,7 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="searchUrl" value="/resultadoFinal/searchExams"/>
-<c:url var="listasUrl" value="/resultadoFinal/getCatalogosListaConcepto"/>}
+<c:url var="listasUrl" value="/resultadoFinal/getCatalogosListaConcepto"/>
 <c:url var="detResultadosUrl" value="/resultadoFinal/getDetResFinalBySolicitud"/>
 <c:url var="conceptosUrl" value="/administracion/respuestasSolicitud/getRespuestasActivas"/>
 <c:url var="saveFinalResult" value="/resultadoFinal/saveFinalResult"/>

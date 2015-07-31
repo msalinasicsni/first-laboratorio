@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.resultados;
 
+import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;

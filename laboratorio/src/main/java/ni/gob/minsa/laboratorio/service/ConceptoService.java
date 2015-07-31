@@ -1,7 +1,7 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.Concepto;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;

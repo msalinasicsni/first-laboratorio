@@ -84,7 +84,6 @@ var SearchNotices = function () {
 				    setTimeout($.unblockUI, 5); 
 				});
             }
-
         }
     };
 

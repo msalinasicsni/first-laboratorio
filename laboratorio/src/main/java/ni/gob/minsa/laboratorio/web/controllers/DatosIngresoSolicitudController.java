@@ -2,13 +2,14 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
+import ni.gob.minsa.laboratorio.domain.muestra.DatoSolicitud;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
-import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -38,15 +39,15 @@ import java.util.Map;
  * Created by souyen-ics.
  */
 @Controller
-@RequestMapping("administracion/respuestasSolicitud")
-public class RespuestasSolicitudController {
+@RequestMapping("administracion/datosSolicitud")
+public class DatosIngresoSolicitudController {
 
-    private static final Logger logger = LoggerFactory.getLogger(RespuestasSolicitudController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DatosIngresoSolicitudController.class);
     @Resource(name = "seguridadService")
     private SeguridadService seguridadService;
 
-    @Resource(name = "usuarioService")
-    private UsuarioService usuarioService;
+    @Resource(name = "datosSolicitudService")
+    private DatosSolicitudService datosSolicitudService;
 
     @Resource(name = "respuestasSolicitudService")
     private RespuestasSolicitudService respuestasSolicitudService;
@@ -84,7 +85,7 @@ public class RespuestasSolicitudController {
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
             mav.addObject("notificaciones", notificacionList);
-            mav.addObject("isAnswer",true);
+            mav.addObject("isAnswer",false);
             mav.setViewName("administracion/searchSolicitud");
         }else
             mav.setViewName(urlValidacion);
@@ -204,40 +205,31 @@ public class RespuestasSolicitudController {
             mav.addObject("estudio", estudio);
             mav.addObject("conceptsList",conceptsList);
             mav.addObject("codigoDatoNumerico",parametro.getValor());
-            mav.setViewName("administracion/enterAnswersRequest");
+            mav.setViewName("administracion/conceptsRequest");
         }else
             mav.setViewName(urlValidacion);
 
         return mav;
     }
 
-    @RequestMapping(value = "getRespuestasSolicitud", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getDatosIngresoSolicitud", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<RespuestaSolicitud> getRespuestasSolicitud(@RequestParam(value = "idDx", required = false) String idDx, @RequestParam(value = "idEstudio", required = false) String idEstudio ) throws Exception {
-        logger.info("Obteniendo las respuestas de un diagnostico o estudio en json en JSON");
-        List<RespuestaSolicitud> respuestas = null;
-
-        if(!idDx.equals("") || !idEstudio.equals(""))
-            if(!idDx.equals("")){
-            respuestas = respuestasSolicitudService.getRespuestasByDx(Integer.valueOf(idDx));
-            }else{
-            respuestas = respuestasSolicitudService.getRespuestasByEstudio(Integer.valueOf(idEstudio));
-            }
-
-        return respuestas;
+    List<DatoSolicitud> getRespuestasSolicitud(@RequestParam(value = "idSolicitud", required = false) Integer idSolicitud) throws Exception {
+        logger.info("Obteniendo los datos de ingreso de información en recepción de dx  en JSON");
+        return datosSolicitudService.getDatosRecepcionDxByIdSolicitud(idSolicitud);
     }
 
-    @RequestMapping(value = "getRespuestaDxById", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getDatoSolicitudById", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    RespuestaSolicitud getRespuestaById(@RequestParam(value = "idRespuesta", required = true) Integer idRespuesta) throws Exception {
-        logger.info("Obteniendo respuesta dx en JSON");
-        return respuestasSolicitudService.getRespuestaDxById(idRespuesta);
+    DatoSolicitud getDatoSolicitudById(@RequestParam(value = "idConceptoSol", required = true) Integer idConceptoSol) throws Exception {
+        logger.info("Obteniendo datos de recepción solicitud en JSON");
+        return datosSolicitudService.getDatoRecepcionSolicitudById(idConceptoSol);
     }
 
-    @RequestMapping(value = "agregarActualizarRespuesta", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    protected void agregarActualizarRespuesta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @RequestMapping(value = "agregarActualizarDato", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void agregarActualizarDato(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json;
         String resultado = "";
         String strRespuesta="";
@@ -247,11 +239,10 @@ public class RespuestasSolicitudController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             strRespuesta = jsonpObject.get("respuesta").toString();
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
-            RespuestaSolicitud respuesta = jsonToRespuesta(strRespuesta);
-            respuesta.setUsuarioRegistro(usuario);
-            respuestasSolicitudService.saveOrUpdateResponse(respuesta);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+            DatoSolicitud datoSolicitud = jsonToDatoRecepcionSolicitud(strRespuesta);
+            datoSolicitud.setUsuarioRegistro(usuario);
+            datosSolicitudService.saveOrUpdateDatoRecepcion(datoSolicitud);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -270,42 +261,40 @@ public class RespuestasSolicitudController {
     }
 
 
-    private RespuestaSolicitud jsonToRespuesta(String jsonRespuesta) throws Exception {
-        RespuestaSolicitud respuestaDx = new RespuestaSolicitud();
+    private DatoSolicitud jsonToDatoRecepcionSolicitud(String jsonRespuesta) throws Exception {
+        DatoSolicitud datoSolicitud = new DatoSolicitud();
         JsonObject jsonpObject = new Gson().fromJson(jsonRespuesta, JsonObject.class);
         //si hay idConcepto se obtiene registro para actualizar, luego si vienen los demas datos se actualizan
-        if (jsonpObject.get("idRespuesta")!=null && !jsonpObject.get("idRespuesta").getAsString().isEmpty()) {
-            respuestaDx = respuestasSolicitudService.getRespuestaDxById(jsonpObject.get("idRespuesta").getAsInt());
+        if (jsonpObject.get("idDato")!=null && !jsonpObject.get("idDato").getAsString().isEmpty()) {
+            datoSolicitud = datosSolicitudService.getDatoRecepcionSolicitudById(jsonpObject.get("idDato").getAsInt());
         }
-        if (jsonpObject.get("idDx")!=null && !jsonpObject.get("idDx").getAsString().isEmpty()) {
-            Catalogo_Dx dx = tomaMxService.getDxsById(jsonpObject.get("idDx").getAsInt());
-            respuestaDx.setDiagnostico(dx);
+        if (jsonpObject.get("idSolicitud")!=null && !jsonpObject.get("idSolicitud").getAsString().isEmpty()) {
+            Catalogo_Dx dx = tomaMxService.getDxsById(jsonpObject.get("idSolicitud").getAsInt());
+            datoSolicitud.setDiagnostico(dx);
         }
-        if (jsonpObject.get("idEstudio")!=null && !jsonpObject.get("idEstudio").getAsString().isEmpty()) {
-            Catalogo_Estudio estudio = tomaMxService.getEstudioById(jsonpObject.get("idEstudio").getAsInt());
-            respuestaDx.setEstudio(estudio);
-        }
+
         if (jsonpObject.get("nombre")!=null && !jsonpObject.get("nombre").getAsString().isEmpty())
-            respuestaDx.setNombre(jsonpObject.get("nombre").getAsString());
+            datoSolicitud.setNombre(jsonpObject.get("nombre").getAsString());
         if (jsonpObject.get("concepto")!=null && !jsonpObject.get("concepto").getAsString().isEmpty()) {
             Concepto concepto = conceptoService.getConceptById(jsonpObject.get("concepto").getAsInt());
-            respuestaDx.setConcepto(concepto);
+            datoSolicitud.setConcepto(concepto);
         }
         if (jsonpObject.get("orden")!=null && !jsonpObject.get("orden").getAsString().isEmpty())
-            respuestaDx.setOrden(jsonpObject.get("orden").getAsInt());
+            datoSolicitud.setOrden(jsonpObject.get("orden").getAsInt());
         if (jsonpObject.get("requerido")!=null && !jsonpObject.get("requerido").getAsString().isEmpty())
-            respuestaDx.setRequerido(jsonpObject.get("requerido").getAsBoolean());
+            datoSolicitud.setRequerido(jsonpObject.get("requerido").getAsBoolean());
         if (jsonpObject.get("pasivo")!=null && !jsonpObject.get("pasivo").getAsString().isEmpty())
-            respuestaDx.setPasivo(jsonpObject.get("pasivo").getAsBoolean());
-        if (jsonpObject.get("minimo")!=null && !jsonpObject.get("minimo").getAsString().isEmpty())
-            respuestaDx.setMinimo(jsonpObject.get("minimo").getAsInt());
+            datoSolicitud.setPasivo(jsonpObject.get("pasivo").getAsBoolean());
+        /*if (jsonpObject.get("minimo")!=null && !jsonpObject.get("minimo").getAsString().isEmpty())
+            conceptoSolicitud.setMinimo(jsonpObject.get("minimo").getAsInt());
         if (jsonpObject.get("maximo")!=null && !jsonpObject.get("maximo").getAsString().isEmpty())
-            respuestaDx.setMaximo(jsonpObject.get("maximo").getAsInt());
-        if (jsonpObject.get("descRespuesta")!=null && !jsonpObject.get("descRespuesta").getAsString().isEmpty())
-            respuestaDx.setDescripcion(jsonpObject.get("descRespuesta").getAsString());
+            conceptoSolicitud.setMaximo(jsonpObject.get("maximo").getAsInt());
+            */
+        if (jsonpObject.get("descripcion")!=null && !jsonpObject.get("descripcion").getAsString().isEmpty())
+            datoSolicitud.setDescripcion(jsonpObject.get("descripcion").getAsString());
 
-        respuestaDx.setFechahRegistro(new Timestamp(new Date().getTime()));
-        return  respuestaDx;
+        datoSolicitud.setFechahRegistro(new Timestamp(new Date().getTime()));
+        return datoSolicitud;
     }
 
     @RequestMapping(value = "getTipoDato", method = RequestMethod.GET, produces = "application/json")
@@ -316,22 +305,24 @@ public class RespuestasSolicitudController {
     }
 
 
-    @RequestMapping(value = "getRespuestasActivas", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getDatosRecepcionActivosDx", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<RespuestaSolicitud> getRespuestasActivas(@RequestParam(value = "idDx", required = false) String idDx, @RequestParam(value = "idEstudio", required = false) String idEstudio) throws Exception {
-        logger.info("Obteniendo las respuestas activas de dx o estudio en JSON");
-        List<RespuestaSolicitud> respuestasActivas = null;
-
-        if(!idDx.equals("") || !idEstudio.equals("")){
-            if(idEstudio.equals("")){
-                respuestasActivas = respuestasSolicitudService.getRespuestasActivasByDx(Integer.valueOf(idDx));
-            }else{
-                respuestasActivas = respuestasSolicitudService.getRespuestasActivasByEstudio(Integer.valueOf(idEstudio));
-            }
-        }
-
-       return  respuestasActivas;
-
+    List<DatoSolicitud> getDatosRecepcionActivosDx(@RequestParam(value = "idSolicitud", required = true) Integer idSolicitud) throws Exception {
+        logger.info("Obteniendo los datos de ingreso de información en recepción activos de dx  en JSON");
+        return datosSolicitudService.getDatosRecepcionActivosDxByIdSolicitud(idSolicitud);
     }
 
+    @RequestMapping(value = "getDatosRecepcionActivos", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<DatoSolicitud> getDatosRecepcionActivos(@RequestParam(value = "solicitudes", required = true) String solicitudes) throws Exception {
+        logger.info("Obteniendo los datos de ingreso de información en recepción activos de los dx  en JSON");
+        List<DatoSolicitud> datoSolicituds = datosSolicitudService.getDatosRecepcionActivosDxByIdSolicitudes(solicitudes);
+        return datoSolicituds;
+    }
+
+    @RequestMapping(value = "getCatalogosListaConcepto", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<Catalogo_Lista> getCatalogoListaConcepto(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
+        logger.info("Obteniendo los valores para los conceptos tipo lista asociados a las respuesta del estudio o dx");
+        return datosSolicitudService.getCatalogoListaConceptoByIdDx(Integer.valueOf(idDx));    }
 }

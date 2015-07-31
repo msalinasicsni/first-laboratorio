@@ -244,10 +244,10 @@
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
                                         <c:choose>
                                         <c:when test="${not empty solicitudDx}">
-                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${solicitudDx.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />">
+                                            <input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${solicitudDx.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                         </c:when>
                                         <c:otherwise>
-                                        	<input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${solicitudEstudio.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />">
+                                        	<input class="form-control" type="text" disabled id="fechaHoraTomaMx" name="fechaHoraTomaMx" value="<fmt:formatDate value="${solicitudEstudio.idTomaMx.fechaHTomaMx}" pattern="dd/MM/yyyy hh:mm:ss a" />"
                                         </c:otherwise>
                                         </c:choose>
                                                placeholder=" <spring:message code="lbl.sampling.datetime" />">
@@ -307,12 +307,13 @@
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
                                         <c:choose>
                                             <c:when test="${not empty solicitudDx}">
-                                                <input class="form-control" type="text" disabled id="fechaHoraDx" name="fechaHoraDx" value="<fmt:formatDate value="${solicitudDx.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" />"
-                                                       placeholder=" <spring:message code="lbl.dx.solic.datetime" />">
+                                                <input class="form-control" type="text" disabled id="fechaHoraDx" name="fechaHoraDx"
+                                                       value="<fmt:formatDate value="${solicitudDx.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" />"
+                                                       placeholder="<spring:message code="lbl.dx.solic.datetime" />"/>
                                             </c:when>
                                             <c:otherwise>
                                                 <input class="form-control" type="text" disabled id="fechaHoraDx" name="fechaHoraDx" value="<fmt:formatDate value="${solicitudEstudio.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" />"
-                                                       placeholder=" <spring:message code="lbl.dx.solic.datetime" />">
+                                                       placeholder="<spring:message code="lbl.dx.solic.datetime" />"/>
                                             </c:otherwise>
                                         </c:choose>
                                         <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.dx.solic.datetime"/>
