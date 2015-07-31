@@ -123,7 +123,7 @@
                         <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
                         <form id="dataDx-form" class="smart-form" autocomplete="off">
                             <fieldset>
-                                <div hidden="hidden" id="dRutina" class="row">
+                                <div class="row">
                                     <section class="col col-sm-6 col-md-6 col-lg-8">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.desc.request"/>
@@ -131,7 +131,15 @@
                                         <div>
                                             <label class="input">
                                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                <input class="form-control" type="text" disabled id="nombreDx" name="nombreDx" value="${dx.nombre}" placeholder=" <spring:message code="lbl.desc.request" />">
+                                                <c:choose>
+                                                    <c:when test="${not empty estudio}">
+                                                        <input class="form-control" type="text" disabled id="nombreEstudio" name="nombreEstudio" value="${estudio.nombre}" placeholder=" <spring:message code="lbl.desc.request" />">
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input class="form-control" type="text" disabled id="nombreDx" name="nombreDx" value="${dx.nombre}" placeholder=" <spring:message code="lbl.desc.request" />">
+                                                    </c:otherwise>
+                                                </c:choose>
+
                                             </label>
                                         </div>
                                     </section>
@@ -143,33 +151,15 @@
                                         <div>
                                             <label class="input">
                                                 <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                <input class="form-control" type="text" disabled name="nombreArea" id="nombreArea" value="${dx.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />"/>
-                                            </label>
-                                        </div>
-                                    </section>
-                                </div>
+                                                <c:choose>
+                                                    <c:when test="${not empty estudio}">
+                                                        <input class="form-control" type="text" disabled name="nombreAreaE" id="nombreAreaE" value="${estudio.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input class="form-control" type="text" disabled name="nombreArea" id="nombreArea" value="${dx.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />"/>
+                                                    </c:otherwise>
+                                                </c:choose>
 
-                                <div hidden="hidden" id="dEstudio" class="row">
-                                    <section class="col col-sm-6 col-md-6 col-lg-8">
-                                        <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.desc.request"/>
-                                        </label>
-                                        <div>
-                                            <label class="input">
-                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                <input class="form-control" type="text" disabled id="nombreEstudio" name="nombreEstudio" value="${estudio.nombre}" placeholder=" <spring:message code="lbl.desc.request" />">
-                                            </label>
-                                        </div>
-                                    </section>
-
-                                    <section class="col col-sm-6 col-md-6 col-lg-4">
-                                        <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.receipt.pcr.area"/>
-                                        </label>
-                                        <div>
-                                            <label class="input">
-                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                <input class="form-control" type="text" disabled name="nombreAreaE" id="nombreAreaE" value="${estudio.area.nombre}" placeholder=" <spring:message code="lbl.receipt.pcr.area" />"/>
                                             </label>
                                         </div>
                                     </section>
@@ -179,10 +169,17 @@
                                 <button type="button" id="btnAddConcept" class="btn btn-primary styleButton" data-toggle="modal"
                                         data-target="myModal">
                                     <i class="fa fa-plus icon-white"></i>
-                                    <spring:message code="act.add.response"/>
+                                    <spring:message code="act.add.data"/>
                                 </button>
-                                <input id="idDx" type="hidden" value="${dx.idDiagnostico}"/>
-                                <input id="idEstudio" type="hidden" value="${estudio.idEstudio}"/>
+                                <c:choose>
+                                    <c:when test="${not empty estudio}">
+                                        <input id="idSolicitud" type="hidden" value="${estudio.idEstudio}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <input id="idSolicitud" type="hidden" value="${dx.idDiagnostico}"/>
+                                    </c:otherwise>
+                                </c:choose>
+
                             </footer>
                         </form>
                     </div>
@@ -215,8 +212,6 @@
                                 <th data-hide="phone"><spring:message code="lbl.response.order"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.response.required"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.response.pasive"/></th>
-                                <th data-hide="phone"><spring:message code="lbl.response.minvalue"/></th>
-                                <th data-hide="phone"><spring:message code="lbl.response.maxvalue"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.response.description"/></th>
                                 <th><spring:message code="act.edit"/></th>
                                 <th><spring:message code="act.override"/></th>
@@ -247,16 +242,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <!--<h4 class="modal-title">
-                    <spring:message code="lbl.response.header.modal.add" />
-                </h4>-->
                 <div class="alert alert-info">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                         &times;
                     </button>
                     <h4 class="modal-title">
                         <i class="fa-fw fa fa-list-alt"></i>
-                        <spring:message code="lbl.response.header.modal.add" />
+                        <spring:message code="lbl.data.header.modal" />
                     </h4>
                 </div>
             </div>
@@ -264,8 +256,8 @@
                 <form id="respuesta-form" class="smart-form" novalidate="novalidate">
                     <fieldset>
                         <div class="row">
-                            <input id="idRespuestaEdit" type="hidden" value=""/>
-                            <input id="codigoDatoNumerico" type="hidden" value="${codigoDatoNumerico}"/>
+                            <input id="idDatoEdit" type="hidden" value=""/>
+                            <!--<input id="codigoDatoNumerico" type="hidden" value="${codigoDatoNumerico}"/>-->
                             <section class="col col-sm-12 col-md-6 col-lg-6">
                                 <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.name"/>
@@ -273,7 +265,7 @@
                                 <div class="">
                                     <label class="input">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                        <input class="form-control" type="text" name="nombreRespuesta" id="nombreRespuesta"
+                                        <input class="form-control" type="text" name="nombreDato" id="nombreDato"
                                                placeholder=" <spring:message code="lbl.response.name" />"/>
                                         <b class="tooltip tooltip-bottom-right"> <i
                                                 class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.name"/>
@@ -306,7 +298,7 @@
                                 <div class="">
                                     <label class="input">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>
-                                        <input class="form-control entero" type="text" name="ordenRespuesta" id="ordenRespuesta"
+                                        <input class="form-control entero" type="text" name="ordenDato" id="ordenDato"
                                                placeholder=" <spring:message code="lbl.response.order" />"/>
                                         <b class="tooltip tooltip-bottom-right"> <i
                                                 class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.order"/>
@@ -324,16 +316,13 @@
                             </section>
                             <section class="col col-sm-4 col-md-3 col-lg-3">
                                 <label class="text-left txt-color-blue font-md"><spring:message code="lbl.response.pasive"/></label>
-                                <div class="row">
-                                    <div class="col col-4">
                                         <label class="checkbox">
                                             <input type="checkbox" name="checkbox-pasive" id="checkbox-pasive">
                                             <i></i></label>
-                                    </div>
-                                </div>
+
                             </section>
                         </div>
-                        <div class="row" id="divNumerico">
+                        <!--<div class="row" id="divNumerico">
                             <section class="col col-sm-6 col-md-3 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.response.minvalue"/>
@@ -364,7 +353,7 @@
                                     </label>
                                 </div>
                             </section>
-                        </div>
+                        </div>-->
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12">
                                 <label class="text-left txt-color-blue font-md">
@@ -373,7 +362,7 @@
                                 <div class="">
                                     <label class="textarea">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                        <textarea class="form-control" rows="3" name="descRespuesta" id="descRespuesta"
+                                        <textarea class="form-control" rows="3" name="descDato" id="descDato"
                                                   placeholder="<spring:message code="lbl.response.description" />"></textarea>
                                         <b class="tooltip tooltip-bottom-right"> <i
                                                 class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.response.description"/>
@@ -384,7 +373,7 @@
                         </div>
                     </fieldset>
                     <footer>
-                        <button type="submit" class="btn btn-success" id="btnAgregarRespuesta">
+                        <button type="submit" class="btn btn-success" id="btnAgregarDato">
                             <i class="fa fa-save"></i>  <spring:message code="act.save" />
                         </button>
                         <button type="button" class="btn btn-danger" data-dismiss="modal">
@@ -436,28 +425,28 @@
 <script src="${jqueryInputMask}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/administracion/requestAnswers.js" var="dxAnswers" />
-<script src="${dxAnswers}"></script>
+<spring:url value="/resources/scripts/administracion/requestData.js" var="dataJs" />
+<script src="${dataJs}"></script>
 <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <spring:url value="/personas/search" var="sPersonUrl"/>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="sRespuestasUrl" value="/administracion/respuestasSolicitud/getRespuestasSolicitud"/>
-<c:url var="sRespuestaUrl" value="/administracion/respuestasSolicitud/getRespuestaDxById"/>
-<c:url var="actionUrl" value="/administracion/respuestasSolicitud/agregarActualizarRespuesta"/>
-<c:url var="sTipoDatoUrl" value="/administracion/respuestasSolicitud/getTipoDato"/>
+<c:url var="sDatosUrl" value="/administracion/datosSolicitud/getDatosIngresoSolicitud"/>
+<c:url var="sDatoUrl" value="/administracion/datosSolicitud/getDatoSolicitudById"/>
+<c:url var="actionUrl" value="/administracion/datosSolicitud/agregarActualizarDato"/>
+<c:url var="sTipoDatoUrl" value="/administracion/datosSolicitud/getTipoDato"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
         var parametros = {blockMess: "${blockMess}",
-            sRespuestasUrl : "${sRespuestasUrl}",
-            sRespuestaUrl : "${sRespuestaUrl}",
+            sDatosUrl : "${sDatosUrl}",
+            sDatoUrl : "${sDatoUrl}",
             actionUrl : "${actionUrl}",
             sFormConcept : "SI",
             sTipoDatoUrl : "${sTipoDatoUrl}"
         };
-        DxAnswers.init(parametros);
+        RequestData.init(parametros);
         $("#divNumerico").hide();
         $("li.administracion").addClass("open");
         $("li.respuestaSolicitud").addClass("active");

@@ -1,8 +1,10 @@
-package ni.gob.minsa.laboratorio.domain.resultados;
+package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
-import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
+import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -15,31 +17,29 @@ import java.sql.Timestamp;
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "respuesta_examen", schema = "laboratorio")
-public class RespuestaExamen implements Serializable {
+@Table(name = "dato_solicitud", schema = "laboratorio")
+public class DatoSolicitud implements Serializable{
 
-    Integer idRespuesta;
+    Integer idConceptoSol;
     String nombre;
-    CatalogoExamenes idExamen;
+    Catalogo_Dx diagnostico;
     Concepto concepto;
     Integer orden;
     boolean requerido;
     boolean pasivo;
-    Integer minimo;
-    Integer maximo;
-    Usuarios usuarioRegistro;
+    User usuarioRegistro;
     Timestamp fechahRegistro;
     String descripcion;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
-    @Column(name = "ID_RESPUESTA", nullable = false, insertable = true, updatable = false)
-    public Integer getIdRespuesta() {
-        return idRespuesta;
+    @Column(name = "ID_CONCEPTO_SOL", nullable = false, insertable = true, updatable = false)
+    public Integer getIdConceptoSol() {
+        return idConceptoSol;
     }
 
-    public void setIdRespuesta(Integer idRespuesta) {
-        this.idRespuesta = idRespuesta;
+    public void setIdConceptoSol(Integer idConceptoSol) {
+        this.idConceptoSol = idConceptoSol;
     }
 
     @Basic
@@ -52,17 +52,14 @@ public class RespuestaExamen implements Serializable {
         this.nombre = nombre;
     }
 
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "ID_EXAMEN", referencedColumnName = "ID_EXAMEN", nullable = false)
-    @ForeignKey(name = "ID_EXAMEN_FK")
-    public CatalogoExamenes getIdExamen() {
-        return idExamen;
-    }
 
-    public void setIdExamen(CatalogoExamenes idExamen) {
-        this.idExamen = idExamen;
-    }
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "DIAGNOSTICO", referencedColumnName = "ID_DIAGNOSTICO", nullable = true)
+    @ForeignKey(name = "CONCEPTO_DX_FK")
+    public Catalogo_Dx getDiagnostico() { return diagnostico; }
+
+    public void setDiagnostico(Catalogo_Dx diagnostico) { this.diagnostico = diagnostico; }
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = false)
@@ -106,34 +103,14 @@ public class RespuestaExamen implements Serializable {
         this.pasivo = pasivo;
     }
 
-    @Basic
-    @Column(name = "MINIMO", nullable = true, insertable = true)
-    public Integer getMinimo() {
-        return minimo;
-    }
-
-    public void setMinimo(Integer minimo) {
-        this.minimo = minimo;
-    }
-
-    @Basic
-    @Column(name = "MAXIMO", nullable = true, insertable = true)
-    public Integer getMaximo() {
-        return maximo;
-    }
-
-    public void setMaximo(Integer maximo) {
-        this.maximo = maximo;
-    }
-
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_REG_FK")
-    public Usuarios getUsuarioRegistro() {
+    public User getUsuarioRegistro() {
         return usuarioRegistro;
     }
 
-    public void setUsuarioRegistro(Usuarios usuarioRegistro) {
+    public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
     }
 

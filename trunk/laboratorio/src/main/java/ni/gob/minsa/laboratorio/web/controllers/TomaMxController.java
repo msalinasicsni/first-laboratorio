@@ -6,6 +6,8 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
@@ -69,6 +71,9 @@ public class TomaMxController {
     @Resource(name = "parametrosService")
     private ParametrosService parametrosService;
 
+    @Resource(name = "datosSolicitudService")
+    private DatosSolicitudService datosSolicitudService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -103,11 +108,47 @@ public class TomaMxController {
     @RequestMapping("noticesrut/{idPerson}")
     public ModelAndView showNoticesRutPerson(@PathVariable("idPerson") long idPerson) throws Exception {
         ModelAndView mav = new ModelAndView();
-        List<DaNotificacion> results = daNotificacionService.getNoticesByPerson(idPerson);
+        List<DaNotificacion> results = daNotificacionService.getNoticesByPerson(idPerson,"TPNOTI|PCNT");
         mav.addObject("notificaciones", results);
         mav.addObject("personaId",idPerson);
         mav.setViewName("tomaMx/results");
         return  mav;
+    }
+
+    /**
+     * Handler for create tomaMx.
+     *
+     * @param idPersona the ID of the person to create noti
+     * @return a ModelMap with the model attributes for the respective view
+     */
+    @RequestMapping("createnoti/{idPersona}")
+    public ModelAndView createTomaMxNoti(@PathVariable("idPersona") String idPersona) throws Exception {
+        ModelAndView mav = new ModelAndView();
+            //registros anteriores de toma Mx
+        DaTomaMx tomaMx = new DaTomaMx();
+        DaNotificacion noti;
+        noti = new DaNotificacion();
+        noti.setPersona(personaService.getPersona(Long.valueOf(idPersona)));
+        noti.setFechaRegistro(new Timestamp(new Date().getTime()));
+        Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
+        if(pUsuarioRegistro!=null) {
+            long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
+            noti.setUsuarioRegistro(usuarioService.getUsuarioById((int)idUsuario));
+        }
+        //noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|CAESP"));
+        noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+        daNotificacionService.addNotification(noti);
+
+        //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
+        catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|PCNT");
+
+        mav.addObject("noti", noti);
+        mav.addObject("tomaMx", tomaMx);
+        mav.addObject("catTipoMx", catTipoMx);
+        mav.addAllObjects(mapModel);
+        mav.setViewName("tomaMx/enterForm");
+
+        return mav;
     }
 
     /**
@@ -119,26 +160,14 @@ public class TomaMxController {
     @RequestMapping("create/{idNotificacion}")
     public ModelAndView createTomaMx(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
         ModelAndView mav = new ModelAndView();
-            //registros anteriores de toma Mx
-            DaTomaMx tomaMx = new DaTomaMx();
+        //registros anteriores de toma Mx
+        DaTomaMx tomaMx = new DaTomaMx();
         DaNotificacion noti;
         //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
-        if (StringUtil.isNumeric(idNotificacion)){
-            noti = new DaNotificacion();
-            noti.setPersona(personaService.getPersona(Long.valueOf(idNotificacion)));
-            noti.setFechaRegistro(new Timestamp(new Date().getTime()));
-            Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
-            if(pUsuarioRegistro!=null) {
-                long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
-                noti.setUsuarioRegistro(usuarioService.getUsuarioById((int)idUsuario));
-            }
-            noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|CAESP"));
-            daNotificacionService.addNotification(noti);
-        }else{
-            noti = daNotificacionService.getNotifById(idNotificacion);
-        }
+        noti = daNotificacionService.getNotifById(idNotificacion);
         if (noti != null) {
-            catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
+            //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
+            catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|PCNT");
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -176,58 +205,7 @@ public class TomaMxController {
 
     }
 
-    @RequestMapping(value = "/saveTomaold", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> saveTomaMx(HttpServletRequest request,
-              @RequestParam(value = "dx", required = false) String dx
-            , @RequestParam(value = "fechaHTomaMx", required = false) String fechaHTomaMx
-            , @RequestParam(value = "codTipoMx", required = false) String codTipoMx
-            , @RequestParam(value = "canTubos", required = false) Integer canTubos
-            , @RequestParam(value = "volumen", required = false) String volumen
-            , @RequestParam(value = "horaRefrigeracion", required = false) String horaRefrigeracion
-            , @RequestParam(value = "mxSeparada", required = false) Integer  mxSeparada
-            , @RequestParam(value = "idNotificacion", required = false) String idNotificacion
-
-    ) throws Exception {
-        logger.debug("Guardando datos de Toma de Muestra");
-
-        DaTomaMx tomaMx = new DaTomaMx();
-
-        tomaMx.setIdNotificacion(daNotificacionService.getNotifById(idNotificacion));
-        if(fechaHTomaMx != null){
-            tomaMx.setFechaHTomaMx(StringToTimestamp(fechaHTomaMx));
-        }
-
-        tomaMx.setCodTipoMx(tomaMxService.getTipoMxById(codTipoMx));
-        tomaMx.setCanTubos(canTubos);
-
-        if(volumen != null && !volumen.equals("")){
-            tomaMx.setVolumen(Float.valueOf(volumen));
-        }
-
-        tomaMx.setHoraRefrigeracion(horaRefrigeracion);
-
-
-        if(mxSeparada != null){
-            if(mxSeparada == 1){
-                tomaMx.setMxSeparada(true);
-            }else {
-                tomaMx.setMxSeparada(false);
-            }
-        }
-
-        tomaMx.setFechaRegistro(new Timestamp(new Date().getTime()));
-        long idUsuario = seguridadService.obtenerIdUsuario(request);
-        tomaMx.setUsuario(usuarioService.getUsuarioById((int)idUsuario));
-        tomaMx.setEstadoMx(catalogoService.getEstadoMx("ESTDMX|PEND"));
-        String codigo = generarCodigoUnicoMx();
-        tomaMx.setCodigoUnicoMx(codigo);
-        tomaMx.setCodigoLab(null);
-        tomaMxService.addTomaMx(tomaMx);
-        saveDxRequest(tomaMx.getIdTomaMx(), dx);
-        return createJsonResponse(tomaMx);
-    }
-
-    private void saveDxRequest(String idTomaMx, String dx) throws Exception {
+    private void saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas) throws Exception {
 
         DaSolicitudDx soli = new DaSolicitudDx();
         String[] arrayDx = dx.split(",");
@@ -245,6 +223,48 @@ public class TomaMxController {
             soli.setLabProcesa(laboratorio);
             soli.setControlCalidad(false);
             tomaMxService.addSolicitudDx(soli);
+
+            JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
+            for(int i = 0; i< cantRespuestas;i++) {
+                String respuesta = jObjectRespuestas.get(String.valueOf(i)).toString();
+                JsonObject jsRespuestaObject = new Gson().fromJson(respuesta, JsonObject.class);
+
+                Integer idRespuesta = jsRespuestaObject.get("idRespuesta").getAsInt();
+                Integer idConcepto = jsRespuestaObject.get("idConcepto").getAsInt();
+
+                DatoSolicitud conceptoTmp =  datosSolicitudService.getDatoRecepcionSolicitudById(idRespuesta);
+                //si la respuesta pertenece al dx de la solicitud, se registra
+                if (conceptoTmp.getDiagnostico().getIdDiagnostico().equals(soli.getCodDx().getIdDiagnostico())) {
+                    String valor = jsRespuestaObject.get("valor").getAsString();
+                    DatoSolicitudDetalle datoSolicitudDetalle = new DatoSolicitudDetalle();
+                    datoSolicitudDetalle.setFechahRegistro(new Timestamp(new Date().getTime()));
+                    datoSolicitudDetalle.setValor(valor);
+                    datoSolicitudDetalle.setDatoSolicitud(conceptoTmp);
+                    datoSolicitudDetalle.setSolicitudDx(soli);
+                    datoSolicitudDetalle.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                    datosSolicitudService.saveOrUpdateDetalleDatoRecepcion(datoSolicitudDetalle);
+                    //validar respuesta solicitud
+                    /*DetalleResultadoFinal resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuesta(idSolicitud, idRespuesta);
+                    if (resFinalRegistrado != null) {
+                        datoSolicitudDetalle.setIdDetalle(resFinalRegistrado.getIdDetalle());
+                        resultadoFinalService.updateDetResFinal(datoSolicitudDetalle);
+                    } else {
+                        //validar respuesta examen como respuesta solicitud
+                        resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuestaExa(idSolicitud, idRespuesta);
+                        if (resFinalRegistrado != null) {
+                            datoSolicitudDetalle.setIdDetalle(resFinalRegistrado.getIdDetalle());
+                            resultadoFinalService.updateDetResFinal(datoSolicitudDetalle);
+                        } else {
+                            //validar si hay respuesta examen con el concetpo a registrar
+                            if (resultadoFinalService.getDetResBySolicitudAndConceptoRespuestaExa(idSolicitud, idConcepto).size() <= 0) {
+                                if (datoSolicitudDetalle.getValor() != null && !datoSolicitudDetalle.getValor().isEmpty()) {
+                                    resultadoFinalService.saveDetResFinal(datoSolicitudDetalle);
+                                }
+                            }
+                        }
+                    }*/
+                }
+            }
         }
 
     }
@@ -282,7 +302,7 @@ public class TomaMxController {
     }
 
     /***************************************************************************/
-    /******************** TOMA MUESTRAS ESTUDIOS********************************/
+    /******************** TOMA MUESTRAS PACIENTES Y OTRAS MX********************************/
     /***************************************************************************/
 
 
@@ -297,6 +317,8 @@ public class TomaMxController {
         String volumen=null;
         String horaRefrigeracion="";
         String dx="";
+        String strRespuestas="";
+        Integer cantRespuestas=0;
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -306,7 +328,8 @@ public class TomaMxController {
             idNotificacion = jsonpObject.get("idNotificacion").getAsString();
             fechaHTomaMx = jsonpObject.get("fechaHTomaMx").getAsString();
             codTipoMx = jsonpObject.get("codTipoMx").getAsString();
-
+            strRespuestas = jsonpObject.get("strRespuestas").toString();
+            cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
             if (jsonpObject.get("canTubos")!=null && !jsonpObject.get("canTubos").getAsString().isEmpty())
                 canTubos = jsonpObject.get("canTubos").getAsInt();
 
@@ -366,13 +389,12 @@ public class TomaMxController {
             tomaMx.setCodigoLab(null);
             tomaMx.setEnvio(envioOrden);
             tomaMxService.addTomaMx(tomaMx);
-            saveDxRequest(tomaMx.getIdTomaMx(), dx);
+            saveDxRequest(tomaMx.getIdTomaMx(), dx, strRespuestas, cantRespuestas);
 
-            //saveSolicitudesEstudio(tomaMx.getIdTomaMx(), jsonArray, request);
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
             ex.printStackTrace();
-            resultado =  messageSource.getMessage("lbl.messagebox.error.saving",null,null);
+            resultado =  messageSource.getMessage("msg.add.receipt.error",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
@@ -384,9 +406,62 @@ public class TomaMxController {
             map.put("fechaHTomaMx", fechaHTomaMx);
             map.put("codTipoMx",codTipoMx);
             map.put("horaRefrigeracion", horaRefrigeracion);
+            map.put("strRespuestas",strRespuestas);
+            map.put("cantRespuestas",cantRespuestas.toString());
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
     }
+
+    @RequestMapping(value = "getDatosSolicitudDetalleBySolicitud", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<DatoSolicitudDetalle> getDatosSolicitudDetalleBySolicitud(@RequestParam(value = "idSolicitud", required = true) String idSolicitud) throws Exception {
+        logger.info("Se obtienen los detalles de resultados activos para la solicitud");
+        List<DatoSolicitudDetalle> resultados = datosSolicitudService.getDatosSolicitudDetalleBySolicitud(idSolicitud);
+        return resultados;
+    }
+
+    @RequestMapping(value = "createnoti", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
+    protected void crearNotificacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json = "";
+        String resultado = "";
+        String idNotificacion = "";
+        Integer idPersona=null;
+        try {
+            logger.debug("Guardando datos de la notificacion");
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idPersona = jsonpObject.get("idPersona").getAsInt();
+            DaNotificacion noti = new DaNotificacion();
+            noti.setPersona(personaService.getPersona(Long.valueOf(idPersona)));
+            noti.setFechaRegistro(new Timestamp(new Date().getTime()));
+            Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
+            if(pUsuarioRegistro!=null) {
+                long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
+                noti.setUsuarioRegistro(usuarioService.getUsuarioById((int)idUsuario));
+            }
+            //noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|CAESP"));
+            noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+            daNotificacionService.addNotification(noti);
+            idNotificacion = noti.getIdNotificacion();
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.add.notification.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idNotificacion",idNotificacion);
+            map.put("mensaje",resultado);
+            map.put("idPersona",String.valueOf(idPersona));
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
 }

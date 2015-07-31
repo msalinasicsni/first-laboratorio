@@ -27,7 +27,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/tomaMx/create" htmlEscape="true "/>"><spring:message code="menu.special.case" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/tomaMx/create" htmlEscape="true "/>"><spring:message code="menu.receipt.patient" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -38,7 +38,7 @@
 			<!-- row -->
 			<div class="row">
 				<!-- col -->
-				<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-6">
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-eyedropper"></i>
@@ -253,6 +253,8 @@
                                                 </div>
                                             </section>
                                         </div>
+                                        <div id="datosSolicitud">
+                                        </div>
                                         <footer style="background-color:white;">
                                             <button type="button" id="submit" class="btn btn-success fc-header-center">
                                                 <i class="fa fa-save"></i> <spring:message code="act.save"  />
@@ -264,6 +266,7 @@
                                     <input type="hidden" id="disappear"  value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input type="hidden" id="msjErrorSaving"  value="<spring:message code="msg.error.saving"/>"/>
                                     <input type="hidden" id="msjSuccessful"  value="<spring:message code="msg.successful.saved"/>"/>
+                                    <input type="hidden" id="dxAgregados"  value=""/>
 								</div>
 								<!-- end widget content -->
 							</div>
@@ -337,14 +340,21 @@
     <spring:url value="/tomaMx/dxByMx" var="dxUrl"/>
     <spring:url value="/tomaMx/saveToma" var="saveTomaUrl"/>
     <spring:url value="/tomaMx/search" var="searchUrl"/>
+    <c:url var="listasUrl" value="/administracion/datosSolicitud/getCatalogosListaConcepto"/>
+    <c:url var="detalleUrl" value="/tomaMx/getDatosSolicitudDetalleBySolicitud"/>
+    <c:url var="datosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivosDx"/>
+    <c:url var="todoDatosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivos"/>
     <script type="text/javascript">
         $(document).ready(function() {
             pageSetUp();
             var parametros = {blockMess: "${blockMess}",
                              dxUrl: "${dxUrl}",
                               saveTomaUrl: "${saveTomaUrl}",
-                              searchUrl: "${searchUrl}"
-
+                              searchUrl: "${searchUrl}",
+                listasUrl:"${listasUrl}",
+                detalleUrl : "${detalleUrl}",
+                datosUrl : "${datosUrl}",
+                todoDatosUrl : "${todoDatosUrl}"
             };
             EnterFormTomaMx.init(parametros);
             handleInputMasks();

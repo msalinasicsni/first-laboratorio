@@ -1,4 +1,4 @@
-package ni.gob.minsa.laboratorio.domain.resultados;
+package ni.gob.minsa.laboratorio.domain.concepto;
 
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
@@ -86,6 +86,5 @@ public class Concepto implements Serializable {
     public void setFechahRegistro(Timestamp fechahRegistro) {
         this.fechahRegistro = fechahRegistro;
     }
-
 
 }

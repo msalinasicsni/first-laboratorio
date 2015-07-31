@@ -25,7 +25,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/febriles/create" htmlEscape="true "/>"><spring:message code="menu.special.case" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/febriles/create" htmlEscape="true "/>"><spring:message code="menu.receipt.patient" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -108,13 +108,10 @@
 							</div>
 							<!-- end widget div -->
 							<div style="border: none" class="row">
-                                <spring:url value="/tomaMx/create/{idPersona}" var="newUrl">
-                                    <spring:param name="idPersona" value="${personaId}" />
-                                </spring:url>
-                                <a href="${fn:escapeXml(newUrl)}"
-									class="btn btn-default btn-large btn-primary pull-right"><i
-									class="fa fa-plus"></i> <spring:message
-										code="lbl.add.notification" /> </a>
+                                <input type="hidden" id="idPersona" value="${personaId}">
+                                <button type="button" id="btnAddNotification" class="btn btn-default btn-large btn-primary pull-right"><i class="fa fa-plus"></i>
+                                    <spring:message code="lbl.add.notification" />
+                                </button>
 							</div>
 						</div>
 						<!-- end widget -->
@@ -144,12 +141,25 @@
 	<script src="${dataTablesBootstrap}"></script>
 	<spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
 	<script src="${dataTablesResponsive}"></script>
+    <!-- JQUERY BLOCK UI -->
+    <spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
+    <script src="${jqueryBlockUi}"></script>
 	<!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<!-- END PAGE LEVEL SCRIPTS -->
+    <spring:url value="/resources/scripts/muestras/results.js" var="enterFormTomaMx" />
+    <script src="${enterFormTomaMx}"></script>
+    <!-- END PAGE LEVEL SCRIPTS -->
+    <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
+    <c:url var="createUrl" value="/tomaMx/create/"/>
+    <c:url var="addNotificationUrl" value="/tomaMx/createnoti"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
+            var parametros = {blockMess: "${blockMess}",
+                createUrl: "${createUrl}",
+                addNotificationUrl: "${addNotificationUrl}"
+            };
+            ResultsNotices.init(parametros);
 	    	$("li.recepcion").addClass("open");
             $("li.tomaMx").addClass("active");
             if ("top" != localStorage.getItem("sm-setmenu")) {
@@ -157,29 +167,7 @@
             }
 
 		});
-		var responsiveHelper_dt_basic = undefined;
-		var breakpointDefinition = {
-			tablet : 1024,
-			phone : 480
-		};
-		var table1 = $('#fichas_result').dataTable({
-			"sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-				"t"+
-				"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-			"autoWidth" : true,
-			"preDrawCallback" : function() {
-				// Initialize the responsive datatables helper once.
-				if (!responsiveHelper_dt_basic) {
-					responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#fichas_result'), breakpointDefinition);
-				}
-			},
-			"rowCallback" : function(nRow) {
-				responsiveHelper_dt_basic.createExpandIcon(nRow);
-			},
-			"drawCallback" : function(oSettings) {
-				responsiveHelper_dt_basic.respond();
-			}
-		});
+
 	</script>
 	<!-- END JAVASCRIPTS -->
 </body>

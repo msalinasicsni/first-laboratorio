@@ -1,4 +1,4 @@
-package ni.gob.minsa.laboratorio.domain.resultados;
+package ni.gob.minsa.laboratorio.domain.concepto;
 
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 

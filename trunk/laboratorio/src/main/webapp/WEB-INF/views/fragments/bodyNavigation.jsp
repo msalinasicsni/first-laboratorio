@@ -83,7 +83,7 @@
                         <a href="<spring:url value="/searchMx/init" htmlEscape="true "/>" title="<spring:message code="menu.search.mx" />"><i class="fa fa-lg fa-fw fa-search"></i> <spring:message code="menu.search.mx" /></a>
                     </li>
                     <li class="tomaMx">
-                        <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.special.case" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.special.case" /></a>
+                        <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.receipt.patient" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.patient" /></a>
                     </li>
 
                     <li class="reprintLabCode">
@@ -167,7 +167,7 @@
                         <a href="<spring:url value="/administracion/respuestas/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.respuestas" />"><i class="fa fa-lg fa-fw fa-font"></i> <spring:message code="menu.admin.respuestas" /></a>
                     </li>
                     <li class="respuestaSolicitud">
-                        <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.request.aswers" />"><i class="fa fa-lg fa-fw fa-list-alt "></i> <spring:message code="menu.admin.request.aswers" /></a>
+                        <a href="<spring:url value="/administracion/respuestasSolicitud/init" htmlEscape="true "/>" title="<spring:message code="menu.admin.request.concepts" />"><i class="fa fa-lg fa-fw fa-list-alt "></i> <spring:message code="menu.admin.request.concepts" /></a>
                     </li>
                     <li class="assocSamplesRequest">
                         <a href="<spring:url value="/administracion/associationSR/init" htmlEscape="true "/>" title="<spring:message code="lbl.association.samples.req" />"><i class="fa fa-lg fa-fw fa-link"></i> <spring:message code="lbl.association.samples.req" /></a>

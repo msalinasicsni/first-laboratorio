@@ -3,9 +3,9 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import ni.gob.minsa.laboratorio.domain.resultados.Catalogo_Lista;
-import ni.gob.minsa.laboratorio.domain.resultados.Concepto;
-import ni.gob.minsa.laboratorio.domain.resultados.TipoDatoCatalogo;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
+import ni.gob.minsa.laboratorio.domain.concepto.TipoDatoCatalogo;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.slf4j.Logger;
@@ -45,29 +45,8 @@ public class ConceptosController {
     @Resource(name = "catalogosService")
     private CatalogoService catalogoService;
 
-    @Resource(name = "tomaMxService")
-    private TomaMxService tomaMxService;
-
-    @Resource(name = "unidadesService")
-    private UnidadesService unidadesService;
-
-    @Resource(name = "entidadAdmonService")
-    private EntidadAdmonService entidadAdmonService;
-
-    @Resource(name = "recepcionMxService")
-    private RecepcionMxService recepcionMxService;
-
-    @Resource(name = "ordenExamenMxService")
-    private OrdenExamenMxService ordenExamenMxService;
-
-    @Resource(name= "separacionMxService")
-    private SeparacionMxService separacionMxService;
-
     @Resource(name = "usuarioService")
     private UsuarioService usuarioService;
-
-    @Resource(name= "alicuotaService")
-    private AlicuotaService alicuotaService;
 
     @Resource(name="conceptoService")
     private ConceptoService conceptoService;
