@@ -33,8 +33,12 @@ public class ConceptoService {
      * Obtiene una lista de los conceptos
      */
 
-    public List<Concepto> getConceptsList() throws Exception {
-        String query = "from Concepto as a where a.pasivo = false order by a.fechahRegistro";
+    public List<Concepto> getConceptsList(boolean excluirFechas) throws Exception {
+        String query = "from Concepto as a where a.pasivo = false ";
+        if (excluirFechas){ //excluir conceptos con tipo dato fecha
+            query += " and a.tipo.codigo != 'TPDATO|FCH'";
+        }
+        query += " order by a.fechahRegistro";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
 

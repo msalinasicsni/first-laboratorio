@@ -199,7 +199,7 @@ public class DatosIngresoSolicitudController {
                 }
             }
 
-            List<Concepto> conceptsList = conceptoService.getConceptsList();
+            List<Concepto> conceptsList = conceptoService.getConceptsList(false);
             Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
             mav.addObject("dx", dx);
             mav.addObject("estudio", estudio);

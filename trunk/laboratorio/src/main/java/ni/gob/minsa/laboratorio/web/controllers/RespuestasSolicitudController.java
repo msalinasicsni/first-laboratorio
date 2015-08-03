@@ -198,7 +198,7 @@ public class RespuestasSolicitudController {
                 }
             }
 
-            List<Concepto> conceptsList = conceptoService.getConceptsList();
+            List<Concepto> conceptsList = conceptoService.getConceptsList(true);
             Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
             mav.addObject("dx", dx);
             mav.addObject("estudio", estudio);
