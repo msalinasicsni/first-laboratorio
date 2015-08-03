@@ -87,7 +87,7 @@ public class ConceptosController {
         logger.info("Obteniendo los tipos de Datos");
 
         List<Concepto> conceptsList = null;
-        conceptsList = conceptoService.getConceptsList();
+        conceptsList = conceptoService.getConceptsList(false);
         return conceptsList;
     }
 

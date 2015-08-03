@@ -126,7 +126,7 @@ public class RespuestasExamenController {
                 CatalogoExamenes examen = examenesService.getExamenById(Integer.valueOf(arParametros[0]));
                 //Catalogo_Dx diagnostico = tomaMxService.getDxsById(Integer.valueOf(arParametros[1]));
                 //TipoNotificacion tipoNotificacion = catalogoService.getTipoNotificacion(arParametros[2]);
-                List<Concepto> conceptsList = conceptoService.getConceptsList();
+                List<Concepto> conceptsList = conceptoService.getConceptsList(true);
                 Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
                 mav.addObject("examen", examen);
                 //mav.addObject("tipoNotificacion", tipoNotificacion);

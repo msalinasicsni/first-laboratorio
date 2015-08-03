@@ -314,6 +314,9 @@
 	<!-- bootstrap datepicker -->
 	<spring:url value="/resources/js/plugin/bootstrap-datepicker/bootstrap-datepicker.js" var="datepickerPlugin" />
 	<script src="${datepickerPlugin}"></script>
+    <spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
+        <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
+    <script src="${datePickerLoc}"></script>
 	<!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<spring:url value="/resources/scripts/muestras/enter-form.js" var="enterFormTomaMx" />
@@ -333,7 +336,8 @@
     <script src="${jqueryInputMask}"></script>
     <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
     <script src="${handleInputMask}"></script>
-
+    <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
+    <script src="${handleDatePickers}"></script>
 	<!-- END PAGE LEVEL SCRIPTS -->
 	<!-- PARAMETROS LENGUAJE -->
 	<c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
@@ -354,7 +358,8 @@
                 listasUrl:"${listasUrl}",
                 detalleUrl : "${detalleUrl}",
                 datosUrl : "${datosUrl}",
-                todoDatosUrl : "${todoDatosUrl}"
+                todoDatosUrl : "${todoDatosUrl}",
+                language : "${pageContext.request.locale.language}"
             };
             EnterFormTomaMx.init(parametros);
             handleInputMasks();

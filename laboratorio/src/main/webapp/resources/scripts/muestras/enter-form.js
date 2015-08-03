@@ -147,6 +147,10 @@ var EnterFormTomaMx = function () {
                                     idControlRespuesta = dataToLoad[i].idConceptoSol;
                                     valorControlRespuesta = $('#'+idControlRespuesta).val();
                                     break;
+                                case 'TPDATO|FCH':
+                                    idControlRespuesta = dataToLoad[i].idConceptoSol;
+                                    valorControlRespuesta = $('#'+idControlRespuesta).val();
+                                    break;
                                 default:
                                     break;
 
@@ -443,11 +447,33 @@ var EnterFormTomaMx = function () {
                                             digits: 2
                                         });
                                         break;
+                                    case 'TPDATO|FCH':
+                                        idControlRespuesta = dataToLoad[i].idConceptoSol;
+                                        contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                        if (dataToLoad[i].requerido){
+                                            contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                        }
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre+'</label>' +
+                                            '<div class="">'+
+                                            '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>';
+                                        if (dataToLoad[i].requerido){
+                                            contenidoControl = contenidoControl + '<input class="form-control date-picker requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
+                                        }else{
+                                            contenidoControl = contenidoControl + '<input class="form-control date-picker" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
+                                        }
+
+                                        contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
+                                            '</div></section>' +
+                                            seccionDescripcion +
+                                            '</div>';
+                                        divResultado.append(contenidoControl);
+                                        break;
                                     default:
                                         break;
 
                                 }
                             }
+                            handleDatePickers("${pageContext.request.locale.language}");
                             desbloquearUI();
                         }else{
                             desbloquearUI();
