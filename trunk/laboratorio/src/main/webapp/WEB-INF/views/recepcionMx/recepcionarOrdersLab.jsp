@@ -105,6 +105,7 @@
                                     <input id="txtEsLaboratorio" type="hidden" value="true"/>
                                     <form id="receiptOrdersLab-form" class="smart-form" autocomplete="off">
                                         <fieldset>
+                                        <c:if test="${not empty recepcionMx.tomaMx.idNotificacion.persona}">
                                             <div class="row">
                                                 <section class="col col-sm-6 col-md-3 col-lg-3">
                                                     <label class="text-left txt-color-blue font-md">
@@ -162,6 +163,38 @@
                                                     </div>
                                                 </section>
                                             </div>
+                                        </c:if>
+                                        <c:if test="${not empty recepcionMx.tomaMx.idNotificacion.solicitante}">
+                                        <div class="row">
+                                            <section class="col col-sm-6 col-md-6 col-lg-6">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.applicant"/>
+                                                </label>
+                                                <div class="">
+                                                    <label class="input">
+                                                        <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                        <input class="form-control" type="text" id="nombre" name="nombre" disabled value="${recepcionMx.tomaMx.idNotificacion.solicitante.nombre}" placeholder=" <spring:message code="lbl.applicant.name" />">
+                                                        <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.applicant.name"/>
+                                                        </b>
+                                                    </label>
+                                                </div>
+                                            </section>
+                                            <section class="col col-sm-6 col-md-6 col-lg-6">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.contact.name"/>
+                                                </label>
+                                                <div class="">
+                                                    <label class="input">
+                                                        <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                        <input class="form-control" type="text" name="contacto" id="contacto" disabled value="${recepcionMx.tomaMx.idNotificacion.solicitante.nombreContacto}" placeholder=" <spring:message code="lbl.contact.name" />" />
+                                                        <b class="tooltip tooltip-bottom-right"> <i
+                                                                class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.contact.name"/>
+                                                        </b>
+                                                    </label>
+                                                </div>
+                                            </section>
+                                        </div>
+                                        </c:if>
                                             <div class="row">
                                                 <section class="col col-sm-12 col-md-6 col-lg-2">
                                                     <label class="text-left txt-color-blue font-md">

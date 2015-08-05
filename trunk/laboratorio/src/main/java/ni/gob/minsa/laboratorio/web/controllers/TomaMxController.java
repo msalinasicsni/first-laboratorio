@@ -6,8 +6,6 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
-import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
@@ -73,6 +71,12 @@ public class TomaMxController {
 
     @Resource(name = "datosSolicitudService")
     private DatosSolicitudService datosSolicitudService;
+
+    @Resource(name = "solicitanteService")
+    private SolicitanteService solicitanteService;
+
+    @Resource(name = "recepcionMxService")
+    private RecepcionMxService recepcionMxService;
 
     @Autowired
     MessageSource messageSource;
@@ -365,6 +369,7 @@ public class TomaMxController {
             }
 
             DaTomaMx tomaMx = new DaTomaMx();
+            Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
             tomaMx.setIdNotificacion(daNotificacionService.getNotifById(idNotificacion));
             if(fechaHTomaMx != null){
@@ -383,13 +388,26 @@ public class TomaMxController {
             tomaMx.setFechaRegistro(new Timestamp(new Date().getTime()));
 
             tomaMx.setUsuario(usuarioRegistro);
-            tomaMx.setEstadoMx(catalogoService.getEstadoMx("ESTDMX|ENV"));
+            tomaMx.setEstadoMx(catalogoService.getEstadoMx("ESTDMX|RCP")); //quedan listas para enviar a procesar en el area que le corresponde
             String codigo = generarCodigoUnicoMx();
             tomaMx.setCodigoUnicoMx(codigo);
-            tomaMx.setCodigoLab(null);
+            //todas deben tener codigo lab, porque son rutinas
+            tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo()));
             tomaMx.setEnvio(envioOrden);
             tomaMxService.addTomaMx(tomaMx);
+            //se procede a registrar los diagnósticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
             saveDxRequest(tomaMx.getIdTomaMx(), dx, strRespuestas, cantRespuestas);
+
+            //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepción de la misma
+            RecepcionMx recepcionMx = new RecepcionMx();
+            recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+            recepcionMx.setLabRecepcion(labUsuario);
+            recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+            recepcionMx.setTipoMxCk(true);
+            recepcionMx.setCantidadTubosCk(true);
+            recepcionMx.setTipoRecepcionMx(catalogoService.getTipoRecepcionMx("TPRECPMX|VRT"));
+            recepcionMx.setTomaMx(tomaMx);
+            recepcionMxService.addRecepcionMx(recepcionMx);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -428,15 +446,25 @@ public class TomaMxController {
         String resultado = "";
         String idNotificacion = "";
         Integer idPersona=null;
+        String idSolicitante = "";
         try {
             logger.debug("Guardando datos de la notificacion");
+            DaNotificacion noti = new DaNotificacion();
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
-            idPersona = jsonpObject.get("idPersona").getAsInt();
-            DaNotificacion noti = new DaNotificacion();
-            noti.setPersona(personaService.getPersona(Long.valueOf(idPersona)));
+            if (jsonpObject.get("idPersona")!=null && !jsonpObject.get("idPersona").getAsString().isEmpty()) {
+                idPersona = jsonpObject.get("idPersona").getAsInt();
+                noti.setPersona(personaService.getPersona(Long.valueOf(idPersona)));
+                noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+            }
+            if (jsonpObject.get("idSolicitante")!=null && !jsonpObject.get("idSolicitante").getAsString().isEmpty()){
+                idSolicitante = jsonpObject.get("idSolicitante").getAsString();
+                noti.setSolicitante(solicitanteService.getSolicitanteById(idSolicitante));
+                noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|OMX"));
+            }
+
             noti.setFechaRegistro(new Timestamp(new Date().getTime()));
             Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
             if(pUsuarioRegistro!=null) {
@@ -444,7 +472,7 @@ public class TomaMxController {
                 noti.setUsuarioRegistro(usuarioService.getUsuarioById((int)idUsuario));
             }
             //noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|CAESP"));
-            noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+
             daNotificacionService.addNotification(noti);
             idNotificacion = noti.getIdNotificacion();
         } catch (Exception ex) {
@@ -458,10 +486,60 @@ public class TomaMxController {
             map.put("idNotificacion",idNotificacion);
             map.put("mensaje",resultado);
             map.put("idPersona",String.valueOf(idPersona));
+            map.put("idSolicitante",idSolicitante);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
     }
 
+    /*******************************************************************************/
+    /***************************** OTRAS MUESTRAS **********************************/
+    /*******************************************************************************/
+
+    @RequestMapping(value = "searchOMx", method = RequestMethod.GET)
+    public String initSearchOtrasForm() throws ParseException {
+        logger.debug("Crear/Buscar Toma de Mx");
+            return "tomaMx/searchOtherSamples";
+    }
+
+    @RequestMapping("notices/applicant/{idSolicitante}")
+    public ModelAndView showNoticesApplicant (@PathVariable("idSolicitante") String idSolicitante) throws Exception {
+        ModelAndView mav = new ModelAndView();
+        List<DaNotificacion> results = daNotificacionService.getNoticesByApplicant(idSolicitante, "TPNOTI|OMX");
+        mav.addObject("notificaciones", results);
+        mav.addObject("idSolicitante",idSolicitante);
+        mav.setViewName("tomaMx/resultsOtherSamples");
+        return  mav;
+    }
+
+    /**
+     * Handler for create tomaMx.
+     *
+     * @param idNotificacion the ID of the notification
+     * @return a ModelMap with the model attributes for the respective view
+     */
+    @RequestMapping("createOMx/{idNotificacion}")
+    public ModelAndView createOtherSample(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
+        ModelAndView mav = new ModelAndView();
+        //registros anteriores de toma Mx
+        DaTomaMx tomaMx = new DaTomaMx();
+        DaNotificacion noti;
+        //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
+        noti = daNotificacionService.getNotifById(idNotificacion);
+        if (noti != null) {
+            //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
+            catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|OMX");
+
+            mav.addObject("noti", noti);
+            mav.addObject("tomaMx", tomaMx);
+            mav.addObject("catTipoMx", catTipoMx);
+            mav.addAllObjects(mapModel);
+            mav.setViewName("tomaMx/enterFormOtherSamples");
+        } else {
+            mav.setViewName("404");
+        }
+
+        return mav;
+    }
 }

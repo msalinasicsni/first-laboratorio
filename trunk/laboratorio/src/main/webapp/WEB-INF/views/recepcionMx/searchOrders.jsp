@@ -372,7 +372,8 @@
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
 	    	$("li.recepcion").addClass("open");
-           	$("li.receipt").addClass("active");
+            $("li.check-in").addClass("open");
+            $("li.receipt").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.receipt").parents("ul").slideDown(200);
 	    	}

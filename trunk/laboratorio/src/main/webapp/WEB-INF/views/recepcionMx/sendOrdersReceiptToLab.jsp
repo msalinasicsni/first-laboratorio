@@ -280,7 +280,7 @@
                                             <%--<th data-hide="phone,tablet"><spring:message code="lbl.sample.number.tubes"/></th>--%>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                                             <th data-hide="phone"><i class="fa fa-exclamation-triangle fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.urgent"/></th>
 
                                             <th><spring:message code="lbl.request"/></th>
@@ -366,7 +366,6 @@
     <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
     <script src="${handleInputMask}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
-	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="ordersUrl" value="/sendMxReceipt/searchOrders"/>
     <c:url var="initUrl" value="/sendMxReceipt/init"/>
@@ -376,7 +375,7 @@
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
-			var parametros = {sPersonUrl: "${sPersonUrl}",
+			var parametros = {
                 sOrdersUrl : "${ordersUrl}",
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
