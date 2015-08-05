@@ -7,6 +7,7 @@ import ni.gob.minsa.laboratorio.domain.irag.Respuesta;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,6 +37,7 @@ public class DaNotificacion {
     private String direccionResidencia;
     private Date fechaInicioSintomas;
     private Respuesta urgente;
+    private Solicitante solicitante;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -170,6 +172,17 @@ public class DaNotificacion {
     public Respuesta getUrgente() { return urgente; }
 
     public void setUrgente(Respuesta urgente) { this.urgente = urgente; }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "ID_SOLICITANTE", referencedColumnName = "ID_SOLICITANTE")
+    @ForeignKey(name = "SOLICITANTE_NOT_FK")
+    public Solicitante getSolicitante() {
+        return solicitante;
+    }
+
+    public void setSolicitante(Solicitante solicitante) {
+        this.solicitante = solicitante;
+    }
 }
 
 

@@ -40,9 +40,9 @@
 					<h1 class="page-title txt-color-blueDark">
 						<!-- PAGE HEADER -->
 						<i class="fa-fw fa fa-fire"></i> 
-							<spring:message code="menu.receipt.patient" />
+							<spring:message code="menu.receipt.other.samples" />
 						<span> <i class="fa fa-angle-right"></i>  
-							<spring:message code="person.search" />
+							<spring:message code="lbl.applicant.search" />
 						</span>
 					</h1>
 				</div>
@@ -75,12 +75,12 @@
 										<fieldset>
 											<section>
 												<label class="input"> <i class="icon-append fa fa-check"></i>
-													<input type="text" id="filtro" name="filtro" placeholder="<spring:message code="person.search.parameters"/>">
-													<b class="tooltip tooltip-bottom-right"><spring:message code="person.search.parameters"/></b> </label>
+													<input type="text" id="filtro" name="filtro" placeholder="<spring:message code="lbl.applicant.search.parameters"/>">
+													<b class="tooltip tooltip-bottom-right"><spring:message code="lbl.applicant.search.parameters"/></b> </label>
 											</section>
 										</fieldset>
 										<footer>
-											<button type="submit" id="search-person" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
+											<button type="submit" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
 										</footer>
 									</form>						
 								</div>
@@ -109,18 +109,17 @@
 								<!-- end widget edit box -->
 								<!-- widget content -->
 								<div class="widget-body no-padding">
-									<table id="persons_result" class="table table-striped table-bordered table-hover" width="100%">
-										<thead>			                
-											<tr>
-												<th data-class="expand"><i class="fa fa-fw fa-key text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.id"/></th>
-												<th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.name1"/></th>
-												<th data-hide="phone,tablet"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.name2"/></th>
-												<th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.lastname1"/></th>
-												<th data-hide="phone,tablet"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.lastname2"/></th>
-												<th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.fecnac"/></th>
-												<th data-hide="phone,tablet"><i class="fa fa-fw fa-map-marker text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.mun.res"/></th>
-												<th></th>
-											</tr>
+									<table id="applicants_result" class="table table-striped table-bordered table-hover" width="100%">
+										<thead>
+                                        <tr>
+                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.applicant.name"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-phone text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.telephone"/></th>
+                                            <th data-hide="phone,tablet"><i class="fa fa-check fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.enabled"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.contact.name"/></th>
+                                            <th data-hide="phone,tablet"><i class="fa fa-fw fa-at text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.contact.email"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-phone txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.contact.movil"/></th>
+                                            <th data-hide="phone,tablet"><spring:message code="lbl.actions"/></th>
+                                        </tr>
 										</thead>
 									</table>
 								</div>
@@ -128,12 +127,12 @@
 							</div>
 							<!-- end widget div -->
                             <div style="border: none" class="row">
-                                <spring:url value="/personas/create" var="newUrl">
+                                <spring:url value="/solicitante/create" var="newUrl">
                                 </spring:url>
                                 <a href="${fn:escapeXml(newUrl)}"
                                    class="btn btn-default btn-large btn-primary pull-right"><i
                                         class="fa fa-plus"></i> <spring:message
-                                        code="lbl.person" /> </a>
+                                        code="lbl.applicant" /> </a>
                             </div>
 						</div>
 						<!-- end widget -->
@@ -182,23 +181,24 @@
 	<script src="${jqueryBlockUi}"></script>
 	<!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/personas/person-search.js" var="personSearch" />
-	<script src="${personSearch}"></script>
+	<spring:url value="/resources/scripts/solicitante/search.js" var="search" />
+	<script src="${search}"></script>
 	<!-- END PAGE LEVEL SCRIPTS -->
-	<spring:url value="/personas/persons" var="sPersonUrl"/>
-	<spring:url value="/tomaMx/noticesrut" var="sActionUrl"/>
+	<spring:url value="/solicitante/getSolicitantes" var="searchUrl"/>
+	<spring:url value="/tomaMx/notices/applicant" var="sActionUrl"/>
 	<c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
-			var parametros = {sPersonUrl: "${sPersonUrl}",
+			var parametros = {searchUrl: "${searchUrl}",
 					sActionUrl: "${sActionUrl}",
 					blockMess:"${blockMess}"};
-			SearchPerson.init(parametros);
-	    	$("li.recepcion").addClass("open");
-            $("li.patient").addClass("active");
+			SearchApplicant.init(parametros);
+            $("li.recepcion").addClass("open");
+            $("li.check-in").addClass("open");
+            $("li.otherSamples").addClass("active");
             if ("top" != localStorage.getItem("sm-setmenu")) {
-                $("li.patient").parents("ul").slideDown(200);
+                $("li.otherSamples").parents("ul").slideDown(200);
             }
 
 		});

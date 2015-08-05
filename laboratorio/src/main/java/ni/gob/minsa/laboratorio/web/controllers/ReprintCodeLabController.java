@@ -154,6 +154,8 @@ public class ReprintCodeLabController {
                 if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                     nombreCompleto = nombreCompleto + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona", nombreCompleto);
+            } else if (recepcion.getTomaMx().getIdNotificacion().getSolicitante() != null) {
+                map.put("persona", recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
             } else {
                 map.put("persona", " ");
             }

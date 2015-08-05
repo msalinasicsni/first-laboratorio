@@ -114,11 +114,10 @@
                     <div class="widget-body no-padding">
                         <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                         <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
-                        <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.dx.not.answers.found"/>"/>
-                        <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
-                        <input id="msg_response_cancel" type="hidden" value="<spring:message code="msg.response.successfully.cancel"/>"/>
-                        <input id="msg_response_added" type="hidden" value="<spring:message code="msg.response.successfully.added"/>"/>
-                        <input id="msg_response_updated" type="hidden" value="<spring:message code="msg.response.successfully.updated"/>"/>
+                        <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.dx.not.data.found"/>"/>
+                        <input id="msg_response_cancel" type="hidden" value="<spring:message code="msg.data.successfully.cancel"/>"/>
+                        <input id="msg_response_added" type="hidden" value="<spring:message code="msg.data.successfully.added"/>"/>
+                        <input id="msg_response_updated" type="hidden" value="<spring:message code="msg.data.successfully.updated"/>"/>
                         <input id="val_yes" type="hidden" value="<spring:message code="lbl.yes"/>"/>
                         <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
                         <form id="dataDx-form" class="smart-form" autocomplete="off">
@@ -194,7 +193,7 @@
             <div class="jarviswidget jarviswidget-color-darken" id="wid-id-1">
                 <header>
                     <span class="widget-icon"> <i class="fa fa-font"></i> </span>
-                    <h2><spring:message code="lbl.response.header" /> </h2>
+                    <h2><spring:message code="lbl.data.header" /> </h2>
                 </header>
                 <!-- widget div-->
                 <div>

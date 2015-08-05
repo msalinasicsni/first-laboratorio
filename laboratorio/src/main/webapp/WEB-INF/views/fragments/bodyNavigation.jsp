@@ -54,38 +54,34 @@
                     <li class="personas">
                         <a href="<spring:url value="/personas/search" htmlEscape="true "/>" title="<spring:message code="menu.persons" />"><i class="fa fa-lg fa-fw fa-group"></i> <spring:message code="menu.persons" /></a>
                     </li>
+                    <li class="solicitantes">
+                        <a href="<spring:url value="/solicitante/search" htmlEscape="true "/>" title="<spring:message code="menu.applicants" />"><i class="fa fa-lg fa-fw fa-group"></i> <spring:message code="menu.applicants" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="recepcion">
                 <a href="#" title="<spring:message code="menu.receipt.orders" />"><i class="fa fa-lg fa-fw fa-tint"></i> <span class="menu-item-parent"><spring:message code="menu.receipt.orders" /></span></a>
                 <ul>
-                   <%-- <li class="check-in">
+                   <li class="check-in">
                         <a href="#" title="<spring:message code="lbl.check-in" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <span class="menu-item-parent"><spring:message code="lbl.check-in" /></span></a>
-                    <ul>
-                        <li class="person">
-                            <a title="<spring:message code="lbl.person" />"><i class="fa fa-lg fa-fw fa-user"></i> <spring:message code="lbl.person" /></a>
-                        </li>
-
-                        <li class="institution">
-                            <a title="<spring:message code="lbl.institution" />"><i class="fa fa-lg fa-fw fa-institution"></i> <spring:message code="lbl.institution" /></a>
-                        </li>
-                    </ul>
-
-                    </li>--%>
-                    <li class="receipt">
-                        <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>" title="<spring:message code="lbl.check-in.samples.from.alerta" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="lbl.check-in.samples.from.alerta" /></a>
+                        <ul>
+                            <li class="patient">
+                                <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.receipt.patient" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.patient" /></a>
+                            </li>
+                            <li class="receipt">
+                                <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>" title="<spring:message code="lbl.check-in.samples.from.alerta" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="lbl.check-in.samples.from.alerta" /></a>
+                            </li>
+                            <li class="otherSamples">
+                                <a href="<spring:url value="/tomaMx/searchOMx" htmlEscape="true "/>" title="<spring:message code="menu.receipt.other.samples" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.other.samples" /></a>
+                            </li>
+                        </ul>
                     </li>
-
                     <li class="sendReceipt">
                         <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>" title="<spring:message code="menu.send.receipt.orders" />"><i class="fa fa-lg fa-fw fa-shopping-cart "></i> <spring:message code="menu.send.receipt.orders" /></a>
                     </li>
                     <li class="searchMx">
                         <a href="<spring:url value="/searchMx/init" htmlEscape="true "/>" title="<spring:message code="menu.search.mx" />"><i class="fa fa-lg fa-fw fa-search"></i> <spring:message code="menu.search.mx" /></a>
                     </li>
-                    <li class="tomaMx">
-                        <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.receipt.patient" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.patient" /></a>
-                    </li>
-
                     <li class="reprintLabCode">
                         <a href="<spring:url value="/reprint/init" htmlEscape="true "/>" title="<spring:message code="lbl.reprint.codelab" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="lbl.reprint.codelab" /></a>
                     </li>

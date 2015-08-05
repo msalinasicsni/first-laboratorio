@@ -258,7 +258,7 @@
                                 <th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                 <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
-                                <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                                 <th><spring:message code="lbl.request.large"/></th>
                                 <th></th>
                             </tr>

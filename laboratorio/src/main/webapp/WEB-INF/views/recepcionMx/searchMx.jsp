@@ -269,7 +269,7 @@
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.lab"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.solic.area.prc"/></th>
-                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                                             <th><spring:message code="lbl.request.large"/></th>
                                         </tr>
                                         </thead>

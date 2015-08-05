@@ -1394,6 +1394,9 @@ public class RecepcionMxController {
                     map.put("embarazada", tomaMxService.estaEmbarazada(tomaMx.getIdNotificacion().getIdNotificacion()));
                 }else
                     map.put("embarazada","--");
+            } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
+                map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
+                map.put("embarazada","--");
             }else{
                 map.put("persona"," ");
                 map.put("embarazada","--");
@@ -1538,7 +1541,10 @@ public class RecepcionMxController {
                         map.put("embarazada", tomaMxService.estaEmbarazada(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion()));
                     }else
                         map.put("embarazada","--");
-                } else {
+                } else if (recepcion.getTomaMx().getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                    map.put("embarazada","--");
+                }else {
                     map.put("persona", " ");
                     map.put("embarazada","--");
                 }

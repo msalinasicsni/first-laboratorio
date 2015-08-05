@@ -101,7 +101,7 @@
                                             <th data-hide="phone"><i class="fa fa-child fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.pregnant.short"/></th>
                                             <th data-hide="phone"><i class="fa fa-hospital-o fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.hosp"/></th>
                                             <th data-hide="phone"><i class="fa fa-exclamation-triangle fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.urgent"/></th>
-                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.name"/></th>
+                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                                             <th></th>
                                         </tr>
                                         </thead>

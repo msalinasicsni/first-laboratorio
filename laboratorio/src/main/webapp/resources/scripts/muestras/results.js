@@ -92,6 +92,50 @@ var ResultsNotices = function () {
                         }
                     });
             }
+
+            /*******************************************************************************/
+            /***************************** OTRAS MUESTRAS **********************************/
+            /*******************************************************************************/
+
+            $('#btnAddNotiOtherSamples').click(function() {
+                addNotiOtherSamples();
+            });
+
+            function addNotiOtherSamples() {
+                var anulacionObj = {};
+                var respuestaObj = {};
+                respuestaObj['idNotificacion']='';
+                anulacionObj['mensaje'] = '';
+                anulacionObj['idSolicitante'] = $("#idSolicitante").val();
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.addNotificationUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(anulacionObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0){
+                                $.smallBox({
+                                    title: data.mensaje ,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }else {
+                                window.location.href = parametros.createUrl+data.idNotificacion;
+                            }
+                            desbloquearUI();
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
         }
 
     }
