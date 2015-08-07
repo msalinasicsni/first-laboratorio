@@ -271,7 +271,9 @@ public class ReportesController {
                 if (receivedMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                     nombreCompleto = nombreCompleto + " " + receivedMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona", nombreCompleto);
-            } else {
+            } else if (receivedMx.getTomaMx().getIdNotificacion().getSolicitante() != null){
+                map.put("persona",receivedMx.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
+            }  else {
                 map.put("persona", " ");
             }
 
@@ -388,20 +390,23 @@ public class ReportesController {
 
                         nombreSolitud = dxs;
 
-                        nombrePersona = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                        if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                        if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-
+                        if (recepcion.getTomaMx().getIdNotificacion().getPersona()!=null) {
+                            nombrePersona = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                            if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                            nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                            if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                nombrePersona = nombrePersona + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                        }else{
+                            nombrePersona = recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                        }
                         content[0] = recepcion.getTomaMx().getCodigoLab() != null ? recepcion.getTomaMx().getCodigoLab() : "";
                         content[1] = recepcion.getTomaMx().getCodTipoMx() != null ? recepcion.getTomaMx().getCodTipoMx().getNombre() : "";
                         content[2] = recepcion.getFechaHoraRecepcion() != null ? DateUtil.DateToString(recepcion.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a") : "";
                         content[3] = recepcion.getCalidadMx() != null ? recepcion.getCalidadMx().getValor() : "";
                         content[4] = recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre() : "";
                         content[5] = recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion() != null ? recepcion.getTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre() : "";
-                        content[6] = recepcion.getTomaMx().getIdNotificacion().getPersona() != null ? nombrePersona : "";
+                        content[6] = nombrePersona;
                         content[7] = nombreSolitud != null ? nombreSolitud : "";
 
                         recList.add(content);
@@ -486,7 +491,7 @@ public class ReportesController {
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.receipt.person.name", null, null));
+            cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
@@ -552,7 +557,7 @@ public class ReportesController {
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.receipt.person.name", null, null));
+                    cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
@@ -818,6 +823,8 @@ public class ReportesController {
                         if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                             nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                         map.put("persona", nombreCompleto);
+                    } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante() != null){
+                        map.put("persona",soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
                     } else {
                         map.put("persona", " ");
                     }
@@ -1014,13 +1021,16 @@ public class ReportesController {
                     content = new String[6];
                     nombreSolitud = soliE.getTipoEstudio().getNombre();
 
-                    nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                    if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                        nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                    nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                    if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                        nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-
+                    if (soliE.getIdTomaMx().getIdNotificacion().getPersona()!=null) {
+                        nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                        if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                        nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                        if (soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            nombrePersona = nombrePersona + " " + soliE.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    }else{
+                        nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                    }
                     if (soliE.getFechaAprobacion() != null) {
                         fechaAprob = DateUtil.DateToString(soliE.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a");
                     }
@@ -1085,7 +1095,7 @@ public class ReportesController {
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(19, messageSource.getMessage("lbl.receipt.person.name", null, null));
+            cell = factHeaderrow.createCell(19, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
@@ -1141,7 +1151,7 @@ public class ReportesController {
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(19, messageSource.getMessage("lbl.receipt.person.name", null, null));
+                    cell = factHeaderrow.createCell(19, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
@@ -1339,6 +1349,8 @@ public class ReportesController {
                             if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                                 nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                             map.put("persona", nombreCompleto);
+                        } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante()!=null){
+                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
                         } else {
                             map.put("persona", " ");
                         }
@@ -1633,13 +1645,16 @@ public class ReportesController {
                             content = new String[7];
                             nombreSolitud = soli.getCodDx().getNombre();
 
-                            nombrePersona = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                                nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                            nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                                nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-
+                            if (soli.getIdTomaMx().getIdNotificacion().getPersona()!=null) {
+                                nombrePersona = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                                if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                    nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                                nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                                if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                    nombrePersona = nombrePersona + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                            }else{
+                                nombrePersona = soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                            }
                             if (soli.getFechaAprobacion() != null) {
                                 fechaAprob = DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a");
                             }
@@ -1758,7 +1773,7 @@ public class ReportesController {
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.receipt.person.name", null, null));
+            cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
@@ -1819,7 +1834,7 @@ public class ReportesController {
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.receipt.person.name", null, null));
+                    cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);

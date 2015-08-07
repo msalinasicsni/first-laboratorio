@@ -160,6 +160,8 @@ public class ResultadoFinalController {
                     if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
                         nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                     map.put("persona",nombreCompleto);
+                }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
                 }else{
                     map.put("persona"," ");
                 }
@@ -367,7 +369,9 @@ public class ResultadoFinalController {
                         if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                             nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                         map.put("persona", nombreCompleto);
-                    } else {
+                    } else if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                        map.put("persona", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                    }else {
                         map.put("persona", " ");
                     }
 

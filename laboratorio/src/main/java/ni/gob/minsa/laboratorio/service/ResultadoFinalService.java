@@ -2,12 +2,14 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadDepartamento;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadDireccion;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
+import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -64,7 +66,7 @@ public class ResultadoFinalService {
         }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
-            crit.createAlias("noti.persona", "person");
+            //crit.createAlias("noti.persona", "person");
             String[] partes = filtro.getNombreApellido().split(" ");
             String[] partesSnd = filtro.getNombreApellido().split(" ");
             for (int i = 0; i < partes.length; i++) {
@@ -76,13 +78,26 @@ public class ResultadoFinalService {
                 }
             }
             for (int i = 0; i < partes.length; i++) {
-                Junction conditionGroup = Restrictions.disjunction();
+                /*Junction conditionGroup = Restrictions.disjunction();
                 conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
-                crit.add(conditionGroup);
+                crit.add(conditionGroup);*/
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("noti.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
+                        .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
+                                .add(Restrictions.or(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
+                                        .add(Restrictions.or(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
+                                                .add(Restrictions.or(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
+                                                        .add(Restrictions.or(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%")))))))
+                        .setProjection(Property.forName("personaId"))))
+                        .add(Subqueries.propertyIn("noti.solicitante.idSolicitante", DetachedCriteria.forClass(Solicitante.class,"solicitante")
+                                .add(Restrictions.ilike("solicitante.nombre", "%" + partes[i] + "%"))
+                                .setProjection(Property.forName("idSolicitante"))));
+
+                crit.add(conditGroup);
             }
         }
         //se filtra por SILAIS
@@ -700,8 +715,8 @@ public class ResultadoFinalService {
         }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
-            crit.createAlias("noti.persona", "person");
-            crit2.createAlias("noti.persona", "person");
+            //crit.createAlias("noti.persona", "person");
+            //crit2.createAlias("noti.persona", "person");
             String[] partes = filtro.getNombreApellido().split(" ");
             String[] partesSnd = filtro.getNombreApellido().split(" ");
             for (int i = 0; i < partes.length; i++) {
@@ -713,14 +728,28 @@ public class ResultadoFinalService {
                 }
             }
             for (int i = 0; i < partes.length; i++) {
-                Junction conditionGroup = Restrictions.disjunction();
+                /*Junction conditionGroup = Restrictions.disjunction();
                 conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
                         .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
                 crit.add(conditionGroup);
-                crit2.add(conditionGroup);
+                crit2.add(conditionGroup);*/
+
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("noti.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
+                        .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
+                                .add(Restrictions.or(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
+                                        .add(Restrictions.or(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
+                                                .add(Restrictions.or(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
+                                                        .add(Restrictions.or(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%")))))))
+                        .setProjection(Property.forName("personaId"))))
+                        .add(Subqueries.propertyIn("noti.solicitante.idSolicitante", DetachedCriteria.forClass(Solicitante.class,"solicitante")
+                                .add(Restrictions.ilike("solicitante.nombre", "%" + partes[i] + "%"))
+                                .setProjection(Property.forName("idSolicitante"))));
+                crit.add(conditGroup);
+                crit2.add(conditGroup);
             }
         }
         //se filtra por SILAIS

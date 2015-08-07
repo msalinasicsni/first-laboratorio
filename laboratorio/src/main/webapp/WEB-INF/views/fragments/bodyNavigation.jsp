@@ -96,15 +96,21 @@
                     <li class="separacionMx">
                         <a href="<spring:url value="/separacionMx/init" htmlEscape="true "/>" title="<spring:message code="menu.generate.aliquot" />"><i class="fa fa-lg fa-fw fa-ticket"></i> <spring:message code="menu.generate.aliquot" /></a>
                     </li>
-                    <li class="trasladoMx">
-                        <a href="<spring:url value="/trasladoMx/init" htmlEscape="true "/>" title="<spring:message code="menu.transfer.internal.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.internal.mx" /></a>
+                    <li class="traslado">
+                        <a href="#" title="<spring:message code="menu.transfer" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <span class="menu-item-parent"><spring:message code="menu.transfer" /></span></a>
+                        <ul>
+                            <li class="trasladoMx">
+                                <a href="<spring:url value="/trasladoMx/init" htmlEscape="true "/>" title="<spring:message code="menu.transfer.internal.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.internal.mx" /></a>
+                            </li>
+                            <li class="trasladoMxCC">
+                                <a href="<spring:url value="/trasladoMx/initCC" htmlEscape="true "/>" title="<spring:message code="menu.transfer.qualitycontrol.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.qualitycontrol.mx" /></a>
+                            </li>
+                            <li class="trasladoMxEx">
+                                <a href="<spring:url value="/trasladoMx/initExternal" htmlEscape="true "/>" title="<spring:message code="menu.transfer.external.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.external.mx" /></a>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="trasladoMxCC">
-                        <a href="<spring:url value="/trasladoMx/initCC" htmlEscape="true "/>" title="<spring:message code="menu.transfer.qualitycontrol.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.qualitycontrol.mx" /></a>
-                    </li>
-                    <li class="trasladoMxEx">
-                        <a href="<spring:url value="/trasladoMx/initExternal" htmlEscape="true "/>" title="<spring:message code="menu.transfer.external.mx" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.transfer.external.mx" /></a>
-                    </li>
+
                 </ul>
             </li>
             <li class="resultado">

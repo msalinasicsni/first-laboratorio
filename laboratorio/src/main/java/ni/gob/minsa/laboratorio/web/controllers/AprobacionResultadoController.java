@@ -4,11 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -211,6 +213,8 @@ public class AprobacionResultadoController {
                 if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
                     nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
+            }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
             }else{
                 map.put("persona"," ");
             }
@@ -377,9 +381,20 @@ public class AprobacionResultadoController {
                 }else {
                     fechaInicioSintomas = solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
                 }
+                SisPersona persona;
+                Solicitante solicitante;
+                if (solicitudDx!=null){
+                    persona = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona();
+                    solicitante = solicitudDx.getIdTomaMx().getIdNotificacion().getSolicitante();
+                }else{
+                    persona = solicitudEstudio.getIdTomaMx().getIdNotificacion().getPersona();
+                    solicitante = solicitudEstudio.getIdTomaMx().getIdNotificacion().getSolicitante();
+                }
                 mav.addObject("solicitudDx", solicitudDx);
                 mav.addObject("solicitudEstudio", solicitudEstudio);
                 mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
+                mav.addObject("persona", persona);
+                mav.addObject("solicitante", solicitante);
                 mav.setViewName("resultados/approveResult");
             }
 
@@ -700,6 +715,8 @@ public class AprobacionResultadoController {
                 if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
                     nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
+            }else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
+                map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
             }else{
                 map.put("persona"," ");
             }

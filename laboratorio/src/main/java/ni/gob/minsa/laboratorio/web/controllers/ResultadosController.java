@@ -6,10 +6,12 @@ import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -165,10 +167,23 @@ public class ResultadosController {
                             && resultadosService.getDetallesResultadoActivosByExamen(ordenExamen.getIdOrdenExamen()).size() <= 0; //y no tiene resultados el examen
                 }
             }
+
+            SisPersona persona;
+            Solicitante solicitante;
+            if (ordenExamen.getSolicitudDx()!=null){
+                persona = ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona();
+                solicitante = ordenExamen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante();
+            }else{
+                persona = ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona();
+                solicitante = ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getSolicitante();
+            }
+
             mav.addObject("ordenExamen", ordenExamen);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
             mav.addObject("solicitarResFinal",solicitarResFinal);
+            mav.addObject("persona", persona);
+            mav.addObject("solicitante", solicitante);
             mav.setViewName("resultados/incomeResult");
         }else
             mav.setViewName(urlValidacion);
@@ -289,7 +304,9 @@ public class ResultadosController {
                     if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                         nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                     map.put("persona", nombreCompleto);
-                } else {
+                } else if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                }else {
                     map.put("persona", " ");
                 }
 

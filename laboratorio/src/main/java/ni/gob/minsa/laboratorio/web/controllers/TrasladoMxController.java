@@ -567,6 +567,8 @@ public class TrasladoMxController {
                 if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
                     nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona",nombreCompleto);
+            } else if (tomaMx.getIdNotificacion().getSolicitante()!=null){
+                map.put("persona",tomaMx.getIdNotificacion().getSolicitante().getNombre());
             }else{
                 map.put("persona"," ");
             }
