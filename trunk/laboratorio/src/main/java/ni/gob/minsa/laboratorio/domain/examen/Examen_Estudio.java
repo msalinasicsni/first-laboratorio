@@ -43,7 +43,7 @@ public class Examen_Estudio {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_EXAMEN", referencedColumnName = "ID_EXAMEN",nullable = false)
-    @ForeignKey(name="EXAMENDX_EXAMEN_FK")
+    @ForeignKey(name="EXAMENEST_EXAMEN_FK")
     public CatalogoExamenes getExamen() {
         return examen;
     }

@@ -97,6 +97,7 @@
                     <div class="widget-body no-padding">
                         <form class="smart-form" autocomplete="off">
                         <fieldset>
+                        <c:if test="${not empty persona}">
                         <div class="row">
                             <section class="col col-sm-6 col-md-3 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
@@ -105,14 +106,8 @@
                                 <div class="">
                                     <label class="input">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                        <c:choose>
-                                            <c:when test="${not empty solicitudDx}">
-                                                <input class="form-control" type="text" disabled id="primerNombre" name="primerNombre" value="${solicitudDx.idTomaMx.idNotificacion.persona.primerNombre}" placeholder=" <spring:message code="person.name1" />">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <input class="form-control" type="text" disabled id="primerNombre" name="primerNombre" value="${solicitudEstudio.idTomaMx.idNotificacion.persona.primerNombre}" placeholder=" <spring:message code="person.name1" />">
-                                            </c:otherwise>
-                                        </c:choose>
+
+                                                <input class="form-control" type="text" disabled id="primerNombre" name="primerNombre" value="${persona.primerNombre}" placeholder=" <spring:message code="person.name1" />">
                                         <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.nombre1"/>
                                         </b>
                                     </label>
@@ -125,14 +120,7 @@
                                 <div class="">
                                     <label class="input">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                        <c:choose>
-                                            <c:when test="${not empty solicitudDx}">
-                                                <input class="form-control" type="text" disabled name="segundoNombre" id="segundoNombre" value="${solicitudDx.idTomaMx.idNotificacion.persona.segundoNombre}" placeholder=" <spring:message code="person.name2" />" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <input class="form-control" type="text" disabled name="segundoNombre" id="segundoNombre" value="${solicitudEstudio.idTomaMx.idNotificacion.persona.segundoNombre}" placeholder=" <spring:message code="person.name2" />" />
-                                            </c:otherwise>
-                                        </c:choose>
+                                                <input class="form-control" type="text" disabled name="segundoNombre" id="segundoNombre" value="${persona.segundoNombre}" placeholder=" <spring:message code="person.name2" />" />
                                         <b class="tooltip tooltip-bottom-right"> <i
                                                 class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.nombre2"/>
                                         </b>
@@ -146,14 +134,7 @@
                                 <div class="">
                                     <label class="input">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                        <c:choose>
-                                            <c:when test="${not empty solicitudDx}">
-                                                <input class="form-control" type="text" disabled name="primerApellido" id="primerApellido" value="${solicitudDx.idTomaMx.idNotificacion.persona.primerApellido}" placeholder=" <spring:message code="person.lastname1" />" />
-                                            </c:when>
-                                            <c:otherwise>
-                                                <input class="form-control" type="text" disabled name="primerApellido" id="primerApellido" value="${solicitudEstudio.idTomaMx.idNotificacion.persona.primerApellido}" placeholder=" <spring:message code="person.lastname1" />" />
-                                            </c:otherwise>
-                                        </c:choose>
+                                                <input class="form-control" type="text" disabled name="primerApellido" id="primerApellido" value="${persona.primerApellido}" placeholder=" <spring:message code="person.lastname1" />" />
                                         <b class="tooltip tooltip-bottom-right"> <i
                                                 class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.apellido1"/>
                                         </b>
@@ -167,14 +148,7 @@
                                 <div class="">
                                     <label class="input">
                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                        <c:choose>
-                                            <c:when test="${not empty solicitudDx}">
-                                                <input class="form-control" type="text" disabled name="segundoApellido" id="segundoApellido" value="${solicitudDx.idTomaMx.idNotificacion.persona.segundoApellido}" placeholder=" <spring:message code="person.lastname2" />"/>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <input class="form-control" type="text" disabled name="segundoApellido" id="segundoApellido" value="${solicitudEstudio.idTomaMx.idNotificacion.persona.segundoApellido}" placeholder=" <spring:message code="person.lastname2" />"/>
-                                            </c:otherwise>
-                                        </c:choose>
+                                                <input class="form-control" type="text" disabled name="segundoApellido" id="segundoApellido" value="${persona.segundoApellido}" placeholder=" <spring:message code="person.lastname2" />"/>
                                         <b class="tooltip tooltip-bottom-right"> <i
                                                 class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.apellido2"/>
                                         </b>
@@ -182,6 +156,38 @@
                                 </div>
                             </section>
                         </div>
+                        </c:if>
+                        <c:if test="${not empty solicitante}">
+                            <div class="row">
+                                <section class="col col-sm-6 col-md-6 col-lg-6">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.applicant"/>
+                                    </label>
+                                    <div class="">
+                                        <label class="input">
+                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                            <input class="form-control" type="text" id="nombre" name="nombre" disabled value="${solicitante.nombre}" placeholder=" <spring:message code="lbl.applicant.name" />">
+                                            <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.applicant.name"/>
+                                            </b>
+                                        </label>
+                                    </div>
+                                </section>
+                                <section class="col col-sm-6 col-md-6 col-lg-6">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.contact.name"/>
+                                    </label>
+                                    <div class="">
+                                        <label class="input">
+                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                            <input class="form-control" type="text" name="contacto" id="contacto" disabled value="${solicitante.nombreContacto}" placeholder=" <spring:message code="lbl.contact.name" />" />
+                                            <b class="tooltip tooltip-bottom-right"> <i
+                                                    class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.contact.name"/>
+                                            </b>
+                                        </label>
+                                    </div>
+                                </section>
+                            </div>
+                        </c:if>
                         <div class="row">
                             <section class="col col-sm-12 col-md-6 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
