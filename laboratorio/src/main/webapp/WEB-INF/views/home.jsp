@@ -116,7 +116,64 @@
 					<!-- WIDGET END -->
 				</div>
 				<!-- end row -->
-				<!-- row -->
+				<div class="row">
+                    <!-- NEW WIDGET START -->
+                    <article class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+
+                        <!-- Widget ID (each widget will need unique ID)-->
+                        <div class="jarviswidget" id="wid-id-7" data-widget-editbutton="false" data-widget-deletebutton="false">
+                            <header>
+                                <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
+                                <h2><spring:message code="lbl.chart.SILAIS.title"/></h2>
+
+                            </header>
+                            <!-- widget div-->
+                            <div>
+                                <!-- widget edit box -->
+                                <div class="jarviswidget-editbox">
+                                    <!-- This area used as dropdown edit box -->
+                                </div>
+                                <!-- end widget edit box -->
+                                <!-- widget content -->
+                                <div class="widget-body no-padding">
+                                    <div id="pie-chart" class="chart"></div>
+                                </div>
+                                <!-- end widget content -->
+                            </div>
+                            <!-- end widget div -->
+                        </div>
+                        <!-- end widget -->
+                    </article>
+                    <!-- WIDGET END -->
+                    <!-- NEW WIDGET START -->
+                    <article class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+
+                        <!-- Widget ID (each widget will need unique ID)-->
+                        <div class="jarviswidget" id="wid-id-6" data-widget-editbutton="false" data-widget-deletebutton="false">
+                            <header>
+                                <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
+                                <h2><spring:message code="lbl.chart.request.title"/></h2>
+                            </header>
+                            <!-- widget div-->
+                            <div>
+                                <!-- widget edit box -->
+                                <div class="jarviswidget-editbox">
+                                    <!-- This area used as dropdown edit box -->
+                                </div>
+                                <!-- end widget edit box -->
+                                <!-- widget content -->
+                                <div class="widget-body no-padding">
+                                    <div id="pie-chart2" class="chart"></div>
+                                </div>
+                                <!-- end widget content -->
+                            </div>
+                            <!-- end widget div -->
+                        </div>
+                        <!-- end widget -->
+                    </article>
+                    <!-- WIDGET END -->
+				</div>
+                <!-- row -->
 				<div class="row">
 					<!-- a blank row to get started -->
 					<div class="col-sm-12">
@@ -148,9 +205,23 @@
     <script src="${dataTablesBootstrap}"></script>
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
+    <!-- Flot Chart Plugin: Flot Engine, Flot Resizer, Flot Tooltip -->
+    <spring:url value="/resources/js/plugin/flot/jquery.flot.cust.min.js" var="jqueryFlot" />
+    <script src="${jqueryFlot}"></script>
+    <spring:url value="/resources/js/plugin/flot/jquery.flot.resize.min.js" var="jqueryFlotResize" />
+    <script src="${jqueryFlotResize}"></script>
+    <spring:url value="/resources/js/plugin/flot/jquery.flot.time.min.js" var="jqueryFlotTime" />
+    <script src="${jqueryFlotTime}"></script>
+    <spring:url value="/resources/js/plugin/flot/jquery.flot.tooltip.min.js" var="jqueryFlotToolTip" />
+    <script src="${jqueryFlotToolTip}"></script>
+    <!-- EASY PIE CHARTS -->
+    <spring:url value="/resources/js/plugin/flot/jquery.flot.pie.min.js" var="pieChart" />
+    <script src="${pieChart}"></script>
 	<!-- END PAGE LEVEL SCRIPTS -->
     <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
     <c:url var="sCreateReceiptUrl" value="/recepcionMx/create/"/>
+    <c:url var="resumenSILAISUrl" value="/getResumenMuestrasSILAIS"/>
+    <c:url var="resumenSolicitudUrl" value="/getResumenMuestrasSolicitud"/>
 	<script>
 	    $(function () {
 	    	$("li.home").addClass("active");
@@ -202,7 +273,7 @@
                         for (var i = 0; i < len; i++) {
                             var idLoad;
                             if ($('#txtEsLaboratorio').val()=='true'){
-                                idLoad =dataToLoad[i]. idRecepcion;
+                                idLoad =dataToLoad[i].idRecepcion;
                             }else{
                                 idLoad = dataToLoad[i].idTomaMx;
                             }
@@ -239,6 +310,121 @@
             }
 
             getOrders();
+
+            /* pie chart */
+
+            function getResumenSILAIS() {
+                $.getJSON("${resumenSILAISUrl}", {
+                    ajax : 'true'
+                }, function(dataToLoad) {
+                    var len = Object.keys(dataToLoad).length;
+                    var colores = ["#00A36A","#7D0096","#DE000F","#ED7B00","#005CDE"];
+                    if (len > 0) {
+                        var data_pie = [];
+                        for (var i = 0; i < len; i++) {
+                            data_pie[i] = {
+                                label : dataToLoad[i].SILAIS,
+                                data : dataToLoad[i].total,
+                                color: colores[i]
+                            }
+                        }
+                        cargarGrafico("#pie-chart",data_pie);
+                    }
+                }).fail(function(response) {
+                    $.smallBox({
+                        title: "error: "+ response.status + "-" + response.statusText ,
+                        content: "${ordersUrl}" ,
+                        color: "#C46A69",
+                        iconSmall: "fa fa-warning",
+                        timeout: 4000
+                    });
+                    //if (response.status!=null && response.status != 403){
+                    //alert( "error: "+ response.status + "-" + response.statusText );
+                    //}
+                    //alert( "error: "+ response.status + "-" + response.statusText + "\n" + "${ordersUrl}" );
+
+                });
+
+            }
+
+            function getResumenSolicitudes() {
+                $.getJSON("${resumenSolicitudUrl}", {
+                    ajax : 'true'
+                }, function(dataToLoad) {
+                    var len = Object.keys(dataToLoad).length;
+                    var colores = ["#00A36A","#7D0096","#DE000F","#ED7B00","#005CDE"];
+                    if (len > 0) {
+                        var data_pie = [];
+                        for (var i = 0; i < len; i++) {
+                            data_pie[i] = {
+                                label : dataToLoad[i].solicitud,
+                                data : dataToLoad[i].total,
+                                color: colores[i]
+                            }
+                        }
+                        cargarGrafico("#pie-chart2",data_pie);
+                    }
+                }).fail(function(response) {
+                    $.smallBox({
+                        title: "error: "+ response.status + "-" + response.statusText ,
+                        content: "${ordersUrl}" ,
+                        color: "#C46A69",
+                        iconSmall: "fa fa-warning",
+                        timeout: 4000
+                    });
+                    //if (response.status!=null && response.status != 403){
+                    //alert( "error: "+ response.status + "-" + response.statusText );
+                    //}
+                    //alert( "error: "+ response.status + "-" + response.statusText + "\n" + "${ordersUrl}" );
+
+                });
+
+            }
+            /*var data_pie = [];
+            var series = Math.floor(Math.random() * 10) + 1;
+            for (var i = 0; i < series; i++) {
+                data_pie[i] = {
+                    label : "Series" + (i + 1),
+                    data : Math.floor(Math.random() * 100) + 1
+                }
+            }*/
+
+            function cargarGrafico(contenedor,data) {
+                $.plot(contenedor, data, {
+                    series: {
+                        pie: {
+                            show: true,
+                            radius: 1,
+                            label: {
+                                show: true,
+                                radius: 2 / 3,
+                                formatter: function (label, series) {
+                                    return '<div style="font-size:11px;text-align:center;padding:4px;color:white;"><br/>' + series.data[0][1] + '</div>';
+                                },
+                                threshold: 0.01
+                            }
+                        }
+                    },
+                    legend: {
+                        show: true,
+                        noColumns: 1, // number of colums in legend table
+                        labelFormatter: null, // fn: string -> string
+                        labelBoxBorderColor: "#000", // border color for the little label boxes
+                        container: null, // container (as jQuery object) to put legend in, null means default on top of graph
+                        position: "ne", // position of default legend container within plot
+                        margin: [5, 10], // distance from grid edge to default legend container within plot
+                        backgroundColor: "#efefef", // null means auto-detect
+                        backgroundOpacity: 1 // set to 0 to avoid background
+                    },
+                    grid: {
+                        hoverable: true
+                    }
+                });
+            }
+
+            getResumenSILAIS();
+            getResumenSolicitudes();
+            /* end pie chart */
 		});
 	</script>
 	<!-- END JAVASCRIPTS -->
