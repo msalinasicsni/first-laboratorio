@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html>
 <!-- BEGIN HEAD -->
 <head>
@@ -57,7 +58,7 @@
 					<!-- NEW WIDGET START -->
 					<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 						<!-- Widget ID (each widget will need unique ID)-->
-						<div class="jarviswidget" id="wid-id-0">
+						<div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
 							<!-- widget options:
 								usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
 								data-widget-colorbutton="false"	
@@ -70,7 +71,7 @@
 								data-widget-sortable="false"
 							-->
 							<header>
-								<span class="widget-icon"> <i class="fa fa-comments"></i> </span>
+								<span class="widget-icon"> <i class="fa fa-tint"></i> </span>
 								<h2><spring:message code="lbl.home.widgettitle" /> </h2>
 							</header>
 							<!-- widget div-->
@@ -83,8 +84,16 @@
 								<!-- end widget edit box -->
 								<!-- widget content -->
 								<div class="widget-body no-padding">
+                                    <p class="alert alert-info">
+                                        <spring:url value="/recepcionMx/init" var="recepcionUrl"/>
+                                        <button type="button" class="btn btn-primary"
+                                                onclick="location.href='${fn:escapeXml(recepcionUrl)}'">
+                                            <spring:message code="lbl.go.to.receipt" />
+                                        </button>
+                                    </p>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
+                                    <input id="msg_no_data_found" type="hidden" value="<spring:message code="lbl.no.data.found"/>"/>
 									<!-- this is what the user will see -->
                                     <table id="orders_result" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
@@ -121,7 +130,7 @@
                     <article class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 
                         <!-- Widget ID (each widget will need unique ID)-->
-                        <div class="jarviswidget" id="wid-id-7" data-widget-editbutton="false" data-widget-deletebutton="false">
+                        <div class="jarviswidget jarviswidget-color-darken" id="wid-id-7" data-widget-editbutton="false" data-widget-deletebutton="false">
                             <header>
                                 <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
                                 <h2><spring:message code="lbl.chart.SILAIS.title"/></h2>
@@ -149,7 +158,7 @@
                     <article class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 
                         <!-- Widget ID (each widget will need unique ID)-->
-                        <div class="jarviswidget" id="wid-id-6" data-widget-editbutton="false" data-widget-deletebutton="false">
+                        <div class="jarviswidget jarviswidget-color-darken" id="wid-id-6" data-widget-editbutton="false" data-widget-deletebutton="false">
                             <header>
                                 <span class="widget-icon"> <i class="fa fa-bar-chart-o"></i> </span>
                                 <h2><spring:message code="lbl.chart.request.title"/></h2>
@@ -283,14 +292,6 @@
 
                         }
 
-                    }else{
-                        $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
-                            content: $("#smallBox_content").val(),
-                            color: "#C79121",
-                            iconSmall: "fa fa-warning",
-                            timeout: 4000
-                        });
                     }
                 }).fail(function(response) {
                     $.smallBox({
@@ -300,11 +301,6 @@
                         iconSmall: "fa fa-warning",
                         timeout: 4000
                     });
-                    //if (response.status!=null && response.status != 403){
-                        //alert( "error: "+ response.status + "-" + response.statusText );
-                    //}
-                    //alert( "error: "+ response.status + "-" + response.statusText + "\n" + "${ordersUrl}" );
-
                 });
 
             }
@@ -329,6 +325,9 @@
                             }
                         }
                         cargarGrafico("#pie-chart",data_pie);
+                    }else{
+                        var noDatos = '<h4 class="alert alert-danger">'+$("#msg_no_data_found").val()+'</h4>';
+                        $("#pie-chart").html(noDatos);
                     }
                 }).fail(function(response) {
                     $.smallBox({
@@ -338,11 +337,6 @@
                         iconSmall: "fa fa-warning",
                         timeout: 4000
                     });
-                    //if (response.status!=null && response.status != 403){
-                    //alert( "error: "+ response.status + "-" + response.statusText );
-                    //}
-                    //alert( "error: "+ response.status + "-" + response.statusText + "\n" + "${ordersUrl}" );
-
                 });
 
             }
@@ -363,7 +357,11 @@
                             }
                         }
                         cargarGrafico("#pie-chart2",data_pie);
+                    }else{
+                        var noDatos = '<h4 class="alert alert-danger">'+$("#msg_no_data_found").val()+'</h4>';
+                        $("#pie-chart2").html(noDatos);
                     }
+
                 }).fail(function(response) {
                     $.smallBox({
                         title: "error: "+ response.status + "-" + response.statusText ,
@@ -372,22 +370,9 @@
                         iconSmall: "fa fa-warning",
                         timeout: 4000
                     });
-                    //if (response.status!=null && response.status != 403){
-                    //alert( "error: "+ response.status + "-" + response.statusText );
-                    //}
-                    //alert( "error: "+ response.status + "-" + response.statusText + "\n" + "${ordersUrl}" );
-
                 });
 
             }
-            /*var data_pie = [];
-            var series = Math.floor(Math.random() * 10) + 1;
-            for (var i = 0; i < series; i++) {
-                data_pie[i] = {
-                    label : "Series" + (i + 1),
-                    data : Math.floor(Math.random() * 100) + 1
-                }
-            }*/
 
             function cargarGrafico(contenedor,data) {
                 $.plot(contenedor, data, {
