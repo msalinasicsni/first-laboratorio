@@ -110,6 +110,9 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="viewNoti">
+                        <a href="<spring:url value="/viewNoti/init" htmlEscape="true "/>" title="<spring:message code="lbl.view.noti" />"><i class="fa fa-lg fa-fw fa-file-pdf-o"></i> <spring:message code="lbl.view.noti" /></a>
+                    </li>
 
                 </ul>
             </li>
