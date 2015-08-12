@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Created by FIRSTICT on 1/6/2015.
@@ -115,6 +116,51 @@ public class DateUtil {
             diff_year--;
         }
         return diff_year;
+    }
+
+    public static String calcularEdad(Date fechaNac, Date fecha){
+        Integer iedadEnAnios;
+        Integer iedadEnMeses;
+        Integer iedadEnDias;
+
+        Calendar calendarDOB = Calendar.getInstance();
+        Calendar calendarToday = Calendar.getInstance();
+
+
+        calendarToday.setTime(fecha);
+        calendarDOB.setTime(fechaNac);
+        iedadEnAnios = calendarToday.get(Calendar.YEAR) - calendarDOB.get(Calendar.YEAR);
+
+        if(calendarToday.before(new GregorianCalendar(calendarToday.get(Calendar.YEAR), calendarDOB.get(Calendar.MONTH), calendarDOB.get(Calendar.DAY_OF_MONTH)))){
+            iedadEnAnios--;
+            iedadEnMeses = (12 - (calendarDOB.get(Calendar.MONTH) + 1)) + (calendarDOB.get(Calendar.MONTH));
+
+            if(calendarDOB.get(Calendar.DAY_OF_MONTH) > calendarToday.get(Calendar.DAY_OF_MONTH)){
+                iedadEnDias = calendarDOB.get(Calendar.DAY_OF_MONTH) - calendarToday.get(Calendar.DAY_OF_MONTH);
+            }
+            else if(calendarDOB.get(Calendar.DAY_OF_MONTH) < calendarToday.get(Calendar.DAY_OF_MONTH)){
+                iedadEnDias = calendarToday.get(Calendar.DAY_OF_MONTH) - calendarDOB.get(Calendar.DAY_OF_MONTH);
+            }
+            else{
+                iedadEnDias = 0;
+            }
+        }
+        else if(calendarToday.after(new GregorianCalendar(calendarToday.get(Calendar.YEAR), calendarDOB.get(Calendar.MONTH), calendarDOB.get(Calendar.DAY_OF_MONTH)))){
+            iedadEnMeses = (calendarToday.get(Calendar.MONTH) - (calendarDOB.get(Calendar.MONTH)));
+            if(calendarDOB.get(Calendar.DAY_OF_MONTH) > calendarToday.get(Calendar.DAY_OF_MONTH))
+                iedadEnDias = calendarDOB.get(Calendar.DAY_OF_MONTH) - calendarToday.get(Calendar.DAY_OF_MONTH) - calendarDOB.get(Calendar.DAY_OF_MONTH);
+            else if(calendarDOB.get(Calendar.DAY_OF_MONTH) < calendarToday.get(Calendar.DAY_OF_MONTH)){
+                iedadEnDias = calendarToday.get(Calendar.DAY_OF_MONTH) - calendarDOB.get(Calendar.DAY_OF_MONTH);
+            }else
+                iedadEnDias = 0;
+        }else{
+            iedadEnAnios = calendarToday.get(Calendar.YEAR) - calendarDOB.get(Calendar.YEAR);
+            iedadEnMeses = 0;
+            iedadEnDias = 0;
+        }
+
+        return iedadEnAnios.toString()+"/"+iedadEnMeses.toString()+"/"+iedadEnDias.toString();
+
     }
 
 }

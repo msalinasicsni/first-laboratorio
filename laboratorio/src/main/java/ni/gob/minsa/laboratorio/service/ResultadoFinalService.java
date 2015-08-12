@@ -980,4 +980,28 @@ public class ResultadoFinalService {
         return fechaResultado;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudDx> getSolicitudesDxByIdNotificacion(String idNotificacion){
+        Session session = sessionFactory.getCurrentSession();
+        Soundex varSoundex = new Soundex();
+        Criteria crit = session.createCriteria(DaSolicitudDx.class, "diagnostico");
+        crit.createAlias("diagnostico.idTomaMx","tomaMx");
+        //crit.createAlias("tomaMx.estadoMx","estado");
+        crit.createAlias("tomaMx.idNotificacion", "noti");
+        //siempre se tomam las muestras que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("tomaMx.anulada", false))
+        );
+        //siempre se tomam las rutinas que no son control de calidad
+        crit.add( Restrictions.and(
+                        Restrictions.eq("diagnostico.controlCalidad", false))
+        );
+        crit.add( Restrictions.and(
+                        Restrictions.eq("noti.idNotificacion", idNotificacion))
+        );
+        crit.add(Restrictions.and(Restrictions.eq("diagnostico.aprobada", true)));
+
+        return crit.list();
+    }
+
 }

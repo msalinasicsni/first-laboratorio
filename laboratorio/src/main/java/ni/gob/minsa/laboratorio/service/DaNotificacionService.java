@@ -1,12 +1,9 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
-import org.apache.commons.codec.language.Soundex;
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
 
 /**
@@ -99,5 +94,7 @@ public class DaNotificacionService {
                 .list();
 
     }
+
+
 
 }
