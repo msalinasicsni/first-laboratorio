@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.examen.AreaDepartamento;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
@@ -256,12 +257,18 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 2) {
                 crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("codDx", "dx")
-                        .createAlias("dx.area","area")
-                        .add(Subqueries.propertyIn("area.departamento.idDepartamento", DetachedCriteria.forClass(AutoridadDepartamento.class)
-                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
-                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
-                                .setProjection(Property.forName("departamento.idDepartamento"))))
-                        //.createAlias("idTomaMx", "toma")
+                        .createAlias("dx.area", "area")
+                        .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
+                                        .createAlias("area","area")
+                                        .createAlias("depDireccion", "depDir")
+                                        .createAlias("depDir.departamento","departamento")
+                                        .add(Restrictions.eq("pasivo", false)) //area departamento activa
+                                        .add(Subqueries.propertyIn("departamento.idDepartamento", DetachedCriteria.forClass(AutoridadDepartamento.class)
+                                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                                .setProjection(Property.forName("departamento.idDepartamento"))))
+                                        .setProjection(Property.forName("area.idArea"))
+                        ))
                         .setProjection(Property.forName("idSolicitudDx")))));
             }
             //nivel director
@@ -270,12 +277,20 @@ public class ResultadoFinalService {
                 crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
-                        .createAlias("area.departamento","departamento")
-                        .add(Subqueries.propertyIn("departamento.direccion.idDireccion", DetachedCriteria.forClass(AutoridadDireccion.class)
-                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
-                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
-                                .setProjection(Property.forName("direccion.idDireccion"))))
-                        //.createAlias("idTomaMx", "toma")
+                        .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
+                                        .createAlias("area","area")
+                                        .createAlias("depDireccion", "depDir")
+                                        .createAlias("depDir.direccionLab","dirLab")
+                                        .createAlias("dirLab.direccion","direccion")
+                                        .add(Restrictions.eq("pasivo", false)) //area departamento activa
+                                        .add(Restrictions.eq("depDir.pasivo", false)) //departamento direccion activa
+                                        .add(Restrictions.eq("dirLab.pasivo", false)) //direccion laboratorio activa
+                                        .add(Subqueries.propertyIn("direccion.idDireccion", DetachedCriteria.forClass(AutoridadDireccion.class)
+                                                .add(Restrictions.eq("pasivo", false)) //autoridad direccion activa
+                                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                                .setProjection(Property.forName("direccion.idDireccion"))))
+                                        .setProjection(Property.forName("area.idArea"))
+                        ))
                         .setProjection(Property.forName("idSolicitudDx")))));
             }
         }
@@ -470,11 +485,17 @@ public class ResultadoFinalService {
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
-                        .add(Subqueries.propertyIn("area.departamento.idDepartamento", DetachedCriteria.forClass(AutoridadDepartamento.class)
-                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
-                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
-                                .setProjection(Property.forName("departamento.idDepartamento"))))
-                        //.createAlias("idTomaMx", "toma")
+                        .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
+                                        .createAlias("area","area")
+                                        .createAlias("depDireccion", "depDir")
+                                        .createAlias("depDir.departamento","departamento")
+                                        .add(Restrictions.eq("pasivo", false)) //area departamento activa
+                                        .add(Subqueries.propertyIn("departamento.idDepartamento", DetachedCriteria.forClass(AutoridadDepartamento.class)
+                                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                                .setProjection(Property.forName("departamento.idDepartamento"))))
+                                        .setProjection(Property.forName("area.idArea"))
+                        ))
                         .setProjection(Property.forName("idSolicitudEstudio")))));
             }
             //nivel director
@@ -483,12 +504,20 @@ public class ResultadoFinalService {
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
-                        .createAlias("area.departamento","departamento")
-                        .add(Subqueries.propertyIn("departamento.direccion.idDireccion", DetachedCriteria.forClass(AutoridadDireccion.class)
-                                .add(Restrictions.eq("pasivo", false)) //autoridad area activa
-                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
-                                .setProjection(Property.forName("direccion.idDireccion"))))
-                        //.createAlias("idTomaMx", "toma")
+                        .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
+                                        .createAlias("area","area")
+                                        .createAlias("depDireccion", "depDir")
+                                        .createAlias("depDir.direccionLab","dirLab")
+                                        .createAlias("dirLab.direccion","direccion")
+                                        .add(Restrictions.eq("pasivo", false)) //area departamento activa
+                                        .add(Restrictions.eq("depDir.pasivo", false)) //departamento direccion activa
+                                        .add(Restrictions.eq("dirLab.pasivo", false)) //direccion laboratorio activa
+                                        .add(Subqueries.propertyIn("direccion.idDireccion", DetachedCriteria.forClass(AutoridadDireccion.class)
+                                                .add(Restrictions.eq("pasivo", false)) //autoridad direccion activa
+                                                .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                                                .setProjection(Property.forName("direccion.idDireccion"))))
+                                        .setProjection(Property.forName("area.idArea"))
+                        ))
                         .setProjection(Property.forName("idSolicitudEstudio")))));
             }
         }

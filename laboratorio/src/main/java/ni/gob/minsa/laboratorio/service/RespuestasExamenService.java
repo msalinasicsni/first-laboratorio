@@ -98,7 +98,7 @@ public class RespuestasExamenService {
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdExamen(Integer idExamen) throws Exception {
-        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaExamen as r inner join r.concepto tdc " +
+        String query = "Select distinct a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaExamen as r inner join r.concepto tdc " +
                 "where a.pasivo = false and tdl.idConcepto = tdc.idConcepto and r.idExamen.idExamen =:idExamen" +
                 " order by  a.valor";
         Session session = sessionFactory.getCurrentSession();

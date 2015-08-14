@@ -102,7 +102,7 @@
                         <input id="msg_result_override" type="hidden" value="<spring:message code="msg.result.successfully.canceled"/>"/>
                         <input id="text_value" type="hidden" value="<spring:message code="lbl.result.value"/>"/>
                         <input id="text_date" type="hidden" value="<spring:message code="lbl.result.date"/>"/>
-                        <input id="study_not_answers" type="hidden" value="<spring:message code="msg.study.not.answers.found"/>"/>
+                        <input id="study_not_answers" type="hidden" value="<spring:message code="msg.dx.not.answers.found"/>"/>
                         <input id="text_response" type="hidden" value="<spring:message code="lbl.approve.response"/>"/>
                         <input type="hidden" id="rutina" value="${rutina}"/>
                         <input type="hidden" id="estudio" value="${estudio}"/>
