@@ -353,7 +353,7 @@ public class TrasladosService {
      */
     public TrasladoMx getTrasladoCCMx(String idTomaMx){
         String query = "select t from TrasladoMx t inner join t.tomaMx mx " +
-                "where mx.idTomaMx = :idTomaMx and t.trasladoExterno = true order by t.fechaHoraRegistro asc" ;
+                "where mx.idTomaMx = :idTomaMx and t.controlCalidad = true order by t.fechaHoraRegistro asc" ;
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);

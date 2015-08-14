@@ -2058,12 +2058,11 @@ public class ReportesController {
         String res = null;
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        String fechaAprobacion = null;
         List<DetalleResultadoFinal> detalleResultado = null;
         List<DetalleResultadoFinal> detalleResultadoNoCC = null;
-        String fechaImpresion = null;
+        //String fechaImpresion = null;
         PDDocument doc = new PDDocument();
-        List<DaSolicitudDx> solicDx = null;
+        List<DaSolicitudDx> solicitudDxList = null;
         PDPageContentStream stream = null;
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
@@ -2071,51 +2070,95 @@ public class ReportesController {
         boolean reporteCRes = false;
 
         for (String codigoMx : tomasArray) {
-            solicDx = tomaMxService.getSolicitudesDxQCAprobByToma(codigoMx);
-            fechaAprobacion = null;
+            solicitudDxList = tomaMxService.getSolicitudesDxQCAprobByToma(codigoMx);
 
             //Obtener las respuestas activas de la solicitud
-                if (solicDx.size()>0) {
+                if (solicitudDxList.size()>0) {
                     reporteCRes = true;
-                    for (DaSolicitudDx solicitudDx : solicDx) {
+                    String[][] contentTable1 = new String[solicitudDxList.size()][8];
+                    int iteracion=0;
+                    //Prepare the document.
+                    float y = 400;
+                    float m1 = 20;
+
+                    PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
+                    page.setRotation(90);
+                    doc.addPage(page);
+                    stream = new PDPageContentStream(doc, page);
+                    stream.concatenate2CTM(0, 1, -1, 0, page.getMediaBox().getWidth(), 0);
+                    GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
+                    drawInfoLab(stream, page, labProcesa);
+
+                    for (DaSolicitudDx solicitudDx : solicitudDxList) {
                         DaSolicitudDx solicitudNoCC = tomaMxService.getSolicitudDxByMxDxNoCC(solicitudDx.getIdTomaMx().getIdTomaMx(),solicitudDx.getCodDx().getIdDiagnostico());
                         detalleResultado = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
                         detalleResultadoNoCC = resultadoFinalService.getDetResActivosBySolicitud(solicitudNoCC.getIdSolicitudDx());
-                        fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
-
-                        if (solicitudDx.getFechaAprobacion() != null) {
-                            fechaAprobacion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getFechaAprobacion());
-                        }
-
+                        //fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
                         if (detalleResultado != null) {
+                            String fechaAprobacion = "";
+                            String labOrigen = "";
+                            String nombrePersona = "";
+                            String fechaSolicitud = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getFechaHSolicitud());
+                            String codigoLabMx = solicitudDx.getIdTomaMx().getCodigoLab();
+                            String tipoMx = solicitudDx.getIdTomaMx().getCodTipoMx().getNombre();
+                            String tipoNoti = solicitudDx.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor();
+
+                            String nombreSoli = solicitudDx.getCodDx().getNombre();
+
+                            if (solicitudDx.getFechaAprobacion() != null) {
+                                fechaAprobacion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudDx.getFechaAprobacion());
+                            }
+
+                            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona()!=null) {
+                                nombrePersona = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                                if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null) {
+                                    nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                                    nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                                } else {
+                                    nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+
+                                }
+                                if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null) {
+                                    nombrePersona = nombrePersona + " " + solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                                }
+                            }else{
+                                nombrePersona = solicitudDx.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                            }
+
+                            TrasladoMx trasladoMxCC = trasladosService.getTrasladoCCMx(solicitudDx.getIdTomaMx().getIdTomaMx());
+                            if (trasladoMxCC!=null) {
+                                labOrigen = trasladoMxCC.getLaboratorioOrigen().getNombre();
+                            }
+                            contentTable1[iteracion][0]=nombreSoli;
+                            contentTable1[iteracion][1]=fechaSolicitud;
+                            contentTable1[iteracion][2]=fechaAprobacion;
+                            contentTable1[iteracion][3]=codigoLabMx;
+                            contentTable1[iteracion][4]=tipoMx;
+                            contentTable1[iteracion][5]=tipoNoti;
+                            contentTable1[iteracion][6]=nombrePersona;
+                            contentTable1[iteracion][7]=labOrigen;
                             boolean coincide = false;
+                            float xCenter;
 
-                            //Prepare the document.
-                            float y = 480;
-                            float m1 = 20;
-
-                            PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
-                            doc.addPage(page);
-                            stream = new PDPageContentStream(doc, page);
-
-                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
-                            drawInfoLabVertical(stream, page, labProcesa);
-                            drawReportHeader(stream, solicitudDx, null);
-
-                            drawInfoSample(stream, solicitudDx, null, y);
+                            xCenter = centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.qualityControl.report", null, null));
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.qualityControl.report", null, null), y, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                            y = y - 10;
+                            String pageNumber = String.valueOf(doc.getNumberOfPages());
+                            GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
                             y -= m1;
 
-
+                            float tableHeight = drawSolicitudTable(contentTable1, doc, page, y);
+                            y -=tableHeight;
                             boolean lista = false;
-                            String valor = null;
+                            String valorOrigen = "";
+                            String valorCC = "";
                             String respuesta;
-                            String[][] content = new String[detalleResultado.size()][2];
+                            String[][] content = new String[detalleResultado.size()][4];
 
 
                             int numFila = 0;
                             for (DetalleResultadoFinal resul : detalleResultado) {
-                                y = y - 20;
                                 if (resul.getRespuesta() != null) {
                                     respuesta = resul.getRespuesta().getNombre();
                                     lista = resul.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST");
@@ -2126,6 +2169,8 @@ public class ReportesController {
 
                                 for (DetalleResultadoFinal resultadoFinalNoCC : detalleResultadoNoCC){
                                     if (!lista) {
+                                        valorOrigen = resultadoFinalNoCC.getValor();
+                                        valorCC = resul.getValor();
                                         if (resul.getValor().equalsIgnoreCase(resultadoFinalNoCC.getValor())) {
                                             coincide = true;
                                         }
@@ -2134,30 +2179,23 @@ public class ReportesController {
                                         Catalogo_Lista catListaNoCC = conceptoService.getCatalogoListaById(Integer.valueOf(resultadoFinalNoCC.getValor()));
                                         if (catLista.getValor().equalsIgnoreCase(catListaNoCC.getValor()))
                                             coincide = true;
+                                        valorOrigen = catListaNoCC.getValor();
+                                        valorCC = catLista.getValor();
                                     }
                                 }
 
-                                /*if (lista) {
-                                    Catalogo_Lista catLista = conceptoService.getCatalogoListaById(Integer.valueOf(resul.getValor()));
-                                    valor = catLista.getValor();
-                                } else {
-                                    valor = resul.getValor();
-                                }*/
-
-
                                 content[numFila][0] = respuesta;
-                                content[numFila][1] = (coincide?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)); //valor;
+                                content[numFila][1] = valorOrigen;
+                                content[numFila][2] = valorCC;
+                                content[numFila][3] = (coincide?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)); //valor;
                                 numFila++;
-
                             }
 
-                            drawFinalResultTable(content, doc, page, y);
-                            y = y - 140;
-                            drawFinalInfo(stream, y, fechaAprobacion, fechaImpresion);
-                            stream.close();
-
+                            drawResultTable(content, doc, page, y);
                         }
+                        iteracion++;
                     }
+                    stream.close();
                 }
 
         }
@@ -2169,6 +2207,200 @@ public class ReportesController {
         }
 
         return res;
+    }
+
+    private float drawSolicitudTable(String[][] content, PDDocument doc, PDPage page, float y) throws IOException {
+
+        //Initialize table
+        float height = 0;
+        float margin = 40;
+        float tableWidth = 770;
+        float yStartNewPage = y;
+        float yStart = yStartNewPage;
+        float bottomMargin = 45;
+        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+
+        //Create Header row
+        //Row headerRow = table.createRow(15f);
+        //table.setHeader(headerRow);
+
+        //Create 2 column row
+        Row row;
+        Cell cell;
+
+        //Create Fact header row
+        Row factHeaderrow = table.createRow(15f);
+
+        cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.request.name1", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(11, messageSource.getMessage("lbl.request.date", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.approve.date", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(10, messageSource.getMessage("lbl.unique.code.mx", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(14, messageSource.getMessage("lbl.sample.type1", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(11, messageSource.getMessage("lbl.notification.type", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(15, messageSource.getMessage("lbl.receipt.person.applicant.name", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell(12, messageSource.getMessage("lbl.transfer.origin.lab", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        height = factHeaderrow.getHeight();
+        //Add multiple rows with random facts about Belgium
+
+        for (String[] fact : content) {
+            row = table.createRow(15f);
+            for (int i = 0; i < fact.length; i++) {
+                switch (i) {
+                    case 0:
+                    case 6: {
+                        cell = row.createCell(15, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    case 1:
+                    case 5: {
+                        cell = row.createCell(11, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    case 2:
+                    case 7: {
+                        cell = row.createCell(12, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    case 3 :{
+                        cell = row.createCell(10, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    default: {
+                        cell = row.createCell(14, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                }
+            }
+            height += row.getHeight();
+        }
+        table.draw();
+        return  height;
+    }
+
+    private void drawResultTable(String[][] content, PDDocument doc, PDPage page, float y) throws IOException {
+
+        //Initialize table
+        float margin = 40;
+        float tableWidth = 770;
+        float yStartNewPage = y;
+        float yStart = yStartNewPage;
+        float bottomMargin = 45;
+        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+
+        //Create Header row
+        Row headerRow = table.createRow(15f);
+        table.setHeader(headerRow);
+
+        //Create 2 column row
+        Row row;
+        Cell cell;
+
+        //Create Fact header row
+        Row factHeaderrow = table.createRow(15f);
+
+        cell = factHeaderrow.createCell(40, messageSource.getMessage("lbl.approve.response", null, null));
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+        cell.setFillColor(Color.LIGHT_GRAY);
+
+        cell = factHeaderrow.createCell((25), messageSource.getMessage("lbl.val1.cc", null, null));
+        cell.setFillColor(Color.lightGray);
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+
+        cell = factHeaderrow.createCell((25), messageSource.getMessage("lbl.val2.cc", null, null));
+        cell.setFillColor(Color.lightGray);
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+
+        cell = factHeaderrow.createCell((10), messageSource.getMessage("lbl.match", null, null));
+        cell.setFillColor(Color.lightGray);
+        cell.setFont(PDType1Font.HELVETICA_BOLD);
+        cell.setFontSize(10);
+
+        //Add multiple rows with random facts about Belgium
+
+        for (String[] fact : content) {
+            row = table.createRow(15f);
+            for (int i = 0; i < fact.length; i++) {
+                switch (i) {
+                    case 0: {
+                        cell = row.createCell(40, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    case 1:
+                    case 2: {
+                        cell = row.createCell(25, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    case 3: {
+                        cell = row.createCell(10, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                    default: {
+                        cell = row.createCell(10, fact[i]);
+                        cell.setFont(PDType1Font.HELVETICA);
+                        cell.setFontSize(10);
+                        break;
+                    }
+                }
+            }
+
+            /*for (int i = 1; i < fact.length; i++) {
+                cell = row.createCell(20, fact[i]);
+                cell.setFont(PDType1Font.HELVETICA_OBLIQUE);
+                cell.setFontSize(10);
+            }*/
+        }
+        table.draw();
     }
 
     private void drawReportHeader(PDPageContentStream stream, DaSolicitudDx soliDx, DaSolicitudEstudio soliE) throws IOException {
@@ -2364,60 +2596,6 @@ public class ReportesController {
 
         }
 
-    }
-
-    private void drawFinalResultTable(String[][] content, PDDocument doc, PDPage page, float y) throws IOException {
-
-        //Initialize table
-        float margin = 50;
-        float tableWidth = 500;
-        float yStartNewPage = y;
-        float yStart = yStartNewPage;
-        float bottomMargin = 45;
-        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
-
-        //Create Header row
-        Row headerRow = table.createRow(15f);
-      /*  Cell cell = headerRow.createCell(100, "");
-        cell.setFont(PDType1Font.HELVETICA_BOLD);
-        cell.setFillColor(Color.black);
-        cell.setTextColor(Color.WHITE);*/
-
-        table.setHeader(headerRow);
-
-        //Create 2 column row
-        Row row;
-        Cell cell;
-
-        //Create Fact header row
-        Row factHeaderrow = table.createRow(15f);
-        cell = factHeaderrow.createCell(50, messageSource.getMessage("lbl.approve.response", null, null));
-        cell.setFont(PDType1Font.HELVETICA_BOLD);
-        cell.setFontSize(10);
-        cell.setFillColor(Color.LIGHT_GRAY);
-
-        cell = factHeaderrow.createCell((50), messageSource.getMessage("lbl.match", null, null));
-        cell.setFillColor(Color.lightGray);
-        cell.setFont(PDType1Font.HELVETICA_BOLD);
-        cell.setFontSize(10);
-
-        //Add multiple rows with random facts about Belgium
-
-        for (String[] fact : content) {
-
-            row = table.createRow(15f);
-            cell = row.createCell(50, fact[0]);
-            cell.setFont(PDType1Font.HELVETICA);
-            cell.setFontSize(10);
-
-
-            for (int i = 1; i < fact.length; i++) {
-                cell = row.createCell(50, fact[i]);
-                cell.setFont(PDType1Font.HELVETICA_OBLIQUE);
-                cell.setFontSize(10);
-            }
-        }
-        table.draw();
     }
 
     private void drawInfoLabVertical(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
