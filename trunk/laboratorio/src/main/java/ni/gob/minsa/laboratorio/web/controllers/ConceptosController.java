@@ -106,8 +106,12 @@ public class ConceptosController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
 
-            nombre = jsonpObject.get("nombre").getAsString();
-            tipo = jsonpObject.get("tipo").getAsString();
+            if(jsonpObject.get("nombre")!=null && !jsonpObject.get("nombre").getAsString().isEmpty()) {
+                nombre = jsonpObject.get("nombre").getAsString();
+            }
+            if(jsonpObject.get("tipo")!=null && !jsonpObject.get("tipo").getAsString().isEmpty()) {
+                tipo = jsonpObject.get("tipo").getAsString();
+            }
 
             if(!jsonpObject.get("pasivo").getAsString().isEmpty()){
                 pasivo = jsonpObject.get("pasivo").getAsString();

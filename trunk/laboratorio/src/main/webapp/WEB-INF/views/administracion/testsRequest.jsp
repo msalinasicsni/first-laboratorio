@@ -153,7 +153,7 @@
                     <table id="tests" class="table table-striped table-bordered table-hover" width="75%">
                         <thead>
                         <tr>
-                            <th data-class="expand" width="15%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
+                            <th data-class="expand" width="35%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
                             <th><spring:message code="lbl.override"/></th>
 
                         </tr>

@@ -188,6 +188,7 @@ var Concepts  = function () {
                     var n2 = (disabled.indexOf("disabled") > -1);
                     if (!n2) {
                         $('#idC').val(data);
+                        $('#valor').val('');
                         getValues(data);
                         showModalValues();
                     }
@@ -203,18 +204,18 @@ var Concepts  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEditC = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+' ' +
-                            ' "> <i class="fa fa-edit"></i>' ;
+                        var btnEditC = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+''+
+                            '"> <i class="fa fa-edit"></i>' ;
 
-                        var btnAddList = ' <button type="button" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+' ' +
+                        var btnAddList = ' <button type="button" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+'' +
                             '"> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+' ' +
+                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+'' +
                             '"> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idConcepto+' ' +
+                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idConcepto+'' +
                             '"> <i class="fa fa-times"></i>';
 
 
@@ -242,6 +243,13 @@ var Concepts  = function () {
                 errorPlacement : function(error, element) {
                     error.insertAfter(element.parent());
                 }
+            });
+
+            $("#btnAdds").click(function(){
+                $("#idConcepto").val('');
+                $("#nombre").val('');
+                $("#tipo").val('').change();
+                showModalConcept();
             });
 
             $('#btnAdd').click(function() {
@@ -340,10 +348,10 @@ var Concepts  = function () {
                     valuesTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+' ' +
+                        var btnEdit = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+'' +
                                     '" > <i class="fa fa-edit"></i>' ;
 
-                        var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ ' ' +
+                        var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ '' +
                             '" > <i class="fa fa-times"></i>' ;
 
                           valuesTable.fnAddData(
@@ -454,7 +462,7 @@ var Concepts  = function () {
                 conceptObj['mensaje'] = '';
                 conceptObj['nombre'] = $('#nombre').val();
                 conceptObj['tipo'] = $('#tipo').val();
-                conceptObj['idConcepto'] = $('#idConcepto').val();
+                conceptObj['idConcepto'] = idConcepto;
                 conceptObj['pasivo'] = 'true';
                 blockUI(parametros.blockMess);
                 $.ajax(

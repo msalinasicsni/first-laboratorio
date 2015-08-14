@@ -240,13 +240,15 @@ public class TomaMxController {
                 //si la respuesta pertenece al dx de la solicitud, se registra
                 if (conceptoTmp.getDiagnostico().getIdDiagnostico().equals(soli.getCodDx().getIdDiagnostico())) {
                     String valor = jsRespuestaObject.get("valor").getAsString();
-                    DatoSolicitudDetalle datoSolicitudDetalle = new DatoSolicitudDetalle();
-                    datoSolicitudDetalle.setFechahRegistro(new Timestamp(new Date().getTime()));
-                    datoSolicitudDetalle.setValor(valor);
-                    datoSolicitudDetalle.setDatoSolicitud(conceptoTmp);
-                    datoSolicitudDetalle.setSolicitudDx(soli);
-                    datoSolicitudDetalle.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                    datosSolicitudService.saveOrUpdateDetalleDatoRecepcion(datoSolicitudDetalle);
+                    if (valor!=null) {
+                        DatoSolicitudDetalle datoSolicitudDetalle = new DatoSolicitudDetalle();
+                        datoSolicitudDetalle.setFechahRegistro(new Timestamp(new Date().getTime()));
+                        datoSolicitudDetalle.setValor(valor.isEmpty()?" ":valor);
+                        datoSolicitudDetalle.setDatoSolicitud(conceptoTmp);
+                        datoSolicitudDetalle.setSolicitudDx(soli);
+                        datoSolicitudDetalle.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                        datosSolicitudService.saveOrUpdateDetalleDatoRecepcion(datoSolicitudDetalle);
+                    }
                     //validar respuesta solicitud
                     /*DetalleResultadoFinal resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuesta(idSolicitud, idRespuesta);
                     if (resFinalRegistrado != null) {

@@ -104,7 +104,7 @@
 
                         <p class="alert alert-info">
 
-                            <button type="submit" id="btnAdds" data-toggle="modal" data-target="#myModal" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.concept" /></button>
+                            <button type="button" id="btnAdds" class="btn btn-primary"><i class="fa fa-plus"></i> <spring:message code="lbl.concept" /></button>
                         </p>
 
                         <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
@@ -261,21 +261,22 @@
                                     </section>
                                 </div>
 
-                                <div class="widget-body no-padding">
-                                    <table id="values-records" class="table table-striped table-bordered table-hover" width="80%">
-                                        <thead>
-                                        <tr>
-                                            <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.value"/></th>
-                                            <th><spring:message code="act.edit"/></th>
-                                            <th><spring:message code="lbl.override"/></th>
-                                        </tr>
-                                        </thead>
-                                    </table>
 
-
-                                </div>
 
                             </form>
+                            <div class="widget-body no-padding">
+                                <table id="values-records" class="table table-striped table-bordered table-hover" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.value"/></th>
+                                        <th><spring:message code="act.edit"/></th>
+                                        <th><spring:message code="lbl.override"/></th>
+                                    </tr>
+                                    </thead>
+                                </table>
+
+
+                            </div>
                         </div>
 
                     </div>

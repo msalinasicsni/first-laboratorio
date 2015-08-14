@@ -242,8 +242,8 @@ var Responses = function () {
                         $("#codConcepto").val(dataToLoad.concepto.idConcepto).change();
                         $("#nombreRespuesta").val(dataToLoad.nombre);
                         $("#ordenRespuesta").val(dataToLoad.orden);
-                        $("#checkbox-required").attr('checked', dataToLoad.requerido);
-                        $("#checkbox-pasive").attr('checked', dataToLoad.pasivo);
+                        $("#checkbox-required").prop('checked', dataToLoad.requerido);
+                        $("#checkbox-pasive").prop('checked', dataToLoad.pasivo);
                         $("#minimoRespuesta").val(dataToLoad.minimo);
                         $("#maximoRespuesta").val(dataToLoad.maximo);
                         $("#descRespuesta").val(dataToLoad.descripcion);
