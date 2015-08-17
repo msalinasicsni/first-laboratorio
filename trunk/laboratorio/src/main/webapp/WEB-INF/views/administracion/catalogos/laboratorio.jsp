@@ -89,20 +89,24 @@
                             <!-- widget content -->
                             <div class="widget-body no-padding">
                                 <p class="alert alert-info">
-                                    <button id="btnAddArea" type="button" class="btn btn-primary">
+                                    <button id="btnAddLab" type="button" class="btn btn-primary">
                                         <i class="fa fa-plus"></i>
                                         <spring:message code="lbl.lab" />
                                     </button>
                                 </p>
                                 <input id="blockUI_message" type="hidden" value="<spring:message code="blockUI.message"/>"/>
                                 <input id="msgSave" type="hidden" value="<spring:message code="msg.save.labo"/>"/>
+                                <input id="msgSaveS" type="hidden" value="<spring:message code="msg.save.SILAIS.labo"/>"/>
                                 <input id="msgOverride" type="hidden" value="<spring:message code="msg.override.labo"/>"/>
+                                <input id="msgOverrideS" type="hidden" value="<spring:message code="msg.override.SILAIS.labo"/>"/>
                                 <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
                                 <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                 <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                 <input id="msgConfirmOverride" type="hidden" value="<spring:message code="msg.confirm.override"/>"/>
                                 <input id="msgOverrideCanceled" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
                                 <input id="msgConfirmTitle" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
+
                                 <table class="table table-striped table-bordered table-hover" width="100%" id="laboratorio-list">
                                     <thead>
                                     <tr>
@@ -110,6 +114,7 @@
                                         <th><spring:message code="lbl.name" /></th>
                                         <th><spring:message code="lbl.desc.request" /></th>
                                         <th><spring:message code="lbl.enabled" /></th>
+                                        <th style="width: 5%" align="center"><spring:message code="lbl.silais" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.edit" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.override" /></th>
                                     </tr>
@@ -126,7 +131,7 @@
 
         </section>
         <!-- Matter ends -->
-        <!-- Modal AREAS ROL ANALISTA-->
+        <!-- Modal LABORATORIO-->
         <div class="modal fade" id="modalLab" aria-hidden="true" data-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -265,6 +270,67 @@
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
 
+        <!-- Modal SILAIS-->
+        <div class="modal fade" id="modalSILAIS" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="alert alert-info">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title">
+                                <i class="fa-fw fa fa-sitemap"></i>
+                                <spring:message code="lbl.header.modal.SILAIS" />
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="modal-body"> <!--  no-padding -->
+                        <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                                <form id="SILAIS-form" class="smart-form" novalidate="novalidate">
+                                    <input type="hidden" id="codigoLab" value="">
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-9 col-lg-10">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.silais" />
+                                            </label>
+                                            <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-location-arrow fa-fw"></i>
+                                    </span>
+                                                <select  class="select2" id="idSILAIS" name="idSILAIS" >
+                                                </select>
+                                            </div>
+                                        </section>
+                                        <section class="col col-sm-12 col-md-3 col-lg-2">
+                                            <button type="submit" class="btn btn-success styleButton" id="btnAddSILAIS">
+                                                <i class="fa fa-save"></i>
+                                            </button>
+                                        </section>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="widget-body no-padding">
+                            <div class="row">
+                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                    <table class="table table-striped table-bordered table-hover" id="SILAIS-list">
+                                        <thead>
+                                        <tr>
+                                            <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
+                                            <th><spring:message code="lbl.override"/></th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
     </div>
 </div>
 
@@ -289,6 +355,9 @@
 <spring:url value="/resources/js/plugin/jquery-validate/messages_{language}.js" var="jQValidationLoc">
     <spring:param name="language" value="${pageContext.request.locale.language}" /></spring:url>
 <script src="${jQValidationLoc}"></script>
+<!-- jQuery Selecte2 Input -->
+<spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
+<script src="${selectPlugin}"></script>
 <!-- JQUERY BLOCK UI -->
 <spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
 <script src="${jqueryBlockUi}"></script>
@@ -301,6 +370,10 @@
 <c:url var="laboratoriosUrl" value="/administracion/laboratorio/getLaboratorios"/>
 <c:url var="overrideUrl" value="/administracion/laboratorio/override"/>
 <c:url var="laboratorioUrl" value="/administracion/laboratorio/getLaboratorio"/>
+<c:url var="SILAISUrl" value="/administracion/laboratorio/getSILAIS"/>
+<c:url var="SILAISDisponiblesUrl" value="/administracion/laboratorio/getSILAISDisponibles"/>
+<c:url var="saveSILAISUrl" value="/administracion/laboratorio/saveSILAIS"/>
+<c:url var="overrideSILAISUrl" value="/administracion/laboratorio/overrideSILAIS"/>
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
@@ -309,7 +382,11 @@
             saveUrl : "${saveUrl}",
             laboratoriosUrl : "${laboratoriosUrl}",
             overrideUrl : "${overrideUrl}",
-            laboratorioUrl : "${laboratorioUrl}"
+            laboratorioUrl : "${laboratorioUrl}",
+            SILAISUrl : "${SILAISUrl}",
+            SILAISDisponiblesUrl : "${SILAISDisponiblesUrl}",
+            saveSILAISUrl : "${saveSILAISUrl}",
+            overrideSILAISUrl : "${overrideSILAISUrl}"
         };
 
         Laboratorio.init(parametros);

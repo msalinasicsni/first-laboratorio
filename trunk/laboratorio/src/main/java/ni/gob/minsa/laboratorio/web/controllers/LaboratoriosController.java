@@ -2,9 +2,12 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
+import ni.gob.minsa.laboratorio.domain.examen.EntidadAdtvaLaboratorio;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.service.AreaService;
+import ni.gob.minsa.laboratorio.service.EntidadAdmonService;
 import ni.gob.minsa.laboratorio.service.LaboratoriosService;
 import ni.gob.minsa.laboratorio.service.SeguridadService;
 import org.slf4j.Logger;
@@ -50,6 +53,10 @@ public class LaboratoriosController {
     private LaboratoriosService laboratoriosService;
 
     @Autowired
+    @Qualifier(value = "entidadAdmonService")
+    private EntidadAdmonService entidadAdmonService;
+
+    @Autowired
     MessageSource messageSource;
 
     @RequestMapping(value = "list", method = RequestMethod.GET)
@@ -63,6 +70,20 @@ public class LaboratoriosController {
     List<Laboratorio> obtenerLaboratorios() throws Exception {
         logger.info("Realizando búsqueda de todas los laboratorios");
         return laboratoriosService.getLaboratoriosRegionales();
+    }
+
+    @RequestMapping(value = "getSILAIS", method = RequestMethod.GET, produces = "application/json")
+    public   @ResponseBody
+    List<EntidadAdtvaLaboratorio> obtenerSILAIS(@RequestParam(value = "codigo", required = true) String codigo) throws Exception {
+        logger.info("Realizando búsqueda de todos los SILAIS que estan asociadas a un laboratorio");
+        return laboratoriosService.getEntidadesAdtvasLab(codigo);
+    }
+
+    @RequestMapping(value = "getSILAISDisponibles", method = RequestMethod.GET, produces = "application/json")
+    public   @ResponseBody
+    List<EntidadesAdtvas> obtenerSILAISDisponibles(@RequestParam(value = "codigo", required = true) String codigo) throws Exception {
+        logger.info("Realizando búsqueda de todos los SILAIS que estan disponibles para un laboratorio");
+        return laboratoriosService.getEntidadesAdtvasDisponiblesLab(codigo);
     }
 
     @RequestMapping(value = "getLaboratorio", method = RequestMethod.GET, produces = "application/json")
@@ -181,6 +202,94 @@ public class LaboratoriosController {
         }finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("codigo",codigo);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "saveSILAIS", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void guardarSILAISLaboratorio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String codigo="";
+        Integer codigoSILAIS=null;
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            if (jsonpObject.get("codigo") != null && !jsonpObject.get("codigo").getAsString().isEmpty())
+                codigo = jsonpObject.get("codigo").getAsString();
+            if (jsonpObject.get("codigoSILAIS") != null && !jsonpObject.get("codigoSILAIS").getAsString().isEmpty())
+                codigoSILAIS = jsonpObject.get("codigoSILAIS").getAsInt();
+
+            EntidadAdtvaLaboratorio entidadAdtvaLaboratorio = new EntidadAdtvaLaboratorio();
+
+            EntidadesAdtvas entidadesAdtvas = entidadAdmonService.getSilaisByCodigo(codigoSILAIS);
+            if (entidadesAdtvas == null){
+                throw new Exception(messageSource.getMessage("msg.not.found.SILAIS.labo",null,null));
+            }
+            Laboratorio laboratorio = laboratoriosService.getLaboratorioByCodigo(codigo);
+            if (laboratorio == null){
+                throw new Exception(messageSource.getMessage("msg.not.found.labo",null,null));
+            }
+            entidadAdtvaLaboratorio.setLaboratorio(laboratorio);
+            entidadAdtvaLaboratorio.setEntidadAdtva(entidadesAdtvas);
+            entidadAdtvaLaboratorio.setPasivo(false);
+            entidadAdtvaLaboratorio.setFechaRegistro(new Date());
+            entidadAdtvaLaboratorio.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+
+            //se registra o actualiza dirección
+            laboratoriosService.saveEntidadAdtvaLaboratorio(entidadAdtvaLaboratorio);
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.error.save.SILAIS.labo",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("codigo", codigo);
+            map.put("codigoSILAIS", String.valueOf(codigoSILAIS));
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "overrideSILAIS", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void anularSILAISLaboratorio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        Integer idEntidadLab=null;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            if (jsonpObject.get("idEntidadLab") != null && !jsonpObject.get("idEntidadLab").getAsString().isEmpty())
+                idEntidadLab = jsonpObject.get("idEntidadLab").getAsInt();
+            EntidadAdtvaLaboratorio entidadAdtvaLaboratorio = laboratoriosService.getEntidadAdtvaLaboratorio(idEntidadLab);
+            if (entidadAdtvaLaboratorio!=null) {
+                entidadAdtvaLaboratorio.setPasivo(true);
+                laboratoriosService.saveEntidadAdtvaLaboratorio(entidadAdtvaLaboratorio);
+            }else{
+                throw new Exception(messageSource.getMessage("msg.not.found.SILAIS.labo",null,null));
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.override.SILAIS.labo.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idEntidadLab",String.valueOf(idEntidadLab));
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());

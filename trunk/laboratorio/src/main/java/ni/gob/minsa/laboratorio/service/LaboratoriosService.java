@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.*;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import org.hibernate.Query;
@@ -43,6 +44,11 @@ public class LaboratoriosService {
     public void saveDepartamentoDireccion(DepartamentoDireccion departamentoDireccion) {
         Session session = sessionFactory.getCurrentSession();
         session.saveOrUpdate(departamentoDireccion);
+    }
+
+    public void saveEntidadAdtvaLaboratorio(EntidadAdtvaLaboratorio entidadAdtvaLaboratorio) {
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(entidadAdtvaLaboratorio);
     }
 
     public List<Laboratorio> getAllLaboratories(){
@@ -112,7 +118,7 @@ public class LaboratoriosService {
         String query = "from Departamento dep, DepartamentoDireccion depDir " +
                 "where dep.idDepartamento = depDir.departamento.idDepartamento and " +
                 "depDir.pasivo = false and dep.pasivo = false and " +
-                "depDir.direccion.idDireccion = :idDireccion order by dep.nombre";
+                "depDir.direccionLab.direccion.idDireccion = :idDireccion order by dep.nombre";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idDireccion",idDireccion);
         return q.list();
@@ -151,5 +157,40 @@ public class LaboratoriosService {
         String query = "from Area area where area.pasivo = false order by area.nombre";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         return q.list();
+    }
+
+    public List<EntidadesAdtvas> getEntidadesAdtvasDisponiblesLab(String codigoLab) throws Exception {
+        String query = "from EntidadesAdtvas ea " +
+                "where ea.entidadAdtvaId not in " +
+                "(select a.entidadAdtvaId from EntidadAdtvaLaboratorio el inner join el.entidadAdtva a inner join el.laboratorio l" +
+                " where l.codigo = :codigoLab and el.pasivo = false and a.pasivo = :pasivo)" +
+                " order by ea.nombre asc";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("codigoLab",codigoLab);
+        q.setParameter("pasivo",'0');
+        return q.list();
+    }
+
+    public List<EntidadAdtvaLaboratorio> getEntidadesAdtvasLab(String codigoLab) throws Exception {
+        String query = "select el from EntidadAdtvaLaboratorio el inner join el.entidadAdtva a inner join el.laboratorio l" +
+                " where l.codigo = :codigoLab " +
+                "and el.pasivo = false and a.pasivo = :pasivo order by a.nombre asc";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("codigoLab",codigoLab);
+        q.setParameter("pasivo",'0');
+        return q.list();
+    }
+
+    public EntidadAdtvaLaboratorio getEntidadAdtvaLaboratorio(Integer idEntidadAdtvaLab) throws Exception {
+        String query = "from EntidadAdtvaLaboratorio a where a.idEntidadAdtvaLab = :idEntidadAdtvaLab";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idEntidadAdtvaLab",idEntidadAdtvaLab);
+        return (EntidadAdtvaLaboratorio)q.uniqueResult();
     }
 }
