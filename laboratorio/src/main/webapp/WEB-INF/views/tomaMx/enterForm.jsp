@@ -364,10 +364,10 @@
             };
             EnterFormTomaMx.init(parametros);
             handleInputMasks();
-            $("li.samples").addClass("open");
-            $("li.tomaMx").addClass("active");
+            $("li.recepcion").addClass("open");
+            $("li.patient").addClass("active");
             if("top"!=localStorage.getItem("sm-setmenu")){
-                $("li.tomaMx").parents("ul").slideDown(200);
+                $("li.patient").parents("ul").slideDown(200);
             }
         });
     </script>
