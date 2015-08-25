@@ -1524,7 +1524,7 @@ public class VisualizarNotificacionController {
                             if (!ordenes.isEmpty()) {
 
                                 String rExamen = null;
-                                String fechaProcesamiento = null;
+                                String fechaProcesamiento = "";
                                 for (OrdenExamen ex : ordenes) {
                                     String[] examen = new String[3];
                                     List<DetalleResultado> results = resultadosService.getDetallesResultadoActivosByExamen(ex.getIdOrdenExamen());
@@ -1622,7 +1622,7 @@ public class VisualizarNotificacionController {
                     // generate the file
                     res = Base64.encodeBase64String(output.toByteArray());
                 }
-            }else if(not.getCodTipoNotificacion().getCodigo().equals("TPNOTI|IRAG")){
+            } else if (not.getCodTipoNotificacion().getCodigo().equals("TPNOTI|IRAG")) {
                 DaIrag irag = daIragService.getFormById(not.getIdNotificacion());
                 String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
@@ -2652,15 +2652,20 @@ public class VisualizarNotificacionController {
                     y = 770;
                     x1 = 65;
                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.irag.lab.data", null, null), y, x1, stream, 9, PDType1Font.TIMES_BOLD);
-                    y -= 5;
-
+                    y -= 10;
 
                     //load all the request by notification
 
                     List<DaSolicitudDx> diagnosticosList = resultadoFinalService.getSolicitudesDxByIdNotificacion(irag.getIdNotificacion().getIdNotificacion());
 
-                    float y1 = 0;
+                    if (diagnosticosList.isEmpty()) {
+                        x1 = 75;
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.nothing.to.show", null, null), y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
+                    }
 
+
+                    float y1 = 0;
+                    BufferedImage image2 = ImageIO.read(new File(workingDir + "/fichaIrag2.png"));
 
                     if (!diagnosticosList.isEmpty()) {
                         int con = 0;
@@ -2777,7 +2782,7 @@ public class VisualizarNotificacionController {
                             if (!ordenes.isEmpty()) {
 
                                 String rExamen = null;
-                                String fechaProcesamiento = null;
+                                String fechaProcesamiento = "";
                                 for (OrdenExamen ex : ordenes) {
                                     String[] examen = new String[3];
                                     List<DetalleResultado> results = resultadosService.getDetallesResultadoActivosByExamen(ex.getIdOrdenExamen());
@@ -2849,10 +2854,15 @@ public class VisualizarNotificacionController {
                         }
                     }
 
-                    BufferedImage image2 = ImageIO.read(new File(workingDir + "/fichaIrag2.png"));
 
+                    if (y1 == 0) {
+                        y1 = 610;
+                        GeneralUtils.drawObject(stream, doc, image2, 10, y1, 580, 140);
+                        y1 += 150;
 
-                    GeneralUtils.drawObject(stream, doc, image2, 10, y1 - 150, 580, 140);
+                    } else {
+                        GeneralUtils.drawObject(stream, doc, image2, 10, y1 - 150, 580, 140);
+                    }
 
                     y = y1 - 32;
                     if (uci != null) {

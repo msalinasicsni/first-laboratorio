@@ -2,27 +2,7 @@
  * Created by souyen-ics on 08-11-15.
  */
 var VisualizarPdf = function () {
-    var bloquearUI = function(mensaje){
-        var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
-        var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
-        $.blockUI({ message: mess,
-            css: {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: '#000',
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: .5,
-                color: '#fff'
-            },
-            baseZ: 1051 // para que se muestre bien en los modales
-        });
-    };
 
-    var desbloquearUI = function() {
-        setTimeout($.unblockUI, 500);
-    };
     return {
         //main function to initiate the module
         init: function (parametros) {
@@ -284,6 +264,7 @@ var VisualizarPdf = function () {
             });
 
             function exportPDF(id) {
+                blockUI();
                 $.ajax(
                     {
                         url: parametros.pdfUrl,
@@ -297,13 +278,20 @@ var VisualizarPdf = function () {
                                 var blob =   blobData(data, 'application/pdf');
                                 var blobUrl =  showBlob(blob);
 
-
+                            }else{
+                                $.smallBox({
+                                    title : $("#msjPdf").val(),
+                                    content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                    color: "#C79121",
+                                    iconSmall: "fa fa-warning",
+                                    timeout : 4000
+                                });
                             }
 
-                            desbloquearUI();
+                            unBlockUI();
                         },
                         error: function (data, status, er) {
-                            desbloquearUI();
+                           unBlockUI();
                             alert("error: " + data + " status: " + status + " er:" + er);
                         }
                     });

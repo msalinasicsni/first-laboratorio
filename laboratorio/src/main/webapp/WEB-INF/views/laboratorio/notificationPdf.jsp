@@ -100,6 +100,7 @@
                 <!-- end widget edit box -->
                 <!-- widget content -->
                 <div class="widget-body no-padding">
+                    <input id="msjPdf" type="hidden" value="<spring:message code="lbl.pdf.notfound"/>"/>
                     <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.solic.DateTime"/>"/>
                     <input id="text_dx" type="hidden" value="<spring:message code="lbl.desc.request"/>"/>
                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
