@@ -163,69 +163,53 @@ var EnterFormTomaMx = function () {
                             objDetalle[i] = objConcepto;
                             cantRespuestas ++;
                         }
-                        /*
-                        var idSoliDx = $("#idSolicitud").val();
-                        var idSoliE = $("#idSolicitudE").val();
-                        if(idSoliDx != ""){
-                            objResultado["idSolicitud"] = idSoliDx;
-                        }else{
-                            objResultado["idSolicitud"] = idSoliE;
-                        }*/
 
                         objetoTomaMx["strRespuestas"] = objDetalle;
                         objetoTomaMx["cantRespuestas"] = cantRespuestas;
-                        $.ajax({
-                            url: parametros.saveTomaUrl,
-                            type: 'POST',
-                            dataType: 'json',
-                            data: JSON.stringify(objetoTomaMx),
-                            contentType: 'application/json',
-                            mimeType: 'application/json',
-                            success: function (data) {
-                                desbloquearUI();
-                                if (data.mensaje.length > 0) {
-                                    $.smallBox({
-                                        title: data.mensaje,
-                                        content: $("#disappear").val(),
-                                        color: "#C46A69",
-                                        iconSmall: "fa fa-warning",
-                                        timeout: 4000
-                                    });
-                                } else {
-                                    $.smallBox({
-                                        title: $('#msjSuccessful').val(),
-                                        content: $('#disappear').val(),
-                                        color: "#739E73",
-                                        iconSmall: "fa fa-check-circle",
-                                        timeout: 4000
-                                    });
-                                    setTimeout(function () {
-                                        window.location.href = parametros.searchUrl;
-                                    }, 4000);
-                                }
 
-                            },
-                            error: function (data, status, er) {
-                                desbloquearUI();
+                    }
+                    $.ajax({
+                        url: parametros.saveTomaUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(objetoTomaMx),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            desbloquearUI();
+                            if (data.mensaje.length > 0) {
                                 $.smallBox({
-                                    title: $('#msjErrorSaving').val() + " error: " + data + " status: " + status + " er:" + er,
-                                    content: $('#disappear').val(),
+                                    title: data.mensaje,
+                                    content: $("#disappear").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",
-                                    timeout: 5000
+                                    timeout: 4000
                                 });
+                            } else {
+                                $.smallBox({
+                                    title: $('#msjSuccessful').val(),
+                                    content: $('#disappear').val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-check-circle",
+                                    timeout: 4000
+                                });
+                                setTimeout(function () {
+                                    window.location.href = parametros.searchUrl;
+                                }, 4000);
                             }
-                        });
-                    }else{
-                        desbloquearUI();
-                        $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
-                            content: $("#disappear").val(),
-                            color: "#C79121",
-                            iconSmall: "fa fa-warning",
-                            timeout: 4000
-                        });
-                    }
+
+                        },
+                        error: function (data, status, er) {
+                            desbloquearUI();
+                            $.smallBox({
+                                title: $('#msjErrorSaving').val() + " error: " + data + " status: " + status + " er:" + er,
+                                content: $('#disappear').val(),
+                                color: "#C46A69",
+                                iconSmall: "fa fa-warning",
+                                timeout: 5000
+                            });
+                        }
+                    });
                 }).fail(function(er) {
                     desbloquearUI();
                     alert( "error "+er );
@@ -240,7 +224,7 @@ var EnterFormTomaMx = function () {
                     for (var i = 0; i < valor.length; i++) {
                         //si ya existe el div, significa que se habia seleccionado el dx con anterioridad, si de deselecciona entonces hay que quitarlo
                         if (!$('#DX'+valor[i]).length) {
-                            fillRespuestasExamen(valor[i], divDatos);
+                            fillDatosRecepcionDx(valor[i], divDatos);
                         }
                     }
                     //validar si se deseleccionó un dx y existen datos agregados de él en la página, si es asi se deben eliminar
@@ -268,7 +252,7 @@ var EnterFormTomaMx = function () {
                 desbloquearUI();
             });
 
-            function fillRespuestasExamen(idDx,divDatos){
+            function fillDatosRecepcionDx(idDx,divDatos){
                 bloquearUI(parametros.blockMess);
                 var valoresListas = {};
                 var detaResultados = {};
@@ -478,7 +462,7 @@ var EnterFormTomaMx = function () {
                         }else{
                             desbloquearUI();
                             $.smallBox({
-                                title: $("#study_not_answers").val() ,
+                                title: $("#msg_no_results_found").val() ,
                                 content: $("#disappear").val(),
                                 color: "#C46A69",
                                 iconSmall: "fa fa-warning",

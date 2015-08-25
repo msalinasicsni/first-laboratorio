@@ -5,9 +5,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import com.sun.media.jfxmedia.logging.Logger;
 
 import ni.gob.minsa.laboratorio.domain.persona.*;
 

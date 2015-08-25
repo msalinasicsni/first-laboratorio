@@ -313,7 +313,7 @@ public class TomaMxController {
 
 
     @RequestMapping(value = "saveToma", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
-    protected void saveTomaMxStudy(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void saveTomaMxPacienteOtras(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String json = "";
         String resultado = "";
         String fechaHTomaMx="";
@@ -334,8 +334,10 @@ public class TomaMxController {
             idNotificacion = jsonpObject.get("idNotificacion").getAsString();
             fechaHTomaMx = jsonpObject.get("fechaHTomaMx").getAsString();
             codTipoMx = jsonpObject.get("codTipoMx").getAsString();
-            strRespuestas = jsonpObject.get("strRespuestas").toString();
-            cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
+            if (jsonpObject.get("strRespuestas")!=null)
+                strRespuestas = jsonpObject.get("strRespuestas").toString();
+            if (jsonpObject.get("cantRespuestas")!=null && !jsonpObject.get("cantRespuestas").getAsString().isEmpty())
+                cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
             if (jsonpObject.get("canTubos")!=null && !jsonpObject.get("canTubos").getAsString().isEmpty())
                 canTubos = jsonpObject.get("canTubos").getAsInt();
 
