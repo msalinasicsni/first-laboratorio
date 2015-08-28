@@ -1033,4 +1033,25 @@ public class ResultadoFinalService {
         return crit.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaSolicitudEstudio> getSolicitudesEByIdNotificacion(String idNotificacion){
+        Session session = sessionFactory.getCurrentSession();
+        Soundex varSoundex = new Soundex();
+        Criteria crit = session.createCriteria(DaSolicitudEstudio.class, "estudio");
+        crit.createAlias("estudio.idTomaMx","tomaMx");
+        //crit.createAlias("tomaMx.estadoMx","estado");
+        crit.createAlias("tomaMx.idNotificacion", "noti");
+        //siempre se tomam las muestras que no estan anuladas
+        crit.add( Restrictions.and(
+                        Restrictions.eq("tomaMx.anulada", false))
+        );
+
+        crit.add( Restrictions.and(
+                        Restrictions.eq("noti.idNotificacion", idNotificacion))
+        );
+        crit.add(Restrictions.and(Restrictions.eq("estudio.aprobada", true)));
+
+        return crit.list();
+    }
+
 }
