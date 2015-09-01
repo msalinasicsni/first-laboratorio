@@ -6,6 +6,22 @@
 <!-- BEGIN HEAD -->
 <head>
 	<jsp:include page="fragments/headTag.jsp" />
+    <style type="text/css">
+        .flotTip
+        {
+            padding: 3px 5px;
+            background-color: #000;
+            z-index: 100;
+            color: #fff;
+            box-shadow: 0 0 10px #555;
+            opacity: .7;
+            filter: alpha(opacity=70);
+            border: 2px solid #fff;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <!-- END HEAD -->
 <!-- BEGIN BODY -->
@@ -221,11 +237,12 @@
     <script src="${jqueryFlotResize}"></script>
     <spring:url value="/resources/js/plugin/flot/jquery.flot.time.min.js" var="jqueryFlotTime" />
     <script src="${jqueryFlotTime}"></script>
-    <spring:url value="/resources/js/plugin/flot/jquery.flot.tooltip.min.js" var="jqueryFlotToolTip" />
-    <script src="${jqueryFlotToolTip}"></script>
     <!-- EASY PIE CHARTS -->
     <spring:url value="/resources/js/plugin/flot/jquery.flot.pie.min.js" var="pieChart" />
     <script src="${pieChart}"></script>
+    <spring:url value="/resources/js/plugin/flot/tooltip/jquery.flot.tooltip.min.js" var="jqueryFlotToolTip" />
+    <script src="${jqueryFlotToolTip}"></script>
+
 	<!-- END PAGE LEVEL SCRIPTS -->
     <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
     <c:url var="sCreateReceiptUrl" value="/recepcionMx/create/"/>
@@ -403,6 +420,15 @@
                     },
                     grid: {
                         hoverable: true
+                    },
+                    tooltip: {
+                        show: true,
+                        content: "%p.0%, %s, n=%n", // show percentages, rounding to 2 decimal places
+                        shifts: {
+                            x: 20,
+                            y: 0
+                        },
+                        defaultTheme: false
                     }
                 });
             }
