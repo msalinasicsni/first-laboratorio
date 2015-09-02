@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: souyen-ics
-  Date: 05-25-15
-  Time: 11:05 PM
+  Date: 31-08-15
+  Time: 02:37 PM
   To change this template use File | Settings | File Templates.
 --%>
 <!DOCTYPE html>
@@ -52,7 +52,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/reports/posNegResults/init" htmlEscape="true "/>"><spring:message code="lbl.posNegReport" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/reports/general/init" htmlEscape="true "/>"><spring:message code="lbl.general.report.results" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -67,7 +67,7 @@
         <h1 class="page-title txt-color-blueDark">
             <!-- PAGE HEADER -->
             <i class="fa-fw fa fa-list"></i>
-            <spring:message code="lbl.posNegReport" />
+            <spring:message code="lbl.general.report.results" />
 
         </h1>
     </div>
@@ -97,16 +97,15 @@
             <!-- widget content -->
             <div class="widget-body no-padding">
                 <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
-                <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
-                <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
+                <input id="dissapearGR" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
+                <input id="msg_no_results_foundGR" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                 <input id="text_dx_date" type="hidden" value="<spring:message code="lbl.solic.DateTime"/>"/>
                 <input id="text_dx" type="hidden" value="<spring:message code="lbl.desc.request"/>"/>
                 <input id="res_aprob" type="hidden" value="<spring:message code="lbl.condition"/>"/>
-                <input id="msg_request_printed" type="hidden" value="<spring:message code="msg.request.printed"/>"/>
                 <input id="msg_select_sample" type="hidden" value="<spring:message code="msg.select.sample"/>"/>
                 <input id="msg_select" type="hidden" value="<spring:message code="msg.unrealized.search"/>"/>
 
-                <form id="pos-neg-request-form" class="smart-form" autocomplete="off">
+                <form id="general-report-form" class="smart-form" autocomplete="off">
                     <fieldset>
                         <div class="row">
                             <section class="col col-sm-6 col-md-3 col-lg-3">
@@ -115,7 +114,7 @@
                                 </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                    <input type="text" name="inicioAprob" id="inicioAprob"
+                                    <input type="text" name="inAprob" id="inAprob"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control from_date" data-date-end-date="+0d"/>
                                     <b class="tooltip tooltip-bottom-right"> <i
@@ -129,7 +128,7 @@
                                 </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
-                                    <input type="text" name="finAprob" id="finAprob"
+                                    <input type="text" name="fiAprob" id="fiAprob"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control to_date" data-date-end-date="+0d"/>
                                     <b class="tooltip tooltip-bottom-right"> <i
@@ -143,7 +142,7 @@
                                     <spring:message code="lbl.solic.area.prc" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select  id="areaSol" name="areaSol"
+                                    <select  id="areaGR" name="areaGR"
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
                                         <c:forEach items="${areas}" var="area">
@@ -160,7 +159,7 @@
                                        <spring:message code="lbl.request.type" /> </label>
                                    <div class="input-group">
                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                       <select id="tipoSol" name="tipoSol"
+                                       <select id="tipoGR" name="tipoGR"
                                                class="select2">
                                            <option value=""><spring:message code="lbl.select" />...</option>
                                            <option value="Estudio"><spring:message code="lbl.study" /></option>
@@ -173,7 +172,7 @@
                                        <spring:message code="lbl.desc.request" />
                                    </label>
                                    <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
-                                       <input type="text" id="nombreSol" name="nombreSol" placeholder="<spring:message code="lbl.desc.request"/>">
+                                       <input type="text" id="nombreSoliGR" name="nombreSoliGR" placeholder="<spring:message code="lbl.desc.request"/>">
                                        <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
                                    </label>
                                </section>
@@ -185,7 +184,7 @@
                                     <spring:message code="lbl.silais" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="codSilais" name="codSilais"
+                                    <select id="codSilaisGR" name="codSilaisGR"
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
                                         <c:forEach items="${entidades}" var="entidad">
@@ -199,24 +198,9 @@
                                     <spring:message code="lbl.health.unit" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="codUnidadSalud" name="codUnidadSalud"
+                                    <select id="codUnidadSaludGR" name="codUnidadSaludGR"
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
-                                    </select>
-                                </div>
-                            </section>
-
-                            <section class="col col-sm-12 col-md-12 col-lg-4">
-                                <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.final.result" />
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="finalRes" name="finalRes"
-                                            class="select2">
-                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                        <option value="Positivo"><spring:message code="lbl.positive" /></option>
-                                        <option value="Rutina"><spring:message code="lbl.negative" /></option>
                                     </select>
                                 </div>
                             </section>
@@ -224,8 +208,8 @@
 
                     </fieldset>
                     <footer>
-                        <button type="submit" id="search" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
-                        <button type="button" id="all-req" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
+                        <button type="submit" id="search-requestGR" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
+                        <button type="button" id="all-requestGR" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
                     </footer>
                 </form>
             </div>
@@ -254,7 +238,7 @@
             <!-- end widget edit box -->
             <!-- widget content -->
             <div class="widget-body no-padding">
-                <table id="pos_neg_request" class="table table-striped table-bordered table-hover" width="100%">
+                <table id="generalRepTable" class="table table-striped table-bordered table-hover" width="100%">
                     <thead>
                     <tr>
                         <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.lab.code.mx"/></th>
@@ -263,7 +247,6 @@
                         <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                         <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                         <th><spring:message code="lbl.request.large"/></th>
-                        <th><spring:message code="lbl.final.result"/></th>
                     </tr>
                     </thead>
                 </table>
@@ -304,6 +287,8 @@
 <script src="${dataTablesColVis}"></script>
 <spring:url value="/resources/js/plugin/datatables/dataTables.tableTools.min.js" var="dataTablesTableTools" />
 <script src="${dataTablesTableTools}"></script>
+<!-- Table Tools Path-->
+<spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
 <spring:url value="/resources/js/plugin/datatables/dataTables.bootstrap.min.js" var="dataTablesBootstrap" />
 <script src="${dataTablesBootstrap}"></script>
 <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
@@ -317,8 +302,6 @@
 <spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
     <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
 <script src="${datePickerLoc}"></script>
-<!-- Table Tools Path-->
-<spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
 <!-- JQUERY VALIDATE -->
 <spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 <script src="${jqueryValidate}"></script>
@@ -343,20 +326,19 @@
 <script src="${generarReporte}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="searchPosNegReqUrl" value="/reports/searchPosNegRequest"/>
+<c:url var="searchReqGRUrl" value="/reports/searchRequestGR"/>
+<c:url var="genRePdfUrl" value="/reports/generalRepToPDF"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-<c:url var="pdfUrl" value="/reports/posNegRequestToPDF"/>
 
 
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
-        var parametros = {searchPosNegReqUrl : "${searchPosNegReqUrl}",
+        var parametros = {searchReqGRUrl : "${searchReqGRUrl}",
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}",
-            sTableToolsPath : "${tabletools}",
-            pdfUrl : "${pdfUrl}"
-
+            genRePdfUrl: "${genRePdfUrl}",
+            sTableToolsPath : "${tabletools}"
 
         };
         ReceptionReport.init(parametros);
@@ -364,9 +346,9 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.reportes").addClass("open");
-        $("li.posNegResultsReport").addClass("active");
+        $("li.generalReport").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.posNegResultsReport").parents("ul").slideDown(200);
+            $("li.generalReport").parents("ul").slideDown(200);
         }
     });
 </script>

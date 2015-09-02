@@ -188,14 +188,12 @@ public class ReportesService {
 
         //nombre solicitud
         if (filtro.getNombreSolicitud() != null) {
-            if (filtro.getCodTipoSolicitud() != null) {
-                if (filtro.getCodTipoSolicitud().equals("Rutina")) {
                             crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-                }
-            }
+
+
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {

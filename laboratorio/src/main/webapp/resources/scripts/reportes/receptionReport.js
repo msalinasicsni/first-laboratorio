@@ -601,10 +601,9 @@ var ReceptionReport = function () {
                         mimeType: 'application/json',
                         success: function (data) {
                             if(data.length != 0){
-                                var blob = b64toBlob(data, 'application/pdf');
-                                var blobUrl = URL.createObjectURL(blob);
+                                var blob =  blobData(data, 'application/pdf');
+                                showBlob(blob);
 
-                                window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
                             }else{
                                 $.smallBox({
                                     title : $("#msg_select").val(),
@@ -625,6 +624,210 @@ var ReceptionReport = function () {
 
 
             }
+
+            /********************************************************************************************
+             Reporte General de Resultados
+             ********************************************************************************************/
+
+
+            var table4 = $('#generalRepTable').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
+                    "t"+
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
+                "aaSorting": [],
+
+                "oTableTools": {
+                    "aButtons": [
+                        {
+                            "sExtends": "xls",
+                            "sTitle": "Reporte General de Resultados"
+                        },
+                        {
+                            "sExtends": "pdf",
+                            "fnClick": function (){exportGenReportPDF();}
+                        }
+
+                    ],
+                    "sSwfPath": parametros.sTableToolsPath
+                },
+
+                "autoWidth" : true,
+
+                "preDrawCallback" : function() {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#generalRepTable'), breakpointDefinition);
+                    }
+                },
+                "rowCallback" : function(nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback" : function(oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                }
+
+            });
+
+
+            <!-- filtro Solicitudes -->
+            $('#general-report-form').validate({
+                // Rules for form validation
+                rules: {
+                    inAprob:{required:function(){return $('#inAprob').val().length>0;}},
+                    fiAprob:{required:function(){return $('#fiAprob').val().length>0;}}
+                },
+                // Do not change code below
+                errorPlacement : function(error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    table4.fnClearTable();
+                    //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
+                    codigos = "";
+                    getRequestGenRep(false)
+                }
+            });
+
+
+            $("#all-requestGR").click(function() {
+                codigos = "";
+                getRequestGenRep(true);
+            });
+
+
+            function getRequestGenRep(showAll) {
+                var mxFiltros = {};
+                if (showAll){
+
+                    mxFiltros['fechaInicioAprob'] = '';
+                    mxFiltros['fechaFinAprob'] = '';
+                    mxFiltros['codSilais'] = '';
+                    mxFiltros['codUnidadSalud'] = '';
+                    mxFiltros['codTipoSolicitud'] = '';
+                    mxFiltros['nombreSolicitud'] = '';
+                    mxFiltros['area'] = '';
+
+
+                }else {
+
+                    mxFiltros['fechaInicioAprob'] = $('#inAprob').val();
+                    mxFiltros['fechaFinAprob'] = $('#fiAprob').val();
+                    mxFiltros['codSilais'] = $('#codSilaisGR').find('option:selected').val();
+                    mxFiltros['codUnidadSalud'] = $('#codUnidadSaludGR').find('option:selected').val();
+                    mxFiltros['codTipoSolicitud'] = $('#tipoGR').find('option:selected').val();
+                    mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSoliGR').val());
+                    mxFiltros['area'] = $('#areaGR').find('option:selected').val();
+
+
+                }
+                blockUI();
+                $.getJSON(parametros.searchReqGRUrl, {
+                    strFilter: JSON.stringify(mxFiltros),
+                    ajax : 'true'
+                }, function(dataToLoad) {
+                    table4.fnClearTable();
+                    var len = Object.keys(dataToLoad).length;
+
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+
+                            table4.fnAddData(
+                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona,dataToLoad[i].solicitud, dataToLoad[i].resultado]);
+
+                            if (i+1< len) {
+                                codigos += dataToLoad[i].idSolicitud + ",";
+
+                            } else {
+                                codigos += dataToLoad[i].idSolicitud;
+
+                            }
+
+                        }
+
+
+                    }else{
+                        $.smallBox({
+                            title: $("#msg_no_results_foundGR").val() ,
+                            content: $("#dissapearGR").val(),
+                            color: "#C79121",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
+                    unBlockUI();
+                })
+                    .fail(function() {
+                        unBlockUI();
+                        alert( "error" );
+                    });
+            }
+
+
+            function exportGenReportPDF() {
+                $.ajax(
+                    {
+                        url: parametros.genRePdfUrl,
+                        type: 'GET',
+                        dataType: 'text',
+                        data: {codes: codigos, fromDate: $('#inAprob').val()  , toDate: $('#inAprob').val()},
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if(data.length != 0){
+                                var blob =  blobData(data, 'application/pdf');
+                                showBlob(blob);
+                            }else{
+                                $.smallBox({
+                                    title : $("#msg_select").val(),
+                                    content : "<i class='fa fa-clock-o'></i> <i>"+$("#dissapearGR").val()+"</i>",
+                                    color : "#C46A69",
+                                    iconSmall : "fa fa-times fa-2x fadeInRight animated",
+                                    timeout : 4000
+                                });
+                            }
+
+                            unBlockUI();
+                        },
+                        error: function (data, status, er) {
+                            unBlockUI();
+                            alert("error: " + data + " status: " + status + " er:" + er);
+                        }
+                    });
+            }
+
+
+            <!-- al seleccionar SILAIS -->
+            $('#codSilaisGR').change(function(){
+                blockUI();
+                if ($(this).val().length > 0) {
+                    $.getJSON(parametros.sUnidadesUrl, {
+                        codSilais: $(this).val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].codigo + '">'
+                                + data[i].nombre
+                                + '</option>';
+                            // html += '</option>';
+                        }
+                        $('#codUnidadSaludGR').html(html);
+                    })
+                }else{
+                    var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                    $('#codUnidadSaludGR').html(html);
+                }
+                $('#codUnidadSaludGR').val('').change();
+                unBlockUI();
+            });
+
+
+
+
+
+
 
         }
     };
