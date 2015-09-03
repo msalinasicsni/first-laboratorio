@@ -208,8 +208,8 @@
 
                     </fieldset>
                     <footer>
-                        <button type="submit" id="search-requestGR" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
                         <button type="button" id="all-requestGR" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
+                        <button type="submit" id="search-requestGR" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
                     </footer>
                 </form>
             </div>
