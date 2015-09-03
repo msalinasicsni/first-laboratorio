@@ -310,14 +310,9 @@
                         }
 
                     }
-                }).fail(function(response) {
-                    $.smallBox({
-                        title: "error: "+ response.status + "-" + response.statusText ,
-                        content: "${ordersUrl}" ,
-                        color: "#C46A69",
-                        iconSmall: "fa fa-warning",
-                        timeout: 4000
-                    });
+                }).fail(function(jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
 
             }
@@ -346,16 +341,10 @@
                         var noDatos = '<h4 class="alert alert-danger">'+$("#msg_no_data_found").val()+'</h4>';
                         $("#pie-chart").html(noDatos);
                     }
-                }).fail(function(response) {
-                    $.smallBox({
-                        title: "error: "+ response.status + "-" + response.statusText ,
-                        content: "${ordersUrl}" ,
-                        color: "#C46A69",
-                        iconSmall: "fa fa-warning",
-                        timeout: 4000
-                    });
+                }).fail(function(jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
-
             }
 
             function getResumenSolicitudes() {
@@ -379,14 +368,9 @@
                         $("#pie-chart2").html(noDatos);
                     }
 
-                }).fail(function(response) {
-                    $.smallBox({
-                        title: "error: "+ response.status + "-" + response.statusText ,
-                        content: "${ordersUrl}" ,
-                        color: "#C46A69",
-                        iconSmall: "fa fa-warning",
-                        timeout: 4000
-                    });
+                }).fail(function(jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
 
             }

@@ -33,7 +33,7 @@ public class AutoridadLaboratorio {
 
     @ManyToOne(optional = false)
     @JoinColumn(name="USUARIO", referencedColumnName = "username", insertable = true, updatable = false)
-    @ForeignKey(name = "AUTORIDADLABORATORIO_USUARIO_FK")
+    @ForeignKey(name = "AUTORIDADLAB_USUARIO_FK")
     public User getUser() {
         return user;
     }
