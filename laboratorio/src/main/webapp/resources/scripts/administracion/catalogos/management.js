@@ -140,9 +140,9 @@ var Managament = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -169,6 +169,9 @@ var Managament = function () {
                             [data[i].nombre, pasivo, btnEditar, btnOverride ]);
                     }
 
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -181,6 +184,9 @@ var Managament = function () {
                     $("#nombre").val(data.nombre);
                     $("#checkbox-enable").prop('checked',!data.pasivo);
                     showModalDireccion();
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -255,9 +261,9 @@ var Managament = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }

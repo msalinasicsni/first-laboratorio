@@ -139,9 +139,9 @@ var Area = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -168,6 +168,9 @@ var Area = function () {
                             [data[i].nombre, pasivo, btnEditar, btnOverride ]);
                     }
 
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -180,6 +183,9 @@ var Area = function () {
                     $("#nombre").val(data.nombre);
                     $("#checkbox-enable").prop('checked',!data.pasivo);
                     showModalArea();
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -254,9 +260,9 @@ var Area = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }

@@ -101,7 +101,10 @@ var AssociationSamplesReq  = function () {
 
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             $('#btnBack').click(function() {
@@ -242,7 +245,10 @@ var AssociationSamplesReq  = function () {
                         mxNotiTable.fnAddData(
                             [data[i].tipoMx.nombre, data[i].tipoNotificacion.valor, btnAdd1, btnOverride]);
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             $('#btnBack2').click(function() {
@@ -269,7 +275,10 @@ var AssociationSamplesReq  = function () {
                         detailTable.fnAddData(
                             [dataToLoad[i].nombre, dataToLoad[i].tipoSolicitud, dataToLoad[i].nombreNotificacion,  dataToLoad[i].tipoMx, btnOverride]);
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
 
@@ -395,9 +404,9 @@ var AssociationSamplesReq  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -448,9 +457,9 @@ var AssociationSamplesReq  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -506,9 +515,9 @@ var AssociationSamplesReq  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -574,9 +583,9 @@ var AssociationSamplesReq  = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 

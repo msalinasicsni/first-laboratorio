@@ -131,6 +131,9 @@ var Tests = function () {
                             [data[i].nombre, data[i].precio,pasivo, data[i].area.nombre, btnEditar, btnOverride ]);
                     }
 
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
                 desbloquearUI();
             }
@@ -146,6 +149,9 @@ var Tests = function () {
                     $("#area").val(data.area.idArea).change();
                     $("#checkbox-enable").prop('checked',!data.pasivo);
                     showModalTest();
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -188,9 +194,9 @@ var Tests = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -267,9 +273,9 @@ var Tests = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }

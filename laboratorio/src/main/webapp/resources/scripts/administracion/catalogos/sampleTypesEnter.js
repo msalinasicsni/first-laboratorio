@@ -134,7 +134,10 @@ var SampleTypes = function () {
 
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
 
@@ -212,9 +215,9 @@ var SampleTypes = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -268,9 +271,9 @@ var SampleTypes = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 

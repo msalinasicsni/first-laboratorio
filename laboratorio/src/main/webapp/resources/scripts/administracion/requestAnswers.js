@@ -119,11 +119,10 @@ var DxAnswers = function(){
                         });
                     }
                     desbloquearUI();
-                })
-                    .fail(function () {
-                        desbloquearUI();
-                        alert("error");
-                    });
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             /****************************************************************
@@ -262,9 +261,9 @@ var DxAnswers = function(){
                         });
                     }
                     desbloquearUI();
-                }).fail(function(er) {
+                }).fail(function(jqXHR) {
                     desbloquearUI();
-                    alert( "error "+er );
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -295,9 +294,9 @@ var DxAnswers = function(){
                         });
                     }
                     desbloquearUI();
-                }).fail(function(er) {
+                }).fail(function(jqXHR) {
                     desbloquearUI();
-                    alert( "error "+er );
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -359,9 +358,9 @@ var DxAnswers = function(){
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -405,9 +404,9 @@ var DxAnswers = function(){
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -455,9 +454,9 @@ var DxAnswers = function(){
 
                         }
                         desbloquearUI();
-                    }).fail(function (er) {
-                        desbloquearUI();
-                        alert("error " + er);
+                    }).fail(function(jqXHR) {
+                        desbloquearUI()
+                        validateLogin(jqXHR);
                     });
                 }
             });

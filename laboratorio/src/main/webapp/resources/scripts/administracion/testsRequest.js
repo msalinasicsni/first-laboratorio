@@ -164,7 +164,10 @@ var TestsRequest  = function () {
 
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             function getExams(id, tipo) {
@@ -182,7 +185,10 @@ var TestsRequest  = function () {
                        testsTable.fnAddData(
                             [dataToLoad[i].nombreExamen, btnOverride]);
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             function showModal(){
@@ -211,7 +217,10 @@ var TestsRequest  = function () {
                             // html += '</option>';
                         }
                         $('#examen').html(html);
-                    })
+                    }).fail(function(jqXHR) {
+                        unBlockUI();
+                        validateLogin(jqXHR);
+                    });
                 }
 
             <!-- Validacion formulario -->
@@ -287,9 +296,9 @@ var TestsRequest  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -344,9 +353,9 @@ var TestsRequest  = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 

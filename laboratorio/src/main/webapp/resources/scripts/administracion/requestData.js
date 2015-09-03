@@ -162,9 +162,9 @@ var RequestData = function(){
                         });
                     }
                     desbloquearUI();
-                }).fail(function(er) {
+                }).fail(function(jqXHR) {
                     desbloquearUI();
-                    alert( "error "+er );
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -181,7 +181,6 @@ var RequestData = function(){
                         $("#nombreDato").val(dataToLoad.nombre);
                         $("#ordenDato").val(dataToLoad.orden);
                         $("#checkbox-required").attr('checked', dataToLoad.requerido);
-                        console.log(dataToLoad.requerido);
                         $("#checkbox-pasive").attr('checked', dataToLoad.pasivo);
                         //$("#minimoRespuesta").val(dataToLoad.minimo);
                         //$("#maximoRespuesta").val(dataToLoad.maximo);
@@ -196,9 +195,9 @@ var RequestData = function(){
                         });
                     }
                     desbloquearUI();
-                }).fail(function(er) {
+                }).fail(function(jqXHR) {
                     desbloquearUI();
-                    alert( "error "+er );
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -259,9 +258,9 @@ var RequestData = function(){
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -305,9 +304,9 @@ var RequestData = function(){
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -334,34 +333,6 @@ var RequestData = function(){
                 limpiarCampoDatoRecepcion();
                 showModalConcept();
             });
-
-            /*$('#codConcepto').change(function() {
-                $("#minimoRespuesta").val("");
-                $("#maximoRespuesta").val("");
-                $("#divNumerico").hide();
-                if ($(this).val().length > 0) {
-                    bloquearUI(parametros.blockMess);
-                    $.getJSON(parametros.sTipoDatoUrl, {
-                        idTipoDato: $(this).val(),
-                        ajax: 'true'
-                    }, function (dataToLoad) {
-                        var len = Object.keys(dataToLoad).length;
-                        if (len > 0) {
-                            if (dataToLoad.tipo.codigo != $("#codigoDatoNumerico").val()) {
-                                $("#divNumerico").hide();
-                            } else {
-                                $("#divNumerico").show();
-                            }
-
-                        }
-                        desbloquearUI();
-                    }).fail(function (er) {
-                        desbloquearUI();
-                        alert("error " + er);
-                    });
-                }
-            });*/
-
         }
     }
 }();

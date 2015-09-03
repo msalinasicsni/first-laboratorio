@@ -161,7 +161,6 @@ var Concepts  = function () {
             function editCHandler(){
                 var data =  $(this.innerHTML).data('id');
                 var detalle = data.split(",");
-                console.log(detalle);
                 $('#idConcepto').val(detalle[0]);
                 $('#nombre').val(detalle[1]);
                 $('#tipo').val(detalle[2]).change();
@@ -228,7 +227,10 @@ var Concepts  = function () {
                         }
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
 
@@ -306,9 +308,9 @@ var Concepts  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -359,7 +361,10 @@ var Concepts  = function () {
                                 [data[i].valor, btnEdit, btnOverride ]);
                     }
 
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
 
@@ -404,9 +409,9 @@ var Concepts  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -450,9 +455,9 @@ var Concepts  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
-                           unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                        error: function (jqXHR) {
+                            unBlockUI();
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -495,9 +500,9 @@ var Concepts  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }

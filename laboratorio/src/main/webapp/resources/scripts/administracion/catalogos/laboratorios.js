@@ -213,9 +213,9 @@ var Laboratorio = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -244,6 +244,9 @@ var Laboratorio = function () {
                             [data[i].codigo, data[i].nombre, data[i].descripcion, pasivo, btnSILAIS, btnEditar, btnOverride ]);
                     }
 
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -262,6 +265,9 @@ var Laboratorio = function () {
                     $("#codigo").prop('disabled',true);
                     $("#checkbox-enable").prop('checked',!data.pasivo);
                     showModalLaboratorio();
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -336,9 +342,9 @@ var Laboratorio = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -347,7 +353,6 @@ var Laboratorio = function () {
                 var codigo = $(this.innerHTML).data('id');
                 if (codigo != null) {
                     $("#codigoLab").val(codigo);
-                    console.log();
                     getSILAISDisponibles();
                     getSILAISAsociados();
                     showModalSILAIS();
@@ -421,9 +426,9 @@ var Laboratorio = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -442,6 +447,9 @@ var Laboratorio = function () {
                         table2.fnAddData(
                             [data[i].entidadAdtva.nombre, btnOverride ]);
                     }
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -459,6 +467,9 @@ var Laboratorio = function () {
                             + '</option>';
                     }
                     $('#idSILAIS').html(html).val("").change();
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -499,9 +510,9 @@ var Laboratorio = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }

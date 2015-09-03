@@ -270,7 +270,10 @@ var OrganizationChart = function () {
                         table1.fnAddData(
                             [data[i].codigo, data[i].nombre, btnAdd]);
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             $('#btnBack1').click(function () {
@@ -366,7 +369,10 @@ var OrganizationChart = function () {
                         table2.fnAddData(
                             [data[i].direccion.nombre, btnDetail, btnOverride]);
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             $('#btnAddManagement').click(function () {
@@ -443,9 +449,9 @@ var OrganizationChart = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -499,9 +505,9 @@ var OrganizationChart = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 
@@ -537,7 +543,10 @@ var OrganizationChart = function () {
                             [data[i].departamento.nombre, btnDetail, btnOverride]);
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             <!-- Validacion formulario 2 -->
@@ -624,9 +633,9 @@ var OrganizationChart = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -679,9 +688,9 @@ var OrganizationChart = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 
@@ -713,7 +722,10 @@ var OrganizationChart = function () {
                             [data[i].area.nombre, btnOverride]);
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             function addArea() {
@@ -756,9 +768,9 @@ var OrganizationChart = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -811,9 +823,9 @@ var OrganizationChart = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 

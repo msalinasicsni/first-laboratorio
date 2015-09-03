@@ -136,9 +136,9 @@ var Request  = function () {
 
                     }
                     unBlockUI();
-                }).fail(function(er) {
+                }).fail(function(jqXHR) {
                     unBlockUI();
-                    alert( "error "+er );
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -171,7 +171,10 @@ var Request  = function () {
 
 
                     }
-                })
+                }).fail(function(jqXHR) {
+                    unBlockUI();
+                    validateLogin(jqXHR);
+                });
             }
 
             <!-- Validacion formulario -->
@@ -281,9 +284,9 @@ var Request  = function () {
                             }
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -340,9 +343,9 @@ var Request  = function () {
                                     }
                                     unBlockUI();
                                 },
-                                error: function (data, status, er) {
+                                error: function (jqXHR) {
                                     unBlockUI();
-                                    alert("error: " + data + " status: " + status + " er:" + er);
+                                    validateLogin(jqXHR);
                                 }
                             });
 
