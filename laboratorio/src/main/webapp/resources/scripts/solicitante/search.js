@@ -84,12 +84,10 @@ var SearchApplicant = function () {
 
                     }
                     setTimeout($.unblockUI, 500);
-                })
-                    .fail(function() {
-                        alert( "error" );
-                        setTimeout($.unblockUI, 5);
-                        alert(" status: " + status + " er:" + er);
-                    });
+                }).fail(function(jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
             }
 
             $("#create-person").click(function(){

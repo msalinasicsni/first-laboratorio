@@ -37,3 +37,6 @@
 <!-- MAIN APP JS FILE -->
 <spring:url value="/resources/js/app.min.js" var="App" />
 <script src="${App}" type="text/javascript"></script>
+<!-- VALIDATE LOGIN IN AJAX REQUEST-->
+<spring:url value="/resources/scripts/security/handleSecurityAjax.js" var="hsAjax" />
+<script src="${hsAjax}" type="text/javascript"></script>

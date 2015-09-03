@@ -310,49 +310,6 @@ var QualityReport = function () {
                     });
             }
 
-            $("#export").click(function() {
-                /*var $report_name = "control calidad";
-                var $test=fn_get_rep_table();
-                var uri = 'data:application/csv;base64,';
-                var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
-                var base64 = function(s) { return window.btoa(decodeURIComponent(encodeURIComponent(s))) } , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
-                var ctx = {worksheet: $report_name || 'Worksheet', table: $test};
-                window.location.href = uri + base64(format(template, ctx));*/
-
-                 $.ajax(
-                          {
-                              url: parametros.exportUrl,
-                              type: 'GET',
-                              dataType: 'text',
-                              data: {codes: codigos, fromDate: $('#fecInicioRecepcion').val()  , toDate: $('#fecFinRecepcion').val()},
-                              contentType: 'application/json',
-                              mimeType: 'application/json',
-                              success: function (data) {
-                                  if(data.length != 0){
-                                      var blob =  blobData(data, 'application/pdf');
-                                      var blobUrl =  showBlob(blob);
-
-                                      window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
-                                  }else{
-                                      $.smallBox({
-                                          title : $("#msg_select").val(),
-                                          content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                                          color : "#C46A69",
-                                          iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                                          timeout : 4000
-                                      });
-                                  }
-
-                                  unBlockUI();
-                              },
-                              error: function (data, status, er) {
-                                  unBlockUI();
-                                  alert("error: " + data + " status: " + status + " er:" + er);
-                              }
-                          });
-
-            });
-
         }
     };
 

@@ -8,8 +8,11 @@
                            http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
     <global-method-security secured-annotations="enabled" />
+    <beans:bean id="customAuthenticationEntryPoint" class="ni.gob.minsa.laboratorio.security.CustomAuthenticationEntryPoint">
+    <beans:property name="loginFormUrl" value="/login"></beans:property>
+    </beans:bean>
 
-    <http auto-config="true">
+    <http auto-config="true" entry-point-ref="customAuthenticationEntryPoint">
         <!-- Restrict URLs based on role -->
         <intercept-url pattern="/login*" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/logout" access="IS_AUTHENTICATED_ANONYMOUSLY" />
