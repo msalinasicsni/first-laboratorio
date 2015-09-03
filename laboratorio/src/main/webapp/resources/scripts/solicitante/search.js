@@ -3,9 +3,9 @@
  */
 var SearchApplicant = function () {
 
-    var bloquearUI = function(mensaje){
+    var bloquearUI = function (mensaje) {
         var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+        var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
         var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
         $.blockUI({ message: mess,
             css: {
@@ -25,38 +25,38 @@ var SearchApplicant = function () {
         init: function (parametros) {
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
-                tablet : 1024,
-                phone : 480
+                tablet: 1024,
+                phone: 480
             };
             var table1 = $('#applicants_result').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true,
-                "preDrawCallback" : function() {
+                "autoWidth": true,
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#applicants_result'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 }
             });
 
             $('#search-form').validate({
                 // Rules for form validation
-                rules : {
-                    filtro : {
-                        required : true,
+                rules: {
+                    filtro: {
+                        required: true,
                         minlength: 3
                     }
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -70,27 +70,27 @@ var SearchApplicant = function () {
             function getApplicants() {
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.searchUrl, {
-                    strFilter : encodeURI($('#filtro').val()),
-                    ajax : 'true'
-                }, function(data) {
+                    strFilter: encodeURI($('#filtro').val()),
+                    ajax: 'true'
+                }, function (data) {
                     var len = data.length;
-                    for ( var i = 0; i < len; i++) {
+                    for (var i = 0; i < len; i++) {
                         var actionUrl = parametros.sActionUrl + '/' + data[i].idSolicitante;
                         var habilitado = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
                         if (data[i].pasivo)
-                        habilitado = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
+                            habilitado = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
                         table1.fnAddData(
-                            [data[i].nombre, data[i].telefono, habilitado, data[i].nombreContacto, data[i].correoContacto, data[i].telefonoContacto,'<a href='+ actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>']);
+                            [data[i].nombre, data[i].telefono, habilitado, data[i].nombreContacto, data[i].correoContacto, data[i].telefonoContacto, '<a href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>']);
 
                     }
                     setTimeout($.unblockUI, 500);
-                }).fail(function(jqXHR) {
+                }).fail(function (jqXHR) {
                     setTimeout($.unblockUI, 10);
                     validateLogin(jqXHR);
                 });
             }
 
-            $("#create-person").click(function(){
+            $("#create-person").click(function () {
                 window.location.href = parametros.createUrl;
             });
         }

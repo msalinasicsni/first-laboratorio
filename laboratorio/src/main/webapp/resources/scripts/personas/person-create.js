@@ -3,9 +3,9 @@
  */
 var CreatePerson = function () {
 
-    var bloquearUI = function(mensaje){
+    var bloquearUI = function (mensaje) {
         var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+        var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
         var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
         $.blockUI({ message: mess,
             css: {
@@ -20,7 +20,7 @@ var CreatePerson = function () {
         });
     };
 
-    var desbloquearUI = function() {
+    var desbloquearUI = function () {
         setTimeout($.unblockUI, 500);
     };
 
@@ -28,7 +28,7 @@ var CreatePerson = function () {
         //main function to initiate the module
         init: function (parametros) {
 
-            function agregarPersona(){
+            function agregarPersona() {
                 var persona = {
                     idPersona: $("#idPersona").val(), // se pasa el id del maestro que se esta editando,
                     primerNombre: $("#primerNombre").val(),
@@ -53,7 +53,7 @@ var CreatePerson = function () {
                     codMuniRes: $('#codMuniReside option:selected').val(),
                     codComunidadRes: $('#codComuniReside option:selected').val()
                 };
-                var esEdicion = ($("#idPersona").val()!=null && $("#idPersona").val().trim().length > 0);
+                var esEdicion = ($("#idPersona").val() != null && $("#idPersona").val().trim().length > 0);
                 var personaObj = {};
                 personaObj['idPersona'] = '';
                 personaObj['mensaje'] = '';
@@ -68,35 +68,35 @@ var CreatePerson = function () {
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
-                            if (data.mensaje.length > 0){
+                            if (data.mensaje.length > 0) {
                                 $.smallBox({
-                                    title: data.mensaje ,
+                                    title: data.mensaje,
                                     content: $("#smallBox_content4s").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",
                                     timeout: 4000
                                 });
-                            }else{
+                            } else {
                                 var msg;
-                                if (esEdicion){
+                                if (esEdicion) {
                                     msg = $("#msg_person_updated").val();
-                                }else{
+                                } else {
                                     msg = $("#msg_person_added").val();
                                 }
                                 $.smallBox({
-                                    title: msg ,
+                                    title: msg,
                                     content: $("#smallBox_content").val(),
                                     color: "#739E73",
                                     iconSmall: "fa fa-success",
                                     timeout: 2000
                                 });
-                                window.location.href = parametros.sPersonUrl + '/'+ data.idPersona;
+                                window.location.href = parametros.sPersonUrl + '/' + data.idPersona;
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     }
                 )
@@ -131,15 +131,17 @@ var CreatePerson = function () {
 
 
             <!-- al seleccionar pais de nacimiento -->
-            $('#codPaisNacimi').change(function() {
+            $('#codPaisNacimi').change(function () {
                 bloquearUI(parametros.blockMess);
                 if ($(this).val().length > 0) {
-                    if ($(this).val()=='NI'){
+                    if ($(this).val() == 'NI') {
                         $('#codDepaNacimi').prop('disabled', false);
                         $('#codMuniNacimi').prop('disabled', false);
                         $('#codDepaNacimi').val($("#codDepaNacimiEd").val()).change();
-                        setTimeout(function(){$('#codMuniNacimi').val($("#codMuniNacimiEd").val()).change();},200);
-                    }else{
+                        setTimeout(function () {
+                            $('#codMuniNacimi').val($("#codMuniNacimiEd").val()).change();
+                        }, 200);
+                    } else {
                         $('#codDepaNacimi').prop('disabled', 'disabled');
                         $('#codMuniNacimi').prop('disabled', 'disabled');
                         $('#codDepaNacimi').prop('selectedIndex', 0).change();
@@ -150,7 +152,7 @@ var CreatePerson = function () {
             });
 
             <!-- al seleccionar departamento de nacimiento -->
-            $('#codDepaNacimi').change(function(){
+            $('#codDepaNacimi').change(function () {
                 bloquearUI(parametros.blockMess);
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sMunicipiosUrl, {
@@ -167,8 +169,11 @@ var CreatePerson = function () {
                             // html += '</option>';
                         }
                         $('#codMuniNacimi').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codMuniNacimi').html(html);
                 }
@@ -177,7 +182,7 @@ var CreatePerson = function () {
             });
 
             <!-- al seleccionar departamento de residencia -->
-            $('#codDepaReside').change(function(){
+            $('#codDepaReside').change(function () {
                 bloquearUI(parametros.blockMess);
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sMunicipiosUrl, {
@@ -194,8 +199,11 @@ var CreatePerson = function () {
                             // html += '</option>';
                         }
                         $('#codMuniReside').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codMuniReside').html(html);
                 }
@@ -204,7 +212,7 @@ var CreatePerson = function () {
             });
 
             <!-- al seleccionar municipio de residencia -->
-            $('#codMuniReside').change(function(){
+            $('#codMuniReside').change(function () {
                 bloquearUI(parametros.blockMess);
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sComunidadesUrl, {
@@ -221,8 +229,11 @@ var CreatePerson = function () {
                             // html += '</option>';
                         }
                         $('#codComuniReside').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codComuniReside').html(html);
                 }
@@ -231,10 +242,10 @@ var CreatePerson = function () {
             });
 
             $("#fechaNacimiento").change(
-                function() {
-                    if ($("#fechaNacimiento").val()!=null && $("#fechaNacimiento").val().length > 0) {
+                function () {
+                    if ($("#fechaNacimiento").val() != null && $("#fechaNacimiento").val().length > 0) {
                         $("#edad").val(getAge($("#fechaNacimiento").val()));
-                    }else{
+                    } else {
                         $("#edad").val('');
                     }
                 });

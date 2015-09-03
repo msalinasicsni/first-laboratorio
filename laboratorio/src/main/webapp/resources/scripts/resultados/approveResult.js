@@ -1,7 +1,7 @@
 var ApproveResult = function () {
-    var bloquearUI = function(mensaje){
+    var bloquearUI = function (mensaje) {
         var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+        var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
         var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
         $.blockUI({ message: mess,
             css: {
@@ -17,7 +17,7 @@ var ApproveResult = function () {
         });
     };
 
-    var desbloquearUI = function() {
+    var desbloquearUI = function () {
         setTimeout($.unblockUI, 500);
     };
     return {
@@ -50,29 +50,32 @@ var ApproveResult = function () {
             var text_selected_all = $("#text_selected_all").val();
             var text_selected_none = $("#text_selected_none").val();
             var table2 = $('#examenes_repite').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "T"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "T" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true,
+                "autoWidth": true,
                 "searching": false,
                 "lengthChange": false,
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#orders_result'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 },
                 "oTableTools": {
                     "sSwfPath": parametros.sTableToolsPath,
                     "sRowSelect": "multi",
-                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
                 }
             });
 
@@ -80,11 +83,15 @@ var ApproveResult = function () {
             $('#approveResult-form').validate({
                 // Rules for form validation
                 rules: {
-                    fecFinTomaMx:{required:function(){return $('#fecInicioTomaMx').val().length>0;}},
-                    fecInicioTomaMx:{required:function(){return $('#fecFinTomaMx').val().length>0;}}
+                    fecFinTomaMx: {required: function () {
+                        return $('#fecInicioTomaMx').val().length > 0;
+                    }},
+                    fecInicioTomaMx: {required: function () {
+                        return $('#fecFinTomaMx').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -97,10 +104,10 @@ var ApproveResult = function () {
             $('#reject-result-form').validate({
                 // Rules for form validation
                 rules: {
-                    causaRechazo: {required : true}
+                    causaRechazo: {required: true}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -109,19 +116,19 @@ var ApproveResult = function () {
                     var len = aSelectedTrs.length;
                     if (len > 0) {
                         rechazarResultado();
-                    }else{
+                    } else {
                         $.smallBox({
-                            title : $("#msg_select_exam").val(),
-                            content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                            color : "#C46A69",
-                            iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                            timeout : 4000
+                            title: $("#msg_select_exam").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                            color: "#C46A69",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 4000
                         });
                     }
                 }
             });
 
-            $("#reject-result").click(function() {
+            $("#reject-result").click(function () {
                 var opcSi = $("#confirm_msg_opc_yes").val();
                 var opcNo = $("#confirm_msg_opc_no").val();
                 $.SmartMessageBox({
@@ -145,24 +152,24 @@ var ApproveResult = function () {
                 })
             });
 
-            function getExamsToRepeat () {
+            function getExamsToRepeat() {
                 bloquearUI(parametros.blockMess);
                 var idSolicitud = $('#idSolicitud').val();
                 $.getJSON(parametros.sExamsRepeat, {
                     idSolicitud: idSolicitud,
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     console.log(dataToLoad);
                     table2.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table2.fnAddData(
-                                [dataToLoad[i].codExamen.nombre+"<input type='hidden' value='"+dataToLoad[i].idOrdenExamen+"'/>",dataToLoad[i].codExamen.area.nombre]);
+                                [dataToLoad[i].codExamen.nombre + "<input type='hidden' value='" + dataToLoad[i].idOrdenExamen + "'/>", dataToLoad[i].codExamen.area.nombre]);
                         }
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#disappear").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -171,19 +178,19 @@ var ApproveResult = function () {
                     }
                     desbloquearUI();
                 })
-                    .fail(function() {
-                        desbloquearUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
-            function showModalReject(){
+            function showModalReject() {
                 $("#myModal").modal({
                     show: true
                 });
             }
 
-            function hideModalReject(){
+            function hideModalReject() {
                 $('#myModal').modal('hide');
             }
 
@@ -194,8 +201,8 @@ var ApproveResult = function () {
                 var idSolicitud = $('#idSolicitud').val();
                 $.getJSON(parametros.searchUrl, {
                     idSolicitud: idSolicitud,
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     console.log(dataToLoad);
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
@@ -203,26 +210,26 @@ var ApproveResult = function () {
                         for (var i = 0; i < len; i++) {
                             console.log(dataToLoad[i].resultado);
                             table1.fnAddData(
-                                [dataToLoad[i].respuesta,dataToLoad[i].valor,dataToLoad[i].fechaResultado]);
+                                [dataToLoad[i].respuesta, dataToLoad[i].valor, dataToLoad[i].fechaResultado]);
                         }
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#disappear").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });
                     }
-                   desbloquearUI();
+                    desbloquearUI();
                 })
-                    .fail(function() {
-                        desbloquearUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
-            function aprobarResultado(){
+            function aprobarResultado() {
                 bloquearUI(parametros.blockMess);
                 var objResultado = {};
                 objResultado["idSolicitud"] = $("#idSolicitud").val();
@@ -238,35 +245,37 @@ var ApproveResult = function () {
                         async: false,
                         success: function (data) {
                             desbloquearUI();
-                            if (data.mensaje.length > 0){
+                            if (data.mensaje.length > 0) {
                                 $.smallBox({
-                                    title: data.mensaje ,
+                                    title: data.mensaje,
                                     content: $("#smallBox_content").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",
                                     timeout: 4000
                                 });
-                            }else{
+                            } else {
                                 var msg = $("#msg_result_approve").val();
                                 $.smallBox({
-                                    title: msg ,
+                                    title: msg,
                                     content: $("#smallBox_content").val(),
                                     color: "#739E73",
                                     iconSmall: "fa fa-success",
                                     timeout: 3000
                                 });
 
-                                setTimeout(function () {window.location.href = parametros.sInitUrl},3000);
+                                setTimeout(function () {
+                                    window.location.href = parametros.sInitUrl
+                                }, 3000);
                             }
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }
 
-            function rechazarResultado(){
+            function rechazarResultado() {
                 bloquearUI(parametros.blockMess);
                 var oTT = TableTools.fnGetInstance('examenes_repite');
                 var aSelectedTrs = oTT.fnGetSelected();
@@ -275,15 +284,15 @@ var ApproveResult = function () {
                 //el input hidden debe estar siempre en la primera columna
                 for (var i = 0; i < len; i++) {
                     var texto = aSelectedTrs[i].firstChild.innerHTML;
-                    var input = texto.substring(texto.lastIndexOf("<"),texto.length);
-                    idOrdenesEx[i]=$(input).val();
+                    var input = texto.substring(texto.lastIndexOf("<"), texto.length);
+                    idOrdenesEx[i] = $(input).val();
                 }
-                console.log(idOrdenesEx);
+
                 var objResultado = {};
                 objResultado["idSolicitud"] = $("#idSolicitud").val();
                 objResultado["causaRechazo"] = $("#causaRechazo").val();
                 objResultado["idOrdenes"] = idOrdenesEx;
-                objResultado['cantOrdenes']=len;
+                objResultado['cantOrdenes'] = len;
                 objResultado["mensaje"] = '';
                 $.ajax(
                     {
@@ -296,30 +305,32 @@ var ApproveResult = function () {
                         async: false,
                         success: function (data) {
                             desbloquearUI();
-                            if (data.mensaje.length > 0){
+                            if (data.mensaje.length > 0) {
                                 $.smallBox({
-                                    title: data.mensaje ,
+                                    title: data.mensaje,
                                     content: $("#smallBox_content").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",
                                     timeout: 4000
                                 });
-                            }else{
+                            } else {
                                 var msg = $("#msg_result_reject").val();
                                 $.smallBox({
-                                    title: msg ,
+                                    title: msg,
                                     content: $("#smallBox_content").val(),
                                     color: "#739E73",
                                     iconSmall: "fa fa-success",
                                     timeout: 3000
                                 });
                                 hideModalReject();
-                                setTimeout(function () {window.location.href = parametros.sInitUrl},3000);
+                                setTimeout(function () {
+                                    window.location.href = parametros.sInitUrl
+                                }, 3000);
                             }
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     });
             }

@@ -1,7 +1,7 @@
 var SendOrdersReceipt = function () {
-    var bloquearUI = function(mensaje){
+    var bloquearUI = function (mensaje) {
         var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+        var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
         var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
         $.blockUI({ message: mess,
             css: {
@@ -17,68 +17,75 @@ var SendOrdersReceipt = function () {
         });
     };
 
-    var desbloquearUI = function() {
+    var desbloquearUI = function () {
         setTimeout($.unblockUI, 500);
     };
     return {
         //main function to initiate the module
         init: function (parametros) {
-			var responsiveHelper_dt_basic = undefined;
-			var breakpointDefinition = {
-				tablet : 1024,
-				phone : 480
-			};
+            var responsiveHelper_dt_basic = undefined;
+            var breakpointDefinition = {
+                tablet: 1024,
+                phone: 480
+            };
             var text_selected_all = $("#text_selected_all").val();
             var text_selected_none = $("#text_selected_none").val();
-			var table1 = $('#orders_result').dataTable({
-				"sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "T"+
-                    "t"+
-					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-				"autoWidth" : true,
+            var table1 = $('#orders_result').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "T" +
+                    "t" +
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth": true,
                 "columns": [
-                    null,null,null,null,null,null,null,null,null,
+                    null, null, null, null, null, null, null, null, null,
                     {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "data":           null,
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
                         "defaultContent": ''
                     }
                 ],
-                "preDrawCallback" : function() {
-					// Initialize the responsive datatables helper once.
-					if (!responsiveHelper_dt_basic) {
-						responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#orders_result'), breakpointDefinition);
-					}
-				},
-				"rowCallback" : function(nRow) {
-					responsiveHelper_dt_basic.createExpandIcon(nRow);
-				},
-				"drawCallback" : function(oSettings) {
-					responsiveHelper_dt_basic.respond();
-				},
+                "preDrawCallback": function () {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#orders_result'), breakpointDefinition);
+                    }
+                },
+                "rowCallback": function (nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback": function (oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                },
                 "oTableTools": {
                     "sSwfPath": parametros.sTableToolsPath,
                     "sRowSelect": "multi",
-                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
                 }
-			});
+            });
 
             $('#searchOrders-form').validate({
-    			// Rules for form validation
+                // Rules for form validation
                 rules: {
-                    fechaFinRecepcion:{required:function(){return $('#fechaInicioRecep').val().length>0;}},
-                    fechaInicioRecep:{required:function(){return $('#fechaFinRecepcion').val().length>0;}}
+                    fechaFinRecepcion: {required: function () {
+                        return $('#fechaInicioRecep').val().length > 0;
+                    }},
+                    fechaInicioRecep: {required: function () {
+                        return $('#fechaFinRecepcion').val().length > 0;
+                    }}
                 },
-    				// Do not change code below
-    				errorPlacement : function(error, element) {
-    					error.insertAfter(element.parent());
-    				},
-    				submitHandler: function (form) {
-                        table1.fnClearTable();
-                        //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                        getOrders(false)
-                    }
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    table1.fnClearTable();
+                    //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
+                    getOrders(false)
+                }
             });
 
             $('#sendOrders-form').validate({
@@ -86,8 +93,8 @@ var SendOrdersReceipt = function () {
                 rules: {
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
-                        error.insertAfter(element.parent());
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
@@ -96,19 +103,19 @@ var SendOrdersReceipt = function () {
             });
 
             /*PARA MOSTRAR TABLA DETALLE DX*/
-            function format (d,indice) {
+            function format(d, indice) {
                 // `d` is the original data object for the row
                 var texto = d[indice]; //indice donde esta el input hidden
                 var diagnosticos = $(texto).val();
-                var json =JSON.parse(diagnosticos);
+                var json = JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_request').val()+'</td><td style="font-weight: bold">'+$('#text_request_date').val()+'</td><td style="font-weight: bold">'+$('#text_request_type').val()+'</td></tr>';
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                    '<tr><td style="font-weight: bold">' + $('#text_request').val() + '</td><td style="font-weight: bold">' + $('#text_request_date').val() + '</td><td style="font-weight: bold">' + $('#text_request_type').val() + '</td></tr>';
                 for (var i = 1; i <= len; i++) {
-                    childTable =childTable +
-                        '<tr><td>'+json[i].nombre+'</td>'+
-                        '<td>'+json[i].fechaSolicitud+'</td>' +
-                        '<td>'+json[i].tipo+'</td></tr>';
+                    childTable = childTable +
+                        '<tr><td>' + json[i].nombre + '</td>' +
+                        '<td>' + json[i].fechaSolicitud + '</td>' +
+                        '<td>' + json[i].tipo + '</td></tr>';
                 }
                 childTable = childTable + '</table>';
                 return childTable;
@@ -117,22 +124,22 @@ var SendOrdersReceipt = function () {
             $('#orders_result tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
                 var row = table1.api().row(tr);
-                if ( row.child.isShown() ) {
+                if (row.child.isShown()) {
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),9)).show();
+                    row.child(format(row.data(), 9)).show();
                     tr.addClass('shown');
                 }
-            } );
+            });
 
             //FIN
-            function blockUI(){
+            function blockUI() {
                 var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+                var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
                 //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
                 var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
                 $.blockUI({ message: mess,
@@ -153,7 +160,7 @@ var SendOrdersReceipt = function () {
 
             function getOrders(showAll) {
                 var encuestaFiltros = {};
-                if (showAll){
+                if (showAll) {
                     encuestaFiltros['nombreApellido'] = '';
                     encuestaFiltros['fechaInicioRecep'] = '';
                     encuestaFiltros['fechaFinRecepcion'] = '';
@@ -162,7 +169,7 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['codTipoMx'] = '';
                     encuestaFiltros['codTipoSolicitud'] = '';
                     encuestaFiltros['nombreSolicitud'] = '';
-                }else {
+                } else {
                     encuestaFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     encuestaFiltros['fechaInicioRecep'] = $('#fechaInicioRecep').val();
                     encuestaFiltros['fechaFinRecepcion'] = $('#fechaFinRecepcion').val();
@@ -175,21 +182,21 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['nombreSolicitud'] = $('#nombreSoli').val();
                 }
                 blockUI();
-    			$.getJSON(parametros.sOrdersUrl, {
+                $.getJSON(parametros.sOrdersUrl, {
                     strFilter: JSON.stringify(encuestaFiltros),
-    				ajax : 'true'
-    			}, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='"+dataToLoad[i].idTomaMx+"'/>",dataToLoad[i].tipoMuestra,dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].urgente, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
+                                [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + dataToLoad[i].idTomaMx + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].urgente, " <input type='hidden' value='" + dataToLoad[i].solicitudes + "'/>"]);
                         }
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -197,14 +204,14 @@ var SendOrdersReceipt = function () {
                         });
                     }
                     unBlockUI();
-    			})
-    			.fail(function() {
-                    unBlockUI();
-				    alert( "error" );
-				});
+                })
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
             }
 
-            $("#all-orders").click(function() {
+            $("#all-orders").click(function () {
                 getOrders(true);
             });
 
@@ -222,9 +229,9 @@ var SendOrdersReceipt = function () {
                             var blob = blobData(data, 'application/pdf');
                             showBlob(blob);
                         },
-                        error: function (data, status, er) {
-                            unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -239,25 +246,24 @@ var SendOrdersReceipt = function () {
                     $.SmartMessageBox({
                         title: $("#msg_sending_confirm_t").val(),
                         content: $("#msg_sending_confirm_c").val(),
-                        buttons: '['+opcSi+']['+opcNo+']'
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
                     }, function (ButtonPressed) {
                         if (ButtonPressed === opcSi) {
                             bloquearUI(parametros.blockMess);
                             var idOrdenes = {};
-                            console.log(len);
                             //el input hidden debe estar siempre en la primera columna
                             for (var i = 0; i < len; i++) {
                                 //var texto = aSelectedTrs[i].cells[7].innerHTML;
                                 var texto = aSelectedTrs[i].firstChild.innerHTML;
-                                var input = texto.substring(texto.lastIndexOf("<"),texto.length);
-                                idOrdenes[i]=$(input).val();
+                                var input = texto.substring(texto.lastIndexOf("<"), texto.length);
+                                idOrdenes[i] = $(input).val();
                             }
                             var ordenesObj = {};
                             ordenesObj['strOrdenes'] = idOrdenes;
                             ordenesObj['mensaje'] = '';
-                            ordenesObj['cantRecepciones']=len;
+                            ordenesObj['cantRecepciones'] = len;
                             ordenesObj['cantRecepProc'] = '';
-                            ordenesObj['numeroHoja']='';
+                            ordenesObj['numeroHoja'] = '';
                             $.ajax(
                                 {
                                     url: parametros.sAgregarEnvioUrl,
@@ -268,19 +274,19 @@ var SendOrdersReceipt = function () {
                                     mimeType: 'application/json',
                                     success: function (data) {
                                         desbloquearUI();
-                                        if (data.mensaje.length > 0){
+                                        if (data.mensaje.length > 0) {
                                             $.smallBox({
-                                                title: data.mensaje ,
+                                                title: data.mensaje,
                                                 content: $("#smallBox_content").val(),
                                                 color: "#C46A69",
                                                 iconSmall: "fa fa-warning",
                                                 timeout: 4000
                                             });
-                                        }else{
+                                        } else {
                                             var msg = $("#msg_send_receipt_succes").val();
-                                            msg = msg.replace(/\{0\}/,data.cantRecepProc);
+                                            msg = msg.replace(/\{0\}/, data.cantRecepProc);
                                             $.smallBox({
-                                                title: msg ,
+                                                title: msg,
                                                 content: $("#smallBox_content").val(),
                                                 color: "#739E73",
                                                 iconSmall: "fa fa-success",
@@ -290,16 +296,16 @@ var SendOrdersReceipt = function () {
                                             getOrders(false);
                                         }
                                     },
-                                    error: function (data, status, er) {
+                                    error: function (jqXHR) {
                                         desbloquearUI();
-                                        alert("error: " + data + " status: " + status + " er:" + er);
+                                        validateLogin(jqXHR);
                                     }
                                 });
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({
                                 title: $("#msg_sending_cancel").val(),
-                                content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
                                 color: "#C46A69",
                                 iconSmall: "fa fa-times fa-2x fadeInRight animated",
                                 timeout: 4000
@@ -307,25 +313,26 @@ var SendOrdersReceipt = function () {
                         }
 
                     });
-                }else{
+                } else {
                     $.smallBox({
-                        title : $("#msg_sending_select_order").val(),
-                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                        color : "#C46A69",
-                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                        timeout : 4000
+                        title: $("#msg_sending_select_order").val(),
+                        content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                        color: "#C46A69",
+                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                        timeout: 4000
                     });
                 }
 
             }
 
-            function limpiarDatosRecepcion(){
+            function limpiarDatosRecepcion() {
                 //$("#txtNombreTransporta").val('');
                 //$("#txtTemperatura").val('');
                 //$("#codLaboratorioProce").val('').change();
             }
+
             <!-- al seleccionar SILAIS -->
-            $('#codSilais').change(function(){
+            $('#codSilais').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
@@ -342,8 +349,11 @@ var SendOrdersReceipt = function () {
                             // html += '</option>';
                         }
                         $('#codUnidadSalud').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codUnidadSalud').html(html);
                 }
@@ -352,13 +362,13 @@ var SendOrdersReceipt = function () {
             });
             <!-- para buscar código de barra -->
             var timer;
-            var iniciado=false;
+            var iniciado = false;
             var contador;
             //var codigo;
-            function tiempo(){
+            function tiempo() {
                 console.log('tiempo');
                 contador++;
-                if(contador >= 10){
+                if (contador >= 10) {
                     clearInterval(timer);
                     iniciado = false;
                     //codigo = $.trim($('#codigo').val());
@@ -367,9 +377,10 @@ var SendOrdersReceipt = function () {
 
                 }
             }
-            $('#txtCodUnicoMx').keypress(function(event){
-                if(!iniciado){
-                    timer    = setInterval(tiempo(),100);
+
+            $('#txtCodUnicoMx').keypress(function (event) {
+                if (!iniciado) {
+                    timer = setInterval(tiempo(), 100);
                     iniciado = true;
                 }
                 contador = 0;

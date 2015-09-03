@@ -14,36 +14,36 @@ var QualityReport = function () {
 
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
-                tablet : 1024,
-                phone : 480
+                tablet: 1024,
+                phone: 480
             };
 
 
             var table1 = $('#result-samples').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
-                "autoWidth" : true,
+                "autoWidth": true,
                 "aaSorting": [],
                 "columns": [
-                    null,null,null,null,null,null, null,null,
+                    null, null, null, null, null, null, null, null,
                     {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "data":           null,
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
                         "defaultContent": ''
                     }
                 ],
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#result-samples'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 },
                 "oTableTools": {
@@ -53,7 +53,9 @@ var QualityReport = function () {
                             "sTitle": "Solicitudes aprobadas control de calidad",
                             "sPdfSize": "A4",
                             "sPdfOrientation": "landscape",
-                            "fnClick": function (){ExportarPDF();}
+                            "fnClick": function () {
+                                ExportarPDF();
+                            }
                         }
                     ],
                     "sSwfPath": parametros.sTableToolsPath
@@ -64,11 +66,15 @@ var QualityReport = function () {
             $('#received-samples-form').validate({
                 // Rules for form validation
                 rules: {
-                    fecFinMx:{required:function(){return $('#fecInicioMx').val().length>0;}},
-                    fecInicioMx:{required:function(){return $('#fecFinMx').val().length>0;}}
+                    fecFinMx: {required: function () {
+                        return $('#fecInicioMx').val().length > 0;
+                    }},
+                    fecInicioMx: {required: function () {
+                        return $('#fecFinMx').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -79,9 +85,9 @@ var QualityReport = function () {
                 }
             });
 
-            function blockUI(){
+            function blockUI() {
                 var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+                var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
                 //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
                 var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
                 $.blockUI({ message: mess,
@@ -102,7 +108,7 @@ var QualityReport = function () {
 
             function getMxs(showAll) {
                 var mxFiltros = {};
-                if (showAll){
+                if (showAll) {
 
                     mxFiltros['fechaInicioRecepcion'] = '';
                     mxFiltros['fechaFinRecepcion'] = '';
@@ -111,9 +117,9 @@ var QualityReport = function () {
                     mxFiltros['codTipoMx'] = '';
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
-                    mxFiltros['laboratorio']='';
+                    mxFiltros['laboratorio'] = '';
 
-                }else {
+                } else {
 
                     mxFiltros['fechaInicioRecepcion'] = $('#fecInicioRecepcion').val();
                     mxFiltros['fechaFinRecepcion'] = $('#fecFinRecepcion').val();
@@ -121,15 +127,15 @@ var QualityReport = function () {
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
-                    mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSoli').val()) ;
-                    mxFiltros['laboratorio']=$('#codLaboratorioOri').find('option:selected').val();
+                    mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoli').val());
+                    mxFiltros['laboratorio'] = $('#codLaboratorioOri').find('option:selected').val();
 
                 }
                 blockUI();
                 $.getJSON(parametros.searchUrl, {
                     strFilter: JSON.stringify(mxFiltros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
 
@@ -137,9 +143,9 @@ var QualityReport = function () {
                         codigos = "";
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].solicitud,dataToLoad[i].fechaSolicitud,dataToLoad[i].fechaAprobacion,dataToLoad[i].codigoLab,
-                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].laboratorio , " <input type='hidden' value='"+dataToLoad[i].resultados+"'/>"]);
-                            if (i+1< len) {
+                                [dataToLoad[i].solicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaAprobacion, dataToLoad[i].codigoLab,
+                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].laboratorio , " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);
+                            if (i + 1 < len) {
                                 codigos += dataToLoad[i].codigoUnicoMx + ",";
 
                             } else {
@@ -147,10 +153,10 @@ var QualityReport = function () {
 
                             }
                         }
-                        codigos = reemplazar(codigos,"-","*");
-                    }else{
+                        codigos = reemplazar(codigos, "-", "*");
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -159,30 +165,30 @@ var QualityReport = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
 
-            $("#all-orders").click(function() {
+            $("#all-orders").click(function () {
                 codigos = "";
                 getMxs(true);
             });
 
             /*PARA MOSTRAR TABLA DETALLE RESULTADO*/
-            function format (d,indice) {
+            function format(d, indice) {
                 // `d` is the original data object for the row
                 var texto = d[indice]; //indice donde esta el input hidden
                 var resultado = $(texto).val();
-                var json =JSON.parse(resultado);
+                var json = JSON.parse(resultado);
                 var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_response').val()+'</td><td style="font-weight: bold">'+$('#text_value').val()+'</td><td style="font-weight: bold">'+$('#text_date').val()+'</td></tr>';
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                    '<tr><td style="font-weight: bold">' + $('#text_response').val() + '</td><td style="font-weight: bold">' + $('#text_value').val() + '</td><td style="font-weight: bold">' + $('#text_date').val() + '</td></tr>';
                 for (var i = 1; i <= len; i++) {
-                    childTable =childTable +
-                        '<tr></tr><tr><td>'+json[i].respuesta+'</td><td>'+json[i].valor+'</td><td>'+json[i].fechaResultado+'</td></tr>';
+                    childTable = childTable +
+                        '<tr></tr><tr><td>' + json[i].respuesta + '</td><td>' + json[i].valor + '</td><td>' + json[i].fechaResultado + '</td></tr>';
                 }
                 childTable = childTable + '</table>';
                 return childTable;
@@ -191,20 +197,20 @@ var QualityReport = function () {
             $('#result-samples tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
                 var row = table1.api().row(tr);
-                if ( row.child.isShown() ) {
+                if (row.child.isShown()) {
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),8)).show();
+                    row.child(format(row.data(), 8)).show();
                     tr.addClass('shown');
                 }
-            } );
+            });
 
             <!-- al seleccionar SILAIS -->
-            $('#codSilais').change(function(){
+            $('#codSilais').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
@@ -221,8 +227,11 @@ var QualityReport = function () {
                             // html += '</option>';
                         }
                         $('#codUnidadSalud').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codUnidadSalud').html(html);
                 }
@@ -231,12 +240,11 @@ var QualityReport = function () {
             });
 
 
-            function reemplazar (texto, buscar, nuevo){
+            function reemplazar(texto, buscar, nuevo) {
                 var temp = '';
                 var long = texto.length;
-                for (j=0; j<long; j++) {
-                    if (texto[j] == buscar)
-                    {
+                for (j = 0; j < long; j++) {
+                    if (texto[j] == buscar) {
                         temp += nuevo;
                     } else
                         temp += texto[j];
@@ -244,41 +252,37 @@ var QualityReport = function () {
                 return temp;
             }
 
-            function fn_get_rep_table()
-            {
+            function fn_get_rep_table() {
                 var oSettings = table1.fnSettings();
-                var colTitles = $.map(oSettings.aoColumns, function(node) {
+                var colTitles = $.map(oSettings.aoColumns, function (node) {
                     return node.sTitle;
                 });
 
-                var $str_return='<thead><tr>';
+                var $str_return = '<thead><tr>';
 
-                jQuery.each(colTitles, function()
-                {
+                jQuery.each(colTitles, function () {
                     console.log(this);
-                    $str_return+='<th>'+this+'</th>';
+                    $str_return += '<th>' + this + '</th>';
                 });
 
-                $str_return+='</tr></thead><tbody>';
+                $str_return += '</tr></thead><tbody>';
 
                 var $rep_data = table1.fnGetData();
 
-                $.each($rep_data, function(key1, value1)
-                {
-                    $str_return+='<tr>';
-                    $.each(value1, function(key2, value2)
-                    {
+                $.each($rep_data, function (key1, value1) {
+                    $str_return += '<tr>';
+                    $.each(value1, function (key2, value2) {
                         console.log(value2);
-                        $str_return+='<td>'+value2+'</td>';
+                        $str_return += '<td>' + value2 + '</td>';
                     });
-                    $str_return+='</tr>';
+                    $str_return += '</tr>';
                 });
 
-                $str_return+='</tbody>';
+                $str_return += '</tbody>';
                 return $str_return;
             }
 
-            function ExportarPDF(){
+            function ExportarPDF() {
                 $.ajax(
                     {
                         url: parametros.exportUrl,
@@ -288,24 +292,24 @@ var QualityReport = function () {
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
-                            if(data.length != 0){
-                                var blob =  blobData(data, 'application/pdf');
+                            if (data.length != 0) {
+                                var blob = blobData(data, 'application/pdf');
                                 showBlob(blob);
-                            }else{
+                            } else {
                                 $.smallBox({
-                                    title : $("#msg_select").val(),
-                                    content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                                    color : "#C46A69",
-                                    iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                                    timeout : 4000
+                                    title: $("#msg_select").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 4000
                                 });
                             }
 
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
-                            unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
                         }
                     });
             }

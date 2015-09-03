@@ -7,42 +7,45 @@ var SearchWorkSheet = function () {
         init: function (parametros) {
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
-                tablet : 1024,
-                phone : 480
+                tablet: 1024,
+                phone: 480
             };
             var text_selected_all = $("#text_selected_all").val();
             var text_selected_none = $("#text_selected_none").val();
             var table1 = $('#mx-results').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "T"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "T" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true,
+                "autoWidth": true,
                 "columns": [
-                    null,null,null,
+                    null, null, null,
                     {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "data":           null,
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
                         "defaultContent": ''
                     }
                 ],
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#mx-results'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 },
                 "oTableTools": {
                     "sSwfPath": parametros.sTableToolsPath,
                     "sRowSelect": "multi",
-                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
                 }
             });
 
@@ -51,11 +54,15 @@ var SearchWorkSheet = function () {
             $('#searchMx-form').validate({
                 // Rules for form validation
                 rules: {
-                    fecFinTomaMx:{required:function(){return $('#fecInicioTomaMx').val().length>0;}},
-                    fecInicioTomaMx:{required:function(){return $('#fecFinTomaMx').val().length>0;}}
+                    fecFinTomaMx: {required: function () {
+                        return $('#fecInicioTomaMx').val().length > 0;
+                    }},
+                    fecInicioTomaMx: {required: function () {
+                        return $('#fecFinTomaMx').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -65,9 +72,9 @@ var SearchWorkSheet = function () {
                 }
             });
 
-            function blockUI(){
+            function blockUI() {
                 var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+                var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
                 //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
                 var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
                 $.blockUI({ message: mess,
@@ -88,11 +95,11 @@ var SearchWorkSheet = function () {
 
             function getWorkSheets(showAll) {
                 var mxFiltros = {};
-                if (showAll){
+                if (showAll) {
                     mxFiltros['hoja'] = '';
                     mxFiltros['fechaInicioHoja'] = '';
                     mxFiltros['fechaFinHoja'] = '';
-                }else {
+                } else {
                     mxFiltros['hoja'] = $('#txtHoja').val();
                     mxFiltros['fechaInicioHoja'] = $('#fecInicioHoja').val();
                     mxFiltros['fechaFinHoja'] = $('#fecFinHoja').val();
@@ -100,8 +107,8 @@ var SearchWorkSheet = function () {
                 blockUI();
                 $.getJSON(parametros.searchUrl, {
                     strFilter: JSON.stringify(mxFiltros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
@@ -110,12 +117,12 @@ var SearchWorkSheet = function () {
                             //   var actionUrl = parametros.sActionUrl+idLoad;
                             //'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>'
                             table1.fnAddData(
-                                [dataToLoad[i].numero,dataToLoad[i].fecha, dataToLoad[i].cantidad, " <input type='hidden' value='"+dataToLoad[i].muestras+"'/>"]);
+                                [dataToLoad[i].numero, dataToLoad[i].fecha, dataToLoad[i].cantidad, " <input type='hidden' value='" + dataToLoad[i].muestras + "'/>"]);
 
                         }
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -124,41 +131,41 @@ var SearchWorkSheet = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
 
-            $("#all-orders").click(function() {
+            $("#all-orders").click(function () {
                 getWorkSheets(true);
             });
 
             /*PARA MOSTRAR TABLA DETALLE DX*/
-            function format (d,indice) {
+            function format(d, indice) {
                 // `d` is the original data object for the row
                 var texto = d[indice]; //indice donde esta el input hidden
                 var diagnosticos = $(texto).val();
 
-                var json =JSON.parse(diagnosticos);
+                var json = JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_cod_mx').val()+
-                    '</td><td style="font-weight: bold">'+$('#text_fechaMx').val()+
-                    '</td><td style="font-weight: bold">'+$('#text_silais').val()+
-                    '</td><td style="font-weight: bold">'+$('#text_unidadS').val()+
-                    '</td><td style="font-weight: bold">'+$('#text_tipoMx').val()+
-                    '</td><td style="font-weight: bold">'+$('#text_persona').val()+
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                    '<tr><td style="font-weight: bold">' + $('#text_cod_mx').val() +
+                    '</td><td style="font-weight: bold">' + $('#text_fechaMx').val() +
+                    '</td><td style="font-weight: bold">' + $('#text_silais').val() +
+                    '</td><td style="font-weight: bold">' + $('#text_unidadS').val() +
+                    '</td><td style="font-weight: bold">' + $('#text_tipoMx').val() +
+                    '</td><td style="font-weight: bold">' + $('#text_persona').val() +
                     '</td></tr>';
                 for (var i = 1; i <= len; i++) {
-                    childTable =childTable +
-                        '<tr></tr><td>'+json[i].codigoUnicoMx+'</td>'+
-                        '<td>'+json[i].fechaTomaMx+'</td>'+
-                        '<td>'+json[i].codSilais+'</td>' +
-                        '<td>'+json[i].codUnidadSalud+'</td>' +
-                        '<td>'+json[i].tipoMuestra+'</td>' +
-                        '<td>'+json[i].persona+'</td>' +
+                    childTable = childTable +
+                        '<tr></tr><td>' + json[i].codigoUnicoMx + '</td>' +
+                        '<td>' + json[i].fechaTomaMx + '</td>' +
+                        '<td>' + json[i].codSilais + '</td>' +
+                        '<td>' + json[i].codUnidadSalud + '</td>' +
+                        '<td>' + json[i].tipoMuestra + '</td>' +
+                        '<td>' + json[i].persona + '</td>' +
                         '</tr>';
                 }
                 childTable = childTable + '</table>';
@@ -168,20 +175,20 @@ var SearchWorkSheet = function () {
             $('#mx-results tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
                 var row = table1.api().row(tr);
-                if ( row.child.isShown() ) {
+                if (row.child.isShown()) {
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),3)).show();
+                    row.child(format(row.data(), 3)).show();
                     tr.addClass('shown');
                 }
-            } );
+            });
 
             <!-- al seleccionar SILAIS -->
-            $('#codSilais').change(function(){
+            $('#codSilais').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
@@ -198,8 +205,11 @@ var SearchWorkSheet = function () {
                             // html += '</option>';
                         }
                         $('#codUnidadSalud').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codUnidadSalud').html(html);
                 }
@@ -207,7 +217,7 @@ var SearchWorkSheet = function () {
                 unBlockUI();
             });
 
-           $("#print").click(function() {
+            $("#print").click(function () {
                 var oTT = TableTools.fnGetInstance('mx-results');
                 var aSelectedTrs = oTT.fnGetSelected();
                 var len = aSelectedTrs.length;
@@ -218,8 +228,8 @@ var SearchWorkSheet = function () {
                     var hojas = "";
                     for (var i = 0; i < len; i++) {
                         var texto = aSelectedTrs[i].firstChild.innerHTML;
-                        var hoja = texto.substring(texto.lastIndexOf(">")+1, texto.length);
-                        if (i+1< len) {
+                        var hoja = texto.substring(texto.lastIndexOf(">") + 1, texto.length);
+                        if (i + 1 < len) {
                             hojas += hoja + ",";
                         } else {
                             hojas += hoja;
@@ -239,21 +249,20 @@ var SearchWorkSheet = function () {
                                 showBlob(blob);
                                 unBlockUI();
                             },
-                            error: function (data, status, er) {
-                                unBlockUI();
-                                alert("error: " + data + " status: " + status + " er:" + er);
+                            error: function (jqXHR) {
+                                desbloquearUI();
+                                validateLogin(jqXHR);
                             }
                         });
 
 
-
-                }else{
+                } else {
                     $.smallBox({
-                        title : $("#msg_select_workSheet").val(),
-                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                        color : "#C46A69",
-                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                        timeout : 4000
+                        title: $("#msg_select_workSheet").val(),
+                        content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                        color: "#C46A69",
+                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                        timeout: 4000
                     });
                 }
 

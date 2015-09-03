@@ -2,79 +2,65 @@
  * Created by souyen-ics on 06-08-15.
  */
 var ReprintCodeLab = function () {
-    var bloquearUI = function(mensaje){
-        var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
-        var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
-        $.blockUI({ message: mess,
-            css: {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: '#000',
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: .5,
-                color: '#fff'
-            },
-            baseZ: 1051 // para que se muestre bien en los modales
-        });
-    };
-
-    var desbloquearUI = function() {
-        setTimeout($.unblockUI, 500);
-    };
     return {
         //main function to initiate the module
         init: function (parametros) {
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
-                tablet : 1024,
-                phone : 480
+                tablet: 1024,
+                phone: 480
             };
             var text_selected_all = $("#text_selected_all").val();
             var text_selected_none = $("#text_selected_none").val();
             var table1 = $('#receptions-records').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
-                    "T"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "T" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                "autoWidth" : true,
+                "autoWidth": true,
                 "columns": [
-                    null,null,null,null,null,null,null,
+                    null, null, null, null, null, null, null,
                     {
-                        "className":      'details-control',
-                        "orderable":      false,
-                        "data":           null,
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
                         "defaultContent": ''
                     }
                 ],
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#receptions-records'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 },
                 "oTableTools": {
                     "sSwfPath": parametros.sTableToolsPath,
                     "sRowSelect": "multi",
-                    "aButtons": [ {"sExtends":"select_all", "sButtonText": text_selected_all}, {"sExtends":"select_none", "sButtonText": text_selected_none}]
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
                 }
             });
 
             $('#searchReceptions-form').validate({
                 // Rules for form validation
                 rules: {
-                    fechaFinRecepcion:{required:function(){return $('#fechaInicioRecep').val().length>0;}},
-                    fechaInicioRecep:{required:function(){return $('#fechaFinRecepcion').val().length>0;}}
+                    fechaFinRecepcion: {required: function () {
+                        return $('#fechaInicioRecep').val().length > 0;
+                    }},
+                    fechaInicioRecep: {required: function () {
+                        return $('#fechaFinRecepcion').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -89,7 +75,7 @@ var ReprintCodeLab = function () {
                 rules: {
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -99,19 +85,19 @@ var ReprintCodeLab = function () {
             });
 
             /*PARA MOSTRAR TABLA DETALLE DX*/
-            function format (d,indice) {
+            function format(d, indice) {
                 // `d` is the original data object for the row
                 var texto = d[indice]; //indice donde esta el input hidden
                 var diagnosticos = $(texto).val();
-                var json =JSON.parse(diagnosticos);
+                var json = JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
-                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">'+
-                    '<tr><td style="font-weight: bold">'+$('#text_request').val()+'</td><td style="font-weight: bold">'+$('#text_request_date').val()+'</td><td style="font-weight: bold">'+$('#text_request_type').val()+'</td></tr>';
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                    '<tr><td style="font-weight: bold">' + $('#text_request').val() + '</td><td style="font-weight: bold">' + $('#text_request_date').val() + '</td><td style="font-weight: bold">' + $('#text_request_type').val() + '</td></tr>';
                 for (var i = 1; i <= len; i++) {
-                    childTable =childTable +
-                        '<tr><td>'+json[i].nombre+'</td>'+
-                        '<td>'+json[i].fechaSolicitud+'</td>' +
-                        '<td>'+json[i].tipo+'</td></tr>';
+                    childTable = childTable +
+                        '<tr><td>' + json[i].nombre + '</td>' +
+                        '<td>' + json[i].fechaSolicitud + '</td>' +
+                        '<td>' + json[i].tipo + '</td></tr>';
                 }
                 childTable = childTable + '</table>';
                 return childTable;
@@ -120,22 +106,22 @@ var ReprintCodeLab = function () {
             $('#receptions-records tbody').on('click', 'td.details-control', function () {
                 var tr = $(this).closest('tr');
                 var row = table1.api().row(tr);
-                if ( row.child.isShown() ) {
+                if (row.child.isShown()) {
                     // This row is already open - close it
                     row.child.hide();
                     tr.removeClass('shown');
                 }
                 else {
                     // Open this row
-                    row.child( format(row.data(),7)).show();
+                    row.child(format(row.data(), 7)).show();
                     tr.addClass('shown');
                 }
-            } );
+            });
 
             //FIN
-            function blockUI(){
+            function blockUI() {
                 var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+                var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
                 //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
                 var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
                 $.blockUI({ message: mess,
@@ -156,7 +142,7 @@ var ReprintCodeLab = function () {
 
             function getOrders(showAll) {
                 var filtros = {};
-                if (showAll){
+                if (showAll) {
                     filtros['nombreApellido'] = '';
                     filtros['fechaInicioRecep'] = '';
                     filtros['fechaFinRecepcion'] = '';
@@ -165,7 +151,7 @@ var ReprintCodeLab = function () {
                     filtros['codTipoMx'] = '';
                     filtros['codTipoSolicitud'] = '';
                     filtros['nombreSolicitud'] = '';
-                }else {
+                } else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
                     filtros['fechaInicioRecep'] = $('#fechaInicioRecep').val();
                     filtros['fechaFinRecepcion'] = $('#fechaFinRecepcion').val();
@@ -179,19 +165,19 @@ var ReprintCodeLab = function () {
                 blockUI();
                 $.getJSON(parametros.searchUrl, {
                     strFilter: JSON.stringify(filtros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx,dataToLoad[i].tipoMuestra,dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, " <input type='hidden' value='"+dataToLoad[i].solicitudes+"'/>"]);
+                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].solicitudes + "'/>"]);
                         }
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -200,17 +186,17 @@ var ReprintCodeLab = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
-            $("#all-orders").click(function() {
+            $("#all-orders").click(function () {
                 getOrders(true);
             });
 
-            $('#btnPrint').click(function() {
+            $('#btnPrint').click(function () {
                 printSelected()
             });
 
@@ -221,38 +207,38 @@ var ReprintCodeLab = function () {
                 var len = aSelectedTrs.length;
                 var opcSi = $("#yes").val();
                 var opcNo = $("#no").val();
-                var urlImpresion ='';
+                var urlImpresion = '';
                 if (len > 0) {
                     $.SmartMessageBox({
                         title: $("#msg_confirm_print").val(),
                         content: $("#msg_print_confirm_c").val(),
-                        buttons: '['+opcSi+']['+opcNo+']'
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
                     }, function (ButtonPressed) {
                         if (ButtonPressed === opcSi) {
                             blockUI(parametros.blockMess);
                             var codesLab = [];
                             for (var i = 0; i < len; i++) {
                                 var texto = aSelectedTrs[i].firstChild.innerHTML;
-                                var input = texto.substring(texto.lastIndexOf(">")+1);
+                                var input = texto.substring(texto.lastIndexOf(">") + 1);
 
-                                if (i+1< len){
+                                if (i + 1 < len) {
                                     codesLab += input + ",";
-                                }else{
+                                } else {
                                     codesLab += input;
                                 }
 
                                 unBlockUI();
                             }
-                            codesLab = reemplazar(codesLab,".","*");
+                            codesLab = reemplazar(codesLab, ".", "*");
                             var loc = window.location;
-                            urlImpresion = 'http://'+loc.host+parametros.printUrl+codesLab;
+                            urlImpresion = 'http://' + loc.host + parametros.printUrl + codesLab;
                             imprimir(urlImpresion);
 
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({
                                 title: $("#msg_print_canceled").val(),
-                                content: "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
                                 color: "#C46A69",
                                 iconSmall: "fa fa-times fa-2x fadeInRight animated",
                                 timeout: 4000
@@ -260,30 +246,29 @@ var ReprintCodeLab = function () {
                         }
 
                     });
-                }else{
+                } else {
                     $.smallBox({
-                        title : $("#msg_print_select").val(),
-                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
-                        color : "#C46A69",
-                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                        timeout : 4000
+                        title: $("#msg_print_select").val(),
+                        content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                        color: "#C46A69",
+                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                        timeout: 4000
                     });
                 }
 
             }
 
-            function imprimir (urlImpresion) {
-                if (urlImpresion.length>0) {
+            function imprimir(urlImpresion) {
+                if (urlImpresion.length > 0) {
                     window.open(urlImpresion, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
                 }
             }
 
-            function reemplazar (texto, buscar, nuevo){
+            function reemplazar(texto, buscar, nuevo) {
                 var temp = '';
                 var long = texto.length;
-                for (j=0; j<long; j++) {
-                    if (texto[j] == buscar)
-                    {
+                for (j = 0; j < long; j++) {
+                    if (texto[j] == buscar) {
                         temp += nuevo;
                     } else
                         temp += texto[j];
@@ -291,8 +276,8 @@ var ReprintCodeLab = function () {
                 return temp;
             }
 
-           <!-- al seleccionar SILAIS -->
-            $('#codSilais').change(function(){
+            <!-- al seleccionar SILAIS -->
+            $('#codSilais').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
@@ -309,8 +294,11 @@ var ReprintCodeLab = function () {
                             // html += '</option>';
                         }
                         $('#codUnidadSalud').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codUnidadSalud').html(html);
                 }
@@ -319,23 +307,24 @@ var ReprintCodeLab = function () {
             });
             <!-- para buscar código de barra -->
             var timer;
-            var iniciado=false;
+            var iniciado = false;
             var contador;
             //var codigo;
-            function tiempo(){
+            function tiempo() {
                 console.log('tiempo');
                 contador++;
-                if(contador >= 10){
+                if (contador >= 10) {
                     clearInterval(timer);
                     iniciado = false;
                     //codigo = $.trim($('#codigo').val());
-                   getOrders(false);
+                    getOrders(false);
 
                 }
             }
-            $('#txtCodUnicoMx').keypress(function(event){
-                if(!iniciado){
-                    timer    = setInterval(tiempo(),100);
+
+            $('#txtCodUnicoMx').keypress(function (event) {
+                if (!iniciado) {
+                    timer = setInterval(tiempo(), 100);
                     iniciado = true;
                 }
                 contador = 0;

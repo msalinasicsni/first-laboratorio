@@ -14,14 +14,14 @@ var ReceptionReport = function () {
 
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
-                tablet : 1024,
-                phone : 480
+                tablet: 1024,
+                phone: 480
             };
 
 
             var table1 = $('#received-samples').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
 
                 "oTableTools": {
@@ -32,7 +32,9 @@ var ReceptionReport = function () {
                         },
                         {
                             "sExtends": "pdf",
-                            "fnClick": function (){exportPDF1();}
+                            "fnClick": function () {
+                                exportPDF1();
+                            }
                         }
 
                     ],
@@ -41,18 +43,18 @@ var ReceptionReport = function () {
 
                 "aaSorting": [],
 
-                "autoWidth" : true,
+                "autoWidth": true,
 
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#received-samples'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 }
 
@@ -62,11 +64,15 @@ var ReceptionReport = function () {
             $('#received-samples-form').validate({
                 // Rules for form validation
                 rules: {
-                    fecInicioRecepcion:{required:function(){return $('#fecInicioRecepcion').val().length>0;}},
-                    fecFinRecepcion:{required:function(){return $('#fecFinRecepcion').val().length>0;}}
+                    fecInicioRecepcion: {required: function () {
+                        return $('#fecInicioRecepcion').val().length > 0;
+                    }},
+                    fecFinRecepcion: {required: function () {
+                        return $('#fecFinRecepcion').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -77,9 +83,9 @@ var ReceptionReport = function () {
                 }
             });
 
-            function blockUI(){
+            function blockUI() {
                 var loc = window.location;
-                var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+                var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
                 //var mess = $("#blockUI_message").val()+' <img src=' + pathName + 'resources/img/loading.gif>';
                 var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif> ' + parametros.blockMess;
                 $.blockUI({ message: mess,
@@ -100,7 +106,7 @@ var ReceptionReport = function () {
 
             function getMxs(showAll) {
                 var mxFiltros = {};
-                if (showAll){
+                if (showAll) {
 
                     mxFiltros['fechaInicioRecepcion'] = '';
                     mxFiltros['fechaFinRecepcion'] = '';
@@ -111,7 +117,7 @@ var ReceptionReport = function () {
                     mxFiltros['nombreSolicitud'] = '';
 
 
-                }else {
+                } else {
 
                     mxFiltros['fechaInicioRecepcion'] = $('#fecInicioRecepcion').val();
                     mxFiltros['fechaFinRecepcion'] = $('#fecFinRecepcion').val();
@@ -119,14 +125,14 @@ var ReceptionReport = function () {
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo option:selected').val();
-                    mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSoli').val()) ;
+                    mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoli').val());
 
                 }
                 blockUI();
                 $.getJSON(parametros.searchUrl, {
                     strFilter: JSON.stringify(mxFiltros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
 
@@ -137,9 +143,9 @@ var ReceptionReport = function () {
                             //   var actionUrl = parametros.sActionUrl+idLoad;
                             //'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>'
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona, dataToLoad[i].solicitudes]);
+                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitudes]);
 
-                            if (i+1< len) {
+                            if (i + 1 < len) {
                                 codigos += dataToLoad[i].codigoUnicoMx + ",";
 
                             } else {
@@ -148,10 +154,10 @@ var ReceptionReport = function () {
                             }
                         }
 
-                        codigos = reemplazar(codigos,"-","*");
-                    }else{
+                        codigos = reemplazar(codigos, "-", "*");
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -160,20 +166,20 @@ var ReceptionReport = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
 
-            $("#all-orders").click(function() {
+            $("#all-orders").click(function () {
                 codigos = "";
                 getMxs(true);
             });
 
             <!-- al seleccionar SILAIS -->
-            $('#codSilais').change(function(){
+            $('#codSilais').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
@@ -190,8 +196,11 @@ var ReceptionReport = function () {
                             // html += '</option>';
                         }
                         $('#codUnidadSalud').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codUnidadSalud').html(html);
                 }
@@ -200,12 +209,11 @@ var ReceptionReport = function () {
             });
 
 
-            function reemplazar (texto, buscar, nuevo){
+            function reemplazar(texto, buscar, nuevo) {
                 var temp = '';
                 var long = texto.length;
-                for (j=0; j<long; j++) {
-                    if (texto[j] == buscar)
-                    {
+                for (j = 0; j < long; j++) {
+                    if (texto[j] == buscar) {
                         temp += nuevo;
                     } else
                         temp += texto[j];
@@ -215,37 +223,37 @@ var ReceptionReport = function () {
 
 
             function exportPDF1() {
-               $.ajax(
-                        {
-                            url: parametros.exportUrl,
-                            type: 'GET',
-                            dataType: 'text',
-                            data: {codes: codigos, fromDate: $('#fecInicioRecepcion').val()  , toDate: $('#fecFinRecepcion').val()},
-                            contentType: 'application/json',
-                            mimeType: 'application/json',
-                            success: function (data) {
-                                if(data.length != 0){
-                                    var blob = b64toBlob(data, 'application/pdf');
-                                    var blobUrl = URL.createObjectURL(blob);
+                $.ajax(
+                    {
+                        url: parametros.exportUrl,
+                        type: 'GET',
+                        dataType: 'text',
+                        data: {codes: codigos, fromDate: $('#fecInicioRecepcion').val(), toDate: $('#fecFinRecepcion').val()},
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.length != 0) {
+                                var blob = b64toBlob(data, 'application/pdf');
+                                var blobUrl = URL.createObjectURL(blob);
 
-                                    window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
-                                }else{
-                                    $.smallBox({
-                                        title : $("#msg_select").val(),
-                                        content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                                        color : "#C46A69",
-                                        iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                                        timeout : 4000
-                                    });
-                                }
-
-                                unBlockUI();
-                            },
-                            error: function (data, status, er) {
-                                unBlockUI();
-                                alert("error: " + data + " status: " + status + " er:" + er);
+                                window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
+                            } else {
+                                $.smallBox({
+                                    title: $("#msg_select").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 4000
+                                });
                             }
-                        });
+
+                            unBlockUI();
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
+                    });
 
 
             }
@@ -276,14 +284,13 @@ var ReceptionReport = function () {
             }
 
 
-
             /********************************************************************************************
              Reporte Resultados Positivos
              ********************************************************************************************/
 
             var table2 = $('#positive_request').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
 
                 "oTableTools": {
@@ -294,7 +301,9 @@ var ReceptionReport = function () {
                         },
                         {
                             "sExtends": "pdf",
-                            "fnClick": function (){exportPDF2();}
+                            "fnClick": function () {
+                                exportPDF2();
+                            }
                         }
 
                     ],
@@ -304,34 +313,37 @@ var ReceptionReport = function () {
                 "aaSorting": [],
 
 
-                "autoWidth" : true,
+                "autoWidth": true,
 
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#positive_request'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 }
 
             });
 
 
-
             <!-- filtro Solicitudes -->
             $('#positive-request-form').validate({
                 // Rules for form validation
                 rules: {
-                    fecInicioAprob:{required:function(){return $('#fecInicioAprob').val().length>0;}},
-                    fecFinAprob:{required:function(){return $('#fecFinAprob').val().length>0;}}
+                    fecInicioAprob: {required: function () {
+                        return $('#fecInicioAprob').val().length > 0;
+                    }},
+                    fecFinAprob: {required: function () {
+                        return $('#fecFinAprob').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -343,7 +355,7 @@ var ReceptionReport = function () {
             });
 
 
-            $("#all-request").click(function() {
+            $("#all-request").click(function () {
                 codigos = "";
                 getRequest(true);
             });
@@ -351,7 +363,7 @@ var ReceptionReport = function () {
 
             function getRequest(showAll) {
                 var mxFiltros = {};
-                if (showAll){
+                if (showAll) {
 
                     mxFiltros['fechaInicioAprob'] = '';
                     mxFiltros['fechaFinAprob'] = '';
@@ -362,45 +374,45 @@ var ReceptionReport = function () {
                     mxFiltros['area'] = '';
 
 
-                }else {
+                } else {
 
                     mxFiltros['fechaInicioAprob'] = $('#fecInicioAprob').val();
                     mxFiltros['fechaFinAprob'] = $('#fecFinAprob').val();
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
-                    mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSoli').val());
+                    mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoli').val());
                     mxFiltros['area'] = $('#area').find('option:selected').val();
 
                 }
                 blockUI();
                 $.getJSON(parametros.searchReqUrl, {
                     strFilter: JSON.stringify(mxFiltros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table2.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
 
                     if (len > 0) {
-                         for (var i = 0; i < len; i++) {
+                        for (var i = 0; i < len; i++) {
 
-                                table2.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona,dataToLoad[i].solicitud]);
+                            table2.fnAddData(
+                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud]);
 
-                             if (i+1< len) {
-                                 codigos += dataToLoad[i].idSolicitud + ",";
+                            if (i + 1 < len) {
+                                codigos += dataToLoad[i].idSolicitud + ",";
 
-                             } else {
-                                 codigos += dataToLoad[i].idSolicitud;
+                            } else {
+                                codigos += dataToLoad[i].idSolicitud;
 
-                             }
+                            }
 
-                           }
+                        }
 
 
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -409,12 +421,11 @@ var ReceptionReport = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
-
 
 
             function exportPDF2() {
@@ -423,30 +434,30 @@ var ReceptionReport = function () {
                         url: parametros.posReqExportUrl,
                         type: 'GET',
                         dataType: 'text',
-                        data: {codes: codigos, fromDate: $('#fecInicioAprob').val()  , toDate: $('#fecFinAprob').val()},
+                        data: {codes: codigos, fromDate: $('#fecInicioAprob').val(), toDate: $('#fecFinAprob').val()},
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
-                            if(data.length != 0){
+                            if (data.length != 0) {
                                 var blob = b64toBlob(data, 'application/pdf');
                                 var blobUrl = URL.createObjectURL(blob);
 
                                 window.open(blobUrl, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
-                            }else{
+                            } else {
                                 $.smallBox({
-                                    title : $("#msg_select").val(),
-                                    content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                                    color : "#C46A69",
-                                    iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                                    timeout : 4000
+                                    title: $("#msg_select").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 4000
                                 });
                             }
 
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
-                            unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
                         }
                     });
             }
@@ -457,8 +468,8 @@ var ReceptionReport = function () {
 
 
             var table3 = $('#pos_neg_request').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
                 "aaSorting": [],
 
@@ -470,25 +481,27 @@ var ReceptionReport = function () {
                         },
                         {
                             "sExtends": "pdf",
-                            "fnClick": function (){exportPDF();}
+                            "fnClick": function () {
+                                exportPDF();
+                            }
                         }
 
                     ],
                     "sSwfPath": parametros.sTableToolsPath
                 },
 
-                "autoWidth" : true,
+                "autoWidth": true,
 
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#pos_neg_request'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 }
 
@@ -499,11 +512,15 @@ var ReceptionReport = function () {
             $('#pos-neg-request-form').validate({
                 // Rules for form validation
                 rules: {
-                   inicioAprob:{required:function(){return $('#inicioAprob').val().length>0;}},
-                   finAprob:{required:function(){return $('#finAprob').val().length>0;}}
+                    inicioAprob: {required: function () {
+                        return $('#inicioAprob').val().length > 0;
+                    }},
+                    finAprob: {required: function () {
+                        return $('#finAprob').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -515,7 +532,7 @@ var ReceptionReport = function () {
             });
 
 
-            $("#all-req").click(function() {
+            $("#all-req").click(function () {
                 codigos = "";
                 getReq(true);
             });
@@ -523,7 +540,7 @@ var ReceptionReport = function () {
 
             function getReq(showAll) {
                 var mxFiltros = {};
-                if (showAll){
+                if (showAll) {
 
                     mxFiltros['fechaInicioAprob'] = '';
                     mxFiltros['fechaFinAprob'] = '';
@@ -534,14 +551,14 @@ var ReceptionReport = function () {
                     mxFiltros['area'] = '';
                     mxFiltros['finalRes'] = '';
 
-                }else {
+                } else {
 
                     mxFiltros['fechaInicioAprob'] = $('#inicioAprob').val();
                     mxFiltros['fechaFinAprob'] = $('#finAprob').val();
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipoSol').find('option:selected').val();
-                    mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSol').val());
+                    mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSol').val());
                     mxFiltros['area'] = $('#areaSol').find('option:selected').val();
                     mxFiltros['finalRes'] = $('#finalRes').find('option:selected').val();
 
@@ -549,8 +566,8 @@ var ReceptionReport = function () {
                 blockUI();
                 $.getJSON(parametros.searchPosNegReqUrl, {
                     strFilter: JSON.stringify(mxFiltros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table3.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
 
@@ -558,9 +575,9 @@ var ReceptionReport = function () {
                         for (var i = 0; i < len; i++) {
 
                             table3.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona,dataToLoad[i].solicitud, dataToLoad[i].resultado]);
+                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud, dataToLoad[i].resultado]);
 
-                            if (i+1< len) {
+                            if (i + 1 < len) {
                                 codigos += dataToLoad[i].idSolicitud + ",";
 
                             } else {
@@ -571,9 +588,9 @@ var ReceptionReport = function () {
                         }
 
 
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found").val(),
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -582,12 +599,11 @@ var ReceptionReport = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
-
 
 
             function exportPDF() {
@@ -596,29 +612,29 @@ var ReceptionReport = function () {
                         url: parametros.pdfUrl,
                         type: 'GET',
                         dataType: 'text',
-                        data: {codes: codigos, fromDate: $('#inicioAprob').val()  , toDate: $('#finAprob').val()},
+                        data: {codes: codigos, fromDate: $('#inicioAprob').val(), toDate: $('#finAprob').val()},
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
-                            if(data.length != 0){
-                                var blob =  blobData(data, 'application/pdf');
+                            if (data.length != 0) {
+                                var blob = blobData(data, 'application/pdf');
                                 showBlob(blob);
 
-                            }else{
+                            } else {
                                 $.smallBox({
-                                    title : $("#msg_select").val(),
-                                    content : "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
-                                    color : "#C46A69",
-                                    iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                                    timeout : 4000
+                                    title: $("#msg_select").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 4000
                                 });
                             }
 
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
-                            unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
                         }
                     });
 
@@ -631,8 +647,8 @@ var ReceptionReport = function () {
 
 
             var table4 = $('#generalRepTable').dataTable({
-                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>"+
-                    "t"+
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-6 hidden-xs'T>r>" +
+                    "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
                 "aaSorting": [],
 
@@ -644,25 +660,27 @@ var ReceptionReport = function () {
                         },
                         {
                             "sExtends": "pdf",
-                            "fnClick": function (){exportGenReportPDF();}
+                            "fnClick": function () {
+                                exportGenReportPDF();
+                            }
                         }
 
                     ],
                     "sSwfPath": parametros.sTableToolsPath
                 },
 
-                "autoWidth" : true,
+                "autoWidth": true,
 
-                "preDrawCallback" : function() {
+                "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#generalRepTable'), breakpointDefinition);
                     }
                 },
-                "rowCallback" : function(nRow) {
+                "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
-                "drawCallback" : function(oSettings) {
+                "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
                 }
 
@@ -673,11 +691,15 @@ var ReceptionReport = function () {
             $('#general-report-form').validate({
                 // Rules for form validation
                 rules: {
-                    inAprob:{required:function(){return $('#inAprob').val().length>0;}},
-                    fiAprob:{required:function(){return $('#fiAprob').val().length>0;}}
+                    inAprob: {required: function () {
+                        return $('#inAprob').val().length > 0;
+                    }},
+                    fiAprob: {required: function () {
+                        return $('#fiAprob').val().length > 0;
+                    }}
                 },
                 // Do not change code below
-                errorPlacement : function(error, element) {
+                errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
@@ -689,7 +711,7 @@ var ReceptionReport = function () {
             });
 
 
-            $("#all-requestGR").click(function() {
+            $("#all-requestGR").click(function () {
                 codigos = "";
                 getRequestGenRep(true);
             });
@@ -697,7 +719,7 @@ var ReceptionReport = function () {
 
             function getRequestGenRep(showAll) {
                 var mxFiltros = {};
-                if (showAll){
+                if (showAll) {
 
                     mxFiltros['fechaInicioAprob'] = '';
                     mxFiltros['fechaFinAprob'] = '';
@@ -708,14 +730,14 @@ var ReceptionReport = function () {
                     mxFiltros['area'] = '';
 
 
-                }else {
+                } else {
 
                     mxFiltros['fechaInicioAprob'] = $('#inAprob').val();
                     mxFiltros['fechaFinAprob'] = $('#fiAprob').val();
                     mxFiltros['codSilais'] = $('#codSilaisGR').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSaludGR').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipoGR').find('option:selected').val();
-                    mxFiltros['nombreSolicitud'] =  encodeURI($('#nombreSoliGR').val());
+                    mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoliGR').val());
                     mxFiltros['area'] = $('#areaGR').find('option:selected').val();
 
 
@@ -723,8 +745,8 @@ var ReceptionReport = function () {
                 blockUI();
                 $.getJSON(parametros.searchReqGRUrl, {
                     strFilter: JSON.stringify(mxFiltros),
-                    ajax : 'true'
-                }, function(dataToLoad) {
+                    ajax: 'true'
+                }, function (dataToLoad) {
                     table4.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
 
@@ -732,9 +754,9 @@ var ReceptionReport = function () {
                         for (var i = 0; i < len; i++) {
 
                             table4.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx ,dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,dataToLoad[i].persona,dataToLoad[i].solicitud, dataToLoad[i].resultado]);
+                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud, dataToLoad[i].resultado]);
 
-                            if (i+1< len) {
+                            if (i + 1 < len) {
                                 codigos += dataToLoad[i].idSolicitud + ",";
 
                             } else {
@@ -745,9 +767,9 @@ var ReceptionReport = function () {
                         }
 
 
-                    }else{
+                    } else {
                         $.smallBox({
-                            title: $("#msg_no_results_foundGR").val() ,
+                            title: $("#msg_no_results_foundGR").val(),
                             content: $("#dissapearGR").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -756,9 +778,9 @@ var ReceptionReport = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function() {
-                        unBlockUI();
-                        alert( "error" );
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
             }
 
@@ -769,35 +791,35 @@ var ReceptionReport = function () {
                         url: parametros.genRePdfUrl,
                         type: 'GET',
                         dataType: 'text',
-                        data: {codes: codigos, fromDate: $('#inAprob').val()  , toDate: $('#inAprob').val()},
+                        data: {codes: codigos, fromDate: $('#inAprob').val(), toDate: $('#inAprob').val()},
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
-                            if(data.length != 0){
-                                var blob =  blobData(data, 'application/pdf');
+                            if (data.length != 0) {
+                                var blob = blobData(data, 'application/pdf');
                                 showBlob(blob);
-                            }else{
+                            } else {
                                 $.smallBox({
-                                    title : $("#msg_select").val(),
-                                    content : "<i class='fa fa-clock-o'></i> <i>"+$("#dissapearGR").val()+"</i>",
-                                    color : "#C46A69",
-                                    iconSmall : "fa fa-times fa-2x fadeInRight animated",
-                                    timeout : 4000
+                                    title: $("#msg_select").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#dissapearGR").val() + "</i>",
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 4000
                                 });
                             }
 
                             unBlockUI();
                         },
-                        error: function (data, status, er) {
-                            unBlockUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
                         }
                     });
             }
 
 
             <!-- al seleccionar SILAIS -->
-            $('#codSilaisGR').change(function(){
+            $('#codSilaisGR').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
@@ -814,19 +836,17 @@ var ReceptionReport = function () {
                             // html += '</option>';
                         }
                         $('#codUnidadSaludGR').html(html);
-                    })
-                }else{
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                } else {
                     var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
                     $('#codUnidadSaludGR').html(html);
                 }
                 $('#codUnidadSaludGR').val('').change();
                 unBlockUI();
             });
-
-
-
-
-
 
 
         }

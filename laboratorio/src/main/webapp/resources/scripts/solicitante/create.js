@@ -3,9 +3,9 @@
  */
 var CreateApplicant = function () {
 
-    var bloquearUI = function(mensaje){
+    var bloquearUI = function (mensaje) {
         var loc = window.location;
-        var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+        var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
         var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
         $.blockUI({ message: mess,
             css: {
@@ -20,14 +20,14 @@ var CreateApplicant = function () {
         });
     };
 
-    var desbloquearUI = function() {
+    var desbloquearUI = function () {
         setTimeout($.unblockUI, 500);
     };
 
     return {
         //main function to initiate the module
         init: function (parametros) {
-            function guardar(){
+            function guardar() {
                 var solicitante = {
                     idSolicitante: $("#idSolicitante").val(), // se pasa el id del maestro que se esta editando,
                     nombre: $("#nombre").val(),
@@ -38,7 +38,7 @@ var CreateApplicant = function () {
                     telefonoContacto: $("#telefonoContacto").val(),
                     habilitado: ($('#checkbox-enable').is(':checked'))
                 };
-                var esEdicion = ($("#idSolicitante").val()!=null && $("#idSolicitante").val().trim().length > 0);
+                var esEdicion = ($("#idSolicitante").val() != null && $("#idSolicitante").val().trim().length > 0);
                 var solicitanteObj = {};
                 solicitanteObj['idSolicitante'] = '';
                 solicitanteObj['mensaje'] = '';
@@ -53,23 +53,23 @@ var CreateApplicant = function () {
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
-                            if (data.mensaje.length > 0){
+                            if (data.mensaje.length > 0) {
                                 $.smallBox({
-                                    title: data.mensaje ,
+                                    title: data.mensaje,
                                     content: $("#smallBox_content4s").val(),
                                     color: "#C46A69",
                                     iconSmall: "fa fa-warning",
                                     timeout: 4000
                                 });
-                            }else{
+                            } else {
                                 var msg;
-                                if (esEdicion){
+                                if (esEdicion) {
                                     msg = $("#msg_updated").val();
-                                }else{
+                                } else {
                                     msg = $("#msg_added").val();
                                 }
                                 $.smallBox({
-                                    title: msg ,
+                                    title: msg,
                                     content: $("#smallBox_content").val(),
                                     color: "#739E73",
                                     iconSmall: "fa fa-success",
@@ -79,9 +79,9 @@ var CreateApplicant = function () {
                             }
                             desbloquearUI();
                         },
-                        error: function (data, status, er) {
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            alert("error: " + data + " status: " + status + " er:" + er);
+                            validateLogin(jqXHR);
                         }
                     }
                 )

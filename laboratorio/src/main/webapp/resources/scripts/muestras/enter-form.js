@@ -1,9 +1,9 @@
 /**
  * Created by souyen-ics on 11-05-14.
  */
-var bloquearUI = function(mensaje){
+var bloquearUI = function (mensaje) {
     var loc = window.location;
-    var pathName = loc.pathname.substring(0,loc.pathname.indexOf('/', 1)+1);
+    var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
     var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
     $.blockUI({ message: mess,
         css: {
@@ -18,7 +18,7 @@ var bloquearUI = function(mensaje){
     });
 };
 
-var desbloquearUI = function() {
+var desbloquearUI = function () {
     setTimeout($.unblockUI, 500);
 };
 
@@ -29,7 +29,7 @@ var EnterFormTomaMx = function () {
 
             $('.datetimepicker').datetimepicker({
                 language: 'es',
-               format: 'DD/MM/YYYY h:m A'
+                format: 'DD/MM/YYYY h:m A'
 
             });
 
@@ -37,7 +37,7 @@ var EnterFormTomaMx = function () {
                 pickDate: false
             });
 
-            $('#codTipoMx').change(function() {
+            $('#codTipoMx').change(function () {
                 $.getJSON(parametros.dxUrl, {
                     codMx: $('#codTipoMx').val(),
                     tipoNoti: $('#tipoNoti').val(),
@@ -46,29 +46,32 @@ var EnterFormTomaMx = function () {
                     var len = data.length;
                     var html = null;
                     for (var i = 0; i < len; i++) {
-                       html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
+                        html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
                             + data[i].diagnostico.nombre
                             + '</option>';
                     }
 
                     $('#dx').html(html);
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
             });
 
 
-         var $validator = $("#registroMx").validate({
+            var $validator = $("#registroMx").validate({
                 rules: {
                     fechaHTomaMx: {
                         required: true
 
                     },
 
-                    codTipoMx:{
-                        required:true
+                    codTipoMx: {
+                        required: true
                     },
 
-                    examenes:{
-                        required:true
+                    examenes: {
+                        required: true
                     }
 
                 },
@@ -78,20 +81,20 @@ var EnterFormTomaMx = function () {
 
                 }
 
-              /*  submitHandler: function (form) {
-                    //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                   save();
-                }*/
+                /*  submitHandler: function (form) {
+                 //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
+                 save();
+                 }*/
             });
 
 
-            $('#submit').click(function() {
+            $('#submit').click(function () {
                 var $validarForm = $("#registroMx").valid();
                 if (!$validarForm) {
                     $validator.focusInvalid();
                     return false;
-                }else{
-                   save();
+                } else {
+                    save();
 
                 }
 
@@ -108,13 +111,13 @@ var EnterFormTomaMx = function () {
                 //objetoTomaMx['dx'] = $('#dx').val();
                 objetoTomaMx['mensaje'] = '';
                 var valores = $('#dx').val();
-                var strValores ='';
+                var strValores = '';
                 bloquearUI(parametros.blockMess);
                 var objDetalle = {};
                 var cantRespuestas = 0;
                 for (var i = 0; i < valores.length; i++) {
                     if (i == 0)
-                        strValores = + valores[i];
+                        strValores = +valores[i];
                     else
                         strValores = strValores + ',' + valores[i];
                 }
@@ -122,8 +125,8 @@ var EnterFormTomaMx = function () {
                 objetoTomaMx['dx'] = strValores;
                 $.getJSON(parametros.todoDatosUrl, {
                     solicitudes: strValores,
-                    ajax : 'false'
-                }, function(dataToLoad) {
+                    ajax: 'false'
+                }, function (dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
@@ -133,23 +136,23 @@ var EnterFormTomaMx = function () {
                             switch (dataToLoad[i].concepto.tipo.codigo) {
                                 case 'TPDATO|LOG':
                                     idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                    valorControlRespuesta = $('#'+idControlRespuesta).is(':checked');
+                                    valorControlRespuesta = $('#' + idControlRespuesta).is(':checked');
                                     break;
                                 case 'TPDATO|LIST':
                                     idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                    valorControlRespuesta = $('#'+idControlRespuesta).find('option:selected').val();
+                                    valorControlRespuesta = $('#' + idControlRespuesta).find('option:selected').val();
                                     break;
                                 case 'TPDATO|TXT':
                                     idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                    valorControlRespuesta = $('#'+idControlRespuesta).val();
+                                    valorControlRespuesta = $('#' + idControlRespuesta).val();
                                     break;
                                 case 'TPDATO|NMRO':
                                     idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                    valorControlRespuesta = $('#'+idControlRespuesta).val();
+                                    valorControlRespuesta = $('#' + idControlRespuesta).val();
                                     break;
                                 case 'TPDATO|FCH':
                                     idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                    valorControlRespuesta = $('#'+idControlRespuesta).val();
+                                    valorControlRespuesta = $('#' + idControlRespuesta).val();
                                     break;
                                 default:
                                     break;
@@ -157,11 +160,11 @@ var EnterFormTomaMx = function () {
                             }
                             var objConcepto = {};
                             objConcepto["idRespuesta"] = idControlRespuesta;
-                            objConcepto["valor"]=valorControlRespuesta;
+                            objConcepto["valor"] = valorControlRespuesta;
                             objConcepto["idConcepto"] = idConcepto;
                             //console.log(objConcepto);
                             objDetalle[i] = objConcepto;
-                            cantRespuestas ++;
+                            cantRespuestas++;
                         }
 
                         objetoTomaMx["strRespuestas"] = objDetalle;
@@ -199,60 +202,56 @@ var EnterFormTomaMx = function () {
                             }
 
                         },
-                        error: function (data, status, er) {
+
+                        error: function (jqXHR) {
                             desbloquearUI();
-                            $.smallBox({
-                                title: $('#msjErrorSaving').val() + " error: " + data + " status: " + status + " er:" + er,
-                                content: $('#disappear').val(),
-                                color: "#C46A69",
-                                iconSmall: "fa fa-warning",
-                                timeout: 5000
-                            });
+                            validateLogin(jqXHR);
                         }
+
                     });
-                }).fail(function(er) {
-                    desbloquearUI();
-                    alert( "error "+er );
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
             }
 
-            $('#dx').change(function(){
+            $('#dx').change(function () {
                 bloquearUI(parametros.blockMess);
                 var valor = $(this).val();
                 var divDatos = $("#datosSolicitud");
-                if (valor!=null){
+                if (valor != null) {
                     for (var i = 0; i < valor.length; i++) {
                         //si ya existe el div, significa que se habia seleccionado el dx con anterioridad, si de deselecciona entonces hay que quitarlo
-                        if (!$('#DX'+valor[i]).length) {
+                        if (!$('#DX' + valor[i]).length) {
                             fillDatosRecepcionDx(valor[i], divDatos);
                         }
                     }
                     //validar si se deseleccionó un dx y existen datos agregados de él en la página, si es asi se deben eliminar
                     var dxAgregados = $("#dxAgregados").val();
-                    if (dxAgregados!=""){
+                    if (dxAgregados != "") {
                         var arrayDxAgregados = dxAgregados.split(',');
-                        for (var ii = 0; ii < arrayDxAgregados.length; ii++){
+                        for (var ii = 0; ii < arrayDxAgregados.length; ii++) {
                             var eliminar = true;
                             for (var j = 0; j < valor.length; j++) {
-                                if (arrayDxAgregados[ii]==valor[j]){
+                                if (arrayDxAgregados[ii] == valor[j]) {
                                     eliminar = false;
                                 }
                             }
-                            if (eliminar){
-                                $('#DX'+arrayDxAgregados[ii]).remove();
+                            if (eliminar) {
+                                $('#DX' + arrayDxAgregados[ii]).remove();
                             }
 
                         }
                     }
                     $("#dxAgregados").val(valor);
-                }else{
+                } else {
                     divDatos.html("");
                     $("#dxAgregados").val("");
                 }
                 desbloquearUI();
             });
 
-            function fillDatosRecepcionDx(idDx,divDatos){
+            function fillDatosRecepcionDx(idDx, divDatos) {
                 bloquearUI(parametros.blockMess);
                 var valoresListas = {};
                 var detaResultados = {};
@@ -260,27 +259,27 @@ var EnterFormTomaMx = function () {
                 var lenDetRes = 0;
                 //var idDx = $("#idDx").val();
                 var idSolicitud = '-';
-                divDatos.append('<div id="DX'+idDx+'"></div>');
-                var divResultado = $('#DX'+idDx);
+                divDatos.append('<div id="DX' + idDx + '"></div>');
+                var divResultado = $('#DX' + idDx);
                 //primero se obtienen los valores de las listas asociadas a las datos del dx
 
                 $.getJSON(parametros.listasUrl, {
-                    idDx: idDx ,
-                    ajax : 'false'
-                }, function(dataToLoad) {
+                    idDx: idDx,
+                    ajax: 'false'
+                }, function (dataToLoad) {
                     lenListas = Object.keys(dataToLoad).length;
                     valoresListas = dataToLoad;
 
-                }).fail(function(er) {
-                    desbloquearUI();
-                    alert( "error "+er );
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
 
                 //se obtienen los detalles de las respuestas contestadas de la solicitud
                 $.getJSON(parametros.detalleUrl, {
                     idSolicitud: idSolicitud,
-                    ajax : 'false'
-                }, function(data) {
+                    ajax: 'false'
+                }, function (data) {
                     lenDetRes = data.length;
                     detaResultados = data;
                     //var divResultado= $("#datosSolicitud");
@@ -289,28 +288,28 @@ var EnterFormTomaMx = function () {
 
 
                     $.getJSON(parametros.datosUrl, {
-                        idSolicitud: idDx ,
-                        ajax : 'false'
-                    }, function(dataToLoad) {
-                        var contenidoControl='';
+                        idSolicitud: idDx,
+                        ajax: 'false'
+                    }, function (dataToLoad) {
+                        var contenidoControl = '';
                         var len = Object.keys(dataToLoad).length;
                         if (len > 0) {
-                            var encabezado = '<legend class="text-left txt-color-blue font-md">'+
+                            var encabezado = '<legend class="text-left txt-color-blue font-md">' +
                                 dataToLoad[0].diagnostico.nombre +
                                 '</legend>';
                             divResultado.append(encabezado);
                             for (var i = 0; i < len; i++) {
                                 var idControlRespuesta;
                                 var descripcionRespuesta = '';
-                                if(dataToLoad[i].descripcion!=null){
-                                    descripcionRespuesta =dataToLoad[i].descripcion;
+                                if (dataToLoad[i].descripcion != null) {
+                                    descripcionRespuesta = dataToLoad[i].descripcion;
                                 }
-                                var seccionDescripcion = '<section class="col col-sm-4 col-md-6 col-lg-6">'+
-                                    '<label class="text-left txt-color-blue font-md">'+
+                                var seccionDescripcion = '<section class="col col-sm-4 col-md-6 col-lg-6">' +
+                                    '<label class="text-left txt-color-blue font-md">' +
                                     '</label>' +
                                     '<div class="note font-sm">' +
-                                    '<strong>'+descripcionRespuesta + '</strong>'+
-                                    '</div>'+
+                                    '<strong>' + descripcionRespuesta + '</strong>' +
+                                    '</div>' +
                                     '</section>';
                                 //se busca si existe valor registrado para la respuesta
                                 var valor = '';
@@ -327,24 +326,24 @@ var EnterFormTomaMx = function () {
                                 switch (dataToLoad[i].concepto.tipo.codigo) {
                                     case 'TPDATO|LOG':
                                         idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                        contenidoControl ='<div class="row">'+
-                                            '<section class="col col-sm-4 col-md-6 col-lg-6">'+
-                                            '<label class="text-left txt-color-blue font-md">'+
+                                        contenidoControl = '<div class="row">' +
+                                            '<section class="col col-sm-4 col-md-6 col-lg-6">' +
+                                            '<label class="text-left txt-color-blue font-md">' +
                                             dataToLoad[i].nombre +
-                                            '</label>'+
+                                            '</label>' +
                                             '<label class="checkbox">';
-                                        if(lenDetRes <= 0) {
-                                            contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" >';
-                                        }else{
-                                            if (valor=='true'){
-                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" checked >';
-                                            }else{
-                                                contenidoControl = contenidoControl +'<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" >';
+                                        if (lenDetRes <= 0) {
+                                            contenidoControl = contenidoControl + '<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" >';
+                                        } else {
+                                            if (valor == 'true') {
+                                                contenidoControl = contenidoControl + '<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" checked >';
+                                            } else {
+                                                contenidoControl = contenidoControl + '<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" >';
                                             }
                                         }
-                                        contenidoControl = contenidoControl + '<i></i>'+
-                                            '</label>'+
-                                            '</section>'+
+                                        contenidoControl = contenidoControl + '<i></i>' +
+                                            '</label>' +
+                                            '</section>' +
                                             seccionDescripcion +
                                             '</div>';
                                         divResultado.append(contenidoControl);
@@ -352,54 +351,54 @@ var EnterFormTomaMx = function () {
                                     case 'TPDATO|LIST':
 
                                         idControlRespuesta = dataToLoad[i].idConceptoSol;
-                                        contenidoControl =  '<div class="row"><section class="col col-sm-12 col-md-6 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                        contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-6 col-lg-6"><label class="text-left txt-color-blue font-md">';
                                         if (dataToLoad[i].requerido) {
-                                            contenidoControl = contenidoControl +'<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                            contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
                                         }
-                                        contenidoControl = contenidoControl + dataToLoad[i].nombre +'</label>'+
-                                            '<div class="input-group">'+
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
+                                            '<div class="input-group">' +
                                             '<span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>';
 
                                         //si la respuesta es requerida
                                         if (dataToLoad[i].requerido) {
-                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="requiredConcept" style="width: 100%;" >';
+                                            contenidoControl = contenidoControl + '<select id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" class="requiredConcept" style="width: 100%;" >';
                                         }
-                                        else{
-                                            contenidoControl = contenidoControl +'<select id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" class="" style="width: 100%;" >';
+                                        else {
+                                            contenidoControl = contenidoControl + '<select id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" class="" style="width: 100%;" >';
                                         }
                                         contenidoControl = contenidoControl + '<option value="">...</option>';
                                         for (var ii = 0; ii < lenListas; ii++) {
-                                            if (valoresListas[ii].idConcepto.idConcepto==dataToLoad[i].concepto.idConcepto){
+                                            if (valoresListas[ii].idConcepto.idConcepto == dataToLoad[i].concepto.idConcepto) {
                                                 //console.log(valoresListas[ii].idCatalogoLista +" == "+ valor);
-                                                if (valoresListas[ii].idCatalogoLista == valor){
-                                                    contenidoControl = contenidoControl + '<option  value="'+valoresListas[ii].idCatalogoLista+'" selected >'+valoresListas[ii].valor+'</option>';
-                                                }else{
-                                                    contenidoControl = contenidoControl + '<option  value="'+valoresListas[ii].idCatalogoLista+'">'+valoresListas[ii].valor+'</option>';
+                                                if (valoresListas[ii].idCatalogoLista == valor) {
+                                                    contenidoControl = contenidoControl + '<option  value="' + valoresListas[ii].idCatalogoLista + '" selected >' + valoresListas[ii].valor + '</option>';
+                                                } else {
+                                                    contenidoControl = contenidoControl + '<option  value="' + valoresListas[ii].idCatalogoLista + '">' + valoresListas[ii].valor + '</option>';
                                                 }
                                             }
                                         }
-                                        contenidoControl = contenidoControl +'</select></div></section>' +
+                                        contenidoControl = contenidoControl + '</select></div></section>' +
                                             seccionDescripcion +
                                             '</div>';
                                         divResultado.append(contenidoControl);
-                                        $("#"+idControlRespuesta).select2();
+                                        $("#" + idControlRespuesta).select2();
                                         break;
                                     case 'TPDATO|TXT':
                                         idControlRespuesta = dataToLoad[i].idConceptoSol;
                                         contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
-                                        if (dataToLoad[i].requerido){
+                                        if (dataToLoad[i].requerido) {
                                             contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
                                         }
-                                        contenidoControl = contenidoControl + dataToLoad[i].nombre+'</label>' +
-                                            '<div class="">'+
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
+                                            '<div class="">' +
                                             '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>';
-                                        if (dataToLoad[i].requerido){
-                                            contenidoControl = contenidoControl + '<input class="form-control requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
-                                        }else{
-                                            contenidoControl = contenidoControl + '<input class="form-control" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
+                                        if (dataToLoad[i].requerido) {
+                                            contenidoControl = contenidoControl + '<input class="form-control requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
+                                        } else {
+                                            contenidoControl = contenidoControl + '<input class="form-control" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
                                         }
 
-                                        contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
+                                        contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad[i].nombre + '</b></label>' +
                                             '</div></section>' +
                                             seccionDescripcion +
                                             '</div>';
@@ -408,24 +407,24 @@ var EnterFormTomaMx = function () {
                                     case 'TPDATO|NMRO':
                                         idControlRespuesta = dataToLoad[i].idConceptoSol;
                                         contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
-                                        if (dataToLoad[i].requerido){
+                                        if (dataToLoad[i].requerido) {
                                             contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
                                         }
-                                        contenidoControl = contenidoControl + dataToLoad[i].nombre+'</label>' +
-                                            '<div class="">'+
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
+                                            '<div class="">' +
                                             '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>';
-                                        if (dataToLoad[i].requerido){
-                                            contenidoControl = contenidoControl + '<input class="form-control decimal requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
-                                        }else{
-                                            contenidoControl = contenidoControl + '<input class="form-control decimal" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
+                                        if (dataToLoad[i].requerido) {
+                                            contenidoControl = contenidoControl + '<input class="form-control decimal requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
+                                        } else {
+                                            contenidoControl = contenidoControl + '<input class="form-control decimal" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
                                         }
 
-                                        contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
+                                        contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad[i].nombre + '</b></label>' +
                                             '</div></section>' +
                                             seccionDescripcion +
                                             '</div>';
                                         divResultado.append(contenidoControl);
-                                        $("#"+idControlRespuesta).inputmask("decimal",{
+                                        $("#" + idControlRespuesta).inputmask("decimal", {
                                             allowMinus: false,
                                             radixPoint: ".",
                                             digits: 2
@@ -434,19 +433,19 @@ var EnterFormTomaMx = function () {
                                     case 'TPDATO|FCH':
                                         idControlRespuesta = dataToLoad[i].idConceptoSol;
                                         contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
-                                        if (dataToLoad[i].requerido){
+                                        if (dataToLoad[i].requerido) {
                                             contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
                                         }
-                                        contenidoControl = contenidoControl + dataToLoad[i].nombre+'</label>' +
-                                            '<div class="">'+
+                                        contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
+                                            '<div class="">' +
                                             '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>';
-                                        if (dataToLoad[i].requerido){
-                                            contenidoControl = contenidoControl + '<input class="form-control date-picker requiredConcept" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
-                                        }else{
-                                            contenidoControl = contenidoControl + '<input class="form-control date-picker" type="text"  id="'+idControlRespuesta+'" name="'+idControlRespuesta+'" value="'+valor+'" placeholder="'+dataToLoad[i].nombre+'" >';
+                                        if (dataToLoad[i].requerido) {
+                                            contenidoControl = contenidoControl + '<input class="form-control date-picker requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
+                                        } else {
+                                            contenidoControl = contenidoControl + '<input class="form-control date-picker" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
                                         }
 
-                                        contenidoControl = contenidoControl +'<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>'+ dataToLoad[i].nombre+'</b></label>' +
+                                        contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad[i].nombre + '</b></label>' +
                                             '</div></section>' +
                                             seccionDescripcion +
                                             '</div>';
@@ -459,10 +458,10 @@ var EnterFormTomaMx = function () {
                             }
                             handleDatePickers("${pageContext.request.locale.language}");
                             desbloquearUI();
-                        }else{
+                        } else {
                             desbloquearUI();
                             $.smallBox({
-                                title: $("#msg_no_results_found").val() ,
+                                title: $("#msg_no_results_found").val(),
                                 content: $("#disappear").val(),
                                 color: "#C46A69",
                                 iconSmall: "fa fa-warning",
@@ -470,14 +469,14 @@ var EnterFormTomaMx = function () {
                             });
                         }
 
-                    }).fail(function(er) {
-                        desbloquearUI();
-                        alert( "error "+er );
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
 
-                }).fail(function(er) {
-                    desbloquearUI();
-                    alert( "error "+er );
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
                 });
             }
 
@@ -487,7 +486,6 @@ var EnterFormTomaMx = function () {
 
         }
     }
-
 
 
 }();
