@@ -49,15 +49,14 @@
         <intercept-url pattern="/administracion/direccion/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/departamento/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/examenes/*" access="ROLE_ADMIN" />
-        <intercept-url pattern="/reports/reception/*" access="ROLE_RECEPCION" />
-        <intercept-url pattern="/reports/reception/*" access="ROLE_RECEPCION" />
-        <intercept-url pattern="/reports/positiveResults/*" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
-        <intercept-url pattern="/reports/posNegResults/*" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/reception/**" access="ROLE_RECEPCION" />
+        <intercept-url pattern="/reports/positiveResults/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/posNegResults/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/searchMx/*" access="ROLE_RECEPCION" />
         <intercept-url pattern="/administracion/request/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/solicitante/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
         <intercept-url pattern="/viewNoti/*" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/reports/general/*" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/general/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
 
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->

@@ -344,9 +344,9 @@
 <script src="${generarReporte}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="searchPosNegReqUrl" value="/reports/searchPosNegRequest"/>
+<c:url var="searchPosNegReqUrl" value="/reports/posNegResults/searchPosNegRequest"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-<c:url var="pdfUrl" value="/reports/posNegRequestToPDF"/>
+<c:url var="pdfUrl" value="/reports/posNegResults/posNegRequestToPDF"/>
 
 
 <script type="text/javascript">

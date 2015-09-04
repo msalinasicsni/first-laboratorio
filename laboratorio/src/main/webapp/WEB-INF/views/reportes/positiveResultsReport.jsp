@@ -325,8 +325,8 @@
 <script src="${handleInputMask}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="searchReqUrl" value="/reports/searchRequest"/>
-<c:url var="posReqExportUrl" value="/reports/positiveRequestToPDF"/>
+<c:url var="searchReqUrl" value="/reports/positiveResults/searchRequest"/>
+<c:url var="posReqExportUrl" value="/reports/positiveResults/positiveRequestToPDF"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 
 

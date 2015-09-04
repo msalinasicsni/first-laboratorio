@@ -146,7 +146,7 @@ public class ReportesController {
      * @return String con las Mx encontradas
      * @throws Exception
      */
-    @RequestMapping(value = "searchSamples", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/reception/searchSamples", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
@@ -314,7 +314,7 @@ public class ReportesController {
     }
 
 
-    @RequestMapping(value = "expToPDF", method = RequestMethod.GET)
+    @RequestMapping(value = "/reception/expToPDF", method = RequestMethod.GET)
     public
     @ResponseBody
     String expToPDF(@RequestParam(value = "codes", required = true) String codes, @RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate, HttpServletRequest request) throws IOException, COSVisitorException, ParseException {
@@ -717,7 +717,7 @@ public class ReportesController {
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
-    @RequestMapping(value = "searchRequest", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/positiveResults/searchRequest", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
     String fetchRequestJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
@@ -922,7 +922,7 @@ public class ReportesController {
     }
 
 
-    @RequestMapping(value = "positiveRequestToPDF", method = RequestMethod.GET)
+    @RequestMapping(value = "/positiveResults/positiveRequestToPDF", method = RequestMethod.GET)
     public
     @ResponseBody
     String positiveRequestToPDF(@RequestParam(value = "codes", required = true) String codes, @RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate, HttpServletRequest request) throws IOException, COSVisitorException, ParseException {
@@ -1257,7 +1257,7 @@ public class ReportesController {
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
-    @RequestMapping(value = "searchPosNegRequest", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/posNegResults/searchPosNegRequest", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
     String fetchPosNegRequestJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
@@ -1567,7 +1567,7 @@ public class ReportesController {
         return valorResultado + "," + mostrar;
     }
 
-    @RequestMapping(value = "posNegRequestToPDF", method = RequestMethod.GET)
+    @RequestMapping(value = "/posNegResults/posNegRequestToPDF", method = RequestMethod.GET)
     public
     @ResponseBody
     String posNegRequestToPDF(@RequestParam(value = "codes", required = true) String codes, @RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate, HttpServletRequest request) throws Exception {
@@ -2695,7 +2695,7 @@ public class ReportesController {
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
-    @RequestMapping(value = "searchRequestGR", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/general/searchRequestGR", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
     String fetchReqJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
@@ -2826,7 +2826,7 @@ public class ReportesController {
     }
 
 
-    @RequestMapping(value = "generalRepToPDF", method = RequestMethod.GET)
+    @RequestMapping(value = "/general/generalRepToPDF", method = RequestMethod.GET)
     public
     @ResponseBody
     String generalRepToPDF(@RequestParam(value = "codes", required = true) String codes, @RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate, HttpServletRequest request) throws Exception {

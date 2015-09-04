@@ -326,8 +326,8 @@
 <script src="${generarReporte}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="searchReqGRUrl" value="/reports/searchRequestGR"/>
-<c:url var="genRePdfUrl" value="/reports/generalRepToPDF"/>
+<c:url var="searchReqGRUrl" value="/reports/general/searchRequestGR"/>
+<c:url var="genRePdfUrl" value="/reports/general/generalRepToPDF"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 
 
