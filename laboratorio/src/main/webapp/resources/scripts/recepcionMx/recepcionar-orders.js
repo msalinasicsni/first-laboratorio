@@ -309,33 +309,35 @@ var ReceiptOrders = function () {
             }
 
             function getOrdersReview() {
-                $.getJSON(parametros.sgetOrdenesExamenUrl, {
-                    idTomaMx: $("#idTomaMx").val(),
-                    contentType: "charset=ISO-8859-1",
-                    ajax: 'true'
-                }, function (response) {
-                    table2.fnClearTable();
-                    var len = Object.keys(response).length;
-                    for (var i = 0; i < len; i++) {
-                        table2.fnAddData(
-                            [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud, response[i].cc, response[i].externo,
-                                    '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
+                if (parametros.sgetOrdenesExamenUrl!=null) {
+                    $.getJSON(parametros.sgetOrdenesExamenUrl, {
+                        idTomaMx: $("#idTomaMx").val(),
+                        contentType: "charset=ISO-8859-1",
+                        ajax: 'true'
+                    }, function (response) {
+                        table2.fnClearTable();
+                        var len = Object.keys(response).length;
+                        for (var i = 0; i < len; i++) {
+                            table2.fnAddData(
+                                [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud, response[i].cc, response[i].externo,
+                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
 
-                    }
-                    $(".anularExamen").on("click", function () {
-                        anularExamen($(this).data('id'));
-                    });
-
-                    //al paginar se define nuevamente la función de cargar el detalle
-                    $(".dataTables_paginate").on('click', function () {
-                        $(".anularExamen").on('click', function () {
+                        }
+                        $(".anularExamen").on("click", function () {
                             anularExamen($(this).data('id'));
                         });
+
+                        //al paginar se define nuevamente la función de cargar el detalle
+                        $(".dataTables_paginate").on('click', function () {
+                            $(".anularExamen").on('click', function () {
+                                anularExamen($(this).data('id'));
+                            });
+                        });
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
                     });
-                }).fail(function (jqXHR) {
-                    setTimeout($.unblockUI, 10);
-                    validateLogin(jqXHR);
-                });
+                }
             }
 
             $("#all-orders").click(function () {

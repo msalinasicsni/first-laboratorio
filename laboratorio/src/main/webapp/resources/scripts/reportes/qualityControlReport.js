@@ -308,7 +308,7 @@ var QualityReport = function () {
                             unBlockUI();
                         },
                         error: function (jqXHR) {
-                            desbloquearUI();
+                            unBlockUI();
                             validateLogin(jqXHR);
                         }
                     });

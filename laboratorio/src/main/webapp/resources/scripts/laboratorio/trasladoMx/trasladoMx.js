@@ -396,7 +396,7 @@ var TrasladoMx = function () {
 
             <!-- Al seleccionar diagnóstico-->
             $('#idDxSolicitado').change(function () {
-                if ($(this).val().length > 0) {
+                if ($(this).val().length > 0 && parametros.sExamenesURL!=null) {
                     $.getJSON(parametros.sExamenesURL, {
                         idDx: $(this).val(),
                         ajax: 'true'

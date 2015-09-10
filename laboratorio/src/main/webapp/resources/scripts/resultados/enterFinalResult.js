@@ -38,7 +38,7 @@ var enterFinalResult = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true,
                 "columns": [
-                    null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null,null,null,
                     {
                         "className": 'details-control',
                         "orderable": false,
@@ -77,7 +77,7 @@ var enterFinalResult = function () {
 
                             table1.fnAddData(
                                 [dataToLoad[i].fechaSolicitud, dataToLoad[i].nombreSolicitud, dataToLoad[i].codigoUnicoMx,
-                                    dataToLoad[i].tipoMx, dataToLoad[i].tipoNotificacion, dataToLoad[i].NombreExamen, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultado + "'/>"]);
+                                    dataToLoad[i].tipoMx, dataToLoad[i].tipoNotificacion, dataToLoad[i].NombreExamen,  dataToLoad[i].laboratorio,  dataToLoad[i].procesado , dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultado + "'/>"]);
 
                         }
                     } else {
@@ -127,7 +127,7 @@ var enterFinalResult = function () {
                 }
                 else {
                     // Open this row
-                    row.child(format(row.data(), 7)).show();
+                    row.child(format(row.data(), 9)).show();
                     tr.addClass('shown');
                 }
             });

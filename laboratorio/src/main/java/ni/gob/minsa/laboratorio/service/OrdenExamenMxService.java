@@ -575,7 +575,7 @@ public class OrdenExamenMxService {
         //se toman las que son de diagnóstico.
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
                 "AutoridadArea as aa, AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and  dx.area.idArea = aa.area.idArea " +
-                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false");
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false and aa.pasivo = false  and al.pasivo = false ");
 
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("username",username);
@@ -583,7 +583,7 @@ public class OrdenExamenMxService {
         //se toman las que son de estudio
         Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx inner join oe.solicitudEstudio.tipoEstudio as es, " +
                 "AutoridadArea as aa,AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and es.area.idArea = aa.area.idArea " +
-                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false");
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and oe.anulado = false and aa.pasivo = false  and al.pasivo = false ");
         q2.setParameter("idTomaMx",idTomaMx);
         q2.setParameter("username",username);
         ordenExamenList.addAll(q2.list());
@@ -594,7 +594,7 @@ public class OrdenExamenMxService {
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx, AutoridadLaboratorio as al " +
                 "where al.laboratorio.codigo = oe.labProcesa.codigo and  mx.codigoLab =:codigoLab " +
-                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false order by oe.fechaHOrden");
+                "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false and al.pasivo = false order by oe.fechaHOrden");
         q.setParameter("codigoLab",codigoLab);
         q.setParameter("idDx",idDx);
         q.setParameter("idExamen",idExamen);

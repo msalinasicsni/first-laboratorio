@@ -375,8 +375,6 @@ public class ResultadoFinalController {
                         map.put("persona", " ");
                     }
 
-
-
                 } else {
                     //examenes para estudio
                     map.put("idSolicitud", examen.getSolicitudEstudio().getIdSolicitudEstudio());
@@ -403,7 +401,7 @@ public class ResultadoFinalController {
                         map.put("persona", " ");
                     }
 
-                     }
+                }
                     //detalle resultado examen
                     List<DetalleResultado> resultList = resultadoFinalService.getResultDetailExaByIdOrden(examen.getIdOrdenExamen());
                     Map<Integer, Object> mapResList = new HashMap<Integer, Object>();
@@ -432,6 +430,8 @@ public class ResultadoFinalController {
                     }
 
                     map.put("resultado", new Gson().toJson(mapResList));
+                    map.put("laboratorio",examen.getLabProcesa().getNombre());
+                    map.put("procesado",(mapResList.size()>0?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
 
                     mapResponse.put(indice, map);
                     indice++;

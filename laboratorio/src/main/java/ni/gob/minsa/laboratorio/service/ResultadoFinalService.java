@@ -534,10 +534,10 @@ public class ResultadoFinalService {
         crit.add(Restrictions.and(
                 Restrictions.eq("rutina.idSolicitudDx", idSolicitud)));
 
-        crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
+        /*crit.add(Subqueries.propertyIn("idOrdenExamen", DetachedCriteria.forClass(DetalleResultado.class)
                 .createAlias("examen", "examen")
                 .add(Restrictions.and(Restrictions.eq("pasivo",false)))
-                .setProjection(Property.forName("examen.idOrdenExamen"))));
+                .setProjection(Property.forName("examen.idOrdenExamen"))));*/
 
         return crit.list();
     }

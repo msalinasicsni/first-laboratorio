@@ -23,7 +23,7 @@ public class HomeService {
         Session session = sessionFactory.getCurrentSession();
         String sQuery = "select count(mx.idTomaMx) as total, sa.entidadAdtvaId, sa.nombre " +
                 "from DaTomaMx as mx left join mx.codSilaisAtencion as sa " +
-                "where mx.envio.laboratorioDestino.codigo = :laboratorio and mx.estadoMx.codigo = 'ESTDMX|ENV'" +
+                "where mx.envio.laboratorioDestino.codigo = :laboratorio and (mx.estadoMx.codigo = 'ESTDMX|ENV' or mx.estadoMx.codigo = 'ESTDMX|TRAS')" +
                 "group by sa.entidadAdtvaId, sa.nombre";
 
 
@@ -40,7 +40,7 @@ public class HomeService {
         String sQuery = "select count(mx.idTomaMx) as total, dx.idDiagnostico, dx.nombre " +
                 "from DaSolicitudDx as sdx inner join sdx.idTomaMx as mx " +
                 "inner join sdx.codDx as dx " +
-                "where mx.envio.laboratorioDestino.codigo = :laboratorio and mx.estadoMx.codigo = 'ESTDMX|ENV'" +
+                "where sdx.labProcesa.codigo = :laboratorio and (mx.estadoMx.codigo = 'ESTDMX|ENV' or mx.estadoMx.codigo = 'ESTDMX|TRAS')" +
                 "group by dx.idDiagnostico, dx.nombre";
 
         String sQuery2 = "select count(mx.idTomaMx) as total, es.idEstudio, es.nombre " +
