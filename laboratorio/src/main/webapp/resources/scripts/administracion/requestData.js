@@ -312,14 +312,16 @@ var RequestData = function(){
             }
 
             function limpiarCampoDatoRecepcion(){
-                $("#nombreRespuesta").val('');
-                $("#ordenRespuesta").val('');
+                console.log("limpiando datos");
+                $("#nombreDato").val('');
+                $("#ordenDato").val('').change();
                 //$("#minimoRespuesta").val('');
                 ///$("#maximoRespuesta").val('');
-                $("#descRespuesta").val('');
+                $("#descDato").val('').change();
                 $("#checkbox-required").attr('checked', false);
                 $("#checkbox-pasive").attr('checked', false);
                 $("#codConcepto").val("").change();
+                console.log("termina limpiando datos");
             }
 
             function showModalConcept(){
