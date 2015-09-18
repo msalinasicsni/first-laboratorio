@@ -372,6 +372,35 @@
                                                     </table>
                                                 </div>
                                             </div>
+                                        <c:if test="${not empty datosList}">
+                                            <div>
+                                                <header>
+                                                    <label class="text-left txt-color-blue" style="font-weight: bold">
+                                                        <spring:message code="lbl.data" />
+                                                    </label>
+                                                </header>
+                                                <br/>
+                                                <br/>
+                                                <div class="widget-body no-padding">
+                                                    <table id="datosrecepcion_list" class="table table-striped table-bordered table-hover" width="100%">
+                                                        <thead>
+                                                            <tr>
+                                                                <c:forEach items="${datosList}" var="record">
+                                                                    <th><c:out value="${record.datoSolicitud.nombre}" /></th>
+                                                                </c:forEach>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <c:forEach items="${datosList}" var="record">
+                                                                    <td>${record.valor}</td>
+                                                                </c:forEach>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </c:if>
                                             <div>
                                                 <header>
                                                     <label class="text-left txt-color-blue" style="font-weight: bold">

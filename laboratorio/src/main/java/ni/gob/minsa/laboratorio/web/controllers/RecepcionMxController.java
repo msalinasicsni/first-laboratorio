@@ -30,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,6 +104,9 @@ public class RecepcionMxController {
     @Autowired
     @Qualifier(value = "resultadoFinalService")
     private ResultadoFinalService resultadoFinalService;
+
+    @Resource(name = "datosSolicitudService")
+    private DatosSolicitudService datosSolicitudService;
 
     @Autowired
     MessageSource messageSource;
@@ -418,7 +422,16 @@ public class RecepcionMxController {
                     dxMostrar = solicitudDxList;
                 }
                 mav.addObject("dxList",dxMostrar);
+                List<DatoSolicitudDetalle> datoSolicitudDetalles = new ArrayList<DatoSolicitudDetalle>();
+                for(DaSolicitudDx solicitudDx : dxMostrar){
+                    datoSolicitudDetalles.addAll(datosSolicitudService.getDatosSolicitudDetalleBySolicitud(solicitudDx.getIdSolicitudDx()));
+                }
+
                 mav.addObject("estudiosList",solicitudEstudios);
+                for(DaSolicitudEstudio solicitudEstudio : solicitudEstudios){
+                    datoSolicitudDetalles.addAll(datosSolicitudService.getDatosSolicitudDetalleBySolicitud(solicitudEstudio.getIdSolicitudEstudio()));
+                }
+                mav.addObject("datosList",datoSolicitudDetalles);
             }
 
 
