@@ -320,13 +320,12 @@
             getOrders();
 
             /* pie chart */
-
+            var colores = ["#0066FF","#FF0000","#009900","#FF6600","#FF3399","#008B8B","#663399","#FFD700","#0000FF","#DC143C","#32CD32","#FF8C00","#C71585","#20B2AA","#6A5ACD","#9ACD32"];
             function getResumenSILAIS() {
                 $.getJSON("${resumenSILAISUrl}", {
                     ajax : 'true'
                 }, function(dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
-                    var colores = ["#00A36A","#7D0096","#DE000F","#ED7B00","#005CDE"];
                     if (len > 0) {
                         var data_pie = [];
                         for (var i = 0; i < len; i++) {
@@ -352,7 +351,6 @@
                     ajax : 'true'
                 }, function(dataToLoad) {
                     var len = Object.keys(dataToLoad).length;
-                    var colores = ["#00A36A","#7D0096","#DE000F","#ED7B00","#005CDE"];
                     if (len > 0) {
                         var data_pie = [];
                         for (var i = 0; i < len; i++) {
