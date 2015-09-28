@@ -43,7 +43,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -60,20 +59,12 @@ public class VisualizarNotificacionController {
     private SeguridadService seguridadService;
 
     @Autowired
-    @Qualifier(value = "usuarioService")
-    private UsuarioService usuarioService;
-
-    @Autowired
     @Qualifier(value = "catalogosService")
     private CatalogoService catalogosService;
 
     @Autowired
     @Qualifier(value = "entidadAdmonService")
     private EntidadAdmonService entidadAdmonService;
-
-    @Autowired
-    @Qualifier(value = "laboratoriosService")
-    private LaboratoriosService laboratoriosService;
 
     @Autowired
     @Qualifier(value = "recepcionMxService")
@@ -84,24 +75,8 @@ public class VisualizarNotificacionController {
     private TomaMxService tomaMxService;
 
     @Autowired
-    @Qualifier(value = "unidadesService")
-    private UnidadesService unidadesService;
-
-    @Autowired
-    @Qualifier(value = "parametrosService")
-    private ParametrosService parametrosService;
-
-    @Autowired
-    @Qualifier(value = "examenesService")
-    private ExamenesService examenesService;
-
-    @Autowired
     @Qualifier(value = "ordenExamenMxService")
     private OrdenExamenMxService ordenExamenMxService;
-
-    @Autowired
-    @Qualifier(value = "respuestasSolicitudService")
-    private RespuestasSolicitudService respuestasSolicitudService;
 
     @Autowired
     @Qualifier(value = "resultadoFinalService")
@@ -179,12 +154,12 @@ public class VisualizarNotificacionController {
     }
 
     private String RecepcionMxToJson(List<RecepcionMx> recepcionMxList) {
-        String jsonResponse = "";
-        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        String jsonResponse;
+        Map<Integer, Object> mapResponse = new HashMap<>();
         Integer indice = 0;
         for (RecepcionMx recepcion : recepcionMxList) {
             boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx()).size() > 0;
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             map.put("idNotificacion", recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
             map.put("codigoUnicoMx", esEstudio ? recepcion.getTomaMx().getCodigoUnicoMx() : recepcion.getTomaMx().getCodigoLab());
             map.put("idRecepcion", recepcion.getIdRecepcion());
@@ -218,7 +193,7 @@ public class VisualizarNotificacionController {
             //Si hay persona
             if (recepcion.getTomaMx().getIdNotificacion().getPersona() != null) {
                 /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
+                String nombreCompleto;
                 nombreCompleto = recepcion.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
                 if (recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
                     nombreCompleto = nombreCompleto + " " + recepcion.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
@@ -238,8 +213,8 @@ public class VisualizarNotificacionController {
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
 
 
-            Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
-            Map<String, String> mapDx = new HashMap<String, String>();
+            Map<Integer, Object> mapDxList = new HashMap<>();
+            Map<String, String> mapDx = new HashMap<>();
             int subIndice = 0;
 
             if (!solicitudDxList.isEmpty()) {
@@ -249,7 +224,7 @@ public class VisualizarNotificacionController {
                     mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     subIndice++;
                     mapDxList.put(subIndice, mapDx);
-                    mapDx = new HashMap<String, String>();
+                    mapDx = new HashMap<>();
                 }
             } else {
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEList) {
@@ -258,7 +233,7 @@ public class VisualizarNotificacionController {
                     mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     subIndice++;
                     mapDxList.put(subIndice, mapDx);
-                    mapDx = new HashMap<String, String>();
+                    mapDx = new HashMap<>();
                 }
             }
 
@@ -328,7 +303,7 @@ public class VisualizarNotificacionController {
     @RequestMapping(value = "getPDF", method = RequestMethod.GET)
     public
     @ResponseBody
-    String getPDF(@RequestParam(value = "idNotificacion", required = true) String idNotificacion, HttpServletRequest request) throws Exception {
+    String getPDF(@RequestParam(value = "idNotificacion", required = true) String idNotificacion) throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         PDDocument doc = new PDDocument();
         DaNotificacion not = daNotificacionService.getNotifById(idNotificacion);
@@ -338,14 +313,13 @@ public class VisualizarNotificacionController {
                 DaSindFebril febril = sindFebrilService.getDaSindFebril(idNotificacion);
 
 
-                String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+                //String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
 
                 if (febril != null) {
                     PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
                     doc.addPage(page);
                     PDPageContentStream stream = new PDPageContentStream(doc, page);
-                    float xCenter;
 
                     String workingDir = System.getProperty("user.dir");
 
@@ -355,7 +329,7 @@ public class VisualizarNotificacionController {
                     String silais = febril.getIdNotificacion().getCodSilaisAtencion().getNombre();
 
                     String nombreS = silais != null ? silais.replace("SILAIS", "") : "----";
-                    String municipio = febril.getIdNotificacion().getPersona().getMunicipioResidencia() != null ? febril.getIdNotificacion().getPersona().getMunicipioResidencia().getNombre() : "----";
+                    String municipio = febril.getIdNotificacion().getCodUnidadAtencion() != null ? febril.getIdNotificacion().getCodUnidadAtencion().getMunicipio().getNombre() : "----";
                     String us = febril.getIdNotificacion().getCodUnidadAtencion() != null ? febril.getIdNotificacion().getCodUnidadAtencion().getNombre() : "----";
                     String nExp = febril.getCodExpediente() != null ? febril.getCodExpediente() : "----------";
                     //laboratorio pendiente
@@ -365,7 +339,7 @@ public class VisualizarNotificacionController {
                     String dia = array != null ? array[2] : "--";
                     String mes = array != null ? array[1] : "--";
                     String anio = array != null ? array[0] : "--";
-                    String nombrePersona = null;
+                    String nombrePersona;
 
                     nombrePersona = febril.getIdNotificacion().getPersona().getPrimerNombre();
                     if (febril.getIdNotificacion().getPersona().getSegundoNombre() != null)
@@ -409,6 +383,7 @@ public class VisualizarNotificacionController {
 
                     String enfCronica = febril.getEnfCronica() != null ? febril.getEnfCronica() : null;
 
+                    String numFicha = febril.getNumFicha()!= null? febril.getNumFicha():null;
 
                     boolean asma = false;
                     boolean alergiaR = false;
@@ -631,7 +606,7 @@ public class VisualizarNotificacionController {
                     String leptospirosis = febril.getSsLepto() != null ? febril.getSsLepto() : null;
                     boolean cefaleaIn = false;
                     boolean tos = false;
-                    boolean respiratorio = false;
+                   // boolean respiratorio = false;
                     boolean ictericia = false;
                     boolean oliguria = false;
                     boolean escalofrio = false;
@@ -778,10 +753,15 @@ public class VisualizarNotificacionController {
 
                     float y = 668;
                     float m = 11;
-                    float m1 = 29;
                     float x = 86;
                     float x1 = 86;
                     float y3 = 0;
+
+                    if(numFicha!= null){
+                        GeneralUtils.drawTEXT(numFicha, y+18, x+405, stream,7, PDType1Font.TIMES_ROMAN);
+
+                    }
+
                     GeneralUtils.drawTEXT(nombreS, y, x, stream, 7, PDType1Font.TIMES_ROMAN);
                     x1 += 122;
                     GeneralUtils.drawTEXT(municipio, y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
@@ -1425,8 +1405,8 @@ public class VisualizarNotificacionController {
                         if (!diagnosticosList.isEmpty()) {
                             int con = 0;
                             for (DaSolicitudDx soli : diagnosticosList) {
-                                List<String[]> reqList = new ArrayList<String[]>();
-                                List<String[]> dxList = new ArrayList<String[]>();
+                                List<String[]> reqList = new ArrayList<>();
+                                List<String[]> dxList = new ArrayList<>();
                                 con++;
                                 if (con >= 2) {
                                     y = y1;
@@ -1551,8 +1531,8 @@ public class VisualizarNotificacionController {
                         if(!estudiosList.isEmpty()){
                             int cn = 0;
                             for (DaSolicitudEstudio est : estudiosList) {
-                                List<String[]> reqList1 = new ArrayList<String[]>();
-                                List<String[]> dxList1 = new ArrayList<String[]>();
+                                List<String[]> reqList1 = new ArrayList<>();
+                                List<String[]> dxList1 = new ArrayList<>();
                                 cn++;
 
                                 if (cn >= 2) {
@@ -1710,26 +1690,26 @@ public class VisualizarNotificacionController {
                 }
             } else if (not.getCodTipoNotificacion().getCodigo().equals("TPNOTI|IRAG")) {
                 DaIrag irag = daIragService.getFormById(not.getIdNotificacion());
-                String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
+               // String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
 
                 if (irag != null) {
                     PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
                     doc.addPage(page);
                     PDPageContentStream stream = new PDPageContentStream(doc, page);
-                    float xCenter;
-
                     String workingDir = System.getProperty("user.dir");
 
                     BufferedImage image = ImageIO.read(new File(workingDir + "/fichaIrag1.png"));
 
                     GeneralUtils.drawObject(stream, doc, image, 10, 50, 580, 780);
 
+                    String clasificacion = irag.getCodClasificacion()!= null? irag.getCodClasificacion().getCodigo():null;
+
                     String us = irag.getIdNotificacion().getCodUnidadAtencion() != null ? irag.getIdNotificacion().getCodUnidadAtencion().getNombre() : "----";
 
-                    String silais = irag.getIdNotificacion().getCodSilaisAtencion().getNombre();
+                    //String silais = irag.getIdNotificacion().getCodSilaisAtencion().getNombre();
 
-                    String nombreS = silais != null ? silais.replace("SILAIS", "") : "----";
-                    String municipio = irag.getIdNotificacion().getPersona().getMunicipioResidencia() != null ? irag.getIdNotificacion().getPersona().getMunicipioResidencia().getNombre() : "----";
+                   // String nombreS = silais != null ? silais.replace("SILAIS", "") : "----";
+                   // String municipio = irag.getIdNotificacion().getPersona().getMunicipioResidencia() != null ? irag.getIdNotificacion().getPersona().getMunicipioResidencia().getNombre() : "----";
                     String nExp = irag.getCodExpediente() != null ? irag.getCodExpediente() : "----------";
 
                     String fecha = irag.getFechaConsulta() != null ? DateUtil.DateToString(irag.getFechaConsulta(), "yyyy/MM/dd") : null;
@@ -1747,7 +1727,7 @@ public class VisualizarNotificacionController {
                     String mesFP = array1 != null ? array1[1] : "--";
                     String anioFP = array1 != null ? array1[0] : "--";
 
-                    String nombrePersona = null;
+                    String nombrePersona;
 
                     nombrePersona = irag.getIdNotificacion().getPersona().getPrimerNombre();
                     if (irag.getIdNotificacion().getPersona().getSegundoNombre() != null)
@@ -1887,7 +1867,7 @@ public class VisualizarNotificacionController {
 
                     String etiologicoViral = irag.getAgenteViral() != null ? irag.getAgenteViral() : null;
 
-                    String agentesEt = irag.getAgenteEtiologico() != null ? irag.getAgenteEtiologico() : null;
+                  //String agentesEt = irag.getAgenteEtiologico() != null ? irag.getAgenteEtiologico() : null;
 
                     String seroti = irag.getSerotipificacion() != null ? irag.getSerotipificacion() : null;
 
@@ -1896,11 +1876,29 @@ public class VisualizarNotificacionController {
                     String nombreUsuario = irag.getUsuario() != null ? irag.getUsuario().getNombre() : null;
 
                     float y = 737;
-                    float m = 11;
-                    float m1 = 29;
                     float x = 86;
                     float x1 = 86;
-                    x1 += 55;
+
+                    if(clasificacion!= null){
+                        switch (clasificacion) {
+                            case "CLASIFVI|ETI":
+                                x1 += 377;
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.x", null, null), y + 25, x1, stream, 8, PDType1Font.TIMES_BOLD);
+                                break;
+                            case "CLASIFVI|IRAG":
+                                x1 += 336;
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.x", null, null), y + 25, x1, stream, 8, PDType1Font.TIMES_BOLD);
+
+                                break;
+                            case "CLASIFVI|INUS":
+                                x1 += 463;
+                                GeneralUtils.drawTEXT("(" + messageSource.getMessage("lbl.x", null, null) +")", y + 25, x1, stream, 8, PDType1Font.TIMES_BOLD);
+
+                                break;
+                        }
+                    }
+
+                    x1= x +55;
                     GeneralUtils.drawTEXT(us, y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
 
                     y -= 42;
@@ -2756,8 +2754,8 @@ public class VisualizarNotificacionController {
                     if (!diagnosticosList.isEmpty()) {
                         int con = 0;
                         for (DaSolicitudDx soli : diagnosticosList) {
-                            List<String[]> reqList = new ArrayList<String[]>();
-                            List<String[]> dxList = new ArrayList<String[]>();
+                            List<String[]> reqList = new ArrayList<>();
+                            List<String[]> dxList = new ArrayList<>();
                             con++;
                             if (con >= 2) {
                                 y = y1;
@@ -3050,13 +3048,11 @@ public class VisualizarNotificacionController {
         //drawTable
 
         //Initialize table
-        float height = 0;
+        float height;
         float margin = 33;
         float tableWidth = 520;
-        float yStartNewPage = y;
-        float yStart = yStartNewPage;
         float bottomMargin = 45;
-        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+        BaseTable table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
 
         //Create Header row
         Row headerRow = table.createRow(10f);
@@ -3119,13 +3115,11 @@ public class VisualizarNotificacionController {
         //drawTable
 
         //Initialize table
-        float height = 0;
+        float height;
         float margin = 33;
         float tableWidth = 520;
-        float yStartNewPage = y;
-        float yStart = yStartNewPage;
         float bottomMargin = 45;
-        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+        BaseTable table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
 
         //Create Header row
         Row headerRow = table.createRow(10f);
@@ -3193,13 +3187,11 @@ public class VisualizarNotificacionController {
         //drawRequestTable
 
         //Initialize table
-        float height = 0;
+        float height;
         float margin = 60;
         float tableWidth = 470;
-        float yStartNewPage = y;
-        float yStart = yStartNewPage;
         float bottomMargin = 45;
-        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+        BaseTable table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
 
         //Create Header row
         Row headerRow = table.createRow(10f);
@@ -3264,13 +3256,11 @@ public class VisualizarNotificacionController {
         //drawRequestTable
 
         //Initialize table
-        float height = 0;
+        float height;
         float margin = 60;
         float tableWidth = 470;
-        float yStartNewPage = y;
-        float yStart = yStartNewPage;
         float bottomMargin = 45;
-        BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+        BaseTable table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
 
         //Create Header row
         Row headerRow = table.createRow(10f);
