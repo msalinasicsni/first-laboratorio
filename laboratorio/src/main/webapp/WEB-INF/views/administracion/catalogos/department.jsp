@@ -236,7 +236,7 @@
 
         Department.init(parametros);
         $("li.administracion").addClass("open");
-        $("li.catalogos").addClass("open");
+        $("li.catalogos").addClass("active");
         $("li.departamento").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.departamento").parents("ul").slideDown(200);

@@ -56,7 +56,7 @@ public class AutoridadLaboratorio {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "USERNAME",nullable = false)
-    @ForeignKey(name="AUTORIDADLABORATORIO_USUARIOREG_FK")
+    @ForeignKey(name="AUTORIDADLAB_USUARIOREG_FK")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
     }

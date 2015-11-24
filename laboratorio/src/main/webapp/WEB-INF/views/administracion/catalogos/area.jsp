@@ -236,7 +236,7 @@
 
         Area.init(parametros);
         $("li.administracion").addClass("open");
-        $("li.catalogos").addClass("open");
+        $("li.catalogos").addClass("active");
         $("li.area").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.area").parents("ul").slideDown(200);

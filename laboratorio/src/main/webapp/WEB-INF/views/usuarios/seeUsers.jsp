@@ -25,7 +25,7 @@
 			</span>
         <!-- breadcrumb -->
         <ol class="breadcrumb">
-            <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/personas/search" htmlEscape="true "/>"><spring:message code="menu.persons" /></a></li>
+            <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/usuarios/list" htmlEscape="true "/>"><spring:message code="menu.admin.users" /></a></li>
         </ol>
         <!-- end breadcrumb -->
         <jsp:include page="../fragments/layoutOptions.jsp" />

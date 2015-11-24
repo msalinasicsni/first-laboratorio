@@ -364,7 +364,7 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.administracion").addClass("open");
-        $("li.catalogos").addClass("open");
+        $("li.catalogos").addClass("active");
         $("li.request").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.request").parents("ul").slideDown(200);

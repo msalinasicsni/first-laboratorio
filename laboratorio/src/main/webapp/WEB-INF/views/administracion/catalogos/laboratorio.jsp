@@ -391,7 +391,7 @@
 
         Laboratorio.init(parametros);
         $("li.administracion").addClass("open");
-        $("li.catalogos").addClass("open");
+        $("li.catalogos").addClass("active");
         $("li.laboratorio").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.laboratorio").parents("ul").slideDown(200);

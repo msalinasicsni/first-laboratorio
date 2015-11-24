@@ -25,7 +25,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>"><spring:message code="menu.receipt.patient" /></a></li>
+				<li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/tomaMx/searchOMx" htmlEscape="true "/>"><spring:message code="menu.receipt.other.samples" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../fragments/layoutOptions.jsp" />
@@ -195,7 +195,7 @@
 					blockMess:"${blockMess}"};
 			SearchApplicant.init(parametros);
             $("li.recepcion").addClass("open");
-            $("li.check-in").addClass("open");
+            $("li.check-in").addClass("active");
             $("li.otherSamples").addClass("active");
             if ("top" != localStorage.getItem("sm-setmenu")) {
                 $("li.otherSamples").parents("ul").slideDown(200);

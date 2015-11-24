@@ -292,7 +292,7 @@
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();
         $("li.administracion").addClass("open");
-        $("li.catalogos").addClass("open");
+        $("li.catalogos").addClass("active");
         $("li.sampleTypes").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.sampleTypes").parents("ul").slideDown(200);

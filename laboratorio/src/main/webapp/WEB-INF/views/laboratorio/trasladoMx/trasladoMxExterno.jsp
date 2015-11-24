@@ -41,7 +41,7 @@
 			</span>
 			<!-- breadcrumb -->
 			<ol class="breadcrumb">
-                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <spring:message code="menu.transfer" /> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/trasladoMx/initCC" htmlEscape="true "/>"><spring:message code="menu.transfer.qualitycontrol.mx" /></a></li>
+                <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <spring:message code="menu.transfer" /> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/trasladoMx/initExternal" htmlEscape="true "/>"><spring:message code="menu.transfer.external.mx" /></a></li>
 			</ol>
 			<!-- end breadcrumb -->
 			<jsp:include page="../../fragments/layoutOptions.jsp" />
@@ -420,7 +420,7 @@
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
 	    	$("li.laboratorio").addClass("open");
-            $("li.traslado").addClass("open");
+            $("li.traslado").addClass("active");
 	    	$("li.trasladoMxEx").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.trasladoMxEx").parents("ul").slideDown(200);

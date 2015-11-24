@@ -391,7 +391,7 @@
             handleDatePickers("${pageContext.request.locale.language}");
             handleInputMasks();
 	    	$("li.laboratorio").addClass("open");
-            $("li.traslado").addClass("open");
+            $("li.traslado").addClass("active");
 	    	$("li.trasladoMxCC").addClass("active");
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.trasladoMxCC").parents("ul").slideDown(200);

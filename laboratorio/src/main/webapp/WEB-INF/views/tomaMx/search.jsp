@@ -196,6 +196,7 @@
 					blockMess:"${blockMess}"};
 			SearchPerson.init(parametros);
 	    	$("li.recepcion").addClass("open");
+            $("li.check-in").addClass("active");
             $("li.patient").addClass("active");
             if ("top" != localStorage.getItem("sm-setmenu")) {
                 $("li.patient").parents("ul").slideDown(200);
