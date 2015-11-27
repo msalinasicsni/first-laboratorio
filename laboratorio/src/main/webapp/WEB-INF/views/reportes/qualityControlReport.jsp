@@ -183,7 +183,7 @@
                         </div>
 
                         <div class="row">
-                            <section class="col col-sm-12 col-md-6 col-lg-4">
+                            <!--<section class="col col-sm-12 col-md-6 col-lg-4">
                                 <label class="text-left txt-color-blue font-md">
                                     <spring:message code="lbl.request.type" /> </label>
                                 <div class="input-group">
@@ -204,7 +204,7 @@
                                     <input type="text" id="nombreSoli" name="nombreSoli" placeholder="<spring:message code="lbl.desc.request"/>">
                                     <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
                                 </label>
-                            </section>
+                            </section>-->
                             <section class="col col-sm-12 col-md-6 col-lg-4">
                                 <label class="text-left txt-color-blue font-md">
                                     <spring:message code="lbl.transfer.origin.lab" /> </label>

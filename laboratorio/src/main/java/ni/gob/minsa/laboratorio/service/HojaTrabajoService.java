@@ -7,6 +7,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.OrderBy;
 import org.hibernate.criterion.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,6 +146,7 @@ public class HojaTrabajoService {
                             .add(Restrictions.and(Restrictions.eq("usuario.username",userName))) //usuario
                             .setProjection(Property.forName("labautorizado.codigo"))));
         }
+        crit.addOrder(Order.asc("hoja.numero"));
 
         return crit.list();
     }

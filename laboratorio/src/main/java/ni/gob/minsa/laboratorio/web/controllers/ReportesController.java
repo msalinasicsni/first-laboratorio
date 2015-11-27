@@ -767,12 +767,12 @@ public class ReportesController {
                             Integer idLista = Integer.valueOf(res.getValor());
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                            if (valor.getValor().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
 
                         } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().toLowerCase().equals("positivo")) {
+                            if (res.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
                         }
@@ -781,12 +781,12 @@ public class ReportesController {
                             Integer idLista = Integer.valueOf(res.getValor());
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                            if (valor.getValor().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
 
                         } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().toLowerCase().equals("positivo")) {
+                            if (res.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
                         }
@@ -850,12 +850,12 @@ public class ReportesController {
                             Integer idLista = Integer.valueOf(res.getValor());
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                            if (valor.getValor().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
 
                         } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().toLowerCase().equals("positivo")) {
+                            if (res.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
                         }
@@ -864,12 +864,12 @@ public class ReportesController {
                             Integer idLista = Integer.valueOf(res.getValor());
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                            if (valor.getValor().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
 
                         } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().toLowerCase().equals("positivo")) {
+                            if (res.getValor().trim().toLowerCase().equals("positivo")) {
                                 mostrar = true;
                             }
                         }
@@ -1007,7 +1007,7 @@ public class ReportesController {
                         unidadSalud = soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre();
                     }
 
-                    content[0] = soli.getIdTomaMx() != null ? soli.getIdTomaMx().getCodigoUnicoMx() : "";
+                    content[0] = soli.getIdTomaMx() != null ? soli.getIdTomaMx().getCodigoLab() : "";
                     content[1] = fechaAprob != null ? fechaAprob : "";
                     content[2] = silais != null ? silais : "";
                     content[3] = unidadSalud != null ? unidadSalud : "";
@@ -1453,13 +1453,13 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().toLowerCase().equals("positivo") ||valor.getValor().toLowerCase().equals("negativo") ) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo") ||valor.getValor().trim().toLowerCase().equals("negativo") ) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().toLowerCase().equals("positivo") || res.getValor().toLowerCase().equals("negativo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo") || res.getValor().trim().toLowerCase().equals("negativo")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1469,13 +1469,13 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().toLowerCase().equals("positivo") || valor.getValor().toLowerCase().equals("negativo") ) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo") || valor.getValor().trim().toLowerCase().equals("negativo") ) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().toLowerCase().equals("positivo") || res.getValor().toLowerCase().equals("negativo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo") || res.getValor().trim().toLowerCase().equals("negativo")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1535,13 +1535,13 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().toLowerCase().equals("positivo") ) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo") ) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().toLowerCase().equals("positivo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1551,13 +1551,13 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().toLowerCase().equals("positivo")) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo")) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().toLowerCase().equals("positivo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -2151,7 +2151,7 @@ public class ReportesController {
 
                         float tableHeight = drawSolicitudTable(contentTable1, doc, page, y);
                         y -=tableHeight;
-                        if (y < 260) {
+                        if (y < 100) {
                             stream.close();
                             page = new PDPage(PDPage.PAGE_SIZE_A4);
                             page.setRotation(90);
@@ -2212,7 +2212,7 @@ public class ReportesController {
 
                         tableHeight = drawResultTable(content, doc, page, y);
                         y -=tableHeight;
-                        if (y < 260) {
+                        if (y < 100) {
                             stream.close();
                             page = new PDPage(PDPage.PAGE_SIZE_A4);
                             page.setRotation(90);
@@ -2713,6 +2713,8 @@ public class ReportesController {
         if (urlValidacion.isEmpty()) {
             List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+            List<Area> areas = areaService.getAreas();
+            mav.addObject("areas", areas);
             mav.addObject("entidades", entidadesAdtvases);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.setViewName("reportes/generalReportResults");
