@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,18 @@ public class DaNotificacionService {
 
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DaNotificacion> getNoticesByPerson(long idPersona){
+        Session session = sessionFactory.getCurrentSession();
+        //todas las notificaciones tipo CASO ESPECIAL registradas para la persona seleccionada
+        return session.createCriteria(DaNotificacion.class, "noti")
+                .createAlias("noti.persona", "persona")
+                .add(Restrictions.and(
+                                Restrictions.eq("persona.personaId", idPersona))
+                ).addOrder(Order.desc("noti.fechaRegistro"))
+                .list();
 
+    }
     public void updateNotificacion(DaNotificacion dto) throws Exception {
         try {
             if (dto != null) {

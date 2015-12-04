@@ -57,9 +57,7 @@ var ReceiptOrders = function () {
                     ]
                 }
             });
-            var table2;
-            if ($("esEstudio").val() == 'true') {
-                table2 = $('#examenes_list').dataTable({
+            var table2 = $('#examenes_list').dataTable({
                     "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
                         "t" +
                         "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
@@ -69,7 +67,7 @@ var ReceiptOrders = function () {
                     "searching": false,
                     "lengthChange": false,
                     "columns": [
-                        null, null, null, null, null,
+                        null, null, null, null, null, null, null,
                         {
                             "className": 'cancelar',
                             "orderable": false
@@ -88,30 +86,7 @@ var ReceiptOrders = function () {
                         responsiveHelper_dt_basic.respond();
                     }
                 });
-            } else {
-                table2 = $('#examenes_list').dataTable({
-                    "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
-                        "t" +
-                        "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
-                    "autoWidth": true,
-                    "paging": false,
-                    "ordering": false,
-                    "searching": false,
-                    "lengthChange": false,
-                    "preDrawCallback": function () {
-                        // Initialize the responsive datatables helper once.
-                        if (!responsiveHelper_dt_basic) {
-                            responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#examenes_list'), breakpointDefinition);
-                        }
-                    },
-                    "rowCallback": function (nRow) {
-                        responsiveHelper_dt_basic.createExpandIcon(nRow);
-                    },
-                    "drawCallback": function (oSettings) {
-                        responsiveHelper_dt_basic.respond();
-                    }
-                });
-            }
+
 
             var table3 = $('#solicitudes_list').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
@@ -227,7 +202,7 @@ var ReceiptOrders = function () {
                 }
             });
 
-            <!-- formulario de recepción en laboratorio -->
+            <!-- formulario para agregar examen -->
             $('#AgregarExamen-form').validate({
                 // Rules for form validation
                 rules: {
@@ -242,6 +217,35 @@ var ReceiptOrders = function () {
                     guardarExamen();
                 }
             });
+
+
+            function showModalOverrideTest() {
+                $("#causaAnulacionEx").val('');
+                $("#modalOverride").modal({
+                    show: true
+                });
+            }
+
+            function hideModalOverrideTest() {
+                $('#modalOverride').modal('hide');
+            }
+
+            <!-- formulario para anular examen -->
+            $('#override-ex-form').validate({
+                // Rules for form validation
+                rules: {
+                    causaAnulacionEx: {required: true}
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    anularExamen($("#idOrdenExamen").val());
+                }
+            });
+
+
 
             function blockUI() {
                 var loc = window.location;
@@ -348,13 +352,17 @@ var ReceiptOrders = function () {
 
                         }
                         $(".anularExamen").on("click", function () {
-                            anularExamen($(this).data('id'));
+                            //anularExamen($(this).data('id'));
+                            $("#idOrdenExamen").val($(this).data('id'));
+                            showModalOverrideTest();
                         });
 
                         //al paginar se define nuevamente la función de cargar el detalle
                         $(".dataTables_paginate").on('click', function () {
                             $(".anularExamen").on('click', function () {
-                                anularExamen($(this).data('id'));
+                                //anularExamen($(this).data('id'));
+                                $("#idOrdenExamen").val($(this).data('id'));
+                                showModalOverrideTest();
                             });
                         });
                     }).fail(function (jqXHR) {
@@ -669,6 +677,7 @@ var ReceiptOrders = function () {
             function anularExamen(idOrdenExamen) {
                 var anulacionObj = {};
                 anulacionObj['idOrdenExamen'] = idOrdenExamen;
+                anulacionObj['causaAnulacion'] = $("#causaAnulacionEx").val();
                 anulacionObj['mensaje'] = '';
                 blockUI();
                 $.ajax(
@@ -690,6 +699,7 @@ var ReceiptOrders = function () {
                                 });
                             } else {
                                 getOrdersReview();
+                                hideModalOverrideTest();
                                 var msg = $("#msg_review_cancel").val();
                                 $.smallBox({
                                     title: msg,

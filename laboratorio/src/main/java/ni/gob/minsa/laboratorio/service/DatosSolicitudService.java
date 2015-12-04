@@ -7,6 +7,7 @@ import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -85,6 +86,20 @@ public class DatosSolicitudService {
             logger.error("Error al actualizar o agregar DatoSolicitudDetalle",ex);
             throw ex;
         }
+    }
+
+    public Integer deleteDetallesDatosRecepcionByTomaMx(String idTomaMx) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+
+        String hqlDelete = "delete DatoSolicitudDetalle dato where dato.solicitudDx.idTomaMx.idTomaMx = :idTomaMx";
+        int deletedEntities = s.createQuery( hqlDelete )
+                .setString("idTomaMx", idTomaMx)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return deletedEntities;
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdDx(Integer idDx) throws Exception {

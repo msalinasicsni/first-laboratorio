@@ -597,7 +597,7 @@ public class AprobacionResultadoController {
                     //se agrega nueva orden de examen
                     OrdenExamen nuevaOrdenExamen = new OrdenExamen();
                     nuevaOrdenExamen.setSolicitudEstudio(ordenExamen.getSolicitudEstudio());
-                    nuevaOrdenExamen.setUsarioRegistro(usuario);
+                    nuevaOrdenExamen.setUsuarioRegistro(usuario);
                     nuevaOrdenExamen.setCodExamen(ordenExamen.getCodExamen());
                     nuevaOrdenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
                     nuevaOrdenExamen.setSolicitudDx(ordenExamen.getSolicitudDx());

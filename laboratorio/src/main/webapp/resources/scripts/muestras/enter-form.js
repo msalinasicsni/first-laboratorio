@@ -103,6 +103,9 @@ var EnterFormTomaMx = function () {
             function save() {
                 var objetoTomaMx = {};
                 objetoTomaMx['idNotificacion'] = $("#idNotificacion").val();
+                objetoTomaMx['codSilais'] = $('#codSilaisAtencion').find('option:selected').val();
+                objetoTomaMx['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
+                objetoTomaMx['codTipoNoti'] = $('#codTipoNoti').find('option:selected').val();
                 objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();
                 objetoTomaMx['canTubos'] = $("#canTubos").val();
                 objetoTomaMx['volumen'] = $("#volumen").val();
@@ -463,7 +466,7 @@ var EnterFormTomaMx = function () {
                             $.smallBox({
                                 title: $("#msg_no_results_found").val(),
                                 content: $("#disappear").val(),
-                                color: "#C46A69",
+                                color: "#C79121",
                                 iconSmall: "fa fa-warning",
                                 timeout: 4000
                             });

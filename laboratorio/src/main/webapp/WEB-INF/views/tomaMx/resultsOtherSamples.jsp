@@ -2,6 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <!-- BEGIN HEAD -->
 <head>
@@ -76,29 +77,39 @@
 									<table id="fichas_result" class="table table-striped table-bordered table-hover" width="100%">
 										<thead>			                
 											<tr>
-												<th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.register.date"/></th>
+                                                <th data-class="expand"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.register.date"/></th>
+                                                <th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.override.date"/></th>
 												<th data-hide="phone"><i class="fa fa-fw fa-user txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.applicant.name"/></th>
 												<th data-hide="phone"><i class="fa fa-fw fa-user txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.telephone"/></th>
 												<th data-hide="phone,tablet"><i class="fa fa-fw fa-user txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.contact.name"/></th>
-												<th></th>
-												<th></th>
+                                                <th><spring:message code="lbl.take.sample" /></th>
+                                                <th><spring:message code="act.override"/> </th>
 											</tr>
 										</thead>
 										<tbody>
 										<c:forEach items="${notificaciones}" var="noti">
 											<tr>
-												<td><c:out value="${noti.fechaRegistro}" /></td>
+                                                <td><fmt:formatDate value="${noti.fechaRegistro}" pattern="dd/MM/yyyy" /></td>
+                                                <td><fmt:formatDate value="${noti.fechaAnulacion}" pattern="dd/MM/yyyy" /></td>
 												<td><c:out value="${noti.solicitante.nombre}" /></td>
 												<td><c:out value="${noti.solicitante.telefono}" /></td>
 												<td><c:out value="${noti.solicitante.nombreContacto}" /></td>
                                                         <spring:url value="/tomaMx/createOMx/{idNotificacion}" var="editUrl">
                                                             <spring:param name="idNotificacion" value="${noti.idNotificacion}" />
                                                         </spring:url>
-												<spring:url value="/febriles/delete/{idNotificacion}" var="deleteUrl">
+                                                <spring:url value="/tomaMx/override/{idNotificacion}" var="deleteUrl">
 													<spring:param name="idNotificacion" value="${noti.idNotificacion}" />
 												</spring:url>
-												<td><c:if test="${noti.pasivo==false}"><a href="${fn:escapeXml(editUrl)}" class="btn btn-default btn-xs"><i class="fa fa-edit"></i></a></c:if></td>
-                                                <td><c:if test="${noti.pasivo==false}"><a href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a></c:if></td>
+												<td><c:if test="${noti.pasivo==false}"><a href="${fn:escapeXml(editUrl)}" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a></c:if>
+                                                    <c:if test="${noti.pasivo==true}">
+                                                        <button type="button" disabled class="btn btn-xs btn-primary"> <i class="fa fa-edit"></i></button>
+                                                    </c:if>
+                                                </td>
+                                                <td><c:if test="${noti.pasivo==false}"><a href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a></c:if>
+                                                    <c:if test="${noti.pasivo==true}">
+                                                        <button type="button" disabled class="btn btn-danger btn-xs"> <i class="fa fa-times"></i></button>
+                                                    </c:if>
+                                                </td>
 											</tr>
 										</c:forEach>
 										</tbody>

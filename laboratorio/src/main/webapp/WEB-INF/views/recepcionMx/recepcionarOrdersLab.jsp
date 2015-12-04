@@ -477,16 +477,6 @@
                                                 <div class="col col-sm-12 col-md-6 col-lg-6" id="dvCausa">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.cause.rejection" /> </label>
-                                                    <!--<div class="">
-                                                        <label class="textarea">
-                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
-                                                            <textarea class="form-control" rows="3" name="causaRechazo" id="causaRechazo"
-                                                                      placeholder="<spring:message code="lbl.cause.rejection" />"></textarea>
-                                                            <b class="tooltip tooltip-bottom-right"> <i
-                                                                    class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.cause.rejection"/>
-                                                            </b>
-                                                        </label>
-                                                    </div>-->
                                                     <div class="input-group">
                                                         <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
                                                         <select id="causaRechazo" name="causaRechazo"
@@ -537,12 +527,14 @@
             <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
-                <!--<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    &times;
-                    </button>-->
-                <h4 class="modal-title">
-                    <spring:message code="lbl.receipt.widgettitle.modal.test" />
-                </h4>
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">
+                        <spring:message code="lbl.receipt.widgettitle.modal.test" />
+                    </h4>
+                </div>
             </div>
             <div class="modal-body"> <!--  no-padding -->
             <form id="AgregarExamen-form" class="smart-form" novalidate="novalidate">
@@ -612,6 +604,55 @@
             </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
 
+            <!-- Modal -->
+            <div class="modal fade" id="modalOverride" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-times"></i>
+                                    <spring:message code="lbl.override" /> <spring:message code="lbl.test2" />
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="modal-body"> <!--  no-padding -->
+                            <form id="override-ex-form" class="smart-form" novalidate="novalidate">
+                                <input id="idOrdenExamen" type="hidden" value=""/>
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.annulment.cause" /> </label>
+                                            <div class="">
+                                                <label class="textarea">
+                                                    <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                    <textarea class="form-control" rows="3" name="causaAnulacionEx" id="causaAnulacionEx"
+                                                              placeholder="<spring:message code="lbl.annulment.cause" />"></textarea>
+                                                    <b class="tooltip tooltip-bottom-right"> <i
+                                                            class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.annulment.cause"/>
+                                                    </b>
+                                                </label>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-save"></i> <spring:message code="act.ok" />
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.cancel" />
+                                    </button>
+                                </footer>
+                            </form>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
         </div>
 		<!-- END MAIN CONTENT -->
 	</div>

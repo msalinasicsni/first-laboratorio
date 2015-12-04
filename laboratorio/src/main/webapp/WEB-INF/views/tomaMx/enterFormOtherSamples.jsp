@@ -224,6 +224,7 @@
                                     <input type="hidden" id="disappear"  value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input type="hidden" id="msjErrorSaving"  value="<spring:message code="msg.error.saving"/>"/>
                                     <input type="hidden" id="msjSuccessful"  value="<spring:message code="msg.successful.saved"/>"/>
+                                    <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.dx.not.data.found"/>"/>
                                     <input type="hidden" id="dxAgregados"  value=""/>
 								</div>
 								<!-- end widget content -->
