@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
+import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.BaseTable;
@@ -73,6 +74,10 @@ public class WorkSheetController {
     private HojaTrabajoService hojaTrabajoService;
 
     @Autowired
+    @Qualifier(value = "trasladosService")
+    private TrasladosService trasladosService;
+
+    @Autowired
     MessageSource messageSource;
 
     @RequestMapping(value = "init", method = RequestMethod.GET)
@@ -128,13 +133,15 @@ public class WorkSheetController {
 
             drawInfoLab(stream,page, labProcesa);
 
+            float xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 12, messageSource.getMessage("lbl.work.sheet", null, null));
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.work.sheet", null, null), 630, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
 
             //draw worksheet info
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", 610, 30, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), 610, 120, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", 590, 30, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), 590, 120, stream, 12, PDType1Font.HELVETICA);
 
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", 610, 310, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), 610, 410, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", 590, 310, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), 590, 410, stream, 12, PDType1Font.HELVETICA);
 
 
             for (DaTomaMx tomaMx_hoja : tomasHoja) {
@@ -147,8 +154,15 @@ public class WorkSheetController {
                 //int numFila = 0;
                 String[] content = null;
                 String fis = "";
+                String controlCalidad = messageSource.getMessage("lbl.no",null,null);
+                TrasladoMx trasladoMxActivo = trasladosService.getTrasladoCCMx(tomaMx_hoja.getIdTomaMx());
+                if (trasladoMxActivo!=null) {
+                    if (trasladoMxActivo.isControlCalidad()) {
+                        controlCalidad = messageSource.getMessage("lbl.yes",null,null);
+                    }
+                }
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                    content = new String[5];
+                    content = new String[6];
                     y = y - 20;
                     if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
                         fis = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
@@ -158,12 +172,13 @@ public class WorkSheetController {
                     content[2] = solicitudDx.getCodDx().getArea().getNombre();
                     content[3] = DateUtil.DateToString(solicitudDx.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a");
                     content[4] = fis;
+                    content[5] = controlCalidad;
                     filasSolicitudes.add(content);
                     //numFila++;
 
                 }
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
-                    content = new String[5];
+                    content = new String[6];
                     y = y - 20;
                     if (solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
                         fis = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
@@ -173,6 +188,7 @@ public class WorkSheetController {
                     content[2] = solicitudEstudio.getTipoEstudio().getArea().getNombre();
                     content[3] = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a");
                     content[4] = fis;
+                    content[5] = controlCalidad;
                     filasSolicitudes.add(content);
                     //numFila++;
 
@@ -180,36 +196,24 @@ public class WorkSheetController {
                 //Initialize table
                 float margin = 30;
                 float tableWidth = 530;
-                float yStartNewPage = 520;
+                float yStartNewPage = 560;
                 float yStart = yStartNewPage;
                 float bottomMargin = 45;
                 BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
 
-
-                //Create Header row
-                Row headerRow = table.createRow(15f);
-                Cell cell = headerRow.createCell(100, "");
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFillColor(Color.black);
-                cell.setTextColor(Color.WHITE);
-
-                table.setHeader(headerRow);
-
-
-
                 //Create Fact header row
                 Row factHeaderrow = table.createRow(15f);
-                cell = factHeaderrow.createCell(17, messageSource.getMessage("lbl.lab.code.mx", null, null));
+                Cell cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
                 cell.setFillColor(Color.LIGHT_GRAY);
 
-                cell = factHeaderrow.createCell((20), messageSource.getMessage("lbl.request.large", null, null));
+                cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.request.large", null, null));
                 cell.setFillColor(Color.lightGray);
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
 
-                cell = factHeaderrow.createCell((20), messageSource.getMessage("lbl.solic.area.prc", null, null));
+                cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
                 cell.setFillColor(Color.lightGray);
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
@@ -219,7 +223,12 @@ public class WorkSheetController {
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
 
-                cell = factHeaderrow.createCell((20), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+                cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+                cell.setFillColor(Color.lightGray);
+                cell.setFont(PDType1Font.HELVETICA_BOLD);
+                cell.setFontSize(10);
+
+                cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
                 cell.setFillColor(Color.lightGray);
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
@@ -232,11 +241,15 @@ public class WorkSheetController {
                     row = table.createRow(15f);
                     for (int i = 0; i < fact.length; i++) {
                         if (i==0) {
-                            cell = row.createCell(17, fact[i]);
+                            cell = row.createCell(16, fact[i]);
+                        }else if (i==1) {
+                            cell = row.createCell(19, fact[i]);
                         }else if (i==3) {
                             cell = row.createCell(23, fact[i]);
+                        }else if (i==5) {
+                            cell = row.createCell(6, fact[i]);
                         }else {
-                            cell = row.createCell(20, fact[i]);
+                            cell = row.createCell(18, fact[i]);
                         }
                         cell.setFont(PDType1Font.HELVETICA);
                         cell.setFontSize(10);
@@ -246,11 +259,6 @@ public class WorkSheetController {
 
                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
                 GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
-
-
-
-
-
 
             }
             stream.close();

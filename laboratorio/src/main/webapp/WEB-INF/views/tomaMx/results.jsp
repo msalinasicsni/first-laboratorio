@@ -171,7 +171,7 @@
     <script src="${enterFormTomaMx}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="createUrl" value="/tomaMx/create/"/>
+    <c:url var="createUrl" value="/tomaMx/createInicial/"/>
     <c:url var="addNotificationUrl" value="/tomaMx/createnoti"/>
 	<script type="text/javascript">
 		$(document).ready(function() {

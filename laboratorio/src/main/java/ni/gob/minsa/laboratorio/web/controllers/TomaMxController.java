@@ -134,58 +134,11 @@ public class TomaMxController {
     /**
      * Handler for create tomaMx.
      *
-     * @param idPersona the ID of the person to create noti
+     * @param idNotificacion the ID of the person to create noti
      * @return a ModelMap with the model attributes for the respective view
      */
-    @RequestMapping("createnoti/{idPersona}")
-    public ModelAndView createTomaMxNoti(@PathVariable("idPersona") String idPersona) throws Exception {
-        ModelAndView mav = new ModelAndView();
-            //registros anteriores de toma Mx
-        DaTomaMx tomaMx = new DaTomaMx();
-        DaNotificacion noti;
-        noti = new DaNotificacion();
-        noti.setPersona(personaService.getPersona(Long.valueOf(idPersona)));
-        noti.setFechaRegistro(new Timestamp(new Date().getTime()));
-        Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
-        if(pUsuarioRegistro!=null) {
-            long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
-            noti.setUsuarioRegistro(usuarioService.getUsuarioById((int)idUsuario));
-        }
-        //noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|CAESP"));
-        noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
-        daNotificacionService.addNotification(noti);
-
-        //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
-        catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|PCNT");
-
-        List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
-        List<TipoNotificacion> tiposNotificacion = new ArrayList<TipoNotificacion>();
-        TipoNotificacion tipoNotificacionSF = catalogoService.getTipoNotificacion("TPNOTI|SINFEB");
-        TipoNotificacion tipoNotificacionIRA = catalogoService.getTipoNotificacion("TPNOTI|IRAG");
-        tiposNotificacion.add(tipoNotificacionSF);
-        tiposNotificacion.add(tipoNotificacionIRA);
-
-        mav.addObject("noti", noti);
-        mav.addObject("tomaMx", tomaMx);
-        mav.addObject("catTipoMx", catTipoMx);
-        mav.addObject("entidades",entidadesAdtvases);
-        mav.addObject("municipios",null);
-        mav.addObject("unidades",null);
-        mav.addObject("notificaciones",tiposNotificacion);
-        //mav.addAllObjects(mapModel);
-        mav.setViewName("tomaMx/enterForm");
-
-        return mav;
-    }
-
-    /**
-     * Handler for create tomaMx.
-     *
-     * @param idNotificacion the ID of the notification
-     * @return a ModelMap with the model attributes for the respective view
-     */
-    @RequestMapping("create/{idNotificacion}")
-    public ModelAndView createTomaMx(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
+    @RequestMapping("createInicial/{idNotificacion}")
+    public ModelAndView createTomaMxInicial(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
         ModelAndView mav = new ModelAndView();
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
@@ -219,6 +172,57 @@ public class TomaMxController {
             mav.addObject("municipios",municipios);
             mav.addObject("unidades",unidades);
             mav.addObject("notificaciones",tiposNotificacion);
+            mav.addObject("esNuevaNoti",true);
+            //mav.addAllObjects(mapModel);
+            mav.setViewName("tomaMx/enterForm");
+        } else {
+            mav.setViewName("404");
+        }
+
+        return mav;
+    }
+
+    /**
+     * Handler for create tomaMx.
+     *
+     * @param idNotificacion the ID of the notification
+     * @return a ModelMap with the model attributes for the respective view
+     */
+    @RequestMapping("create/{idNotificacion}")
+    public ModelAndView createTomaMx(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
+        ModelAndView mav = new ModelAndView();
+        //registros anteriores de toma Mx
+        DaTomaMx tomaMx = new DaTomaMx();
+        DaNotificacion noti;
+        //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
+        noti = daNotificacionService.getNotifById(idNotificacion);
+        if (noti != null) {
+            catTipoMx = tomaMxService.getTipoMxByTipoNoti(noti.getCodTipoNotificacion().getCodigo());
+            List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+            List<Divisionpolitica> municipios = null;
+            if (noti.getCodSilaisAtencion()!=null){
+                municipios = divisionPoliticaService.getMunicipiosBySilais(noti.getCodSilaisAtencion().getCodigo());
+            }
+            List<Unidades> unidades = null;
+            if (noti.getCodUnidadAtencion()!=null && noti.getCodSilaisAtencion()!=null){
+                unidades = unidadesService.getPrimaryUnitsByMunicipio_Silais(noti.getCodUnidadAtencion().getMunicipio().getCodigoNacional(),
+                        noti.getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimarias.getDiscriminator().split(","));
+            }
+            List<TipoNotificacion> tiposNotificacion = new ArrayList<TipoNotificacion>();
+
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
+
+
+            mav.addObject("noti", noti);
+            mav.addObject("tomaMx", tomaMx);
+            mav.addObject("catTipoMx", catTipoMx);
+            mav.addObject("entidades",entidadesAdtvases);
+            mav.addObject("municipios",municipios);
+            mav.addObject("unidades",unidades);
+            mav.addObject("notificaciones",tiposNotificacion);
+            mav.addObject("esNuevaNoti",false);
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {
@@ -261,17 +265,6 @@ public class TomaMxController {
         logger.info("Obteniendo los diagnósticos segun muestra y tipo de Notificacion en JSON");
         //nombre usuario null, para que no valide autoridad
         return tomaMxService.getDx(codMx, tipoNoti,null);
-    }
-
-
-    @RequestMapping(value = "tomaMxByIdNoti", method = RequestMethod.GET, produces = "application/json")
-    public
-    @ResponseBody
-    List<DaTomaMx> getTestBySample(@RequestParam(value = "idNotificacion", required = true) String idNotificacion) throws Exception {
-        logger.info("Realizando búsqueda de Toma de Mx.");
-
-        return tomaMxService.getTomaMxByIdNoti(idNotificacion);
-
     }
 
     private boolean saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas) throws Exception {
@@ -600,6 +593,25 @@ public class TomaMxController {
         }
     }
 
+    @RequestMapping(value = "tomaMxByIdNoti", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<DaTomaMx> getTestBySample(@RequestParam(value = "idNotificacion", required = true) String idNotificacion) throws Exception {
+        logger.info("Realizando búsqueda de Toma de Mx.");
+
+        return tomaMxService.getTomaMxByIdNoti(idNotificacion);
+
+    }
+
+    @RequestMapping(value = "getTipoMxByTipoNoti", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<TipoMx_TipoNotificacion> getTipoMxByTipoNoti(@RequestParam(value = "codigo", required = true) String codigo) throws Exception {
+        logger.info("Realizando búsqueda de tipos de muestras según el tipo de notificación");
+
+        return tomaMxService.getTipoMxByTipoNoti(codigo);
+
+    }
     /*******************************************************************************/
     /***************************** OTRAS MUESTRAS **********************************/
     /*******************************************************************************/

@@ -324,5 +324,8 @@ public class DatosIngresoSolicitudController {
     public @ResponseBody
     List<Catalogo_Lista> getCatalogoListaConcepto(@RequestParam(value = "idDx", required = true) String idDx) throws Exception {
         logger.info("Obteniendo los valores para los conceptos tipo lista asociados a las respuesta del estudio o dx");
-        return datosSolicitudService.getCatalogoListaConceptoByIdDx(Integer.valueOf(idDx));    }
+        if (!idDx.isEmpty())
+            return datosSolicitudService.getCatalogoListaConceptoByIdDx(Integer.valueOf(idDx));
+        else return null;
+    }
 }
