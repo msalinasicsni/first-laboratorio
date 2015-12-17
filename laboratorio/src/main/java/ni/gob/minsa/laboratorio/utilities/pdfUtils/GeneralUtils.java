@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -28,6 +29,14 @@ import java.io.InputStream;
 public class GeneralUtils {
 
     private static ImagenesService imagenesService;
+
+    @Autowired
+    private ImagenesService tImagenesService;
+
+    @PostConstruct
+    public void init() {
+        GeneralUtils.imagenesService = tImagenesService;
+    }
 
     public static PDPage addNewPage(PDDocument doc) {
         PDPage page = new PDPage();
@@ -57,19 +66,15 @@ public class GeneralUtils {
         }
 
     public static void drawHeaderAndFooter(PDPageContentStream stream, PDDocument doc, float inY, float wHeader, float hHeader, float wFooter, float hFooter) throws IOException {
-        String workingDir = System.getProperty("user.dir");
         Imagen imagen = imagenesService.getImagenByName("HEADER_REPORTES");
         InputStream inputStream = new ByteArrayInputStream(imagen.getBytes());
         //dibujar encabezado
-        //BufferedImage headerImage = ImageIO.read(new File(workingDir + "/encabezadoMinsa.jpg"));
         BufferedImage headerImage = ImageIO.read(inputStream);
         GeneralUtils.drawObject(stream, doc, headerImage, 5, inY,wHeader, hHeader);
-
 
         //dibujar pie de pag
         imagen = imagenesService.getImagenByName("FOOTER_REPORTES");
         inputStream = new ByteArrayInputStream(imagen.getBytes());
-        //BufferedImage footerImage = ImageIO.read(new File(workingDir + "/piePMinsa.jpg"));
         BufferedImage footerImage = ImageIO.read(inputStream);
         GeneralUtils.drawObject(stream, doc, footerImage, 5, 20, wFooter, hFooter);
     }
