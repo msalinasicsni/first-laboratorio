@@ -30,6 +30,10 @@
             text-align: center;
             width: 5%;
         }
+        .well {
+            margin: 10px 5px 5px 5px;
+            padding: 10px 22px;
+        }
     </style>
 </head>
 <!-- END HEAD -->
@@ -437,6 +441,13 @@
                                                     </button>
                                                 </section>
                                             </div>
+                                        <div class="row">
+                                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                                                <div class="well well-lg text-danger text-left" id="divReglas">
+
+                                                </div>
+                                            </div>
+                                        </div>
                                         </fieldset>
                                         <fieldset>
                                             <header>
@@ -695,8 +706,9 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-    <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
+    <c:set var="noRules"><spring:message code="msg.no.rules"/></c:set>
 
+    <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/receiptLaboratory"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/initLab"/>
@@ -707,6 +719,8 @@
     <c:url var="sExamenesURL" value="/api/v1/getExamenes"/>
     <c:url var="sEstudiosURL" value="/api/v1/getEstudios"/>
     <c:url var="sExamenesEstURL" value="/api/v1/getExamenesEstudio"/>
+    <c:url var="sReglasExamenesURL" value="/administracion/examenes/obtenerReglasExamenes"/>
+
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -722,7 +736,9 @@
                 sExamenesURL : "${sExamenesURL}",
                 sAgregarOrdenExamenUrl : "${sAgregarOrdenExamenUrl}",
                 sEstudiosURL : "${sEstudiosURL}",
-                sExamenesEstURL : "${sExamenesEstURL}"
+                sExamenesEstURL : "${sExamenesEstURL}",
+                sReglasExamenesURL : "${sReglasExamenesURL}",
+                noRules : "${noRules}"
             };
 			ReceiptOrders.init(parametros);
 	    	$("li.laboratorio").addClass("open");

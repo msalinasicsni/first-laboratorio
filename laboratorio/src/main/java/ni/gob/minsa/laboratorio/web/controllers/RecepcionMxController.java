@@ -1600,6 +1600,7 @@ public class RecepcionMxController {
                 if (agregarExamenDx) {
                     map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
                     map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                    map.put("idExamen", ordenExamen.getCodExamen().getIdExamen().toString());
                     map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
                     map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
                     map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
@@ -1622,6 +1623,7 @@ public class RecepcionMxController {
             }else{
                 map.put("idTomaMx", ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
                 map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                map.put("idExamen", ordenExamen.getCodExamen().getIdExamen().toString());
                 map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
                 map.put("nombreSolic", ordenExamen.getSolicitudEstudio().getTipoEstudio().getNombre());
                 map.put("nombreAreaPrc", ordenExamen.getSolicitudEstudio().getTipoEstudio().getArea().getNombre());

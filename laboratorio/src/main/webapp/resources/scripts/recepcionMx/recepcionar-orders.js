@@ -345,7 +345,13 @@ var ReceiptOrders = function () {
                     }, function (response) {
                         table2.fnClearTable();
                         var len = Object.keys(response).length;
+                        var idExamenes = "";
                         for (var i = 0; i < len; i++) {
+                            if (i==0) {
+                                idExamenes = response[i].idExamen;
+                            } else {
+                                idExamenes = idExamenes +','+response[i].idExamen;
+                            }
                             table2.fnAddData(
                                 [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud, response[i].cc, response[i].externo,
                                         '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
@@ -365,6 +371,8 @@ var ReceiptOrders = function () {
                                 showModalOverrideTest();
                             });
                         });
+
+                        getRulesTest(idExamenes);
                     }).fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);
                         validateLogin(jqXHR);
@@ -974,6 +982,41 @@ var ReceiptOrders = function () {
                         temp += texto[j];
                 }
                 return temp;
+            }
+
+            /***************REGLAS EXAMENES***********************/
+            function getRulesTest(idExamenes) {
+                $.getJSON(parametros.sReglasExamenesURL, {
+                    idExamenes: idExamenes,
+                    contentType: "charset=ISO-8859-1",
+                    ajax: 'true'
+                }, function (response) {
+                    var len = Object.keys(response).length;
+                    var idExamenActual;
+                    var htmlDivReglas = '';
+                    for (var i = 0; i < len; i++) {
+                        if (idExamenActual==response[i].examen.idExamen) {
+                            htmlDivReglas = htmlDivReglas + '<br/>';
+                            htmlDivReglas = htmlDivReglas + '<i class="fa fa-minus icon-red"></i> ';
+                            htmlDivReglas = htmlDivReglas + response[i].descripcion;
+                        } else {
+                            if (i>0) {
+                                htmlDivReglas = htmlDivReglas + '<br/><br/>';
+                            }
+                            htmlDivReglas = htmlDivReglas + '<h5>'+response[i].examen.nombre+'</h5>';
+                            htmlDivReglas = htmlDivReglas + '<i class="fa fa-minus icon-red"></i> ';
+                            htmlDivReglas = htmlDivReglas + response[i].descripcion;
+                        }
+                        idExamenActual = response[i].examen.idExamen;
+                    }
+                    if (htmlDivReglas=='')
+                        htmlDivReglas = '<h3>'+parametros.noRules+'</h3>';
+
+                    $("#divReglas").html(htmlDivReglas);
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
             }
         }
     };
