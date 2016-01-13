@@ -231,7 +231,7 @@ var Laboratorio = function () {
                             '> <i class="fa fa-times"></i>';
                         var btnEditar = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+' ' +
                             '> <i class="fa fa-edit"></i>';
-                        var btnSILAIS = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+' ' +
+                        var btnSILAIS = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+ "," + data[i].nombre +
                             '> <i class="fa fa-list"></i>';
                         var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
                         if (data[i].pasivo==true){
@@ -350,14 +350,19 @@ var Laboratorio = function () {
             }
 
             function listSILAISHandler(){
-                var codigo = $(this.innerHTML).data('id');
-                if (codigo != null) {
+                var data = $(this.innerHTML).data('id');
+                if (data != null) {
+                    var detalle = data.split(",");
+                    var codigo = detalle[0];
+                    var name = detalle[1];
                     $("#codigoLab").val(codigo);
+                    $('#labName').html($('#labo').val() + " " + name);
                     getSILAISDisponibles();
                     getSILAISAsociados();
                     showModalSILAIS();
                 }else{
                     $("#codigoLab").val('');
+                    $('#labName').html('');
                 }
             }
 

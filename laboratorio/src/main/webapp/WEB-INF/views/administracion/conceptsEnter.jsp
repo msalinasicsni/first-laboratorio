@@ -160,6 +160,7 @@
                             <form id="concepts-form" class="smart-form" autocomplete="off">
                                 <div class="row">
                                     <input id="idConcepto" hidden="hidden" type="text" name="idConcepto"/>
+
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.name"/>
@@ -239,6 +240,12 @@
                                 <div class="row">
                                     <input id="idC" hidden="hidden" type="text" name="idC"/>
                                     <input id="idCatalogoLista" hidden="hidden" type="text" name="idCatalogoLista"/>
+
+                                    <%--<input id="conc" type="hidden" value="<spring:message code="lbl.concept"/>"/>--%>
+                                    <div style="padding-left: 25px; padding-bottom: 5px" class="row">
+                                        <h4 id="concName" ></h4>
+                                    </div>
+
                                     <section class="col col-sm-12 col-md-6 col-lg-6">
                                         <label class="text-left txt-color-blue font-md">
                                             <spring:message code="lbl.value"/>

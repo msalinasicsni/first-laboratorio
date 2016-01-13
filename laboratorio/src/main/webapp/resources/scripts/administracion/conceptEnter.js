@@ -183,12 +183,16 @@ var Concepts  = function () {
             function addListHandler(){
                 var data =  $(this.innerHTML).data('id');
                 if (data != null) {
+                    var detalle = data.split(",");
+                    var codigo = detalle[0];
+                    var name = detalle[1];
                     var disabled = this.innerHTML;
                     var n2 = (disabled.indexOf("disabled") > -1);
                     if (!n2) {
-                        $('#idC').val(data);
+                        $('#concName').html(name);
+                        $('#idC').val(codigo);
                         $('#valor').val('');
-                        getValues(data);
+                        getValues(codigo);
                         showModalValues();
                     }
                 }
@@ -206,7 +210,7 @@ var Concepts  = function () {
                         var btnEditC = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+''+
                             '"> <i class="fa fa-edit"></i>' ;
 
-                        var btnAddList = ' <button type="button" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+'' +
+                        var btnAddList = ' <button type="button" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto + "," + data[i].nombre +
                             '"> <i class="fa fa-list-ol"></i>';
 
 

@@ -279,10 +279,13 @@
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                                 &times;
                             </button>
+
                             <h4 class="modal-title">
                                 <i class="fa-fw fa fa-sitemap"></i>
-                                <spring:message code="lbl.header.modal.SILAIS" />
+                                <spring:message code="lbl.header.modal.SILAIS"/>
+
                             </h4>
+
                         </div>
                     </div>
                     <div class="modal-body"> <!--  no-padding -->
@@ -290,6 +293,11 @@
                             <div class="col col-sm-12 col-md-12 col-lg-12">
                                 <form id="SILAIS-form" class="smart-form" novalidate="novalidate">
                                     <input type="hidden" id="codigoLab" value="">
+                                    <input id="labo" type="hidden" value="<spring:message code="lbl.lab"/>"/>
+                                    <div style="padding-left: 15px; padding-bottom: 5px" class="row">
+                                        <h4 id="labName" ></h4>
+                                    </div>
+
                                     <div class="row">
                                         <section class="col col-sm-12 col-md-9 col-lg-10">
                                             <label class="text-left txt-color-blue font-md">

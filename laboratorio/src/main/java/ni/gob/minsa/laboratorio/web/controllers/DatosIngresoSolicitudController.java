@@ -5,22 +5,19 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
-import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.muestra.DatoSolicitud;
-import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
-import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
-import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
-import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -68,7 +65,7 @@ public class DatosIngresoSolicitudController {
     MessageSource messageSource;
 
 
-    @RequestMapping(value = "init", method = RequestMethod.GET)
+   /* @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initForm(HttpServletRequest request) throws Exception {
         logger.debug("Pantalla de inicio para crear respuestas- búsqueda de dx");
         String urlValidacion;
@@ -91,9 +88,9 @@ public class DatosIngresoSolicitudController {
             mav.setViewName(urlValidacion);
 
         return mav;
-    }
+    }*/
 
-    @RequestMapping(value = "getDx", method = RequestMethod.GET, produces = "application/json")
+  /*  @RequestMapping(value = "getDx", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String getOrdenesExamen(@RequestParam(value = "tipo", required = false) String tipo, @RequestParam(value = "nombre", required = false) String nombre) throws Exception {
         List<Catalogo_Dx> records = null;
@@ -112,9 +109,9 @@ public class DatosIngresoSolicitudController {
 
 
         return DxToJson(records, recordsE);
-    }
+    }*/
 
-    private String DxToJson(List<Catalogo_Dx> objectsDx, List<Catalogo_Estudio> objectsE ){
+   /* private String DxToJson(List<Catalogo_Dx> objectsDx, List<Catalogo_Estudio> objectsE ){
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -169,10 +166,10 @@ public class DatosIngresoSolicitudController {
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
-    }
+    }*/
 
 
-    @RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
+    /*@RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
     public ModelAndView createResponseForm(HttpServletRequest request, @PathVariable("strParametros") String strParametros) throws Exception {
         logger.debug("inicializar pantalla de creación de respuestas para dx o estudio");
         String urlValidacion;
@@ -210,7 +207,7 @@ public class DatosIngresoSolicitudController {
             mav.setViewName(urlValidacion);
 
         return mav;
-    }
+    }*/
 
     @RequestMapping(value = "getDatosIngresoSolicitud", method = RequestMethod.GET, produces = "application/json")
     public
@@ -285,11 +282,7 @@ public class DatosIngresoSolicitudController {
             datoSolicitud.setRequerido(jsonpObject.get("requerido").getAsBoolean());
         if (jsonpObject.get("pasivo")!=null && !jsonpObject.get("pasivo").getAsString().isEmpty())
             datoSolicitud.setPasivo(jsonpObject.get("pasivo").getAsBoolean());
-        /*if (jsonpObject.get("minimo")!=null && !jsonpObject.get("minimo").getAsString().isEmpty())
-            conceptoSolicitud.setMinimo(jsonpObject.get("minimo").getAsInt());
-        if (jsonpObject.get("maximo")!=null && !jsonpObject.get("maximo").getAsString().isEmpty())
-            conceptoSolicitud.setMaximo(jsonpObject.get("maximo").getAsInt());
-            */
+
         if (jsonpObject.get("descripcion")!=null && !jsonpObject.get("descripcion").getAsString().isEmpty())
             datoSolicitud.setDescripcion(jsonpObject.get("descripcion").getAsString());
 

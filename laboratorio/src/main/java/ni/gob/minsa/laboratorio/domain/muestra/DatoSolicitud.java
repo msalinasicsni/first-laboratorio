@@ -55,7 +55,7 @@ public class DatoSolicitud implements Serializable{
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(optional = true)
-    @JoinColumn(name = "DIAGNOSTICO", referencedColumnName = "ID_DIAGNOSTICO", nullable = true)
+    @JoinColumn(name = "DIAGNOSTICO", referencedColumnName = "ID_DIAGNOSTICO", nullable = false)
     @ForeignKey(name = "CONCEPTO_DX_FK")
     public Catalogo_Dx getDiagnostico() { return diagnostico; }
 

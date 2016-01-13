@@ -2,12 +2,12 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
@@ -83,8 +86,14 @@ public class RespuestasSolicitudController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
+            List<Concepto> conceptsList = conceptoService.getConceptsList(true);
+            Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
+
+
             mav.addObject("notificaciones", notificacionList);
             mav.addObject("isAnswer",true);
+            mav.addObject("conceptsList",conceptsList);
+            mav.addObject("codigoDatoNumerico",parametro.getValor());
             mav.setViewName("administracion/searchSolicitud");
         }else
             mav.setViewName(urlValidacion);
@@ -171,7 +180,59 @@ public class RespuestasSolicitudController {
     }
 
 
-    @RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
+
+    @RequestMapping(value = "getRequestData", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    String getRequestData(@RequestParam(value = "strParametros", required = false) String strParametros) throws Exception {
+       Catalogo_Dx dx = null;
+       Catalogo_Estudio estudio = null;
+        String[] arParametros = strParametros.split(",");
+
+        if(arParametros[1] != null){
+            if(arParametros[1].equals("Rutina")){
+                dx = tomaMxService.getDxsById(Integer.valueOf(arParametros[0]));
+            }else{
+                estudio = tomaMxService.getEstudioById(Integer.valueOf(arParametros[0]));
+            }
+        }
+
+        return dataToJson(dx, estudio);
+    }
+
+    private String dataToJson(Catalogo_Dx diagnostico,Catalogo_Estudio estudio ){
+        String jsonResponse="";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+
+        if (diagnostico != null) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", String.valueOf(diagnostico.getIdDiagnostico()));
+            map.put("nombre", diagnostico.getNombre());
+            map.put("area", diagnostico.getArea().getNombre());
+            map.put("tipo", "Rutina");
+            mapResponse.put(0, map);
+        }
+
+        if (estudio != null) {
+
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", String.valueOf(estudio.getIdEstudio()));
+            map.put("nombre", estudio.getNombre());
+            map.put("area", estudio.getArea().getNombre());
+            map.put("tipo", "Estudio");
+            mapResponse.put(0, map);
+
+        }
+
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+
+
+
+   /* @RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
     public ModelAndView createResponseForm(HttpServletRequest request, @PathVariable("strParametros") String strParametros) throws Exception {
         logger.debug("inicializar pantalla de creación de respuestas para dx o estudio");
         String urlValidacion;
@@ -186,7 +247,7 @@ public class RespuestasSolicitudController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-            Catalogo_Dx dx = null;
+         *//*   Catalogo_Dx dx = null;
             Catalogo_Estudio estudio = null;
             String[] arParametros = strParametros.split(",");
 
@@ -196,34 +257,37 @@ public class RespuestasSolicitudController {
                 }else{
                     estudio = tomaMxService.getEstudioById(Integer.valueOf(arParametros[0]));
                 }
-            }
+            }*//*
 
             List<Concepto> conceptsList = conceptoService.getConceptsList(true);
             Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
-            mav.addObject("dx", dx);
-            mav.addObject("estudio", estudio);
+           // mav.addObject("dx", dx);
+          //  mav.addObject("estudio", estudio);
             mav.addObject("conceptsList",conceptsList);
             mav.addObject("codigoDatoNumerico",parametro.getValor());
-            mav.setViewName("administracion/enterAnswersRequest");
+           // mav.setViewName("administracion/enterAnswersRequest");
         }else
             mav.setViewName(urlValidacion);
 
         return mav;
-    }
+    }*/
 
     @RequestMapping(value = "getRespuestasSolicitud", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<RespuestaSolicitud> getRespuestasSolicitud(@RequestParam(value = "idDx", required = false) String idDx, @RequestParam(value = "idEstudio", required = false) String idEstudio ) throws Exception {
+    List<RespuestaSolicitud> getRespuestasSolicitud(@RequestParam(value = "strParametros", required = false) String strParametros) throws Exception {
         logger.info("Obteniendo las respuestas de un diagnostico o estudio en json en JSON");
         List<RespuestaSolicitud> respuestas = null;
+        String[] arParametros = strParametros.split(",");
 
-        if(!idDx.equals("") || !idEstudio.equals(""))
-            if(!idDx.equals("")){
-            respuestas = respuestasSolicitudService.getRespuestasByDx(Integer.valueOf(idDx));
+        if(arParametros[1] != null){
+            if(arParametros[1].equals("Rutina")){
+                respuestas = respuestasSolicitudService.getRespuestasByDx(Integer.valueOf(arParametros[0]));
+
             }else{
-            respuestas = respuestasSolicitudService.getRespuestasByEstudio(Integer.valueOf(idEstudio));
+                respuestas = respuestasSolicitudService.getRespuestasByEstudio(Integer.valueOf(arParametros[0]));
             }
+        }
 
         return respuestas;
     }
@@ -277,13 +341,20 @@ public class RespuestasSolicitudController {
         if (jsonpObject.get("idRespuesta")!=null && !jsonpObject.get("idRespuesta").getAsString().isEmpty()) {
             respuestaDx = respuestasSolicitudService.getRespuestaDxById(jsonpObject.get("idRespuesta").getAsInt());
         }
-        if (jsonpObject.get("idDx")!=null && !jsonpObject.get("idDx").getAsString().isEmpty()) {
-            Catalogo_Dx dx = tomaMxService.getDxsById(jsonpObject.get("idDx").getAsInt());
-            respuestaDx.setDiagnostico(dx);
-        }
-        if (jsonpObject.get("idEstudio")!=null && !jsonpObject.get("idEstudio").getAsString().isEmpty()) {
-            Catalogo_Estudio estudio = tomaMxService.getEstudioById(jsonpObject.get("idEstudio").getAsInt());
-            respuestaDx.setEstudio(estudio);
+
+        if (jsonpObject.get("tipo")!=null && !jsonpObject.get("tipo").getAsString().isEmpty()) {
+
+            if(jsonpObject.get("idRequest")!=null && !jsonpObject.get("idRequest").getAsString().isEmpty()){
+
+                if(jsonpObject.get("tipo").getAsString() == "Rutina"){
+                    Catalogo_Dx dx = tomaMxService.getDxsById(jsonpObject.get("idRequest").getAsInt());
+                    respuestaDx.setDiagnostico(dx);
+                }else{
+                    Catalogo_Estudio estudio = tomaMxService.getEstudioById(jsonpObject.get("idRequest").getAsInt());
+                    respuestaDx.setEstudio(estudio);
+                }
+            }
+
         }
         if (jsonpObject.get("nombre")!=null && !jsonpObject.get("nombre").getAsString().isEmpty())
             respuestaDx.setNombre(jsonpObject.get("nombre").getAsString());
@@ -333,5 +404,6 @@ public class RespuestasSolicitudController {
        return  respuestasActivas;
 
     }
+
 
 }
