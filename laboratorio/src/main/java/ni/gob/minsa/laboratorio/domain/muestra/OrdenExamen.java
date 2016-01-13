@@ -1,8 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
-import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
@@ -22,10 +20,12 @@ public class OrdenExamen {
     private DaSolicitudDx solicitudDx;
     private Timestamp fechaHOrden;
     private CatalogoExamenes codExamen;
-    private User usarioRegistro;
+    private User usuarioRegistro;
     private boolean anulado;
     private DaSolicitudEstudio solicitudEstudio;
     private Laboratorio labProcesa;
+    private User usuarioAnulacion;
+    private String causaAnulacion;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -74,12 +74,12 @@ public class OrdenExamen {
     @ManyToOne(optional = false)
     @JoinColumn(name = "USUARIO", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_FK")
-    public User getUsarioRegistro() {
-        return usarioRegistro;
+    public User getUsuarioRegistro() {
+        return usuarioRegistro;
     }
 
-    public void setUsarioRegistro(User usarioRegistro) {
-        this.usarioRegistro = usarioRegistro;
+    public void setUsuarioRegistro(User usarioRegistro) {
+        this.usuarioRegistro = usarioRegistro;
     }
 
     @Basic
@@ -112,5 +112,26 @@ public class OrdenExamen {
 
     public void setLabProcesa(Laboratorio labProcesa) {
         this.labProcesa = labProcesa;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "USUARIO_ANUL", referencedColumnName = "username")
+    @ForeignKey(name = "USUARIO_ANUL_FK")
+    public User getUsuarioAnulacion() {
+        return usuarioAnulacion;
+    }
+
+    public void setUsuarioAnulacion(User usuarioAnulacion) {
+        this.usuarioAnulacion = usuarioAnulacion;
+    }
+
+    @Basic
+    @Column(name = "CAUSA_ANULACION", nullable = true, insertable = true, updatable = true, length = 255)
+    public String getCausaAnulacion() {
+        return causaAnulacion;
+    }
+
+    public void setCausaAnulacion(String causaAnulacion) {
+        this.causaAnulacion = causaAnulacion;
     }
 }

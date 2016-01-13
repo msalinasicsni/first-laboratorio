@@ -102,6 +102,7 @@
                                         <th><spring:message code="lbl.test.price" /></th>
                                         <th><spring:message code="lbl.enabled" /></th>
                                         <th><spring:message code="lbl.area" /></th>
+                                        <th style="width: 5%" align="center"><spring:message code="lbl.rules" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.edit" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.override" /></th>
                                     </tr>
@@ -205,7 +206,8 @@
                                         <input id="msjSuccessfulOverride" type="hidden" value="<spring:message code="msg.test.disabled"/>"/>
                                         <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                         <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
-
+                                        <input id="msjSuccessfulRule" type="hidden" value="<spring:message code="msg.rule.added"/>"/>
+                                        <input id="msjOverrideRule" type="hidden" value="<spring:message code="msg.rule.disabled"/>"/>
                                         <input id="idExamen" type="hidden" value="" />
 
                                         <button type="submit" class="btn btn-success styleButton">
@@ -222,6 +224,65 @@
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
+
+        <!-- Modal Rules -->
+        <div class="modal fade" id="modalRules" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="alert alert-info">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="headerRules">
+                                <i class="fa-fw fa fa-list"></i>
+                                <spring:message code="lbl.add.edit.rules" />
+                            </h4>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <form id="rules-form" class="smart-form" autocomplete="off">
+                            <div class="row">
+                                <input id="idRegla" hidden="hidden" type="text" name="idRegla"/>
+                                <input id="idExamenAsociado" hidden="hidden" type="text" name="idExamenAsociado"/>
+                                <section class="col col-sm-12 col-md-8 col-lg-8">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.rule"/>
+                                    </label>
+                                    <div class="">
+                                        <label class="textarea">
+                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                            <textarea class="form-control" rows="3" maxlength="250" name="descripcion" id="descripcion"
+                                                      placeholder="<spring:message code="lbl.rule" />"></textarea>
+                                            <b class="tooltip tooltip-bottom-right"> <i
+                                                    class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.rule"/>
+                                            </b>
+                                        </label>
+                                    </div>
+                                </section>
+                                <section style="padding-top: 10px" class="col col-sm-6 col-md-3 col-lg-3">
+                                    <button type="submit" id="btnSave" class="btn btn-success styleButton"><i class="fa fa-save"></i></button>
+                                </section>
+                            </div>
+                        </form>
+                        <div class="widget-body no-padding">
+                            <table id="rules-list" class="table table-striped table-bordered table-hover" width="100%">
+                                <thead>
+                                <tr>
+                                    <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.rule"/></th>
+                                    <th><spring:message code="act.edit"/></th>
+                                    <th><spring:message code="lbl.override"/></th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
     </div>
 </div>
 
@@ -261,6 +322,11 @@
 <c:url var="examenesUrl" value="/administracion/examenes/getTests"/>
 <c:url var="overrideUrl" value="/administracion/examenes/override"/>
 <c:url var="examenUrl" value="/administracion/examenes/getTest"/>
+<c:url var="rulesUrl" value="/administracion/examenes/obtenerReglas"/>
+<c:url var="ruleUrl" value="/administracion/examenes/obtenerRegla"/>
+<c:url var="saveRuleUrl" value="/administracion/examenes/guardarReglaExamen"/>
+<c:url var="overrideRuleUrl" value="/administracion/examenes/deshabilitarRegla"/>
+<c:set var="headerModalRules"><spring:message code="lbl.add.edit.rules" /></c:set>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         pageSetUp();
@@ -269,7 +335,12 @@
             saveUrl : "${saveUrl}",
             examenesUrl : "${examenesUrl}",
             overrideUrl : "${overrideUrl}",
-            examenUrl : "${examenUrl}"
+            examenUrl : "${examenUrl}",
+            rulesUrl : "${rulesUrl}",
+            ruleUrl : "${ruleUrl}",
+            saveRuleUrl : "${saveRuleUrl}",
+            overrideRuleUrl : "${overrideRuleUrl}",
+            headerModalRules : "${headerModalRules}"
         };
         Tests.init(parametros);
         $("li.administracion").addClass("open");

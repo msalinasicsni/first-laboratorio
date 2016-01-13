@@ -37,14 +37,36 @@ var EnterFormTomaMx = function () {
                 pickDate: false
             });
 
-            $('#codTipoMx').change(function () {
-                $.getJSON(parametros.dxUrl, {
-                    codMx: $('#codTipoMx').val(),
-                    tipoNoti: $('#tipoNoti').val(),
+            $('#codTipoNoti').change(function () {
+                var codigo = $(this).val();
+                $.getJSON(parametros.tipoMxUrl, {
+                    codigo: codigo,
                     ajax: 'true'
                 }, function (data) {
                     var len = data.length;
-                    var html = null;
+                    var html = '<option value="">...</option>';
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + data[i].tipoMx.idTipoMx + '">'
+                            + data[i].tipoMx.nombre
+                            + '</option>';
+                    }
+
+                    $('#codTipoMx').html(html);
+                    $('#codTipoMx').val('').change();
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
+            });
+
+            $('#codTipoMx').change(function () {
+                $.getJSON(parametros.dxUrl, {
+                    codMx: $('#codTipoMx').val(),
+                    tipoNoti: $('#codTipoNoti').find('option:selected').val(),
+                    ajax: 'true'
+                }, function (data) {
+                    var len = data.length;
+                    var html = null;// '<option value="">...</option>';
                     for (var i = 0; i < len; i++) {
                         html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
                             + data[i].diagnostico.nombre
@@ -52,6 +74,7 @@ var EnterFormTomaMx = function () {
                     }
 
                     $('#dx').html(html);
+                    $('#dx').val('').change();
                 }).fail(function (jqXHR) {
                     setTimeout($.unblockUI, 10);
                     validateLogin(jqXHR);
@@ -101,8 +124,16 @@ var EnterFormTomaMx = function () {
             });
 
             function save() {
+
                 var objetoTomaMx = {};
                 objetoTomaMx['idNotificacion'] = $("#idNotificacion").val();
+                objetoTomaMx['codSilais'] = $('#codSilaisAtencion').find('option:selected').val();
+                objetoTomaMx['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
+                if ($('#esNuevaNoti').val()=='true'){
+                    objetoTomaMx['codTipoNoti'] = $('#codTipoNoti').find('option:selected').val();
+                }else{
+                    objetoTomaMx['codTipoNoti'] = '';
+                }
                 objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();
                 objetoTomaMx['canTubos'] = $("#canTubos").val();
                 objetoTomaMx['volumen'] = $("#volumen").val();
@@ -463,7 +494,7 @@ var EnterFormTomaMx = function () {
                             $.smallBox({
                                 title: $("#msg_no_results_found").val(),
                                 content: $("#disappear").val(),
-                                color: "#C46A69",
+                                color: "#C79121",
                                 iconSmall: "fa fa-warning",
                                 timeout: 4000
                             });

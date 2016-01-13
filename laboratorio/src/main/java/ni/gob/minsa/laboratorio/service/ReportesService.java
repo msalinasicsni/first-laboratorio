@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
+import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import org.hibernate.Criteria;
@@ -393,15 +394,26 @@ public class ReportesService {
                         Restrictions.eq("rutina.aprobada", true))
         );
 
+        // se filtra por tipo de muestra
+        if (filtro.getCodTipoMx()!=null){
+            crit.createAlias("toma.codTipoMx", "tipoMx");
+            crit.add( Restrictions.and(
+
+                            Restrictions.eq("tipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
+            );
+        }
         //filtro de resultado final positivo
         /*crit.add(Subqueries.propertyIn("rutina.idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
                 .setProjection(Property.forName("solicitudDx.idSolicitudDx"))));*/
 
         //crit.addOrder(Order.asc("fechaAprobacion"));
 
-        crit.createAlias("rutina.labProcesa","labProcesa");
         if (filtro.getCodLaboratio()!=null){
-            crit.add(Restrictions.eq("labProcesa.codigo",filtro.getCodLaboratio()));
+            crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(TrasladoMx.class)
+                    .createAlias("tomaMx", "tomaMx")
+                    .add(Restrictions.eq("laboratorioOrigen.codigo",filtro.getCodLaboratio()))
+                    .setProjection(Property.forName("tomaMx.idTomaMx"))));
+            //crit.add(Restrictions.eq("labProcesa.codigo",filtro.getCodLaboratio()));
         }
 
         /*crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)

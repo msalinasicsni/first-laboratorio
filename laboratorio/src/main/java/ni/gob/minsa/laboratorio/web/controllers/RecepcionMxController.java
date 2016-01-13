@@ -345,7 +345,7 @@ public class RecepcionMxController {
                                             ordenExamen.setSolicitudDx(solicitudDx);
                                             ordenExamen.setCodExamen(examenTmp.getExamen());
                                             ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                            ordenExamen.setUsarioRegistro(usuario);
+                                            ordenExamen.setUsuarioRegistro(usuario);
                                             ordenExamen.setLabProcesa(labUsuario);
                                             try {
                                                 ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -389,7 +389,7 @@ public class RecepcionMxController {
                                         ordenExamen.setSolicitudEstudio(solicitudEstudio);
                                         ordenExamen.setCodExamen(examen);
                                         ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                        ordenExamen.setUsarioRegistro(usuario);
+                                        ordenExamen.setUsuarioRegistro(usuario);
                                         ordenExamen.setLabProcesa(labUsuario);
                                         try {
                                             ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -830,27 +830,31 @@ public class RecepcionMxController {
         logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion;
         String idOrdenExamen = "";
+        String causaAnulacion = "";
         String json="";
         String resultado = "";
         try {
 
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+            try {
+                urlValidacion = seguridadService.validarLogin(request);
+                //si la url esta vacia significa que la validación del login fue exitosa
+                if (urlValidacion.isEmpty())
+                    urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
+            }catch (Exception e){
+                e.printStackTrace();
+                urlValidacion = "404";
+            }
             if (urlValidacion.isEmpty()) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
                 json = br.readLine();
                 JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
                 idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
+                causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
                 OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
                 if(ordenExamen!=null){
                     ordenExamen.setAnulado(true);
+                    ordenExamen.setUsuarioAnulacion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                    ordenExamen.setCausaAnulacion(causaAnulacion);
                     try{
                         ordenExamenMxService.updateOrdenExamen(ordenExamen);
                     }catch (Exception ex){
@@ -872,6 +876,7 @@ public class RecepcionMxController {
         } finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", idOrdenExamen);
+            map.put("causaAnulacion",causaAnulacion);
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
@@ -1109,7 +1114,7 @@ public class RecepcionMxController {
                                             ordenExamen.setSolicitudDx(solicitudDx);
                                             ordenExamen.setCodExamen(examenTmp.getExamen());
                                             ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                            ordenExamen.setUsarioRegistro(user);
+                                            ordenExamen.setUsuarioRegistro(user);
                                             ordenExamen.setLabProcesa(labUsuario);
                                             try {
                                                 ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -1159,7 +1164,7 @@ public class RecepcionMxController {
                                         ordenExamen.setSolicitudEstudio(solicitudEstudio);
                                         ordenExamen.setCodExamen(examen);
                                         ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                        ordenExamen.setUsarioRegistro(user);
+                                        ordenExamen.setUsuarioRegistro(user);
                                         ordenExamen.setLabProcesa(labUsuario);
                                         try {
                                             ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -1181,7 +1186,7 @@ public class RecepcionMxController {
                                         ordenExamen.setSolicitudEstudio(solicitudEstudio);
                                         ordenExamen.setCodExamen(examen);
                                         ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                        ordenExamen.setUsarioRegistro(user);
+                                        ordenExamen.setUsuarioRegistro(user);
                                         ordenExamen.setLabProcesa(labUsuario);
                                         try {
                                             ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -1261,7 +1266,7 @@ public class RecepcionMxController {
                 ordenExamen.setSolicitudDx(solicitudDx);
                 ordenExamen.setCodExamen(examen);
                 ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                ordenExamen.setUsarioRegistro(usuario);
+                ordenExamen.setUsuarioRegistro(usuario);
                 ordenExamen.setLabProcesa(labUsuario);
                 try {
                     ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -1302,7 +1307,7 @@ public class RecepcionMxController {
                 ordenExamen.setSolicitudEstudio(solicitudEstudio);
                 ordenExamen.setCodExamen(examen);
                 ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                ordenExamen.setUsarioRegistro(usuario);
+                ordenExamen.setUsuarioRegistro(usuario);
                 ordenExamen.setLabProcesa(labUsuario);
                 try {
                     ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -1595,10 +1600,11 @@ public class RecepcionMxController {
                 if (agregarExamenDx) {
                     map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
                     map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                    map.put("idExamen", ordenExamen.getCodExamen().getIdExamen().toString());
                     map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
                     map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
                     map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
-                    map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
                     map.put("tipo", "Rutina");
                     if (ordenExamen.getSolicitudDx().getControlCalidad())
                         map.put("cc", messageSource.getMessage("lbl.yes", null, null));
@@ -1617,10 +1623,11 @@ public class RecepcionMxController {
             }else{
                 map.put("idTomaMx", ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
                 map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                map.put("idExamen", ordenExamen.getCodExamen().getIdExamen().toString());
                 map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
                 map.put("nombreSolic", ordenExamen.getSolicitudEstudio().getTipoEstudio().getNombre());
                 map.put("nombreAreaPrc", ordenExamen.getSolicitudEstudio().getTipoEstudio().getArea().getNombre());
-                map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("tipo","Estudio");
                 map.put("cc",messageSource.getMessage("lbl.no",null,null));
                 map.put("externo",messageSource.getMessage("lbl.no",null,null));

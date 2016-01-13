@@ -75,12 +75,56 @@
 								<!-- end widget edit box -->
 								<!-- widget content -->
 								<div class="widget-body no-padding">
-                                <input value="${noti.codTipoNotificacion.codigo}" hidden="hidden" type="text" id="tipoNoti" name="tipoNoti"/>
+                                <input value="${esNuevaNoti}" hidden="hidden" type="text" id="esNuevaNoti" name="esNuevaNoti"/>
+
                                 <form id="noti" class="smart-form"  autocomplete="off">
                                 <fieldset >
                                     <legend class="text-left txt-color-blue font-md"> <spring:message code="lbl.notification.data"/>
                                         ${noti.codTipoNotificacion.valor}
                                    </legend>
+                                    <div class="row">
+                                        <section class="col col-sm-6 col-md-6 col-lg-4">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <spring:message code="lbl.notification.type" /> </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                <c:choose>
+                                                    <c:when test="${esNuevaNoti}">
+                                                        <select id="codTipoNoti" name="codTipoNoti"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${notificaciones}" var="tipoNoti">
+                                                                <c:choose>
+                                                                    <c:when test="${tipoNoti.codigo eq noti.codTipoNotificacion.codigo}">
+                                                                        <option selected value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <select id="codTipoNoti" disabled name="codTipoNoti"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${notificaciones}" var="tipoNoti">
+                                                                <c:choose>
+                                                                    <c:when test="${tipoNoti.codigo eq noti.codTipoNotificacion.codigo}">
+                                                                        <option selected value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </section>
+                                    </div>
                                     <div class="row">
                                         <section class="col col-md-3">
                                             <label class="text-left txt-color-blue font-md">
@@ -165,6 +209,73 @@
                                             </div>
                                         </section>
                                     </div>
+                                    <!-- START ROW -->
+                                    <div class="row">
+                                        <section class="col col-4">
+                                            <label class="text-left txt-color-blue font-md hidden-xs">
+                                                <spring:message code="lbl.silais" />
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                                <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.silais" />" name="codSilaisAtencion" id="codSilaisAtencion" class="select2">
+                                                    <option value=""></option>
+                                                    <c:forEach items="${entidades}" var="entidad">
+                                                        <c:choose>
+                                                            <c:when test="${entidad.codigo eq noti.codSilaisAtencion.codigo}">
+                                                                <option selected value="${entidad.codigo}">${entidad.nombre}</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <option value="${entidad.codigo}">${entidad.nombre}</option>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                        </section>
+                                        <section class="col col-4">
+                                            <label class="text-left txt-color-blue font-md hidden-xs">
+                                                <spring:message code="lbl.muni" />
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                                <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.muni" />" name="codMunicipio" id="codMunicipio" class="select2">
+                                                    <option value=""></option>
+                                                    <c:forEach items="${municipios}" var="muni">
+                                                        <c:choose>
+                                                            <c:when test="${muni.codigoNacional eq noti.codUnidadAtencion.municipio.codigoNacional}">
+                                                                <option selected value="${muni.codigoNacional}">${muni.nombre}</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <option value="${muni.codigoNacional}">${muni.nombre}</option>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                        </section>
+                                        <section class="col col-4">
+                                            <label class="text-left txt-color-blue font-md hidden-xs">
+                                                <spring:message code="lbl.health.unit" />
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                                <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.health.unit" />" name="codUnidadAtencion" id="codUnidadAtencion" class="select2">
+                                                    <option value=""></option>
+                                                    <c:forEach items="${unidades}" var="us">
+                                                        <c:choose>
+                                                            <c:when test="${us.codigo eq noti.codUnidadAtencion.codigo}">
+                                                                <option selected value="${us.codigo}">${us.nombre}</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <option value="${us.codigo}">${us.nombre}</option>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <!-- END ROW -->
                                 </fieldset>
                                 </form>
                                 <form  id="registroMx" class="smart-form">
@@ -324,6 +435,9 @@
 	<script src="${enterFormTomaMx}"></script>
 	<spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 	<script src="${handleDatePickers}"></script>
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    <spring:url value="/resources/scripts/utilidades/seleccionUnidad.js" var="selecUnidad" />
+    <script src="${selecUnidad}"></script>
     <!-- bootstrap datetimepicker -->
     <spring:url value="/resources/js/plugin/bootstrap-datetimepicker/moment.js" var="moment" />
     <script src="${moment}"></script>
@@ -345,25 +459,33 @@
     <spring:url value="/tomaMx/dxByMx" var="dxUrl"/>
     <spring:url value="/tomaMx/saveToma" var="saveTomaUrl"/>
     <spring:url value="/tomaMx/search" var="searchUrl"/>
+    <spring:url var="municipiosUrl" value="/api/v1/municipiosbysilais"/>
+    <spring:url var="unidadesUrl"   value="/api/v1/unidadesPrimHosp"  />
     <c:url var="listasUrl" value="/administracion/datosSolicitud/getCatalogosListaConcepto"/>
     <c:url var="detalleUrl" value="/tomaMx/getDatosSolicitudDetalleBySolicitud"/>
     <c:url var="datosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivosDx"/>
     <c:url var="todoDatosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivos"/>
+    <c:url var="tipoMxUrl" value="/tomaMx/getTipoMxByTipoNoti"/>
     <script type="text/javascript">
         $(document).ready(function() {
             pageSetUp();
-            var parametros = {blockMess: "${blockMess}",
-                             dxUrl: "${dxUrl}",
-                              saveTomaUrl: "${saveTomaUrl}",
-                              searchUrl: "${searchUrl}",
+            var parametros = {
+                blockMess: "${blockMess}",
+                dxUrl: "${dxUrl}",
+                saveTomaUrl: "${saveTomaUrl}",
+                searchUrl: "${searchUrl}",
                 listasUrl:"${listasUrl}",
                 detalleUrl : "${detalleUrl}",
                 datosUrl : "${datosUrl}",
                 todoDatosUrl : "${todoDatosUrl}",
+                municipiosUrl : "${municipiosUrl}",
+                unidadesUrl : "${unidadesUrl}",
+                tipoMxUrl : "${tipoMxUrl}",
                 language : "${pageContext.request.locale.language}"
             };
             EnterFormTomaMx.init(parametros);
             handleInputMasks();
+            SeleccionUnidad.init(parametros);
             $("li.recepcion").addClass("open");
             $("li.patient").addClass("active");
             if("top"!=localStorage.getItem("sm-setmenu")){

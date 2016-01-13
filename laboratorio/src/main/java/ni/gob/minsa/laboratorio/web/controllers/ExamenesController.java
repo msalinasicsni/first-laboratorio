@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.examen.ReglaExamen;
 import ni.gob.minsa.laboratorio.service.AreaService;
 import ni.gob.minsa.laboratorio.service.ExamenesService;
 import ni.gob.minsa.laboratorio.service.SeguridadService;
@@ -172,5 +173,115 @@ public class ExamenesController {
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
+    }
+
+    /**************RULES****************************/
+
+    @RequestMapping(value = "obtenerReglas", method = RequestMethod.GET, produces = "application/json")
+    public   @ResponseBody
+    List<ReglaExamen>  obtenerReglas(@RequestParam(value = "idExamen", required = true) int idExamen) throws Exception {
+        logger.info("Realizando búsqueda de todas las reglas activas de un examen");
+        return examenesService.getReglasByExamen(idExamen);
+    }
+
+    @RequestMapping(value = "obtenerRegla", method = RequestMethod.GET, produces = "application/json")
+    public   @ResponseBody
+    ReglaExamen  obtenerRegla(@RequestParam(value = "idExamen", required = true) String idRegla) throws Exception {
+        logger.info("Realizando búsqueda de regla");
+        return examenesService.getReglaById(idRegla);
+    }
+
+    @RequestMapping(value = "guardarReglaExamen", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void guardarReglaExamen(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String descripcion="";
+        String idRegla = "";
+        Integer idExamen = null;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+
+            if (jsonpObject.get("idRegla")!=null && !jsonpObject.get("idRegla").getAsString().isEmpty())
+                idRegla = jsonpObject.get("idRegla").getAsString();
+
+            descripcion = jsonpObject.get("descripcion").getAsString();
+            idExamen = jsonpObject.get("idExamen").getAsInt();
+
+            ReglaExamen reglaExamen;
+            if (!idRegla.isEmpty()){//edición
+                reglaExamen = examenesService.getReglaById(idRegla);
+            }else{ //nueva
+                reglaExamen = new ReglaExamen();
+                CatalogoExamenes examen = examenesService.getExamenById(idExamen);
+                reglaExamen.setExamen(examen);
+                reglaExamen.setPasivo(false);
+                reglaExamen.setFechaRegistro(new Timestamp(new Date().getTime()));
+                reglaExamen.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+            }
+            reglaExamen.setDescripcion(descripcion);
+            this.examenesService.guardarReglaExamen(reglaExamen);
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.add.rule.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("descripcion", descripcion);
+            map.put("idExamen",String.valueOf(idExamen));
+            map.put("idRegla",idRegla);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "deshabilitarRegla", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void deshabilitarRegla(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String idRegla = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            if (jsonpObject.get("idRegla")!=null && !jsonpObject.get("idRegla").getAsString().isEmpty())
+                idRegla = jsonpObject.get("idRegla").getAsString();
+            ReglaExamen reglaExamen = examenesService.getReglaById(idRegla);
+            if (reglaExamen!=null){
+                reglaExamen.setPasivo(true);
+                this.examenesService.guardarReglaExamen(reglaExamen);
+            }else {
+                throw new Exception(messageSource.getMessage("msg.rule.not.found",null,null));
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.disable.rule.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("mensaje",resultado);
+            map.put("idRegla",idRegla);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "obtenerReglasExamenes", method = RequestMethod.GET, produces = "application/json")
+    public   @ResponseBody
+    List<ReglaExamen>  obtenerReglasExamenes(@RequestParam(value = "idExamenes", required = true) String idExamenes) throws Exception {
+        logger.info("Realizando búsqueda de todas las reglas activas de un examen");
+        if (idExamenes.isEmpty())
+            return null;
+        else
+            return examenesService.getReglasByExamenes(idExamenes);
     }
 }

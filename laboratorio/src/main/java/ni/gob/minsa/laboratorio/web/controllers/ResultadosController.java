@@ -715,7 +715,7 @@ public class ResultadosController {
                                                 CatalogoExamenes examen = examenesService.getExamenById(239);
                                                 ordenExamen.setCodExamen(examen);
                                                 ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                                ordenExamen.setUsarioRegistro(usuario);
+                                                ordenExamen.setUsuarioRegistro(usuario);
                                                 ordenExamen.setLabProcesa(labUsuario);
                                                 try {
                                                     ordenExamenMxService.addOrdenExamen(ordenExamen);
@@ -739,7 +739,7 @@ public class ResultadosController {
                                                 CatalogoExamenes examen = examenesService.getExamenById(239);
                                                 ordenExamen.setCodExamen(examen);
                                                 ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                                ordenExamen.setUsarioRegistro(usuario);
+                                                ordenExamen.setUsuarioRegistro(usuario);
                                                 ordenExamen.setLabProcesa(labUsuario);
                                                 try {
                                                     ordenExamenMxService.addOrdenExamen(ordenExamen);

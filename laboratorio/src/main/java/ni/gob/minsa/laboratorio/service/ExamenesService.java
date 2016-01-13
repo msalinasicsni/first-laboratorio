@@ -2,11 +2,10 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
-import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.domain.examen.ReglaExamen;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,6 +150,34 @@ public class ExamenesService {
     public List<CatalogoExamenes> getExamenes(){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select ex from CatalogoExamenes ex");
+        return q.list();
+    }
+
+    /***REGLAS DE EXAMEN****/
+
+    public void guardarReglaExamen(ReglaExamen regla) {
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(regla);
+    }
+
+    public ReglaExamen getReglaById(String idRegla){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("from ReglaExamen where idRegla = :idRegla");
+        q.setParameter("idRegla",idRegla);
+        return (ReglaExamen)q.uniqueResult();
+    }
+
+    public List<ReglaExamen> getReglasByExamen(Integer idExamen){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select regla from ReglaExamen regla  where regla.examen.idExamen = :idExamen and regla.pasivo = false ");
+        q.setParameter("idExamen",idExamen);
+        return q.list();
+    }
+
+    public List<ReglaExamen> getReglasByExamenes(String idExamenes){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select regla from ReglaExamen regla  where regla.examen.idExamen in ("+idExamenes+") and regla.pasivo = false" +
+                " order by regla.examen.nombre");
         return q.list();
     }
 }

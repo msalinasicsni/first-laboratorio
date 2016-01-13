@@ -80,7 +80,7 @@ public class DaVacunasIrag implements Serializable {
     }
 
     @Basic
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Temporal(TemporalType.DATE)
     @Column(name = "FECHA_ULTIMA_DOSIS", nullable = true, insertable = true, updatable = true)
     public Date getFechaUltimaDosis() {
         return fechaUltimaDosis;

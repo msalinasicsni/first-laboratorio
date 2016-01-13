@@ -250,7 +250,7 @@ var SearchWorkSheet = function () {
                                 unBlockUI();
                             },
                             error: function (jqXHR) {
-                                desbloquearUI();
+                                unBlockUI();
                                 validateLogin(jqXHR);
                             }
                         });

@@ -8,15 +8,13 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.apache.commons.codec.language.Soundex;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -50,6 +48,30 @@ public class TomaMxService {
     public void addTomaMx(DaTomaMx toma) {
         Session session = sessionFactory.getCurrentSession();
         session.save(toma);
+    }
+
+    /**
+     * Eliminar tomaMx
+     * @param toma
+     */
+    public void deleteTomaMx(DaTomaMx toma) {
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(toma);
+    }
+
+    public Integer anularTomasMxByIdNotificacion(String idNotificacion, Timestamp fechaAnulacion) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+
+        String hqlUpdate = "update DaTomaMx mx set mx.anulada = true, mx.fechaAnulacion = :fechaAnulacion where mx.idNotificacion.idNotificacion = :idNotificacion";
+        int updatedEntities = s.createQuery( hqlUpdate )
+                .setParameter("fechaAnulacion",fechaAnulacion)
+                .setString("idNotificacion", idNotificacion)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return updatedEntities;
     }
 
     /**
@@ -138,7 +160,7 @@ public class TomaMxService {
         //Se filtra por rango de fecha de toma de muestra
         if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
             crit.add( Restrictions.and(
-                            Restrictions.between("tomaMx.fechaRegistro", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+                            Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
         // se filtra por tipo de muestra
@@ -592,11 +614,39 @@ public class TomaMxService {
         session.save(orden);
     }
 
+    public Integer deleteSolicitudesDxByTomaMx(String idTomaMx) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+
+        String hqlDelete = "delete DaSolicitudDx dx where dx.idTomaMx.idTomaMx = :idTomaMx";
+        int deletedEntities = s.createQuery( hqlDelete )
+                .setString("idTomaMx", idTomaMx)
+                .executeUpdate();
+        tx.commit();
+        s.close();
+        return deletedEntities;
+    }
+
     public void addEnvioOrden(DaEnvioMx dto) throws Exception {
         try {
             if (dto != null) {
                 Session session = sessionFactory.getCurrentSession();
                 session.save(dto);
+            }
+            else
+                throw new Exception("Objeto Envio Orden es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
+
+    public void deleteEnvioOrden(DaEnvioMx dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
             }
             else
                 throw new Exception("Objeto Envio Orden es NULL");

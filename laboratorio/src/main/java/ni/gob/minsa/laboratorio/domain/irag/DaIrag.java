@@ -60,7 +60,6 @@ public class DaIrag implements Serializable {
     private String serotipificacion;
     private String agenteViral;
     private String agenteEtiologico;
-    private boolean fichaCompleta;
     private String manifestaciones;
     private String otraManifestacion;
     private String condiciones;
@@ -180,6 +179,7 @@ public class DaIrag implements Serializable {
     public void setTarjetaVacuna(Integer tarjetaVacuna) {
         this.tarjetaVacuna = tarjetaVacuna;
     }
+
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Catalogo.class, optional = true)
     @JoinColumn(name = "COD_ANTB_ULSEM", referencedColumnName = "CODIGO", nullable = true)
@@ -481,16 +481,6 @@ public class DaIrag implements Serializable {
 
     public void setAgenteEtiologico(String agenteEtiologico) {
         this.agenteEtiologico = agenteEtiologico;
-    }
-
-    @Basic
-    @Column(name = "FICHA_COMPLETA", nullable = true, insertable = true, updatable = true)
-    public boolean isFichaCompleta() {
-        return fichaCompleta;
-    }
-
-    public void setFichaCompleta(boolean fichaCompleta) {
-        this.fichaCompleta = fichaCompleta;
     }
 
     @Basic
