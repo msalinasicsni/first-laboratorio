@@ -5,9 +5,9 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -174,8 +174,7 @@ public class RespuestasExamenController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             strRespuesta = jsonpObject.get("respuesta").toString();
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int)idUsuario);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             RespuestaExamen respuesta = jsonToRespuesta(strRespuesta);
             respuesta.setUsuarioRegistro(usuario);
             //si tiene id de concepto entonces se debe actualizar, sino se agrega

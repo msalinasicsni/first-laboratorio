@@ -105,7 +105,7 @@ public class DatoSolicitud implements Serializable{
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "username")
-    @ForeignKey(name = "USUARIO_REG_FK")
+    @ForeignKey(name = "DS_USUARIO_REG_FK")
     public User getUsuarioRegistro() {
         return usuarioRegistro;
     }

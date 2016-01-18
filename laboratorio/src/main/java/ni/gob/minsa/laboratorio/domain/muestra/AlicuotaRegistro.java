@@ -1,8 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
-import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
-import org.codehaus.jackson.annotate.JsonIgnore;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -24,7 +22,7 @@ public class AlicuotaRegistro implements Serializable {
     Timestamp fechaHoraRegistro;
     DaSolicitudEstudio solicitudEstudio;
     DaSolicitudDx solicitudDx;
-    Usuarios usuarioRegistro;
+    User usuarioRegistro;
     boolean pasivo;
 
     @Id
@@ -101,13 +99,13 @@ public class AlicuotaRegistro implements Serializable {
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "USUARIO_ID")
-    @ForeignKey(name = "USUARIO_REG_FK")
-    public Usuarios getUsuarioRegistro() {
+    @JoinColumn(name = "USUARIO_REGISTRO", referencedColumnName = "username")
+    @ForeignKey(name = "AR_USUARIO_REG_FK")
+    public User getUsuarioRegistro() {
         return usuarioRegistro;
     }
 
-    public void setUsuarioRegistro(Usuarios usuarioRegistro) {
+    public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
     }
 

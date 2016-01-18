@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -428,8 +428,7 @@ public class SeparacionMxController {
             idSoliE = jsonpObject.get("idSoliE").getAsString();
 
 
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             boolean consecutivo = true;
 
 
@@ -592,8 +591,7 @@ public class SeparacionMxController {
 
     private void addAliq(HttpServletRequest request, Integer quantity, Alicuota alicuotaCat, String codigoUnico, DaSolicitudEstudio estudio, DaSolicitudDx dx ) throws Exception {
         AlicuotaRegistro alicuotaReg = new AlicuotaRegistro();
-        long idUsuario = seguridadService.obtenerIdUsuario(request);
-        Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
+        User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         boolean consecutivo = true;
 
         for(int i = 0; i < quantity; i++ ){
