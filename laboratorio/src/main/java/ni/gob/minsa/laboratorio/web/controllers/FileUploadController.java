@@ -1,10 +1,7 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
-import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
-import ni.gob.minsa.laboratorio.domain.muestra.TipoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Imagen;
 import ni.gob.minsa.laboratorio.service.ImagenesService;
-import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.FileMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,7 +28,7 @@ import java.util.List;
  * V1.0
  */
 @Controller
-@RequestMapping("/file")
+@RequestMapping("administracion/file")
 public class FileUploadController {
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
@@ -51,7 +47,7 @@ public class FileUploadController {
         return mav;
     }
     /***************************************************
-     * URL: /rest/controller/upload
+     * URL: /administracion/file/uploadheader
      * upload(): receives files
      * @param request : MultipartHttpServletRequest auto passed
      * @param response : HttpServletResponse auto passed
@@ -91,7 +87,6 @@ public class FileUploadController {
                 imagenesService.saveOrUpdateImagen(imagen);
 
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             //2.4 add to files
@@ -103,7 +98,7 @@ public class FileUploadController {
     }
 
     /***************************************************
-     * URL: /rest/controller/upload
+     * URL: /administracion/file/uploadfooter
      * upload(): receives files
      * @param request : MultipartHttpServletRequest auto passed
      * @param response : HttpServletResponse auto passed
@@ -143,7 +138,6 @@ public class FileUploadController {
                 imagenesService.saveOrUpdateImagen(imagen);
 
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             //2.4 add to files
@@ -155,26 +149,13 @@ public class FileUploadController {
     }
 
     /***************************************************
-     * URL: /rest/controller/get/{value}
+     * URL: /administracion/file/get/{value}
      * get(): get file as an attachment
      * @param response : passed by the server
-     * @param value : value from the URL
+     * @param nombre : Nombre de la imagen
      * @return void
      ****************************************************/
-    @RequestMapping(value = "/get/{value}", method = RequestMethod.GET)
-    public void get(HttpServletResponse response,@PathVariable String value){
-        FileMeta getFile = files.get(Integer.parseInt(value));
-        try {
-            response.setContentType(getFile.getFileType());
-            response.setHeader("Content-disposition", "attachment; filename=\""+getFile.getFileName()+"\"");
-            FileCopyUtils.copy(getFile.getBytes(), response.getOutputStream());
-        }catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    @RequestMapping(value = "/get2/{nombre}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/{nombre}", method = RequestMethod.GET)
     public void get2(HttpServletResponse response,@PathVariable String nombre){
         Imagen imagen = imagenesService.getImagenByName(nombre);
         try {
@@ -182,11 +163,15 @@ public class FileUploadController {
             response.setHeader("Content-disposition", "attachment; filename=\""+imagen.getNombreArchivo()+"\"");
             FileCopyUtils.copy(imagen.getBytes(), response.getOutputStream());
         }catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
+    /***************************************************
+     * URL: /administracion/file/get/{value}
+     * get(): get file as an attachment
+     * @return List<Imagen>
+     ****************************************************/
     @RequestMapping(value = "/getAll", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody List<Imagen> getAll()throws Exception {

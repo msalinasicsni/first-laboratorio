@@ -58,7 +58,7 @@
         <intercept-url pattern="/viewNoti/*" access="ROLE_ADMIN,ROLE_ANALISTA" />
         <intercept-url pattern="/reports/general/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/qualityControl/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
-        <intercept-url pattern="/file/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/administracion/file/**" access="ROLE_ADMIN" />
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->

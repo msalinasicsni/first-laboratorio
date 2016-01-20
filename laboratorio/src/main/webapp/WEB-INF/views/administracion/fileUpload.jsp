@@ -53,7 +53,7 @@
 			</span>
     <!-- breadcrumb -->
     <ol class="breadcrumb">
-        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/file/init" htmlEscape="true "/>"><spring:message code="menu.admin.images" /></a></li>
+        <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/file/init" htmlEscape="true "/>"><spring:message code="menu.admin.images" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -124,7 +124,7 @@
                                 <section class="col col-sm-12 col-md-4 col-lg-3" id="headerFU">
                                                 <span class="btn btn-success fileinput-button styleButton">
                                                     <i class="fa fa-plus"></i>
-                                                    <span>Seleccione imagen...</span>
+                                                    <span><spring:message code="lbl.select.image"/></span>
                                                         <input id="fileupload" type="file" name="files[]"
                                                                data-url="uploadheader">
                                                  </span>
@@ -137,7 +137,7 @@
                                 <section class="col col-sm-12 col-md-2 col-lg-3" id="footerFU" hidden="hidden">
                                                 <span class="btn btn-success fileinput-button styleButton">
                                                     <i class="fa fa-plus"></i>
-                                                    <span>Seleccione imagen...</span>
+                                                    <span><spring:message code="lbl.select.image"/></span>
                                                         <input id="fileupload2" type="file" name="files[]"
                                                                data-url="uploadfooter">
                                                  </span>
@@ -181,9 +181,9 @@
                      <table id="uploaded-files" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th align="center">Download</th>
+                            <th><spring:message code="lbl.name"/></th>
+                            <th><spring:message code="lbl.description"/></th>
+                            <th align="center"><spring:message code="act.download"/></th>
                         </tr>
                         </thead>
                     </table>
@@ -243,8 +243,8 @@
 <spring:url value="/resources/scripts/administracion/fileUpload.js" var="fileUpload" />
 <script src="${fileUpload}"></script>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="filesUrl" value="/file/getAll"/>
-<c:url var="getFileUrl" value="/file/get2/"/>
+<c:url var="filesUrl" value="/administracion/file/getAll"/>
+<c:url var="getFileUrl" value="/administracion/file/get/"/>
 
 <!-- END PAGE LEVEL SCRIPTS -->
 <script type="text/javascript">
