@@ -131,10 +131,10 @@
                                 </section>
                                 <section class="col col-sm-12 col-md-6 col-lg-7" id="headerFUP">
                                     <div id="progress" class="progress">
-                                        <div class="bar" style="width: 0%;"></div>
+                                        <div class="bar" style="width: 0;"></div>
                                     </div>
                                 </section>
-                                <section class="col col-sm-12 col-md-2 col-lg-2" id="footerFU" hidden="hidden">
+                                <section class="col col-sm-12 col-md-2 col-lg-3" id="footerFU" hidden="hidden">
                                                 <span class="btn btn-success fileinput-button styleButton">
                                                     <i class="fa fa-plus"></i>
                                                     <span>Seleccione imagen...</span>
@@ -142,9 +142,9 @@
                                                                data-url="uploadfooter">
                                                  </span>
                                 </section>
-                                <section class="col col-sm-12 col-md-6 col-lg-6" id="footerFUP" hidden="hidden">
+                                <section class="col col-sm-12 col-md-6 col-lg-7" id="footerFUP" hidden="hidden">
                                     <div id="progress2" class="progress">
-                                        <div class="bar" style="width: 0%;"></div>
+                                        <div class="bar" style="width: 0;"></div>
                                     </div>
                                 </section>
                             </div>
