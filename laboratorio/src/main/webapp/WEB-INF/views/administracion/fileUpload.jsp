@@ -111,6 +111,7 @@
                                     <label class="text-left txt-color-blue font-md">
                                         <spring:message code="lbl.imagen.type"/>
                                     </label>
+
                                     <div class="inline-group">
                                         <label class="radio">
                                             <input type="radio" name="rdTipoImagen" value="header" checked>
@@ -120,14 +121,15 @@
                                             <i></i><spring:message code="lbl.footer"/></label>
                                     </div>
                                 </section>
-                                <section class="col col-sm-12 col-md-2 col-lg-2" id="headerFU">
+                                <section class="col col-sm-12 col-md-4 col-lg-3" id="headerFU">
                                                 <span class="btn btn-success fileinput-button styleButton">
                                                     <i class="fa fa-plus"></i>
                                                     <span>Seleccione imagen...</span>
-                                                        <input id="fileupload" type="file" name="files[]" data-url="uploadheader">
+                                                        <input id="fileupload" type="file" name="files[]"
+                                                               data-url="uploadheader">
                                                  </span>
                                 </section>
-                                <section class="col col-sm-12 col-md-6 col-lg-6" id="headerFUP">
+                                <section class="col col-sm-12 col-md-6 col-lg-7" id="headerFUP">
                                     <div id="progress" class="progress">
                                         <div class="bar" style="width: 0%;"></div>
                                     </div>
@@ -136,7 +138,8 @@
                                                 <span class="btn btn-success fileinput-button styleButton">
                                                     <i class="fa fa-plus"></i>
                                                     <span>Seleccione imagen...</span>
-                                                        <input id="fileupload2" type="file" name="files[]" data-url="uploadfooter">
+                                                        <input id="fileupload2" type="file" name="files[]"
+                                                               data-url="uploadfooter">
                                                  </span>
                                 </section>
                                 <section class="col col-sm-12 col-md-6 col-lg-6" id="footerFUP" hidden="hidden">
