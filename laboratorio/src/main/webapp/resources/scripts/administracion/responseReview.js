@@ -33,6 +33,15 @@ var Responses = function () {
                     "t"+
 					"<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
 				"autoWidth" : true,
+
+                "columns": [
+                    null, null,
+                    {
+                        "className":      'addC',
+                        "orderable":      false
+                    }
+
+                ],
                 "preDrawCallback" : function() {
 					// Initialize the responsive datatables helper once.
 					if (!responsiveHelper_dt_basic) {
@@ -44,8 +53,37 @@ var Responses = function () {
 				},
 				"drawCallback" : function(oSettings) {
 					responsiveHelper_dt_basic.respond();
-				}
+				},
+
+                fnDrawCallback : function() {
+                    $('.addC')
+                        .off("click", addCHandler)
+                        .on("click", addCHandler);
+
+                }
 			});
+
+            function addCHandler() {
+                var data = $(this.innerHTML).data('id');
+                if (data != null) {
+                    $('#div1').hide();
+                    $('#theme1').hide();
+                    getResponses(data);
+                    getExaData(data);
+                    $('#infoExa').fadeIn('slow');
+                    $('#theme2').fadeIn('slow');
+                }
+            }
+
+            $("#btnBack").click(function () {
+                $('#idExamen').val('');
+                $('#nombreExamen2').val('');
+                $('#area').val('');
+                $('#infoExa').hide();
+                $('#div1').fadeIn('slow');
+                $('#theme1').fadeIn('slow');
+                $('#theme2').hide();
+            });
 
             var table2 = $('#concepts_list').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>"+
@@ -107,10 +145,10 @@ var Responses = function () {
                 required: true,
                 minlength: 2
             });
-
+/*
             if (parametros.sFormConcept == 'SI'){
                 getResponses();
-            }
+            }*/
             $('#search-form').validate({
     			// Rules for form validation
                 rules: {
@@ -146,6 +184,38 @@ var Responses = function () {
                 }
             });
 
+
+            function getExaData(idExamen) {
+
+                bloquearUI(parametros.blockMess);
+                $.getJSON(parametros.getExaUrl, {
+                    idExamen: idExamen,
+                    ajax: 'true'
+                }, function (dataToLoad) {
+                    var len = Object.keys(dataToLoad).length;
+                    if (len > 0) {
+                        $('#idExamen').val(dataToLoad.idExamen);
+                        $('#nombreArea').val(dataToLoad.area.nombre);
+                        $('#nombreExamen2').val(dataToLoad.nombre);
+
+
+                    } else {
+                        $.smallBox({
+                            title: $("#msg_no_results_found").val(),
+                            content: $("#smallBox_content").val(),
+                            color: "#C79121",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
+                    desbloquearUI();
+                }).fail(function (jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
+                });
+            }
+
+
             function getTests(showAll) {
                 var pTipoNoti, pIdDx, pNombreEx;
                 if (showAll){
@@ -166,10 +236,12 @@ var Responses = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            var actionUrl = parametros.sActionUrl+dataToLoad[i].idExamen; //+","+dataToLoad[i].idDx+","+dataToLoad[i].codNoti;
+                          //  var actionUrl = parametros.sActionUrl+dataToLoad[i].idExamen; //+","+dataToLoad[i].idDx+","+dataToLoad[i].codNoti;
+                            var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idExamen +
+                                '" > <i class="fa fa-list"></i>' ;
                             table1.fnAddData(
                                 [dataToLoad[i].nombreExamen//,dataToLoad[i].nombreNoti,dataToLoad[i].nombreDx,''
-                                , dataToLoad[i].nombreArea, '<a href='+ actionUrl + ' class="btn btn-default btn-xs btn-primary"><i class="fa fa-list"></i></a>']);
+                                , dataToLoad[i].nombreArea, btnAdd]);
                         }
                     }else{
                         $.smallBox({
@@ -188,16 +260,17 @@ var Responses = function () {
                     });
             }
 
-            function getResponses() {
+            function getResponses(idExamen) {
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sRespuestasUrl, {
-                    idExamen: $("#idExamen").val() ,
+                    idExamen: idExamen,
                     ajax : 'true'
                 }, function(dataToLoad) {
                     table2.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
+
                     if (len > 0) {
-                        for (var i = 0; i < len; i++) {
+                       for (var i = 0; i < len; i++) {
                             var req, pas, botonEditar;
                             if (dataToLoad[i].requerido==true)
                                 req = $("#val_yes").val();
@@ -217,7 +290,7 @@ var Responses = function () {
                         }
                     }else{
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found2").val() ,
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -249,7 +322,7 @@ var Responses = function () {
                         $("#descRespuesta").val(dataToLoad.descripcion);
                     }else{
                         $.smallBox({
-                            title: $("#msg_no_results_found").val() ,
+                            title: $("#msg_no_results_found2").val() ,
                             content: $("#smallBox_content").val(),
                             color: "#C79121",
                             iconSmall: "fa fa-warning",
@@ -286,7 +359,7 @@ var Responses = function () {
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
-                        url: parametros.sActionUrl,
+                        url: parametros.sActionUrl2,
                         type: 'POST',
                         dataType: 'json',
                         data: JSON.stringify(jsonObj),
@@ -302,7 +375,7 @@ var Responses = function () {
                                     timeout: 4000
                                 });
                             }else{
-                                getResponses();
+                                getResponses($('#idExamen').val());
                                 var msg;
                                 //si es guardar limpiar el formulario
                                 if ($("#idRespuestaEdit").val().length <= 0){
@@ -342,7 +415,7 @@ var Responses = function () {
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
-                        url: parametros.sActionUrl,
+                        url: parametros.sActionUrl2,
                         type: 'POST',
                         dataType: 'json',
                         data: JSON.stringify(anulacionObj),
@@ -358,7 +431,7 @@ var Responses = function () {
                                     timeout: 4000
                                 });
                             }else{
-                                getResponses();
+                                getResponses($('#idExamen').val());
                                 var msg = $("#msg_response_cancel").val();
                                 $.smallBox({
                                     title: msg ,

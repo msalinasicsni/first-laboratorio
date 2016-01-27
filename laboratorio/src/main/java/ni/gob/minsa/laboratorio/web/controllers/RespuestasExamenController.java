@@ -90,7 +90,12 @@ public class RespuestasExamenController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
+            List<Concepto> conceptsList = conceptoService.getConceptsList(true);
+            Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
+
+            mav.addObject("codigoDatoNumerico",parametro.getValor());
             mav.addObject("notificaciones", notificacionList);
+            mav.addObject("conceptsList",conceptsList);
             mav.setViewName("administracion/searchResponse");
         }else
             mav.setViewName(urlValidacion);
@@ -106,54 +111,26 @@ public class RespuestasExamenController {
         return ExamenesToJson(objectsExamen);
     }
 
-    @RequestMapping(value = "create/{strParametros}", method = RequestMethod.GET)
-    public ModelAndView createResponseForm(HttpServletRequest request, @PathVariable("strParametros") String strParametros) throws Exception {
-        logger.debug("inicializar pantalla de creación de respuestas para examen");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
-        ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            String[] arParametros = strParametros.split(",");
-            //if (arParametros.length == 3) {//tienen que venir los 3 parámetros
-                CatalogoExamenes examen = examenesService.getExamenById(Integer.valueOf(arParametros[0]));
-                //Catalogo_Dx diagnostico = tomaMxService.getDxsById(Integer.valueOf(arParametros[1]));
-                //TipoNotificacion tipoNotificacion = catalogoService.getTipoNotificacion(arParametros[2]);
-                List<Concepto> conceptsList = conceptoService.getConceptsList(true);
-                Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
-                mav.addObject("examen", examen);
-                //mav.addObject("tipoNotificacion", tipoNotificacion);
-                //mav.addObject("diagnostico", diagnostico);
-                mav.addObject("conceptsList",conceptsList);
-                mav.addObject("codigoDatoNumerico",parametro.getValor());
-            //}
-
-            mav.setViewName("administracion/createResponse");
-        }else
-            mav.setViewName(urlValidacion);
-
-        return mav;
+    @RequestMapping(value = "getExaById", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    CatalogoExamenes getExaById(@RequestParam(value = "idExamen", required = true) Integer idExamen) throws Exception {
+        logger.info("Obteniendo los datos de examen por el Id");
+        return examenesService.getExamenById(idExamen);
     }
 
-    @RequestMapping(value = "getRespuetasExamen", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "getRespuestasExamen", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<RespuestaExamen> getRespuetasExamen(@RequestParam(value = "idExamen", required = true) String idExamen) throws Exception {
+    List<RespuestaExamen> getRespuetasExamen(@RequestParam(value = "idExamen", required = true) Integer idExamen) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        return respuestasExamenService.getRespuestasByExamen(Integer.valueOf(idExamen));
+        return respuestasExamenService.getRespuestasByExamen(idExamen);
     }
 
     @RequestMapping(value = "getRespuestasActivasExamen", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    List<RespuestaExamen> getRespuestasActivasExamen(@RequestParam(value = "idExamen", required = true) String idExamen) throws Exception {
+    List<RespuestaExamen> getRespuestasActivasExamen(@RequestParam(value = "idExamen", required = true) Integer idExamen) throws Exception {
         logger.info("Obteniendo los sectores por unidad de salud en JSON");
-        return respuestasExamenService.getRespuestasActivasByExamen(Integer.valueOf(idExamen));
+        return respuestasExamenService.getRespuestasActivasByExamen(idExamen);
     }
 
     @RequestMapping(value = "getTipoDato", method = RequestMethod.GET, produces = "application/json")
