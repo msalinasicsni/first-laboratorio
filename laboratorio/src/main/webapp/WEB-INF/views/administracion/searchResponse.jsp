@@ -266,16 +266,18 @@
                                     </table>
                                 </div>
 
-                                <div class="row" style="border: none">
+                            </div>
 
-                                    <div style="border: none" id="dBack" class="pull-left">
-                                        <button type="button" id="btnBack" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <spring:message code="lbl.back" /></button>
-                                    </div>
+                            <div class="row" style="border: none; margin-bottom: 10px">
 
+                                <div style="border: none" id="dBack" class="pull-left">
+                                    <button type="button" id="btnBack" class="btn btn-primary"><i class="fa fa-arrow-left"></i> <spring:message code="lbl.back" /></button>
                                 </div>
 
                             </div>
                         </div>
+
+
                     </article>
 				</div>
 				<!-- end row -->
