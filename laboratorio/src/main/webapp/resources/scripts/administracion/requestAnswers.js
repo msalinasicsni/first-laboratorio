@@ -90,12 +90,11 @@ var DxAnswers = function () {
                 var data =  $(this.innerHTML).data('id');
                 if (data != null) {
                     $('#div1').hide();
+                    $('#div2').show();
+                    $('#divInfo').show();
+                    $('#dButton1').show();
                     getRequestData(data);
                     getResponses(data);
-                    $('#div2').fadeIn('slow');
-                    $('#divInfo').fadeIn('slow');
-                    $('#dButton1').fadeIn('slow');
-
                 }
             }
 
@@ -105,12 +104,11 @@ var DxAnswers = function () {
                     var detalle = data.split(",");
                     var id = detalle[0];
                     $('#div1').hide();
+                    $('#div3').show();
+                    $('#divInfo').show();
+                    $('#dButton2').show();
                     getRequestData(data);
                     getSamplingData(id);
-                    $('#div3').fadeIn('slow');
-                    $('#divInfo').fadeIn('slow');
-                    $('#dButton2').fadeIn('slow');
-
                 }
             }
 
@@ -547,7 +545,7 @@ var DxAnswers = function () {
                         }
                         desbloquearUI();
                     }).fail(function (jqXHR) {
-                        desbloquearUI()
+                        desbloquearUI();
                         validateLogin(jqXHR);
                     });
                 }

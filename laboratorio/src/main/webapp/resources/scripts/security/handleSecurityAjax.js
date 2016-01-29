@@ -15,7 +15,7 @@ function validateLogin(jqXHR){
         var pathParts = path.split('/');
         var login = loc.protocol + "//" + loc.host + "/"+pathParts[1];
         setTimeout(function(){window.location.href = login;},2000);
-    }else{
+    }else if (jqXHR.status!=200){
         $.smallBox({
             title: $("#txtErrorAjax").val() ,
             content: "error: "+ jqXHR.status + "-" + jqXHR.statusText ,

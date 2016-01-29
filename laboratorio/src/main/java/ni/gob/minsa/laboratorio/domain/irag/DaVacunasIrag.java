@@ -31,7 +31,7 @@ public class DaVacunasIrag implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.TABLE)
     @Column(name = "ID_VACUNA", nullable = false, updatable = true, insertable = true, precision = 0)
     public Integer getIdVacuna() {
         return idVacuna;

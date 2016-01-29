@@ -187,7 +187,7 @@
 
         <!-- row -->
 
-        <div hidden="hidden" id="divInfo">
+        <div class="row" hidden="hidden" id="divInfo">
             <article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <!-- Widget ID (each widget will need unique ID)-->
                 <div class="jarviswidget jarviswidget-color-darken" id="wid-id-2">
@@ -707,7 +707,7 @@
 <c:url var="sDatosUrl" value="/administracion/datosSolicitud/getDatosIngresoSolicitud"/>
 <c:url var="sDatoUrl" value="/administracion/datosSolicitud/getDatoSolicitudById"/>
 <c:url var="actionUrl2" value="/administracion/datosSolicitud/agregarActualizarDato"/>
-<c:url var="sTipoDatoUrl" value="/administracion/datosSolicitud/getTipoDato"/>
+<c:url var="sTipoDatoUrl2" value="/administracion/datosSolicitud/getTipoDato"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
@@ -724,7 +724,7 @@
             sDatoUrl : "${sDatoUrl}",
             actionUrl2 : "${actionUrl2}",
             sFormConcept2 : "SI",
-            sTipoDatoUrl2 : "${sTipoDatoUrl}"
+            sTipoDatoUrl2 : "${sTipoDatoUrl2}"
         };
 
         DxAnswers.init(parametros);

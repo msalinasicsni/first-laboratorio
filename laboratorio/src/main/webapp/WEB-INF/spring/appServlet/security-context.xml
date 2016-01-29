@@ -32,23 +32,12 @@
         <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_RES,ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestas/getRespuestasActivasExamen" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestasSolicitud/getRespuestasActivas" access="ROLE_ANALISTA" />
-        <intercept-url pattern="/aprobacion/**" access="ROLE_ADMIN,ROLE_DIR,ROLE_ANALISTA" />
-        <intercept-url pattern="/administracion/**" access="ROLE_ADMIN" />
-        <intercept-url pattern="/separacionMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/resultadoFinal/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/aprobacion/**" access="ROLE_DIR,ROLE_JEFE,ROLE_ADMIN" />
-        <intercept-url pattern="/tomaMx/**" access="ROLE_ADMIN" />
-        <intercept-url pattern="/personas/**" access="ROLE_ADMIN" />
-        <intercept-url pattern="/workSheet/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
-        <intercept-url pattern="/trasladoMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/administracion/examenes/obtenerReglasExamenes" access="ROLE_ADMIN,ROLE_ANALISTA,ROLE_JEFE,ROLE_DIR" />
         <intercept-url pattern="/elisaResult/save" access="ROLE_ANALISTA" />
-        <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/associationSR/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/sampleTypes/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/direccion/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/administracion/departamento/*" access="ROLE_ADMIN" />
-        <intercept-url pattern="/administracion/examenes/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/reports/reception/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/reports/positiveResults/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/posNegResults/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
@@ -59,6 +48,17 @@
         <intercept-url pattern="/reports/general/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/qualityControl/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/administracion/file/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/aprobacion/**" access="ROLE_ADMIN,ROLE_DIR,ROLE_ANALISTA" />
+        <intercept-url pattern="/administracion/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/separacionMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/resultadoFinal/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/aprobacion/**" access="ROLE_DIR,ROLE_JEFE,ROLE_ADMIN" />
+        <intercept-url pattern="/tomaMx/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/personas/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/workSheet/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
+        <intercept-url pattern="/trasladoMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->

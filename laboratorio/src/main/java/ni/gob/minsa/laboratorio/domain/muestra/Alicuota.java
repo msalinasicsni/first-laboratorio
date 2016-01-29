@@ -31,7 +31,7 @@ public class Alicuota implements Serializable {
 
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.TABLE)
     @Column(name = "ID_ALICUOTA", nullable = false, updatable = true, insertable = true, precision = 0)
     public Integer getIdAlicuota() {
         return idAlicuota;
