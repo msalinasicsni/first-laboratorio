@@ -60,7 +60,7 @@ public class Cie10  implements Serializable {
     public void setIdCie10(long idCie10) {
         this.idCie10 = idCie10;
     }
-    
+
     @Column(name="CODIGO_CIE10", nullable=false, length=10)
     public String getCodigoCie10() {
         return this.codigoCie10;
@@ -105,6 +105,8 @@ public class Cie10  implements Serializable {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+
+    @Temporal(TemporalType.DATE)
     @Column(name="FECHA_REGISTRO")
     public Date getFechaRegistro() {
         return this.fechaRegistro;

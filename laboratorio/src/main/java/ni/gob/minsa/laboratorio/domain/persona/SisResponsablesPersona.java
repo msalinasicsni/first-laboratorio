@@ -26,7 +26,7 @@ public class SisResponsablesPersona implements java.io.Serializable {
     private Parentesco parentesco;
     private long notificaEmergencia;
     private Timestamp fechaRegistro;
-    private String usuarioRegistro;
+    //private String usuarioRegistro;
 
     public SisResponsablesPersona() {
     }
@@ -44,7 +44,7 @@ public class SisResponsablesPersona implements java.io.Serializable {
         this.responsablePersona = responsablePersona;
         this.parentesco = parentesco;
         this.fechaRegistro = fechaRegistro;
-        this.usuarioRegistro = usuarioRegistro;
+        //this.usuarioRegistro = usuarioRegistro;
         this.notificaEmergencia = notificaEmergencia;
     }
 
@@ -98,14 +98,14 @@ public class SisResponsablesPersona implements java.io.Serializable {
         this.responsablePersonaId = responsablePersonaId;
     }
 
-    @Column(name="USUARIO_REGISTRO")
+    /*@Column(name="USUARIO_REGISTRO")
     public String getUsuarioRegistro() {
         return usuarioRegistro;
     }
 
     public void setUsuarioRegistro(String usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
-    }
+    }*/
 
     @Column(name="NOTIFICA_EMERGENCIA")
     public long getNotificaEmergencia() {

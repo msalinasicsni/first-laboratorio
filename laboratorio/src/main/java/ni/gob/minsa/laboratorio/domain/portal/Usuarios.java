@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by Herrold on 27/05/14 12:39
@@ -17,12 +18,12 @@ public class Usuarios {
     private String nombre;
     private String username;
     private String clave;
-    private String claveTemporal;
-    private Timestamp fechaFin;
+    private char claveTemporal;
+    private Date fechaFin;
     private Timestamp fechaRegistro;
     private Timestamp ultimaSesion;
     private Timestamp ultimaModificacion;
-    private String pasivo;
+    private char pasivo;
     private String email;
     private String referencia;
 
@@ -68,21 +69,21 @@ public class Usuarios {
 
     @Basic
     @Column(name = "CLAVE_TEMPORAL", nullable = false, insertable = true, updatable = true, length = 1)
-    public String getClaveTemporal() {
+    public char getClaveTemporal() {
         return claveTemporal;
     }
 
-    public void setClaveTemporal(String claveTemporal) {
+    public void setClaveTemporal(char claveTemporal) {
         this.claveTemporal = claveTemporal;
     }
 
-    @Basic
+    @Temporal( TemporalType.DATE)
     @Column(name = "FECHA_FIN", nullable = true, insertable = true, updatable = true)
-    public Timestamp getFechaFin() {
+    public Date getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Timestamp fechaFin) {
+    public void setFechaFin(Date fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -118,11 +119,11 @@ public class Usuarios {
 
     @Basic
     @Column(name = "PASIVO", nullable = false, insertable = true, updatable = true, length = 1)
-    public String getPasivo() {
+    public char getPasivo() {
         return pasivo;
     }
 
-    public void setPasivo(String pasivo) {
+    public void setPasivo(char pasivo) {
         this.pasivo = pasivo;
     }
 
@@ -155,14 +156,11 @@ public class Usuarios {
 
         if (usuarioId != usuarios.usuarioId) return false;
         if (clave != null ? !clave.equals(usuarios.clave) : usuarios.clave != null) return false;
-        if (claveTemporal != null ? !claveTemporal.equals(usuarios.claveTemporal) : usuarios.claveTemporal != null)
-            return false;
         if (email != null ? !email.equals(usuarios.email) : usuarios.email != null) return false;
         if (fechaFin != null ? !fechaFin.equals(usuarios.fechaFin) : usuarios.fechaFin != null) return false;
         if (fechaRegistro != null ? !fechaRegistro.equals(usuarios.fechaRegistro) : usuarios.fechaRegistro != null)
             return false;
         if (nombre != null ? !nombre.equals(usuarios.nombre) : usuarios.nombre != null) return false;
-        if (pasivo != null ? !pasivo.equals(usuarios.pasivo) : usuarios.pasivo != null) return false;
         if (referencia != null ? !referencia.equals(usuarios.referencia) : usuarios.referencia != null) return false;
         if (ultimaModificacion != null ? !ultimaModificacion.equals(usuarios.ultimaModificacion) : usuarios.ultimaModificacion != null)
             return false;
@@ -179,12 +177,10 @@ public class Usuarios {
         result = 31 * result + (nombre != null ? nombre.hashCode() : 0);
         result = 31 * result + (username != null ? username.hashCode() : 0);
         result = 31 * result + (clave != null ? clave.hashCode() : 0);
-        result = 31 * result + (claveTemporal != null ? claveTemporal.hashCode() : 0);
         result = 31 * result + (fechaFin != null ? fechaFin.hashCode() : 0);
         result = 31 * result + (fechaRegistro != null ? fechaRegistro.hashCode() : 0);
         result = 31 * result + (ultimaSesion != null ? ultimaSesion.hashCode() : 0);
         result = 31 * result + (ultimaModificacion != null ? ultimaModificacion.hashCode() : 0);
-        result = 31 * result + (pasivo != null ? pasivo.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (referencia != null ? referencia.hashCode() : 0);
         return result;

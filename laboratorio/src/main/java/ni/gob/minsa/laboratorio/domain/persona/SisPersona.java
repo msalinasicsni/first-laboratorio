@@ -71,7 +71,7 @@ public class SisPersona  implements java.io.Serializable {
     private Timestamp fechaRegistro;
     private String usuarioRegistro;
     private long fallecida;
-    private char pasivo;
+    private int pasivo;
     private String idRegistroCentral;
     private String email;
     private String fax;
@@ -465,12 +465,12 @@ public class SisPersona  implements java.io.Serializable {
 	}
 
 	@Column(name = "PASIVO", nullable = false, length = 1)
-	public char getPasivo() {
+	public int getPasivo() {
 		return pasivo;
 	}
 
 
-	public void setPasivo(char pasivo) {
+	public void setPasivo(int pasivo) {
 		this.pasivo = pasivo;
 	}
 

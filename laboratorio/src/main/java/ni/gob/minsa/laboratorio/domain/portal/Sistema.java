@@ -27,7 +27,7 @@ public class Sistema implements Serializable {
 	private long sistemaId;
 
 	@Column(name="BLOQUEADO",length=1,nullable=false)
-	private String bloqueado;
+	private char bloqueado;
 
 	@Column(name="CODIGO",length=10,nullable=false,unique=true)
 	private String codigo;
@@ -67,7 +67,7 @@ public class Sistema implements Serializable {
 	 * Retorna <code>"1"</code> si se encuentra bloqueado, 
 	 * <code>"0"</code> caso contrario.
 	 */
-	public String getBloqueado() {
+	public char getBloqueado() {
 		return this.bloqueado;
 	}
 
@@ -78,7 +78,7 @@ public class Sistema implements Serializable {
 	 * <code>"1"</code> si se encuentra bloqueado, 
 	 * <code>"0"</code> caso contrario. 
 	 */
-	public void setBloqueado(String bloqueado) {
+	public void setBloqueado(char bloqueado) {
 		this.bloqueado = bloqueado;
 	}
 

@@ -1,7 +1,9 @@
 package ni.gob.minsa.laboratorio.domain.estructura;
 
 import javax.persistence.*;
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by FIRSTICT on 9/2/2014.
@@ -11,19 +13,20 @@ import java.sql.Timestamp;
 public class CalendarioEpi {
     private int anio;
     private int noSemana;
-    private Timestamp fechaInicial;
-    private Timestamp fechaFinal;
+    private Date fechaInicial;
+    private Date fechaFinal;
     private int noMes;
-    private Timestamp fechabaja;
+    private Date fechabaja;
     private String usuariobaja;
 
     @Id
+    @Temporal(TemporalType.DATE)
     @Column(name = "FECHA_INICIAL")
-    public Timestamp getFechaInicial() {
+    public Date getFechaInicial() {
         return fechaInicial;
     }
 
-    public void setFechaInicial(Timestamp fechaInicial) {
+    public void setFechaInicial(Date fechaInicial) {
         this.fechaInicial = fechaInicial;
     }
 
@@ -48,12 +51,13 @@ public class CalendarioEpi {
     }
 
     @Basic
+    @Temporal(TemporalType.DATE)
     @Column(name = "FECHA_FINAL")
-    public Timestamp getFechaFinal() {
+    public Date getFechaFinal() {
         return fechaFinal;
     }
 
-    public void setFechaFinal(Timestamp fechaFinal) {
+    public void setFechaFinal(Date fechaFinal) {
         this.fechaFinal = fechaFinal;
     }
 
@@ -68,12 +72,13 @@ public class CalendarioEpi {
     }
 
     @Basic
+    @Temporal(TemporalType.DATE)
     @Column(name = "FECHABAJA")
-    public Timestamp getFechabaja() {
+    public Date getFechabaja() {
         return fechabaja;
     }
 
-    public void setFechabaja(Timestamp fechabaja) {
+    public void setFechabaja(Date fechabaja) {
         this.fechabaja = fechabaja;
     }
 

@@ -32,7 +32,7 @@ public class UsuarioUnidad implements Serializable {
     @Column(name="USUARIO_UNIDAD_ID", insertable=true, updatable=false, nullable=false, precision=10)
     private long usuarioUnidadId;
 
-    @Temporal( TemporalType.TIMESTAMP)
+    @Temporal( TemporalType.DATE)
     @Column(name="FECHA_REGISTRO", updatable=false, nullable=false)
     private Date fechaRegistro;
 
