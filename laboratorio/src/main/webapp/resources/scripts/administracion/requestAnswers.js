@@ -79,10 +79,7 @@ var DxAnswers = function () {
                     $('.addD')
                         .off("click", addDHandler)
                         .on("click", addDHandler);
-
-
                 }
-
 
             });
 
@@ -90,11 +87,13 @@ var DxAnswers = function () {
                 var data =  $(this.innerHTML).data('id');
                 if (data != null) {
                     $('#div1').hide();
+                    $('#div11').hide();
                     $('#div2').show();
                     $('#divInfo').show();
                     $('#dButton1').show();
                     getRequestData(data);
                     getResponses(data);
+
                 }
             }
 
@@ -104,6 +103,7 @@ var DxAnswers = function () {
                     var detalle = data.split(",");
                     var id = detalle[0];
                     $('#div1').hide();
+                    $('#div11').hide();
                     $('#div3').show();
                     $('#divInfo').show();
                     $('#dButton2').show();
@@ -558,7 +558,8 @@ var DxAnswers = function () {
                 $('#area').val('');
                 $('#divInfo').hide();
                 $('#div2').hide();
-                $('#div1').fadeIn('slow');
+                $('#div1').show();
+                $('#div11').show();
                 $('#dButton1').hide();
             });
 
@@ -573,7 +574,8 @@ var DxAnswers = function () {
                 $('#area').val('');
                 $('#divInfo').hide();
                 $('#div3').hide();
-                $('#div1').fadeIn('slow');
+                $('#div1').show();
+                $('#div11').show();
                 $('#dButton2').hide();
             });
 

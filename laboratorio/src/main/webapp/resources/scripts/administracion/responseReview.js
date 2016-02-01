@@ -67,11 +67,14 @@ var Responses = function () {
                 var data = $(this.innerHTML).data('id');
                 if (data != null) {
                     $('#div1').hide();
+                    $('#div11').hide();
+                    $('#div2').show();
+                    $('#div3').show();
                     $('#theme1').hide();
+                    $('#theme2').show();
                     getResponses(data);
                     getExaData(data);
-                    $('#infoExa').fadeIn('slow');
-                    $('#theme2').fadeIn('slow');
+
                 }
             }
 
@@ -79,9 +82,11 @@ var Responses = function () {
                 $('#idExamen').val('');
                 $('#nombreExamen2').val('');
                 $('#area').val('');
-                $('#infoExa').hide();
-                $('#div1').fadeIn('slow');
-                $('#theme1').fadeIn('slow');
+                $('#div1').show();
+                $('#div11').show();
+                $('#div2').hide();
+                $('#div3').hide();
+                $('#theme1').show();
                 $('#theme2').hide();
             });
 
