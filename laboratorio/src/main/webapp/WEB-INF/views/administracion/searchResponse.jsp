@@ -407,7 +407,7 @@
                             </section>
                         </div>
                         <div class="row" id="divNumerico">
-                            <section class="col col-sm-6 col-md-3 col-lg-3">
+                            <section class="col col-sm-6 col-md-6 col-lg-5">
                                 <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message
                                         code="lbl.response.minvalue"/>
@@ -427,7 +427,7 @@
                                     </label>
                                 </div>
                             </section>
-                            <section class="col col-sm-6 col-md-3 col-lg-3">
+                            <section class="col col-sm-6 col-md-6 col-lg-5">
                                 <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message
                                         code="lbl.response.maxvalue"/>

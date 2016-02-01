@@ -88,12 +88,14 @@ public class RespuestasSolicitudController {
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
             List<Concepto> conceptsList = conceptoService.getConceptsList(true);
+            List<Concepto> conceptsListDatoIngreso = conceptoService.getConceptsList(false);
             Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
 
 
             mav.addObject("notificaciones", notificacionList);
             mav.addObject("isAnswer",true);
             mav.addObject("conceptsList",conceptsList);
+            mav.addObject("conceptsListDI",conceptsListDatoIngreso);
             mav.addObject("codigoDatoNumerico",parametro.getValor());
             mav.setViewName("administracion/searchSolicitud");
         }else

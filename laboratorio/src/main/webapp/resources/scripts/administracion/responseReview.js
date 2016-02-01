@@ -23,6 +23,8 @@ var Responses = function () {
     return {
         //main function to initiate the module
         init: function (parametros) {
+
+            var bloquearConceptoEnPop = false;
 			var responsiveHelper_dt_basic = undefined;
 			var breakpointDefinition = {
 				tablet : 1024,
@@ -142,6 +144,7 @@ var Responses = function () {
                 var id = $(this.innerHTML).data('id');
                 if (id != null) {
                     $("#idRespuestaEdit").val(id);
+                    bloquearConceptoEnPop = false;
                     getResponse(id);
                     showModalConcept();
                 }
@@ -335,6 +338,7 @@ var Responses = function () {
                         });
                     }
                     desbloquearUI();
+                    bloquearConceptoEnPop = true;
                 }).fail(function(jqXHR) {
                     desbloquearUI();
                     validateLogin(jqXHR);
@@ -474,6 +478,7 @@ var Responses = function () {
 
             $("#btnAddConcept").click(function(){
                 $("#idRespuestaEdit").val('');
+                bloquearConceptoEnPop = true;
                 limpiarDatosRespuesta();
                 showModalConcept();
             });
@@ -483,7 +488,9 @@ var Responses = function () {
                 $("#maximoRespuesta").val("");
                 $("#divNumerico").hide();
                 if ($(this).val().length > 0) {
-                    bloquearUI(parametros.blockMess);
+                    if (bloquearConceptoEnPop) {
+                        bloquearUI(parametros.blockMess);
+                    }
                     $.getJSON(parametros.sTipoDatoUrl, {
                         idTipoDato: $(this).val(),
                         ajax: 'true'
