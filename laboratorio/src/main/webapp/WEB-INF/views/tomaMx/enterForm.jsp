@@ -285,15 +285,27 @@
                                         <div class="row">
                                             <section class="col col-3">
                                                 <label  class="text-left txt-color-blue font-md">
-                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sampling.datetime" />
+                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sampling.date" />
                                                 </label>
                                                 <div class="">
                                                     <label class="input">
                                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                         <input name="fechaHTomaMx" id="fechaHTomaMx" value="${tomaMx.fechaHTomaMx}" type='text'
-                                                               class="form-control datetimepicker"
-                                                               placeholder="<spring:message code="lbl.sampling.datetime" />"/>
-                                                        <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="msg.enter.sampling.datetime"/></b>
+                                                               class="form-control date-picker" data-date-end-date="+0d"
+                                                               placeholder="<spring:message code="lbl.sampling.date" />"/>
+                                                    </label>
+                                                </div>
+                                            </section>
+                                            <section class="col col-3">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.sampling.time" />
+                                                </label>
+                                                <div class=''>
+                                                    <label class="input">
+                                                        <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-clock-o fa-fw"></i>
+                                                        <input id="horaTomaMx" name="horaTomaMx" value="${tomaMx.horaTomaMx}" type='text'
+                                                               class="form-control"
+                                                               placeholder="<spring:message code="lbl.sampling.time" />"/>
                                                     </label>
                                                 </div>
                                             </section>
@@ -311,7 +323,9 @@
                                                 </select>
                                             </div>
                                             </section>
-                                            <section class="col col-5">
+                                        </div>
+                                        <div class="row">
+                                            <section class="col col-6">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.sample.type"/>
                                                 </label>
@@ -485,6 +499,7 @@
             };
             EnterFormTomaMx.init(parametros);
             handleInputMasks();
+            handleDatePickers("${pageContext.request.locale.language}");
             SeleccionUnidad.init(parametros);
             $("li.recepcion").addClass("open");
             $("li.patient").addClass("active");

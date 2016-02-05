@@ -115,7 +115,12 @@ public class ResultadoFinalService {
                             Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
             );
         }
-
+        //Se filtra por rango de fecha de toma de muestra
+        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+        }
         //Se filtra por rango de fecha de recepción
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
@@ -351,7 +356,12 @@ public class ResultadoFinalService {
                             Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
             );
         }
-
+        //Se filtra por rango de fecha de toma de muestra
+        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+        }
         //Se filtra por rango de fecha de recepción
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
@@ -795,7 +805,15 @@ public class ResultadoFinalService {
                             Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
             );
         }
-
+        //Se filtra por rango de fecha de toma de muestra
+        if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+            crit2.add( Restrictions.and(
+                            Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+        }
         //Se filtra por rango de fecha de recepción
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)

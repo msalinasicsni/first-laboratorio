@@ -164,14 +164,6 @@ public class RecepcionMxService {
                 }
             }
             for (int i = 0; i < partes.length; i++) {
-                /*Junction conditionGroup = Restrictions.disjunction();
-                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
-                crit.add(conditionGroup);
-                */
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("notifi.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
                         .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
@@ -229,9 +221,10 @@ public class RecepcionMxService {
 
         //Se filtra por rango de fecha de recepcion en laboratorio
         if (filtro.getFechaInicioRecepLab()!=null && filtro.getFechaFinRecepLab()!=null){
-            crit.add( Restrictions.or(
-                            Restrictions.between("recepcion.fechaHoraRecepcionLab", filtro.getFechaInicioRecepLab(),filtro.getFechaFinRecepLab()))
-            );
+            crit.add(Subqueries.propertyIn("recepcion.idRecepcion", DetachedCriteria.forClass(RecepcionMxLab.class)
+                    .createAlias("recepcionMx", "recepcionGral")
+                    .add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecepLab(),filtro.getFechaFinRecepLab()))
+                    .setProjection(Property.forName("recepcionGral.idRecepcion"))));
         }
 
         if(filtro.getIncluirMxInadecuada()!=null && filtro.getIncluirMxInadecuada()){

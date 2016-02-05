@@ -82,6 +82,29 @@
                                         ${noti.codTipoNotificacion.valor}
                                    </legend>
                                     <div class="row">
+                                        <section class="col col-sm-6 col-md-6 col-lg-4">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <spring:message code="lbl.notification.type" /> </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codTipoNoti" disabled name="codTipoNoti"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${notificaciones}" var="tipoNoti">
+                                                                <c:choose>
+                                                                    <c:when test="${tipoNoti.codigo eq noti.codTipoNotificacion.codigo}">
+                                                                        <option selected value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:forEach>
+                                                        </select>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="row">
                                         <section class="col col-sm-6 col-md-5 col-lg-5">
                                             <label class="text-left txt-color-blue font-md">
                                                 <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>
@@ -132,15 +155,27 @@
                                         <div class="row">
                                             <section class="col col-3">
                                                 <label  class="text-left txt-color-blue font-md">
-                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sampling.datetime" />
+                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sampling.date" />
                                                 </label>
                                                 <div class="">
                                                     <label class="input">
                                                         <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                         <input name="fechaHTomaMx" id="fechaHTomaMx" value="${tomaMx.fechaHTomaMx}" type='text'
-                                                               class="form-control datetimepicker"
-                                                               placeholder="<spring:message code="lbl.sampling.datetime" />"/>
-                                                        <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="msg.enter.sampling.datetime"/></b>
+                                                               class="form-control date-picker" data-date-end-date="+0d"
+                                                               placeholder="<spring:message code="lbl.sampling.date" />"/>
+                                                    </label>
+                                                </div>
+                                            </section>
+                                            <section class="col col-3">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.sampling.time" />
+                                                </label>
+                                                <div class=''>
+                                                    <label class="input">
+                                                        <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-clock-o fa-fw"></i>
+                                                        <input id="horaTomaMx" name="horaTomaMx" value="${tomaMx.horaTomaMx}" type='text'
+                                                               class="form-control"
+                                                               placeholder="<spring:message code="lbl.sampling.time" />"/>
                                                     </label>
                                                 </div>
                                             </section>
@@ -149,16 +184,18 @@
                                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.sample.type"/>
                                                 </label>
                                                 <div class="input-group">
-                                                <span class="input-group-addon"> <i class="fa fa-list fa-fw"></i></span>
-                                                <select name="codTipoMx" id="codTipoMx" data-placeholder="<spring:message code="msj.select.type.sample"/>" class="select2" >
-                                                    <option value=""><spring:message code="lbl.select" />...</option>
-                                                    <c:forEach items="${catTipoMx}" var="catTipoMx">
-                                                        <option value="${catTipoMx.tipoMx.idTipoMx}">${catTipoMx.tipoMx.nombre}</option>
-                                                    </c:forEach>
-                                                </select>
-                                            </div>
+                                                    <span class="input-group-addon"> <i class="fa fa-list fa-fw"></i></span>
+                                                    <select name="codTipoMx" id="codTipoMx" data-placeholder="<spring:message code="msj.select.type.sample"/>" class="select2" >
+                                                        <option value=""><spring:message code="lbl.select" />...</option>
+                                                        <c:forEach items="${catTipoMx}" var="catTipoMx">
+                                                            <option value="${catTipoMx.tipoMx.idTipoMx}">${catTipoMx.tipoMx.nombre}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
                                             </section>
-                                            <section class="col col-5">
+                                        </div>
+                                        <div class="row">
+                                            <section class="col col-6">
                                                 <label class="text-left txt-color-blue font-md">
                                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.sample.type"/>
                                                 </label>
@@ -322,6 +359,7 @@
             };
             EnterFormTomaMx.init(parametros);
             handleInputMasks();
+            handleDatePickers("${pageContext.request.locale.language}");
             $("li.recepcion").addClass("open");
             $("li.check-in").addClass("open");
             $("li.otherSamples").addClass("active");

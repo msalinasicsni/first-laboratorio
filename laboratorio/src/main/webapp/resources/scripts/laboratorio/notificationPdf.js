@@ -50,9 +50,7 @@ var VisualizarPdf = function () {
                     $('.fPdf')
                         .off("click", pdfHandler)
                         .on("click", pdfHandler);
-
                 }
-
             });
 
             function pdfHandler() {
@@ -123,7 +121,6 @@ var VisualizarPdf = function () {
                     filtros['codSilais'] = $('#codSilais option:selected').val();
                     filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     filtros['codTipoMx'] = $('#codTipoMx option:selected').val();
-                    filtros['fecFinRecepcionLab'] = $('#fec').val();
                     filtros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                     filtros['codTipoSolicitud'] = $('#tipo option:selected').val();
                     filtros['nombreSolicitud'] = $('#nombreSoli').val();

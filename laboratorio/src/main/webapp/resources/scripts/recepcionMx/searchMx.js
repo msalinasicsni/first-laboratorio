@@ -385,7 +385,7 @@ var SearchMx = function () {
                                 unBlockUI();
                             },
                             error: function (jqXHR) {
-                                desbloquearUI();
+                                unBlockUI();
                                 validateLogin(jqXHR);
                             }
                         });

@@ -110,7 +110,7 @@ public class SearchMxController {
     String nombrePersona = null;
     String nombreSilais = null;
     String nombreUS = null;
-    int edad = 0;
+    Integer edad = null;
     String sexo = null;
     String fechaRecepcion = null;
     String fechaToma = null;
@@ -256,7 +256,8 @@ public class SearchMxController {
             RecepcionMx rec = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
             map.put("idTomaMx", tomaMx.getIdTomaMx());
             map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():(messageSource.getMessage("lbl.not.generated", null, null))));
-            map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy")+
+                    (tomaMx.getHoraTomaMx()!=null?" "+tomaMx.getHoraTomaMx():""));
 
             if (rec != null) {
                 if (rec.getCalidadMx() != null) {
@@ -472,7 +473,7 @@ public class SearchMxController {
             nombrePersona = null;
             nombreSilais = null;
             nombreUS = null;
-            edad = 0;
+            edad = null;
             sexo = null;
             fechaRecepcion = null;
             fechaToma = null;
@@ -621,7 +622,8 @@ public class SearchMxController {
                                 orderSample = messageSource.getMessage("lbl.first.sample", null, null);
                                 detalleRF = resultadoFinalService.getDetResActivosBySolicitud(solicitudE.getIdSolicitudEstudio());
 
-                                fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solicitudE.getIdTomaMx().getFechaHTomaMx());
+                                fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solicitudE.getIdTomaMx().getFechaHTomaMx())+
+                                        (solicitudE.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudE.getIdTomaMx().getHoraTomaMx():"");
 
 
                                 //draw Report Header
@@ -893,24 +895,27 @@ public class SearchMxController {
         if (soliDx != null || soliE != null) {
 
             if (soliDx != null) {
-                nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona()!=null) {
+                    nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                    if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null) {
+                        nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                        nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                    } else {
+                        nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+
+                    }
+                    if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null) {
+                        nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    }
+                }else{
+                    nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                }
                 nombreSoli = soliDx.getCodDx().getNombre();
 
                 if (soliDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas() != null) {
                     fis = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(soliDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas());
                 } else {
                     fis = "---------------";
-                }
-
-                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null) {
-                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                } else {
-                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-
-                }
-                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null) {
-                    nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 }
 
                 if (soliDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
@@ -922,17 +927,16 @@ public class SearchMxController {
                     nombreUS = "---------------";
                 }
 
-                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor() != null) {
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona() != null && soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor() != null) {
                     sexo = soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getValor();
                 } else {
                     sexo = "----------------";
                 }
 
-                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento() != null) {
+                if (soliDx.getIdTomaMx().getIdNotificacion().getPersona() != null && soliDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento() != null) {
                     String fechaformateada = DateUtil.DateToString(soliDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
                     edad = DateUtil.edad(fechaformateada);
                 }
-
             } else {
                 nombrePersona = soliE.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
                 nombreSoli = soliE.getTipoEstudio().getNombre();
@@ -985,7 +989,7 @@ public class SearchMxController {
             GeneralUtils.drawTEXT(nombrePersona, inY, 80, stream, 12, PDType1Font.HELVETICA);
 
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null) + " ", inY, 380, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(String.valueOf(edad), inY, 425, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT((edad!=null?String.valueOf(edad):"-"), inY, 425, stream, 12, PDType1Font.HELVETICA);
 
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sex", null, null) + " ", inY, 450, stream, 14, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(sexo, inY, 495, stream, 12, PDType1Font.HELVETICA);
@@ -1013,7 +1017,8 @@ public class SearchMxController {
             if (solDx != null) {
 
                 if (solDx.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx());
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx())+
+                            (solDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solDx.getIdTomaMx().getHoraTomaMx():"");
                 }
 
                 RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
@@ -1031,7 +1036,8 @@ public class SearchMxController {
             } else {
 
                 if (solE.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solE.getIdTomaMx().getFechaHTomaMx());
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solE.getIdTomaMx().getFechaHTomaMx())+
+                            (solE.getIdTomaMx().getHoraTomaMx()!=null?" "+solE.getIdTomaMx().getHoraTomaMx():"");
                 }
 
                 RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
@@ -1118,7 +1124,8 @@ public class SearchMxController {
     private void drawInfoSpecialSample(String orderSample, float inY, DaSolicitudEstudio detSoliE, PDPageContentStream stream) throws IOException {
         if (detSoliE != null) {
             if (detSoliE.getIdTomaMx().getFechaHTomaMx() != null) {
-                fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(detSoliE.getIdTomaMx().getFechaHTomaMx());
+                fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(detSoliE.getIdTomaMx().getFechaHTomaMx())+
+                        (detSoliE.getIdTomaMx().getHoraTomaMx()!=null?" "+detSoliE.getIdTomaMx().getHoraTomaMx():"");
             } else {
                 fechaToma = "----------";
             }

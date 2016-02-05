@@ -27,13 +27,11 @@ var EnterFormTomaMx = function () {
     return {
         init: function (parametros) {
 
-            $('.datetimepicker').datetimepicker({
-                language: 'es',
-                format: 'DD/MM/YYYY h:m A'
-
+            $('#horaRefrigeracion').datetimepicker({
+                pickDate: false
             });
 
-            $('#horaRefrigeracion').datetimepicker({
+            $('#horaTomaMx').datetimepicker({
                 pickDate: false
             });
 
@@ -135,6 +133,7 @@ var EnterFormTomaMx = function () {
                     objetoTomaMx['codTipoNoti'] = '';
                 }
                 objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();
+                objetoTomaMx['horaTomaMx'] = $("#horaTomaMx").val();
                 objetoTomaMx['canTubos'] = $("#canTubos").val();
                 objetoTomaMx['volumen'] = $("#volumen").val();
                 objetoTomaMx['horaRefrigeracion'] = $("#horaRefrigeracion").val();

@@ -170,7 +170,8 @@ public class WorkSheetController {
                     content[0] = solicitudDx.getIdTomaMx().getCodigoLab();
                     content[1] = solicitudDx.getCodDx().getNombre();
                     content[2] = solicitudDx.getCodDx().getArea().getNombre();
-                    content[3] = DateUtil.DateToString(solicitudDx.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a");
+                    content[3] = DateUtil.DateToString(solicitudDx.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
+                            (solicitudDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudDx.getIdTomaMx().getHoraTomaMx():"");
                     content[4] = fis;
                     content[5] = controlCalidad;
                     filasSolicitudes.add(content);
@@ -186,7 +187,8 @@ public class WorkSheetController {
                     content[0] = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
                     content[1] = solicitudEstudio.getTipoEstudio().getNombre();
                     content[2] = solicitudEstudio.getTipoEstudio().getArea().getNombre();
-                    content[3] = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a");
+                    content[3] = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
+                            (solicitudEstudio.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudEstudio.getIdTomaMx().getHoraTomaMx():"");
                     content[4] = fis;
                     content[5] = controlCalidad;
                     filasSolicitudes.add(content);
@@ -319,7 +321,8 @@ public class WorkSheetController {
             for (DaTomaMx tomaMx : tomaMxList){
                 boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( tomaMx.getIdTomaMx()).size() > 0;
                 mapMx.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
-                mapMx.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                mapMx.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy")+
+                        (tomaMx.getHoraTomaMx()!=null?" "+tomaMx.getHoraTomaMx():""));
                 if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
                     mapMx.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
                 }else {

@@ -122,7 +122,8 @@ public class SeparacionMxController {
             map.put("codigoUnicoMx", esEstudio?recepcion.getTomaMx().getCodigoUnicoMx():recepcion.getTomaMx().getCodigoLab());
             map.put("idRecepcion", recepcion.getIdRecepcion());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
-            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
+                    (recepcion.getTomaMx().getHoraTomaMx()!=null?" "+recepcion.getTomaMx().getHoraTomaMx():""));
 
             RecepcionMxLab recepcionMxLab = recepcionMxService.getRecepcionMxLabByIdRecepGral(recepcion.getIdRecepcion());
             if (recepcionMxLab!=null)

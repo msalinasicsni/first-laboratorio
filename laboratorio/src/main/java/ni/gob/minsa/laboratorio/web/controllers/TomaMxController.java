@@ -318,7 +318,7 @@ public class TomaMxController {
     }
 
     private Timestamp StringToTimestamp(String fechah) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date date = sdf.parse(fechah);
         return new Timestamp(date.getTime());
     }
@@ -370,6 +370,7 @@ public class TomaMxController {
         Integer codSilais=null;
         Integer codUnidadSalud=null;
         String codTipoNoti="";
+        String horaTomaMx="";
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -400,6 +401,9 @@ public class TomaMxController {
 
             if (jsonpObject.get("codTipoNoti")!=null && !jsonpObject.get("codTipoNoti").getAsString().isEmpty())
                 codTipoNoti = jsonpObject.get("codTipoNoti").getAsString();
+
+            if (jsonpObject.get("horaTomaMx")!=null && !jsonpObject.get("horaTomaMx").getAsString().isEmpty())
+                horaTomaMx = jsonpObject.get("horaTomaMx").getAsString();
 
             horaRefrigeracion = jsonpObject.get("horaRefrigeracion").getAsString();
 
@@ -446,6 +450,7 @@ public class TomaMxController {
 
             tomaMx.setCodTipoMx(tomaMxService.getTipoMxById(codTipoMx));
             tomaMx.setCanTubos(canTubos);
+            tomaMx.setHoraTomaMx(horaTomaMx);
 
             if(volumen != null && !volumen.equals("")){
                 tomaMx.setVolumen(Float.valueOf(volumen));
@@ -526,6 +531,7 @@ public class TomaMxController {
             map.put("codSilais","");
             map.put("codUnidadSalud","");
             map.put("codTipoNoti",codTipoNoti);
+            map.put("horaTomaMx",horaTomaMx);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -649,7 +655,10 @@ public class TomaMxController {
         if (noti != null) {
             //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
             catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|OMX");
+            List<TipoNotificacion> tiposNotificacion = new ArrayList<TipoNotificacion>();
 
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|OMX"));
+            mav.addObject("notificaciones",tiposNotificacion);
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
             mav.addObject("catTipoMx", catTipoMx);

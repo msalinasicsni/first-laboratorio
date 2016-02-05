@@ -164,7 +164,8 @@ public class VisualizarNotificacionController {
             map.put("codigoUnicoMx", esEstudio ? recepcion.getTomaMx().getCodigoUnicoMx() : recepcion.getTomaMx().getCodigoLab());
             map.put("idRecepcion", recepcion.getIdRecepcion());
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
-            map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
+                    (recepcion.getTomaMx().getHoraTomaMx()!=null?" "+recepcion.getTomaMx().getHoraTomaMx():""));
 
             RecepcionMxLab recepcionMxLab = recepcionMxService.getRecepcionMxLabByIdRecepGral(recepcion.getIdRecepcion());
             if (recepcionMxLab != null)
@@ -1417,7 +1418,9 @@ public class VisualizarNotificacionController {
 
                                 content[0] = soli.getCodDx().getNombre() != null ? soli.getCodDx().getNombre() : "";
                                 content[1] = soli.getFechaHSolicitud() != null ? DateUtil.DateToString(soli.getFechaHSolicitud(), "dd/MM/yyyy HH:mm:ss") : "";
-                                content[2] = soli.getIdTomaMx().getFechaHTomaMx() != null ? DateUtil.DateToString(soli.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy HH:mm:ss") : "";
+                                content[2] = soli.getIdTomaMx().getFechaHTomaMx() != null ?
+                                        DateUtil.DateToString(soli.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+(soli.getIdTomaMx().getHoraTomaMx()!=null?" "+soli.getIdTomaMx().getHoraTomaMx():"")
+                                        : "";
                                 content[3] = soli.getIdTomaMx().getCodTipoMx() != null ? soli.getIdTomaMx().getCodTipoMx().getNombre() : "";
 
                                 int cont = 0;
@@ -1551,7 +1554,9 @@ public class VisualizarNotificacionController {
 
                                 content1[0] = est.getTipoEstudio().getNombre() != null ? est.getTipoEstudio().getNombre() : "";
                                 content1[1] = est.getFechaHSolicitud() != null ? DateUtil.DateToString(est.getFechaHSolicitud(), "dd/MM/yyyy HH:mm:ss") : "";
-                                content1[2] = est.getIdTomaMx().getFechaHTomaMx() != null ? DateUtil.DateToString(est.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy HH:mm:ss") : "";
+                                content1[2] = est.getIdTomaMx().getFechaHTomaMx() != null ?
+                                        DateUtil.DateToString(est.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+(est.getIdTomaMx().getHoraTomaMx()!=null?" "+est.getIdTomaMx().getHoraTomaMx():"")
+                                        : "";
                                 content1[3] = est.getIdTomaMx().getCodTipoMx() != null ? est.getIdTomaMx().getCodTipoMx().getNombre() : "";
 
                                 int cont1 = 0;
@@ -2766,7 +2771,9 @@ public class VisualizarNotificacionController {
 
                             content[0] = soli.getCodDx().getNombre() != null ? soli.getCodDx().getNombre() : "";
                             content[1] = soli.getFechaHSolicitud() != null ? DateUtil.DateToString(soli.getFechaHSolicitud(), "dd/MM/yyyy HH:mm:ss") : "";
-                            content[2] = soli.getIdTomaMx().getFechaHTomaMx() != null ? DateUtil.DateToString(soli.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy HH:mm:ss") : "";
+                            content[2] = soli.getIdTomaMx().getFechaHTomaMx() != null ?
+                                    DateUtil.DateToString(soli.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+(soli.getIdTomaMx().getHoraTomaMx()!=null?" "+soli.getIdTomaMx().getHoraTomaMx():"")
+                                    : "";
                             content[3] = soli.getIdTomaMx().getCodTipoMx() != null ? soli.getIdTomaMx().getCodTipoMx().getNombre() : "";
 
                             int cont = 0;

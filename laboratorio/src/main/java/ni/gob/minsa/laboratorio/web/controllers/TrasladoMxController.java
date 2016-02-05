@@ -534,7 +534,8 @@ public class TrasladoMxController {
             map.put("idTomaMx", tomaMx.getIdTomaMx());
             map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
             //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy")+
+                    (tomaMx.getHoraTomaMx()!=null?" "+tomaMx.getHoraTomaMx():""));
             if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
                 map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
             }else{

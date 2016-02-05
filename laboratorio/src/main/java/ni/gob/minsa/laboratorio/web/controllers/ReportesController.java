@@ -1954,7 +1954,8 @@ public class ReportesController {
             map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoUnicoMx());
             map.put("codigoLab", diagnostico.getIdTomaMx().getCodigoLab());
             map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
-            map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
+                    (diagnostico.getIdTomaMx().getHoraTomaMx()!=null?" "+diagnostico.getIdTomaMx().getHoraTomaMx():""));
             if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
                 map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
             }else{
@@ -2584,7 +2585,8 @@ public class ReportesController {
             if (solDx != null) {
 
                 if (solDx.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx());
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solDx.getIdTomaMx().getFechaHTomaMx())+
+                            (solDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solDx.getIdTomaMx().getHoraTomaMx():"");
                 }
 
                 RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
@@ -2602,7 +2604,8 @@ public class ReportesController {
             } else {
 
                 if (solE.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solE.getIdTomaMx().getFechaHTomaMx());
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solE.getIdTomaMx().getFechaHTomaMx())+
+                            (solE.getIdTomaMx().getHoraTomaMx()!=null?" "+solE.getIdTomaMx().getHoraTomaMx():"");
                 }
 
                 RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));

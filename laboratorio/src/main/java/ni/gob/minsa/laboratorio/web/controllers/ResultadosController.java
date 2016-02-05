@@ -277,7 +277,8 @@ public class ResultadosController {
                 map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoLab());
                 map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
-                map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
+                        (orden.getSolicitudDx().getIdTomaMx().getHoraTomaMx()!=null?" "+orden.getSolicitudDx().getIdTomaMx().getHoraTomaMx():""));
                 if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
                     map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
                 }

@@ -130,7 +130,8 @@ public class ResultadoFinalController {
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab());
                 map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
-                map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy hh:mm:ss a"));
+                map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
+                        (diagnostico.getIdTomaMx().getHoraTomaMx()!=null?" "+diagnostico.getIdTomaMx().getHoraTomaMx():""));
                 if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
                     map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
                 }else{
@@ -194,7 +195,8 @@ public class ResultadoFinalController {
                   Map<String, String> map = new HashMap<String, String>();
                   map.put("codigoUnicoMx", estudio.getIdTomaMx().getCodigoUnicoMx());
                   map.put("idTomaMx", estudio.getIdTomaMx().getIdTomaMx());
-                  map.put("fechaTomaMx", DateUtil.DateToString(estudio.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                  map.put("fechaTomaMx", DateUtil.DateToString(estudio.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
+                          (estudio.getIdTomaMx().getHoraTomaMx()!=null?" "+estudio.getIdTomaMx().getHoraTomaMx():""));
                   map.put("codSilais", estudio.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
                   map.put("codUnidadSalud", estudio.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
                   map.put("tipoMuestra", estudio.getIdTomaMx().getCodTipoMx().getNombre());
