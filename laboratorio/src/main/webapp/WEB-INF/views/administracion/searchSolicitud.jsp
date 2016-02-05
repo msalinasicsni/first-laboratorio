@@ -624,7 +624,7 @@
                         </span>
                                     <select class="select2" id="codConcepto2" name="codConcepto2">
                                         <option value=""><spring:message code="lbl.select"/>...</option>
-                                        <c:forEach items="${conceptsList}" var="respuesta">
+                                        <c:forEach items="${conceptsListDI}" var="respuesta">
                                             <option value="${respuesta.idConcepto}">${respuesta.nombre}</option>
                                         </c:forEach>
                                     </select>
