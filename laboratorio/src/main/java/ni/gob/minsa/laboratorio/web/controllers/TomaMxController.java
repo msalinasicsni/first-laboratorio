@@ -12,6 +12,7 @@ import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
+import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import org.slf4j.Logger;
@@ -371,6 +372,7 @@ public class TomaMxController {
         Integer codUnidadSalud=null;
         String codTipoNoti="";
         String horaTomaMx="";
+        String fechaInicioSintomas="";
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -404,6 +406,9 @@ public class TomaMxController {
 
             if (jsonpObject.get("horaTomaMx")!=null && !jsonpObject.get("horaTomaMx").getAsString().isEmpty())
                 horaTomaMx = jsonpObject.get("horaTomaMx").getAsString();
+
+            if (jsonpObject.get("fechaInicioSintomas")!=null && !jsonpObject.get("fechaInicioSintomas").getAsString().isEmpty())
+                fechaInicioSintomas = jsonpObject.get("fechaInicioSintomas").getAsString();
 
             horaRefrigeracion = jsonpObject.get("horaRefrigeracion").getAsString();
 
@@ -442,7 +447,9 @@ public class TomaMxController {
             if (!codTipoNoti.isEmpty()){
                 notificacion.setCodTipoNotificacion(catalogoService.getTipoNotificacion(codTipoNoti));
             }
-
+            if (!fechaInicioSintomas.isEmpty()){
+                notificacion.setFechaInicioSintomas(DateUtil.StringToDate(fechaInicioSintomas,"dd/MM/yyyyy"));
+            }
             tomaMx.setIdNotificacion(notificacion);
             if(fechaHTomaMx != null){
                 tomaMx.setFechaHTomaMx(StringToTimestamp(fechaHTomaMx));
@@ -532,6 +539,7 @@ public class TomaMxController {
             map.put("codUnidadSalud","");
             map.put("codTipoNoti",codTipoNoti);
             map.put("horaTomaMx",horaTomaMx);
+            map.put("fechaInicioSintomas",fechaInicioSintomas);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -577,6 +585,7 @@ public class TomaMxController {
                 long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
                 noti.setUsuarioRegistro(usuarioService.getUsuarioById((int)idUsuario));
             }
+            noti.setCompleta(false);
             //noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|CAESP"));
 
             daNotificacionService.addNotification(noti);

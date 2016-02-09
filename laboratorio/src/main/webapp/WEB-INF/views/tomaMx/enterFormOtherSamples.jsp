@@ -76,7 +76,7 @@
 								<!-- widget content -->
 								<div class="widget-body no-padding">
                                 <input value="${noti.codTipoNotificacion.codigo}" hidden="hidden" type="text" id="tipoNoti" name="tipoNoti"/>
-                                <form id="noti" class="smart-form"  autocomplete="off">
+                                <form id="datos-noti" class="smart-form"  autocomplete="off">
                                 <fieldset >
                                     <legend class="text-left txt-color-blue font-md"> <spring:message code="lbl.notification.data"/>
                                         ${noti.codTipoNotificacion.valor}

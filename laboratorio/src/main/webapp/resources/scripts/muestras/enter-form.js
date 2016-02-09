@@ -84,41 +84,44 @@ var EnterFormTomaMx = function () {
                 rules: {
                     fechaHTomaMx: {
                         required: true
-
                     },
-
                     codTipoMx: {
                         required: true
                     },
-
-                    examenes: {
+                    dx: {
                         required: true
                     }
-
                 },
-
                 errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
-
                 }
-
-                /*  submitHandler: function (form) {
-                 //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                 save();
-                 }*/
             });
 
+            var $validator2 = $("#datos-noti").validate({
+                rules: {
+                    fechaInicioSintomas:{
+                        required: true
+                    }
+                },
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                }
+            });
 
             $('#submit').click(function () {
-                var $validarForm = $("#registroMx").valid();
-                if (!$validarForm) {
-                    $validator.focusInvalid();
+                var $validarFormNoti = $("#datos-noti").valid();
+                if (!$validarFormNoti) {
+                    $validator2.focusInvalid();
                     return false;
                 } else {
-                    save();
-
+                    var $validarForm = $("#registroMx").valid();
+                    if (!$validarForm) {
+                        $validator.focusInvalid();
+                        return false;
+                    } else {
+                        save();
+                    }
                 }
-
             });
 
             function save() {
@@ -132,13 +135,17 @@ var EnterFormTomaMx = function () {
                 }else{
                     objetoTomaMx['codTipoNoti'] = '';
                 }
+                if (document.getElementById('fechaInicioSintomas')){
+                    objetoTomaMx['fechaInicioSintomas'] = $("#fechaInicioSintomas").val();
+                }else{
+                    objetoTomaMx['fechaInicioSintomas'] = '';
+                }
                 objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();
                 objetoTomaMx['horaTomaMx'] = $("#horaTomaMx").val();
                 objetoTomaMx['canTubos'] = $("#canTubos").val();
                 objetoTomaMx['volumen'] = $("#volumen").val();
                 objetoTomaMx['horaRefrigeracion'] = $("#horaRefrigeracion").val();
                 objetoTomaMx['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
-                //objetoTomaMx['dx'] = $('#dx').val();
                 objetoTomaMx['mensaje'] = '';
                 var valores = $('#dx').val();
                 var strValores = '';
@@ -153,6 +160,7 @@ var EnterFormTomaMx = function () {
                 }
                 //console.log(strValores);
                 objetoTomaMx['dx'] = strValores;
+
                 $.getJSON(parametros.todoDatosUrl, {
                     solicitudes: strValores,
                     ajax: 'false'
@@ -243,6 +251,7 @@ var EnterFormTomaMx = function () {
                     setTimeout($.unblockUI, 10);
                     validateLogin(jqXHR);
                 });
+
             }
 
             $('#dx').change(function () {

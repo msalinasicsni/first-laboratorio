@@ -22,7 +22,7 @@ public class DaVacunasIrag implements Serializable {
     private Integer idVacuna;
     private DaIrag idNotificacion;
     private Vacuna codVacuna;
-    private TipoVacuna codTipoVacuna;
+    private String codTipoVacuna;
     private Integer dosis;
     private Date fechaUltimaDosis;
     private Timestamp fechaRegistro;
@@ -61,12 +61,12 @@ public class DaVacunasIrag implements Serializable {
     public void setCodVacuna(Vacuna codVacuna) { this.codVacuna = codVacuna; }
 
 
-    @ManyToOne(fetch=FetchType.LAZY,targetEntity=Catalogo.class)
-    @JoinColumn(name="COD_TIPO_VACUNA", referencedColumnName = "CODIGO", nullable = false)
-    @ForeignKey(name = "COD_TVACUNA_FK")
-    public TipoVacuna getCodTipoVacuna() { return codTipoVacuna; }
+    @Basic
+    @Column(name = "COD_TIPO_VACUNA", nullable = true, insertable = true, updatable = true, length = 250)
 
-    public void setCodTipoVacuna(TipoVacuna codTipoVacuna) { this.codTipoVacuna = codTipoVacuna; }
+    public String getCodTipoVacuna() { return codTipoVacuna; }
+
+    public void setCodTipoVacuna(String codTipoVacuna) { this.codTipoVacuna = codTipoVacuna; }
 
 
     @Basic

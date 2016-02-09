@@ -1773,7 +1773,7 @@ public class VisualizarNotificacionController {
 
                     String depProce = irag.getIdNotificacion().getPersona().getMunicipioResidencia() != null ? irag.getIdNotificacion().getPersona().getMunicipioResidencia().getDependencia().getNombre() : "----------";
                     String municProce = irag.getIdNotificacion().getPersona().getMunicipioResidencia() != null ? irag.getIdNotificacion().getPersona().getMunicipioResidencia().getNombre() : "----------";
-                    String comunidadResidencia = irag.getIdNotificacion().getComunidadResidencia() != null ? irag.getIdNotificacion().getComunidadResidencia().getNombre() : "----------";
+                    String comunidadResidencia = irag.getIdNotificacion().getPersona().getComunidadResidencia() != null ? irag.getIdNotificacion().getPersona().getComunidadResidencia().getNombre() : "----------";
                     String direccionResidencia = irag.getIdNotificacion().getDireccionResidencia() != null ? irag.getIdNotificacion().getDireccionResidencia() : "----------";
                     String telefono = irag.getIdNotificacion().getPersona().getTelefonoResidencia() != null ? irag.getIdNotificacion().getPersona().getTelefonoResidencia() : "----------";
                     String captacion = irag.getCodCaptacion() != null ? irag.getCodCaptacion().getCodigo() : null;

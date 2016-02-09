@@ -77,7 +77,7 @@
 								<div class="widget-body no-padding">
                                 <input value="${esNuevaNoti}" hidden="hidden" type="text" id="esNuevaNoti" name="esNuevaNoti"/>
 
-                                <form id="noti" class="smart-form"  autocomplete="off">
+                                <form id="datos-noti" class="smart-form"  autocomplete="off">
                                 <fieldset >
                                     <legend class="text-left txt-color-blue font-md"> <spring:message code="lbl.notification.data"/>
                                         ${noti.codTipoNotificacion.valor}
@@ -272,6 +272,30 @@
                                                         </c:choose>
                                                     </c:forEach>
                                                 </select>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-3">
+                                            <label  class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.symptoms.start.date.full" />
+                                            </label>
+                                            <div class="">
+                                                <label class="input">
+                                                    <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
+                                                    <c:choose>
+                                                        <c:when test="${esNuevaNoti}">
+                                                            <input name="fechaInicioSintomas" id="fechaInicioSintomas" value="<fmt:formatDate value="${noti.fechaInicioSintomas}" pattern="dd/MM/yyyy" />" type='text'
+                                                                   class="form-control date-picker" data-date-end-date="+0d"
+                                                                   placeholder="<spring:message code="lbl.receipt.symptoms.start.date.full" />"/>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <input name="fechaInicioSintomas" disabled id="fechaInicioSintomas" value="<fmt:formatDate value="${noti.fechaInicioSintomas}" pattern="dd/MM/yyyy" />" type='text'
+                                                                   class="form-control"
+                                                                   placeholder="<spring:message code="lbl.receipt.symptoms.start.date.full" />"/>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </label>
                                             </div>
                                         </section>
                                     </div>
