@@ -82,7 +82,7 @@ public class DaIrag implements Serializable {
 
     @Basic
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    @Column(name = "FECHA_CONSULTA", nullable = false, insertable = true, updatable = true)
+    @Column(name = "FECHA_CONSULTA", nullable = true, insertable = true, updatable = true)
     public Date getFechaConsulta() {
         return fechaConsulta;
     }

@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -65,6 +67,12 @@ public class TomaMxController {
 
     @Resource(name = "daNotificacionService")
     public DaNotificacionService daNotificacionService;
+
+    @Resource(name = "sindFebrilService")
+    public SindFebrilService sindFebrilService;
+
+    @Resource(name = "daIragService")
+    public DaIragService daIragService;
 
     @Resource(name = "personaService")
     public PersonaService personaService;
@@ -485,6 +493,7 @@ public class TomaMxController {
 
             try {
                 daNotificacionService.updateNotificacion(notificacion);
+                crearFicha(notificacion);
             }catch (Exception ex){
                 resultado = messageSource.getMessage("msg.error.update.noti",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
@@ -543,6 +552,29 @@ public class TomaMxController {
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
+        }
+    }
+
+    private void crearFicha(DaNotificacion notificacion){
+        switch (notificacion.getCodTipoNotificacion().getCodigo()){
+            case "TPNOTI|SINFEB": {
+                DaSindFebril sindFebril = new DaSindFebril();
+                sindFebril.setIdNotificacion(notificacion);
+                sindFebril.setFechaFicha(new Date());
+                sindFebril.setMesesEmbarazo(0);
+                sindFebrilService.saveSindFebril(sindFebril);
+                break;
+            }
+            case "TPNOTI|IRAG": {
+                DaIrag irag = new DaIrag();
+                irag.setIdNotificacion(notificacion);
+                irag.setFechaRegistro(new Timestamp(new Date().getTime()));
+                irag.setUsuario(notificacion.getUsuarioRegistro());
+                daIragService.saveOrUpdateIrag(irag);
+                break;
+            }
+            default:
+                break;
         }
     }
 

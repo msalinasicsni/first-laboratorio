@@ -37,4 +37,13 @@ public class DaIragService {
 
     }
 
+    /**
+     * Guarda o actualiza una notificacion irag
+     */
+    public void saveOrUpdateIrag(DaIrag irag) {
+        Session session = sessionFactory.getCurrentSession();
+        session.saveOrUpdate(irag.getIdNotificacion());
+        session.saveOrUpdate(irag);
+    }
+
 }
