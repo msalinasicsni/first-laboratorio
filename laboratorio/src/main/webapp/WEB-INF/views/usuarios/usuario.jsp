@@ -218,20 +218,22 @@
                                     </button></td>
                             </tr>
                             <tr class="info">
-                                <td>
                                 <c:choose>
-                                    <c:when test="${fn:contains(rolesString,'ROLE_ADMIN')}">
-                                            <button id="btn-mkNoAdmin" type="button" class="btn btn-danger">
-                                                <spring:message code="users.noadmin" />
+                                    <c:when test="${fn:contains(rolesString,'ROLE_RECEPCION')}">
+                                        <td>
+                                            <button id="btn-mkNoRecep" type="button" class="btn btn-danger">
+                                                <spring:message code="users.norecep" />
                                             </button>
+                                        </td>
                                     </c:when>
                                     <c:otherwise>
-                                            <button id="btn-mkAdmin" type="button" class="btn btn-success">
-                                                <spring:message code="users.admin" />
+                                        <td>
+                                            <button id="btn-mkRecep" type="button" class="btn btn-success">
+                                                <spring:message code="users.recep" />
                                             </button>
+                                        </td>
                                     </c:otherwise>
-                                   </c:choose>
-                                </td>
+                                </c:choose>
                                    <c:choose>
                                     <c:when test="${fn:contains(rolesString,'ROLE_ANALISTA')}">
                                         <td>
@@ -255,42 +257,7 @@
                                          </td>
                                     </c:otherwise>
                                     </c:choose>
-                                <c:choose>
-                                    <c:when test="${fn:contains(rolesString,'ROLE_RECEPCION')}">
-                                        <td>
-                                            <button id="btn-mkNoRecep" type="button" class="btn btn-danger">
-                                                <spring:message code="users.norecep" />
-                                            </button>
-                                        </td>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <td>
-                                            <button id="btn-mkRecep" type="button" class="btn btn-success">
-                                                <spring:message code="users.recep" />
-                                            </button>
-                                        </td>
-                                    </c:otherwise>
-                                </c:choose>
-                                <c:choose>
-                                    <c:when test="${fn:contains(rolesString,'ROLE_DIR')}">
-                                        <td>
-                                            <button id="btn-mkNoDir" type="button" class="btn btn-danger">
-                                                <spring:message code="users.nodir" />
-                                            </button>
-                                            <br/><br/>
-                                            <button id="btn-direction" type="button" class="btn btn-primary">
-                                                <spring:message code="act.admin.direction" />
-                                            </button>
-                                        </td>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <td>
-                                            <button id="btn-mkDir" type="button" class="btn btn-success">
-                                                <spring:message code="users.dir" />
-                                            </button>
-                                        </td>
-                                    </c:otherwise>
-                                </c:choose>
+
                                 <c:choose>
                                     <c:when test="${fn:contains(rolesString,'ROLE_JEFE')}">
                                         <td>
@@ -311,6 +278,42 @@
                                         </td>
                                     </c:otherwise>
                                 </c:choose>
+
+                                <c:choose>
+                                    <c:when test="${fn:contains(rolesString,'ROLE_DIR')}">
+                                        <td>
+                                            <button id="btn-mkNoDir" type="button" class="btn btn-danger">
+                                                <spring:message code="users.nodir" />
+                                            </button>
+                                            <br/><br/>
+                                            <button id="btn-direction" type="button" class="btn btn-primary">
+                                                <spring:message code="act.admin.direction" />
+                                            </button>
+                                        </td>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <td>
+                                            <button id="btn-mkDir" type="button" class="btn btn-success">
+                                                <spring:message code="users.dir" />
+                                            </button>
+                                        </td>
+                                    </c:otherwise>
+                                </c:choose>
+
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${fn:contains(rolesString,'ROLE_ADMIN')}">
+                                            <button id="btn-mkNoAdmin" type="button" class="btn btn-danger">
+                                                <spring:message code="users.noadmin" />
+                                            </button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button id="btn-mkAdmin" type="button" class="btn btn-success">
+                                                <spring:message code="users.admin" />
+                                            </button>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
                                 <td></td>
                             </tr>
                         </table>

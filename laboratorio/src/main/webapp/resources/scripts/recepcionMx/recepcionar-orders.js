@@ -23,6 +23,7 @@ var ReceiptOrders = function () {
     return {
         //main function to initiate the module
         init: function (parametros) {
+
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
                 tablet: 1024,
@@ -574,6 +575,8 @@ var ReceiptOrders = function () {
                 recepcionObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val();
                 recepcionObj['causaRechazo'] = $('#causaRechazo').find('option:selected').val();//$('#causaRechazo').val();
                 recepcionObj['codigoUnicoMx'] = '';
+                recepcionObj['fechaRecibido']= $('#fechaRec').val() ;
+                recepcionObj['horaRecibido']= $('#horaRec').val() ;
 
                 $.ajax(
                     {

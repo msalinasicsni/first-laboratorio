@@ -7,6 +7,7 @@ import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -31,6 +32,8 @@ public class RecepcionMx {
     CausaRechazoMx causaRechazo;
     Laboratorio labRecepcion;
     CondicionMx condicionMx;
+    Date fechaRecibido;
+    String horaRecibido;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -162,4 +165,17 @@ public class RecepcionMx {
     public void setCondicionMx(CondicionMx condicionMx) {
         this.condicionMx = condicionMx;
     }
+
+    @Basic
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "FECHA_RECIBIDO", nullable = true, insertable = true, updatable = true)
+    public Date getFechaRecibido() { return fechaRecibido; }
+
+    public void setFechaRecibido(Date fechaRecibido) { this.fechaRecibido = fechaRecibido; }
+
+    @Basic
+    @Column(name = "HORA_RECIBIDO", nullable = true, insertable = true, updatable = true, length = 8)
+    public String getHoraRecibido() { return horaRecibido; }
+
+    public void setHoraRecibido(String horaRecibido) { this.horaRecibido = horaRecibido; }
 }

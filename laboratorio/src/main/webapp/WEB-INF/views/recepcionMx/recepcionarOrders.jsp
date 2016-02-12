@@ -9,8 +9,11 @@
 <head>
 	<jsp:include page="../fragments/headTag.jsp" />
     <style>
-        textarea {
+        /*textarea {
             resize: none;
+        }*/
+        .styleTime {
+            orientation: bottom;
         }
     </style>
 </head>
@@ -383,6 +386,34 @@
                                                 </div>
                                             </div>
                                             <div class="row">
+                                                <section class="col col-3">
+                                                    <label  class="text-left txt-color-blue font-md">
+                                                       <spring:message code="lbl.received.date" />
+                                                    </label>
+                                                    <div class="">
+                                                        <label class="input">
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
+                                                            <input name="fechaRec" id="fechaRec" type='text'
+                                                                   class="form-control date-picker" data-date-end-date="+0d"
+                                                                   placeholder="<spring:message code="lbl.received.date" />"/>
+                                                        </label>
+                                                    </div>
+                                                </section>
+                                                <section class="col col-3">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.received.time" />
+                                                    </label>
+                                                    <div class=''>
+                                                        <label class="input">
+                                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-clock-o fa-fw"></i>
+                                                            <input id="horaRec" name="horaRec" type='text'
+                                                                   class="form-control styleTime"
+                                                                   placeholder="<spring:message code="lbl.received.time" />"/>
+                                                        </label>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                            <div class="row">
                                                 <section class="col col-sm-12 col-md-12 col-lg-12">
                                                     <label class="text-left txt-color-red font-md">
                                                         ${inadecuada}
@@ -424,8 +455,10 @@
 	<!-- END FOOTER -->
 	<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
 	<jsp:include page="../fragments/corePlugins.jsp" />
-	<!-- BEGIN PAGE LEVEL PLUGINS -->
-	<spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
+
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    <!-- datatable -->
+    <spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
     <script src="${dataTables}"></script>
     <spring:url value="/resources/js/plugin/datatables/dataTables.colVis.min.js" var="dataTablesColVis" />
     <script src="${dataTablesColVis}"></script>
@@ -436,27 +469,54 @@
     <spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
     <script src="${dataTablesResponsive}"></script>
     <spring:url value="/resources/js/plugin/datatables/swf/copy_csv_xls_pdf.swf" var="tabletools" />
-    <!-- jQuery Selecte2 Input -->
+    <!-- JQUERY VALIDATE -->
+    <spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
+    <script src="${jqueryValidate}"></script>
+    <spring:url value="/resources/js/plugin/jquery-validate/messages_{language}.js" var="jQValidationLoc">
+        <spring:param name="language" value="${pageContext.request.locale.language}" /></spring:url>
+    <script src="${jQValidationLoc}"></script>
+    <!-- jQuery Select2 Input -->
     <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
     <script src="${selectPlugin}"></script>
-	<!-- JQUERY VALIDATE -->
-	<spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
-	<script src="${jqueryValidate}"></script>
-	<spring:url value="/resources/js/plugin/jquery-validate/messages_{language}.js" var="jQValidationLoc">
-	<spring:param name="language" value="${pageContext.request.locale.language}" /></spring:url>				
-	<script src="${jQValidationLoc}"></script>
-	<!-- JQUERY BLOCK UI -->
-	<spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
-	<script src="${jqueryBlockUi}"></script>
+    <!-- jQuery Select2 Locale -->
+    <spring:url value="/resources/js/plugin/select2/select2_locale_{language}.js" var="selectPluginLocale">
+        <spring:param name="language" value="${pageContext.request.locale.language}" /></spring:url>
+    <script src="${selectPluginLocale}"></script>
+    <!-- JQUERY BLOCK UI -->
+    <spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
+    <script src="${jqueryBlockUi}"></script>
+    <!-- bootstrap datepicker -->
+    <spring:url value="/resources/js/plugin/bootstrap-datepicker/bootstrap-datepicker.js" var="datepickerPlugin" />
+    <script src="${datepickerPlugin}"></script>
+    <spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
+        <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
+    <script src="${datePickerLoc}"></script>
     <!-- END PAGE LEVEL PLUGINS -->
-	<!-- BEGIN PAGE LEVEL SCRIPTS -->
-	<spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />
-	<script src="${receiptOrders}"></script>
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    <spring:url value="/resources/scripts/recepcionMx/recepcionar-orders.js" var="receiptOrders" />
+    <script src="${receiptOrders}"></script>
+    <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
+    <script src="${handleDatePickers}"></script>
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    <spring:url value="/resources/scripts/utilidades/seleccionUnidad.js" var="selecUnidad" />
+    <script src="${selecUnidad}"></script>
+    <!-- bootstrap datetimepicker -->
+    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/moment-with-locales.js" var="moment" />
+    <script src="${moment}"></script>
+    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/bootstrap-datetimepicker.js" var="datetimepicker" />
+    <script src="${datetimepicker}"></script>
+    <!-- JQUERY INPUT MASK -->
+    <spring:url value="/resources/js/plugin/jquery-inputmask/jquery.inputmask.bundle.min.js" var="jqueryInputMask" />
+    <script src="${jqueryInputMask}"></script>
+    <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
+    <script src="${handleInputMask}"></script>
+    <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
+    <script src="${handleDatePickers}"></script>
+
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
-
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
@@ -470,9 +530,11 @@
                 blockMess: "${blockMess}",
                 sAddReceiptUrl: "${sAddReceiptUrl}",
                 sSearchReceiptUrl : "${sSearchReceiptUrl}",
+                language : "${pageContext.request.locale.language}",
                 sPrintUrl : "${sPrintUrl}"
             };
 			ReceiptOrders.init(parametros);
+            handleDatePickers("${pageContext.request.locale.language}");
 	    	$("li.recepcion").addClass("open");
             $("li.check-in").addClass("open");
             $("li.receipt").addClass("active");
@@ -480,6 +542,11 @@
 	    		$("li.receipt").parents("ul").slideDown(200);
 	    	}
             $('#dvCausa').hide();
+            $('#horaRec').datetimepicker({
+                format: 'LT'
+
+            });
+
         });
 	</script>
 	<!-- END JAVASCRIPTS -->
