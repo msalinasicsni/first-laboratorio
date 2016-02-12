@@ -477,13 +477,10 @@
     <spring:url value="/resources/scripts/utilidades/seleccionUnidad.js" var="selecUnidad" />
     <script src="${selecUnidad}"></script>
     <!-- bootstrap datetimepicker -->
-    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker/moment.js" var="moment" />
+    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/moment-with-locales.js" var="moment" />
     <script src="${moment}"></script>
-    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker/bootstrap-datetimepicker.js" var="datetimepicker" />
+    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/bootstrap-datetimepicker.js" var="datetimepicker" />
     <script src="${datetimepicker}"></script>
-    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker/locale/{languagedt}.js" var="datetimePickerLoc">
-        <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
-    <script src="${datetimePickerLoc}"></script>
     <!-- JQUERY INPUT MASK -->
     <spring:url value="/resources/js/plugin/jquery-inputmask/jquery.inputmask.bundle.min.js" var="jqueryInputMask" />
     <script src="${jqueryInputMask}"></script>

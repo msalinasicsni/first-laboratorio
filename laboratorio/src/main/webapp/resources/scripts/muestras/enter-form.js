@@ -28,11 +28,11 @@ var EnterFormTomaMx = function () {
         init: function (parametros) {
 
             $('#horaRefrigeracion').datetimepicker({
-                pickDate: false
+                format: 'LT'
             });
 
             $('#horaTomaMx').datetimepicker({
-                pickDate: false
+                format: 'LT'
             });
 
             $('#codTipoNoti').change(function () {
