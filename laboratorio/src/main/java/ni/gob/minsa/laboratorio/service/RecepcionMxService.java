@@ -143,7 +143,7 @@ public class RecepcionMxService {
                 crit.add(Restrictions.or(
                         Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()).
                         add(Restrictions.or(
-                        Restrictions.eq("estado.codigo", "ESTDMX|TRAS".toLowerCase()))));
+                        Restrictions.eq("estado.codigo", "ESTDMX|TRAS"))));
             }else {
                 crit.add(Restrictions.and(
                         Restrictions.eq("estado.codigo", filtro.getCodEstado().toLowerCase()).ignoreCase()));

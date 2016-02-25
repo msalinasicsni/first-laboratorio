@@ -223,6 +223,7 @@ var ReceptionReport = function () {
 
 
             function exportPDF1() {
+                blockUI();
                 $.ajax(
                     {
                         url: parametros.exportUrl,
@@ -246,16 +247,13 @@ var ReceptionReport = function () {
                                     timeout: 4000
                                 });
                             }
-
                             unBlockUI();
                         },
                         error: function (jqXHR) {
-                            desbloquearUI();
+                            unBlockUI();
                             validateLogin(jqXHR);
                         }
                     });
-
-
             }
 
 
@@ -429,6 +427,7 @@ var ReceptionReport = function () {
 
 
             function exportPDF2() {
+                blockUI();
                 $.ajax(
                     {
                         url: parametros.posReqExportUrl,
@@ -456,7 +455,7 @@ var ReceptionReport = function () {
                             unBlockUI();
                         },
                         error: function (jqXHR) {
-                            desbloquearUI();
+                            unBlockUI();
                             validateLogin(jqXHR);
                         }
                     });
@@ -607,6 +606,7 @@ var ReceptionReport = function () {
 
 
             function exportPDF() {
+                blockUI();
                 $.ajax(
                     {
                         url: parametros.pdfUrl,
@@ -633,7 +633,7 @@ var ReceptionReport = function () {
                             unBlockUI();
                         },
                         error: function (jqXHR) {
-                            desbloquearUI();
+                            unBlockUI();
                             validateLogin(jqXHR);
                         }
                     });
@@ -786,6 +786,7 @@ var ReceptionReport = function () {
 
 
             function exportGenReportPDF() {
+                blockUI();
                 $.ajax(
                     {
                         url: parametros.genRePdfUrl,
@@ -811,7 +812,7 @@ var ReceptionReport = function () {
                             unBlockUI();
                         },
                         error: function (jqXHR) {
-                            desbloquearUI();
+                            unBlockUI();
                             validateLogin(jqXHR);
                         }
                     });

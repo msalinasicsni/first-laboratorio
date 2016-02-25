@@ -9,7 +9,7 @@
 
     <global-method-security secured-annotations="enabled" />
     <beans:bean id="customAuthenticationEntryPoint" class="ni.gob.minsa.laboratorio.security.CustomAuthenticationEntryPoint">
-    <beans:property name="loginFormUrl" value="/login"></beans:property>
+    <beans:property name="loginFormUrl" value="/login"/>
     </beans:bean>
 
     <http auto-config="true" entry-point-ref="customAuthenticationEntryPoint">
@@ -29,7 +29,6 @@
         <intercept-url pattern="/recepcionMx/recepcionMasivaLab" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/generacionAlicuota/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_RES,ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestas/getRespuestasActivasExamen" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestasSolicitud/getRespuestasActivas" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/examenes/obtenerReglasExamenes" access="ROLE_ADMIN,ROLE_ANALISTA,ROLE_JEFE,ROLE_DIR" />
@@ -52,10 +51,11 @@
         <intercept-url pattern="/aprobacion/**" access="ROLE_ADMIN,ROLE_DIR,ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/separacionMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/resultadoFinal/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
         <intercept-url pattern="/aprobacion/**" access="ROLE_DIR,ROLE_JEFE,ROLE_ADMIN" />
         <intercept-url pattern="/tomaMx/**" access="ROLE_RECEPCION" />
+        <intercept-url pattern="/reprint/**" access="ROLE_RECEPCION,ROLE_ANALISTA" />
         <intercept-url pattern="/personas/persons" access="ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/personas/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/workSheet/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
@@ -68,7 +68,7 @@
 
         <form-login login-page="/login" default-target-url="/"
                     authentication-failure-url="/loginfailed" />
-        <logout logout-success-url="/logout" />
+        <logout logout-url="/logout" invalidate-session="true" delete-cookies="true" />
         <access-denied-handler error-page="/403"/>
     </http>
 

@@ -44,7 +44,7 @@
 
 		<!-- logout button -->
 		<div id="logout" class="btn-header transparent pull-right">
-			<span> <a href="#" title="<spring:message code="act.logout" />" data-action="userLogout" data-logout-msg="<spring:message code="msg.logout" />"><i class="fa fa-sign-out"></i></a> </span>
+			<span> <a href="<spring:url value="/logout" htmlEscape="true "/>" title="<spring:message code="act.logout" />" data-action="userLogout" data-logout-msg="<spring:message code="msg.logout" />"><i class="fa fa-sign-out"></i></a> </span>
 		</div>
 		<!-- end logout button -->
 		<!-- fullscreen button -->

@@ -1,21 +1,4 @@
 var SendOrders = function () {
-    var bloquearUI = function (mensaje) {
-        var loc = window.location;
-        var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
-        var mess = '<img src=' + pathName + 'resources/img/ajax-loading.gif>' + mensaje;
-        $.blockUI({ message: mess,
-            css: {
-                border: 'none',
-                padding: '15px',
-                backgroundColor: '#000',
-                '-webkit-border-radius': '10px',
-                '-moz-border-radius': '10px',
-                opacity: .5,
-                color: '#fff'
-            }
-        });
-    };
-
     var desbloquearUI = function () {
         setTimeout($.unblockUI, 500);
     };
@@ -133,7 +116,9 @@ var SendOrders = function () {
                         '-moz-border-radius': '10px',
                         opacity: .5,
                         color: '#fff'
-                    }});
+                    },
+                    baseZ: 1051 // para que se muestre bien en los modales
+                });
             }
 
             function unBlockUI() {
