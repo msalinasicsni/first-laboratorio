@@ -498,6 +498,7 @@ public class TomaMxController {
                 resultado = messageSource.getMessage("msg.error.update.noti",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
                 ex.printStackTrace();
+                tomaMxService.deleteTomaMx(tomaMx);
                 throw ex;
             }
             //se procede a registrar los diagnósticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)

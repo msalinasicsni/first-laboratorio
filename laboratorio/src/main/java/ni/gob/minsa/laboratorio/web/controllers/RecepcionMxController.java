@@ -515,7 +515,8 @@ public class RecepcionMxController {
             if (jsonpObject.get("horaRecibido") != null && !jsonpObject.get("horaRecibido").getAsString().isEmpty())
                 horaRecibido = jsonpObject.get("horaRecibido").getAsString();
 
-            fechaRecibido = jsonpObject.get("fechaRecibido").getAsString();
+            if (jsonpObject.get("fechaRecibido") != null && !jsonpObject.get("fechaRecibido").getAsString().isEmpty())
+                fechaRecibido = jsonpObject.get("fechaRecibido").getAsString();
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());

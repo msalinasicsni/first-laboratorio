@@ -1017,7 +1017,7 @@ public class SearchMxController {
             if (solDx != null) {
 
                 if (solDx.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(solDx.getIdTomaMx().getFechaHTomaMx())+
+                    fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solDx.getIdTomaMx().getFechaHTomaMx())+
                             (solDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solDx.getIdTomaMx().getHoraTomaMx():"");
                 }
 
