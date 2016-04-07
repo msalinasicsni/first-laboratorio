@@ -161,8 +161,11 @@ public class WorkSheetController {
                         controlCalidad = messageSource.getMessage("lbl.yes",null,null);
                     }
                 }
+                String solicitudes="";
+                String areaEntrega="";
+                int prioridad =100;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                    content = new String[6];
+                    /*content = new String[6];
                     y = y - 20;
                     if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
                         fis = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
@@ -174,12 +177,16 @@ public class WorkSheetController {
                             (solicitudDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudDx.getIdTomaMx().getHoraTomaMx():"");
                     content[4] = fis;
                     content[5] = controlCalidad;
-                    filasSolicitudes.add(content);
+                    */
+                    solicitudes += (solicitudes.isEmpty()?"":",")+solicitudDx.getCodDx().getNombre();
+                    //filasSolicitudes.add(content);
                     //numFila++;
+                    if(prioridad>=solicitudDx.getCodDx().getPrioridad())
+                    areaEntrega += areaEntrega.isEmpty()?solicitudDx.getCodDx().getArea().getNombre():"";
 
                 }
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
-                    content = new String[6];
+                    /*content = new String[6];
                     y = y - 20;
                     if (solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
                         fis = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
@@ -191,10 +198,29 @@ public class WorkSheetController {
                             (solicitudEstudio.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudEstudio.getIdTomaMx().getHoraTomaMx():"");
                     content[4] = fis;
                     content[5] = controlCalidad;
-                    filasSolicitudes.add(content);
+                    filasSolicitudes.add(content);*/
+                    solicitudes += (solicitudes.isEmpty()?"":",")+solicitudEstudio.getTipoEstudio().getNombre();
+                    areaEntrega += areaEntrega.isEmpty()?solicitudEstudio.getTipoEstudio().getArea().getNombre():"";
                     //numFila++;
 
                 }
+                if (tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas()!=null) {
+                    fis = DateUtil.DateToString(tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
+                }
+
+                content = new String[6];
+                y = y - 20;
+
+                content[0] = tomaMx_hoja.getCodigoLab()!=null?tomaMx_hoja.getCodigoLab():tomaMx_hoja.getCodigoUnicoMx();
+                content[1] = solicitudes;
+                content[2] = areaEntrega;
+                content[3] = DateUtil.DateToString(tomaMx_hoja.getFechaHTomaMx(), "dd/MM/yyyy")+
+                        (tomaMx_hoja.getHoraTomaMx()!=null?" "+tomaMx_hoja.getHoraTomaMx():"");
+                content[4] = fis;
+                content[5] = controlCalidad;
+
+                filasSolicitudes.add(content);
+
                 //Initialize table
                 float margin = 30;
                 float tableWidth = 530;
@@ -210,7 +236,7 @@ public class WorkSheetController {
                 cell.setFontSize(10);
                 cell.setFillColor(Color.LIGHT_GRAY);
 
-                cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.request.large", null, null));
+                cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
                 cell.setFillColor(Color.lightGray);
                 cell.setFont(PDType1Font.HELVETICA_BOLD);
                 cell.setFontSize(10);
