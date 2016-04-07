@@ -500,6 +500,8 @@ public class RecepcionMxController {
         String idTomaMx = "";
         String codigoLabMx = "";
         String causaRechazo;
+        String horaRecibido = "";
+        String fechaRecibido ="";
         boolean mxInadecuada = false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -510,6 +512,11 @@ public class RecepcionMxController {
             verificaTipoMx = jsonpObject.get("verificaTipoMx").getAsString();
             idTomaMx = jsonpObject.get("idTomaMx").getAsString();
             causaRechazo = jsonpObject.get("causaRechazo").getAsString();
+            if (jsonpObject.get("horaRecibido") != null && !jsonpObject.get("horaRecibido").getAsString().isEmpty())
+                horaRecibido = jsonpObject.get("horaRecibido").getAsString();
+
+            if (jsonpObject.get("fechaRecibido") != null && !jsonpObject.get("fechaRecibido").getAsString().isEmpty())
+                fechaRecibido = jsonpObject.get("fechaRecibido").getAsString();
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -524,7 +531,10 @@ public class RecepcionMxController {
             boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size()>0;
             tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
-
+            if(fechaRecibido != null){
+                recepcionMx.setFechaRecibido(DateUtil.StringToDate(fechaRecibido,"dd/MM/yyyyy" ));
+            }
+            recepcionMx.setHoraRecibido(horaRecibido);
             recepcionMx.setUsuarioRecepcion(usuario);
             recepcionMx.setLabRecepcion(labUsuario);
             recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));

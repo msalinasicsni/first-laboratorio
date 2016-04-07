@@ -59,7 +59,9 @@ public class HomeController {
     }
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
-    public String logout() {
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        session.invalidate();
         return "login";
     }
 

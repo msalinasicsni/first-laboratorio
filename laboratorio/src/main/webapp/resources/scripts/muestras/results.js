@@ -12,7 +12,8 @@ var ResultsNotices = function () {
                 '-moz-border-radius': '10px',
                 opacity: .5,
                 color: '#fff'
-            }
+            },
+            baseZ: 1051 // para que se muestre bien en los modales
         });
     };
 

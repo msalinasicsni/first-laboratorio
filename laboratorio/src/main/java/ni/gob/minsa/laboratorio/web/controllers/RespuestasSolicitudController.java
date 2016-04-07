@@ -348,7 +348,7 @@ public class RespuestasSolicitudController {
 
             if(jsonpObject.get("idRequest")!=null && !jsonpObject.get("idRequest").getAsString().isEmpty()){
 
-                if(jsonpObject.get("tipo").getAsString() == "Rutina"){
+                if(jsonpObject.get("tipo").getAsString().equalsIgnoreCase("Rutina")){
                     Catalogo_Dx dx = tomaMxService.getDxsById(jsonpObject.get("idRequest").getAsInt());
                     respuestaDx.setDiagnostico(dx);
                 }else{

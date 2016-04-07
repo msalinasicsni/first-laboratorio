@@ -154,11 +154,11 @@
                             <li class="area">
                                 <a href="<spring:url value="/administracion/area/list" htmlEscape="true "/>" title="<spring:message code="menu.area" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.area" /></a>
                             </li>
-                            <li class="examen">
-                                <a href="<spring:url value="/administracion/examenes/list" htmlEscape="true "/>" title="<spring:message code="menu.test" />"><i class="fa fa-lg fa-fw fa-medkit"></i> <spring:message code="menu.test" /></a>
-                            </li>
                             <li class="request">
                                 <a href="<spring:url value="/administracion/request/init" htmlEscape="true "/>" title="<spring:message code="lbl.dx.large" />"><i class="fa fa-lg fa-fw fa-file-text-o"></i> <spring:message code="lbl.dx.large" /></a>
+                            </li>
+                            <li class="examen">
+                                <a href="<spring:url value="/administracion/examenes/list" htmlEscape="true "/>" title="<spring:message code="menu.test" />"><i class="fa fa-lg fa-fw fa-medkit"></i> <spring:message code="menu.test" /></a>
                             </li>
                             <li class="sampleTypes">
                                 <a href="<spring:url value="/administracion/sampleTypes/init" htmlEscape="true "/>" title="<spring:message code="lbl.sample.types" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="lbl.sample.types" /></a>
