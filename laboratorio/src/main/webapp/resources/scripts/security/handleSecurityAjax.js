@@ -15,6 +15,14 @@ function validateLogin(jqXHR){
         var pathParts = path.split('/');
         var login = loc.protocol + "//" + loc.host + "/"+pathParts[1];
         setTimeout(function(){window.location.href = login;},2000);
+    }else if (jqXHR.status===403){
+        $.smallBox({
+            title: $("#txtAlertAjax").val() ,
+            content: "Mensaje: "+ jqXHR.status + "- Not authorized" ,
+            color: "#AF801C",
+            iconSmall: "fa fa-warning",
+            timeout: 4000
+        });
     }else if (jqXHR.status!=200){
         $.smallBox({
             title: $("#txtErrorAjax").val() ,

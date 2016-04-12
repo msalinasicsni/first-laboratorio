@@ -9,6 +9,7 @@
     <!-- texto para indicar que es necesario iniciar sesión si hay timeout de sesión y se hace una llamada ajax-->
     <input type="hidden" id="txtNotLoginAjax" value="<spring:message code="lbl.must.login"/>">
     <input type="hidden" id ="txtErrorAjax" value="<spring:message code="lbl.error"/>">
+    <input type="hidden" id ="txtAlertAjax" value="<spring:message code="lbl.alert"/>">
 	<!-- pulled right: nav area -->
 	<div class="pull-right">
 		
