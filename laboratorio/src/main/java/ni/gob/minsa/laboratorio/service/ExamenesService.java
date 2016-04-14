@@ -136,9 +136,10 @@ public class ExamenesService {
     public List<CatalogoExamenes> getExamenesDisponiblesUser(String userName){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select ex from CatalogoExamenes as ex, AutoridadArea as aa " +
-                "where ex.area.idArea = aa.area.idArea and aa.pasivo = false " +
+                "where ex.area.idArea = aa.area.idArea and aa.pasivo = false and ex.pasivo = false " +
                 "and aa.user.username = :userName and ex.idExamen not in (select aex.examen.idExamen from AutoridadExamen as aex " +
-                "where aex.pasivo = false and aex.autoridadArea.pasivo = false and aex.autoridadArea.user.username = :userName)");
+                "where aex.pasivo = false and aex.autoridadArea.pasivo = false and aex.autoridadArea.user.username = :userName) " +
+                "order by ex.nombre");
         q.setParameter("userName",userName);
         return q.list();
     }

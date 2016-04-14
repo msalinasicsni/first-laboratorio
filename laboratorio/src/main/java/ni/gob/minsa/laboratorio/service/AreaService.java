@@ -52,7 +52,9 @@ public class AreaService {
                 "and ad.depDireccion.idDepartDireccion = dd.idDepartDireccion " +
                 "and dd.direccionLab.idDireccionLab = dl.idDireccionLab " +
                 "and dl.laboratorio.codigo = al.laboratorio.codigo " +
-                "and al.user.username = :userName order by nombre";
+                "and al.user.username = :userName " +
+                "and aa.pasivo = false and ad.pasivo = false and dd.pasivo = false and dl.pasivo = false and al.pasivo = false " +
+                "order by aa.nombre";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);

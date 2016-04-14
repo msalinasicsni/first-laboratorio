@@ -227,7 +227,8 @@ public class AutoridadesService {
                 "(select a.direccion.idDireccion FROM AutoridadDireccion as a where a.pasivo = false and a.user.username = :userName) " +
                 "and dl.laboratorio.codigo = al.laboratorio.codigo " +
                 "and dl.direccion.idDireccion = d.idDireccion " +
-                "and al.user.username = :userName");
+                "and al.user.username = :userName " +
+                "and d.pasivo = false and al.pasivo = false and dl.pasivo = false order by d.nombre");
 
         query.setParameter("userName",userName);
         return query.list();
@@ -242,7 +243,9 @@ public class AutoridadesService {
                 "and dl.laboratorio.codigo = al.laboratorio.codigo " +
                 "and dl.idDireccionLab = dd.direccionLab.idDireccionLab " +
                 "and dd.departamento.idDepartamento = d.idDepartamento " +
-                "and al.user.username = :userName");
+                "and al.user.username = :userName " +
+                "and dl.pasivo = false and dd.pasivo = false and d.pasivo = false and al.pasivo = false " +
+                "order by d.nombre ");
 
         query.setParameter("userName",userName);
         return query.list();
