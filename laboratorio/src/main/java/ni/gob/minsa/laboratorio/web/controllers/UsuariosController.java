@@ -640,23 +640,6 @@ public class UsuariosController {
         return "usuarios/ChgPassUser";
     }
 
-    /*@RequestMapping(value = "/mod/password", method = RequestMethod.PUT)
-    public String processChgPassUser2Form(@Valid User user, BindingResult result, SessionStatus status, RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            return "usuarios/ChgPassUser";
-        } else {
-            user.setCreated(new Date());
-            user.setUsuario(user.getUsername());
-            StandardPasswordEncoder encoder = new StandardPasswordEncoder();
-            String encodedPass = encoder.encode(user.getPassword());
-            user.setPassword(encodedPass);
-            this.usuarioService.updateUser(user);
-            status.setComplete();
-            redirectAttributes.addFlashAttribute("SUCCESS", "Contrase�a cambiada correctamente!");
-            return "redirect:/";
-        }
-    }*/
-
     @RequestMapping(value = "/admin/new", method = RequestMethod.GET)
     public String initCreationForm(Model model) {
         List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosRegionales();
