@@ -7,8 +7,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
-
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import org.hibernate.annotations.ForeignKey;
+
+import java.io.Serializable;
 
 /**
  * Simple objeto de dominio que representa un rol
@@ -18,7 +20,7 @@ import org.hibernate.annotations.ForeignKey;
 
 @Entity
 @Table(name = "usuarios_roles", schema = "laboratorio")
-public class Authority {
+public class Authority implements Serializable, Auditable {
 	
 	private AuthorityId authId;
 	private User user;
@@ -53,4 +55,34 @@ public class Authority {
 		this.rol = rol;
 	}
 
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Authority{" +
+                "authId=" + authId +
+                ", user=" + user +
+                ", rol=" + rol +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Authority)) return false;
+
+        Authority authority = (Authority) o;
+
+        if (!authId.equals(authority.authId)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return authId.hashCode();
+    }
 }

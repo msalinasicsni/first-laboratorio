@@ -125,4 +125,27 @@ public class Cie10  implements Serializable {
         this.eliminado = eliminado;
     }
 
+    @Override
+    public String toString() {
+        return "Cie10{" +
+                "idCie10=" + idCie10 +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Cie10)) return false;
+
+        Cie10 cie10 = (Cie10) o;
+
+        if (idCie10 != cie10.idCie10) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (idCie10 ^ (idCie10 >>> 32));
+    }
 }

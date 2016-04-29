@@ -186,4 +186,10 @@ public class Usuarios {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "username='" + username + '\'' +
+                '}';
+    }
 }

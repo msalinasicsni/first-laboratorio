@@ -1,11 +1,13 @@
 package ni.gob.minsa.laboratorio.domain.irag;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.Cie10;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.estructura.Procedencia;
 import org.hibernate.annotations.ForeignKey;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -19,7 +21,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "da_irag", schema = "alerta")
-public class DaIrag implements Serializable {
+public class DaIrag implements Serializable, Auditable {
 
     private static final long serialVersionUID = 4700369684537438371L;
     private DaNotificacion idNotificacion;
@@ -67,9 +69,16 @@ public class DaIrag implements Serializable {
     private String otraCondicion;
     private Timestamp fechaRegistro;
     private Usuarios usuario;
-
+    private String id;
 
     @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @Column(name = "ID_FICHA", nullable = false, insertable = true, updatable = true, length = 36)
+    public String getId(){return this.id;}
+
+    public void setId(String id){this.id = id;}
+
     @OneToOne(targetEntity=DaNotificacion.class)
     @JoinColumn(name = "ID_NOTIFICACION", referencedColumnName = "ID_NOTIFICACION")
     public DaNotificacion getIdNotificacion() {
@@ -553,5 +562,37 @@ public class DaIrag implements Serializable {
 
     public void setOtraCondicion(String otraCondicion) {
         this.otraCondicion = otraCondicion;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("idNotificacion") || fieldname.matches("usuario") || fieldname.matches("fechaRegistro")) return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "DaIrag{" +
+                "idNotificacion=" + idNotificacion.getIdNotificacion() +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaIrag)) return false;
+
+        DaIrag daIrag = (DaIrag) o;
+
+        if (idNotificacion != null ? !idNotificacion.getIdNotificacion().equals(daIrag.idNotificacion.getIdNotificacion()) : daIrag.idNotificacion.getIdNotificacion() != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idNotificacion != null ? idNotificacion.hashCode() : 0;
     }
 }

@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
@@ -17,7 +18,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "da_tomamx", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = "CODUNICOMX"))
-public class DaTomaMx implements Serializable {
+public class DaTomaMx implements Serializable, Auditable {
 
     private String idTomaMx;
     private DaNotificacion idNotificacion;
@@ -250,5 +251,35 @@ public class DaTomaMx implements Serializable {
 
     public void setHoraTomaMx(String horaTomaMx) {
         this.horaTomaMx = horaTomaMx;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("estadoMx") || fieldname.matches("anulada") || fieldname.matches("envio") || fieldname.matches("codigoLab"))
+            return true;
+        else
+            return false;
+    }
+
+    @Override
+    public String toString() {
+        return "idTomaMx='" + idTomaMx+ '\'';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaTomaMx)) return false;
+
+        DaTomaMx tomaMx = (DaTomaMx) o;
+
+        if (idTomaMx != null ? !idTomaMx.equals(tomaMx.idTomaMx) : tomaMx.idTomaMx != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idTomaMx != null ? idTomaMx.hashCode() : 0;
     }
 }

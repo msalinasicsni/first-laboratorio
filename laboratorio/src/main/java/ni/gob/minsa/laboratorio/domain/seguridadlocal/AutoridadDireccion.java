@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.seguridadlocal;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.examen.Direccion;
 import org.hibernate.annotations.ForeignKey;
 
@@ -12,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "autoridad_direccion", schema = "laboratorio")
-public class AutoridadDireccion {
+public class AutoridadDireccion implements Auditable {
     Integer idAutoridadDirec;
     User user;
     Direccion direccion;
@@ -82,5 +83,35 @@ public class AutoridadDireccion {
 
     public void setPasivo(Boolean pasivo) {
         this.pasivo = pasivo;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechaRegistro") || fieldname.matches("usuarioRegistro")) return false;
+        return  true;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "idAutoridadDirec=" + idAutoridadDirec +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AutoridadDireccion)) return false;
+
+        AutoridadDireccion that = (AutoridadDireccion) o;
+
+        if (!idAutoridadDirec.equals(that.idAutoridadDirec)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idAutoridadDirec.hashCode();
     }
 }

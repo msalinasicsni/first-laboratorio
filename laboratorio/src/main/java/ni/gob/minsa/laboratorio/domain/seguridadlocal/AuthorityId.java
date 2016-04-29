@@ -22,7 +22,15 @@ public class AuthorityId implements Serializable {
 		
 	}
 
-	public boolean equals(Object other) {
+    @Override
+    public String toString() {
+        return "{" +
+                "'" + username + '\'' +
+                "-'" + authority + '\'' +
+                '}';
+    }
+
+    public boolean equals(Object other) {
 		if ((this == other))
 			return true;
 		if ((other == null))

@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.concepto.Concepto;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Estudio;
@@ -18,7 +19,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "dato_solicitud", schema = "laboratorio")
-public class DatoSolicitud implements Serializable{
+public class DatoSolicitud implements Serializable, Auditable{
 
     Integer idConceptoSol;
     String nombre;
@@ -132,5 +133,37 @@ public class DatoSolicitud implements Serializable{
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechahRegistro") || fieldname.matches("usuarioRegistro"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "{idConceptoSol=" + idConceptoSol +
+                ", nombre='" + nombre + '\''+
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DatoSolicitud)) return false;
+
+        DatoSolicitud that = (DatoSolicitud) o;
+
+        if (!idConceptoSol.equals(that.idConceptoSol)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idConceptoSol.hashCode();
     }
 }

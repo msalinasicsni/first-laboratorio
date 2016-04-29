@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -18,7 +20,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "recepcion_mx", schema = "laboratorio")
-public class RecepcionMx {
+public class RecepcionMx implements Serializable, Auditable {
 
     String idRecepcion;
     DaTomaMx tomaMx;
@@ -178,4 +180,34 @@ public class RecepcionMx {
     public String getHoraRecibido() { return horaRecibido; }
 
     public void setHoraRecibido(String horaRecibido) { this.horaRecibido = horaRecibido; }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("tomaMx") || fieldname.matches("fechaHoraRecepcion") || fieldname.matches("tipoRecepcionMx") || fieldname.matches("usuarioRecepcion"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "idRecepcion='" + idRecepcion + '\'';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecepcionMx)) return false;
+
+        RecepcionMx that = (RecepcionMx) o;
+
+        if (!idRecepcion.equals(that.idRecepcion)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idRecepcion.hashCode();
+    }
 }

@@ -531,7 +531,7 @@ public class RecepcionMxController {
             boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size()>0;
             tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
-            if(fechaRecibido != null){
+            if(fechaRecibido != null && !fechaRecibido.isEmpty()){
                 recepcionMx.setFechaRecibido(DateUtil.StringToDate(fechaRecibido,"dd/MM/yyyyy" ));
             }
             recepcionMx.setHoraRecibido(horaRecibido);

@@ -218,4 +218,19 @@ public class UsuarioService {
         Query query = session.createQuery("FROM Authority as a");
         return query.list();
     }
+
+    public Authority getAuthority(String userName, String role) throws Exception {
+        Session session = sessionFactory.getCurrentSession();
+        String query = "from Authority auth where auth.authId.username = :userName and" +
+                " auth.authId.authority = :role";
+        Query q = session.createQuery(query);
+        q.setString("userName", userName);
+        q.setString("role", role);
+        return  (Authority)q.uniqueResult();
+    }
+
+    public void deleteRole(Authority authority) {
+        Session session = sessionFactory.getCurrentSession();
+        session.delete(authority);
+    }
 }

@@ -32,8 +32,8 @@ public class DaVacunasIragService {
       @SuppressWarnings("unchecked")
       public List<DaVacunasIrag> getAllVaccinesByIdIrag(String id){
 
-          String query = "select vacu FROM DaVacunasIrag vacu where vacu.idNotificacion = :id and vacu.pasivo = :pasivo";
-          Session session = sessionFactory.getCurrentSession();
+          String query = "select vacu FROM DaVacunasIrag vacu where vacu.idNotificacion.idNotificacion.idNotificacion = :id and vacu.pasivo = :pasivo";
+          org.hibernate.Session session = sessionFactory.getCurrentSession();
           Query q = session.createQuery(query);
           q.setParameter("pasivo", false);
           q.setString("id",id);

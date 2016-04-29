@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.notificacion;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
@@ -14,6 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -23,8 +25,9 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "da_notificacion", schema = "alerta")
-public class DaNotificacion {
+public class DaNotificacion implements Serializable, Auditable {
 
+    private static final long serialVersionUID = 1L;
     private String idNotificacion;
     private SisPersona persona;
     private TipoNotificacion codTipoNotificacion;
@@ -39,7 +42,7 @@ public class DaNotificacion {
     private Date fechaInicioSintomas;
     private Respuesta urgente;
     private Solicitante solicitante;
-	private boolean completa;
+    private boolean completa;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -182,12 +185,40 @@ public class DaNotificacion {
     public void setSolicitante(Solicitante solicitante) {
         this.solicitante = solicitante;
     }
-	
-	@Basic
+
+    @Basic
     @Column(name = "COMPLETA", nullable = true, insertable = true, updatable = true)
     public boolean isCompleta() { return completa; }
 
     public void setCompleta(boolean completa) {  this.completa = completa; }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("usuarioRegistro") || fieldname.matches("fechaRegistro") || fieldname.matches("solicitante") || fieldname.matches("persona"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString(){
+        return idNotificacion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaNotificacion)) return false;
+
+        DaNotificacion that = (DaNotificacion) o;
+
+        if (!idNotificacion.equals(that.idNotificacion)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idNotificacion.hashCode();
+    }
 }
-
-

@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -26,7 +27,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name = "usuarios_sistema", schema = "laboratorio")
-public class User implements Serializable {
+public class User implements Serializable, Auditable {
     private String username;
     private Date created;
     private String password;
@@ -34,7 +35,6 @@ public class User implements Serializable {
     private String email;
     private Boolean enabled=true;
     private String usuario;
-    //private Set<Authority> authorities;
 
     @Id
     @Column(name = "username", nullable = false, length =50)
@@ -85,16 +85,6 @@ public class User implements Serializable {
     public void setEnabled(Boolean enabled) {
 	this.enabled = enabled;
     }
-
-    /*@OneToMany(mappedBy = "user", fetch=FetchType.EAGER)
-    @IndexColumn(name = "username", base=0)
-    public Set<Authority> getAuthorities() {
-	return authorities;
-    }
-    public void setAuthorities(Set<Authority> authorities) {
-	this.authorities = authorities;
-    }*/
-
     @Column(name = "usuario", nullable = false, length =50)
     public String getUsuario() {
 	return usuario;
@@ -102,4 +92,35 @@ public class User implements Serializable {
     public void setUsuario(String usuario) {
 	this.usuario = usuario;
     }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("created")) return false;
+        else return true;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "username='" + username + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+
+        if (!username.equals(user.username)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return username.hashCode();
+    }
+
 }

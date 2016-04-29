@@ -1,8 +1,10 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.web.servlet.tags.EditorAwareTag;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -13,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "da_solicitud_dx", schema = "alerta")
-public class DaSolicitudDx {
+public class DaSolicitudDx implements Auditable {
 
     private String idSolicitudDx;
     private DaTomaMx idTomaMx;
@@ -133,5 +135,35 @@ public class DaSolicitudDx {
 
     public void setLabProcesa(Laboratorio labProcesa) {
         this.labProcesa = labProcesa;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "idSolicitudDx='" + idSolicitudDx + '\'' +
+                ", " + idTomaMx +
+                ", codDx=" + codDx ;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaSolicitudDx)) return false;
+
+        DaSolicitudDx that = (DaSolicitudDx) o;
+
+        if (idSolicitudDx != null ? !idSolicitudDx.equals(that.idSolicitudDx) : that.idSolicitudDx != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idSolicitudDx != null ? idSolicitudDx.hashCode() : 0;
     }
 }

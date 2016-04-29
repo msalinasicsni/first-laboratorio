@@ -3,25 +3,20 @@ package ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import org.hibernate.annotations.ForeignKey;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.irag.Respuesta;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.estructura.Procedencia;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "da_ficha_sindfeb", schema = "alerta")
-public class DaSindFebril implements Serializable{
+public class DaSindFebril implements Serializable, Auditable {
 
     /**
      *
@@ -78,12 +73,20 @@ public class DaSindFebril implements Serializable{
 
     private String nombreLlenoFicha;
 
+    private String id;
 
     public DaSindFebril() {
         super();
     }
 
     @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @Column(name = "ID_FICHA", nullable = false, insertable = true, updatable = true, length = 36)
+    public String getId(){return this.id;}
+
+    public void setId(String id){this.id = id;}
+
     @OneToOne(targetEntity=DaNotificacion.class)
     @JoinColumn(name = "ID_NOTIFICACION", referencedColumnName = "ID_NOTIFICACION")
     public DaNotificacion getIdNotificacion() {
@@ -445,5 +448,35 @@ public class DaSindFebril implements Serializable{
 
     public void setNombreLlenoFicha(String nombreLlenoFicha) {
         this.nombreLlenoFicha = nombreLlenoFicha;
+    }
+
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("idNotificacion"))
+            return  false;
+        else
+            return true;
+    }
+    @Override
+    public String toString() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaSindFebril)) return false;
+
+        DaSindFebril that = (DaSindFebril) o;
+
+        if (!id.equals(that.id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

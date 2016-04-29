@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.concepto;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "concepto", schema = "laboratorio")
-public class Concepto implements Serializable {
+public class Concepto implements Serializable, Auditable {
 
     Integer idConcepto;
     String nombre;
@@ -87,4 +88,35 @@ public class Concepto implements Serializable {
         this.fechahRegistro = fechahRegistro;
     }
 
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechahRegistro") || fieldname.matches("usuarioRegistro"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "{idConcepto=" + idConcepto +
+                ", nombre='" + nombre + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Concepto)) return false;
+
+        Concepto concepto = (Concepto) o;
+
+        if (!idConcepto.equals(concepto.idConcepto)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idConcepto.hashCode();
+    }
 }

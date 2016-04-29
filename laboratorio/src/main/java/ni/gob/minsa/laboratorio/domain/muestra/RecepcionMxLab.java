@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -76,5 +78,10 @@ public class RecepcionMxLab {
 
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    @Override
+    public String toString() {
+        return "idRecepcion='" + idRecepcion + '\'';
     }
 }

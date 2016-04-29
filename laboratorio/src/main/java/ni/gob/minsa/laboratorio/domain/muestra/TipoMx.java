@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,7 +15,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "tipo_muestra", schema = "alerta")
-    public class TipoMx implements Serializable {
+    public class TipoMx implements Serializable, Auditable {
 
     private static final long serialVersionUID = 6373407114599760842L;
     Integer idTipoMx;
@@ -75,6 +76,37 @@ import java.util.Date;
         this.usuarioRegistro = usuarioRegistro;
     }
 
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("idTipoMx") || fieldname.matches("fechaRegistro") || fieldname.matches("usuarioRegistro"))
+            return  false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "TipoMx{" +
+                "idTipoMx=" + idTipoMx +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TipoMx)) return false;
+
+        TipoMx tipoMx = (TipoMx) o;
+
+        if (!idTipoMx.equals(tipoMx.idTipoMx)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idTipoMx.hashCode();
+    }
 }
 
 

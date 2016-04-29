@@ -92,4 +92,27 @@ public class DaEnvioMx {
     public void setUsarioRegistro(Usuarios usarioRegistro) {
         this.usarioRegistro = usarioRegistro;
     }
+
+    @Override
+    public String toString() {
+        return "idEnvio='" + idEnvio + '\'';
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaEnvioMx)) return false;
+
+        DaEnvioMx envioMx = (DaEnvioMx) o;
+
+        if (idEnvio != null ? !idEnvio.equals(envioMx.idEnvio) : envioMx.idEnvio != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idEnvio != null ? idEnvio.hashCode() : 0;
+    }
 }

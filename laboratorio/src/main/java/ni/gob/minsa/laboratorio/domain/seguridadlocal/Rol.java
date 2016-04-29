@@ -40,4 +40,10 @@ public class Rol {
 		this.authorities = authorities;
 	}
 
+    @Override
+    public String toString() {
+        return "{" +
+                "authority='" + authority + '\'' +
+                '}';
+    }
 }

@@ -163,6 +163,35 @@ public class AutoridadesService {
         return updateEntities;
     }
 
+    public Integer bajaAutoridadAnalista(String userName) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+        int updateEntities = 0,updateEntities2=0;
+        try {
+
+
+            String hqlBaja = "update AutoridadArea set pasivo=true where user.username = :userName and pasivo = false ";
+            updateEntities = s.createQuery(hqlBaja)
+                    .setString("userName", userName)
+                    .executeUpdate();
+
+            //String hqlBaja2 = "update AutoridadExamen ex set pasivo=true where ex.autoridadArea.user.username = :userName and pasivo = false ";
+            String hqlBaja3 = "update AutoridadExamen ex set pasivo=true where autoridadArea.idAutoridadArea in( select idAutoridadArea from AutoridadArea where user.username = :userName and pasivo = false)";
+            updateEntities2 = s.createQuery(hqlBaja3)
+                    .setString("userName", userName)
+                    .executeUpdate();
+
+            tx.commit();
+        }catch (Exception ex){
+            tx.rollback();
+            throw ex;
+        }finally {
+            s.close();
+        }
+        return updateEntities+updateEntities2;
+    }
+
     public Integer bajaAutoridadExamenesByUserName(String userName) {
         // Retrieve session from Hibernate
         Session s = sessionFactory.openSession();

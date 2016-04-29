@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
@@ -14,7 +15,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "orden_examen", schema = "laboratorio")
-public class OrdenExamen {
+public class OrdenExamen implements Auditable {
 
     private String idOrdenExamen;
     private DaSolicitudDx solicitudDx;
@@ -133,5 +134,39 @@ public class OrdenExamen {
 
     public void setCausaAnulacion(String causaAnulacion) {
         this.causaAnulacion = causaAnulacion;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("anulado"))
+            return true;
+        else
+            return false;
+    }
+
+    @Override
+    public String toString() {
+        return "OrdenExamen{" +
+                "idOrdenExamen='" + idOrdenExamen + '\'' +
+                ", solicitudDx=" + solicitudDx +
+                ", codExamen=" + codExamen +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrdenExamen)) return false;
+
+        OrdenExamen that = (OrdenExamen) o;
+
+        if (!idOrdenExamen.equals(that.idOrdenExamen)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idOrdenExamen.hashCode();
     }
 }

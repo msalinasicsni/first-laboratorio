@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "estudio_unidad", schema = "alerta")
-public class Estudio_UnidadSalud {
+public class Estudio_UnidadSalud implements Auditable {
 
     Integer idEstudioUnidad;
     Catalogo_Estudio estudio;
@@ -83,5 +84,33 @@ public class Estudio_UnidadSalud {
         this.usuarioRegistro = usuarioRegistro;
     }
 
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Estudio_UnidadSalud{" +
+                "idEstudioUnidad=" + idEstudioUnidad +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Estudio_UnidadSalud)) return false;
+
+        Estudio_UnidadSalud that = (Estudio_UnidadSalud) o;
+
+        if (!idEstudioUnidad.equals(that.idEstudioUnidad)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idEstudioUnidad.hashCode();
+    }
 }
 

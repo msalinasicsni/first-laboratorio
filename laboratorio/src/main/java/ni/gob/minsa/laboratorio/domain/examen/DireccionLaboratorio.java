@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.examen;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.muestra.Catalogo_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "direccion_laboratorio", schema = "laboratorio")
-public class DireccionLaboratorio {
+public class DireccionLaboratorio implements Auditable {
 
     Integer idDireccionLab;
     Laboratorio laboratorio;
@@ -88,4 +89,33 @@ public class DireccionLaboratorio {
     }
 
 
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechaRegistro") || fieldname.matches("usuarioRegistro")) return false;
+        return  true;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "idDireccionLab=" + idDireccionLab +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DireccionLaboratorio)) return false;
+
+        DireccionLaboratorio that = (DireccionLaboratorio) o;
+
+        if (!idDireccionLab.equals(that.idDireccionLab)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idDireccionLab.hashCode();
+    }
 }

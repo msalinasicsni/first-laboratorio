@@ -123,8 +123,7 @@ public class UsuariosController {
             userName = jsonpObject.get("userName").getAsString();
             User user = this.usuarioService.getUser(userName);
             user.setCreated(new Date());
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            user.setUsuario(authentication.getName());
+            user.setUsuario(seguridadService.obtenerNombreUsuario());
             user.setEnabled(true);
             this.usuarioService.updateUser(user);
         } catch (Exception ex) {
@@ -160,9 +159,7 @@ public class UsuariosController {
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             userName = jsonpObject.get("userName").getAsString();
             User user = this.usuarioService.getUser(userName);
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            user.setUsuario(authentication.getName());
-            user.setCreated(new Date());
+            user.setUsuario(seguridadService.obtenerNombreUsuario());
             user.setEnabled(false);
             this.usuarioService.updateUser(user);
         } catch (Exception ex) {
@@ -231,7 +228,8 @@ public class UsuariosController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             userName = jsonpObject.get("userName").getAsString();
-            this.usuarioService.deleteRole(userName,"ROLE_ADMIN");
+            Authority authority = usuarioService.getAuthority(userName,"ROLE_ADMIN");
+            this.usuarioService.deleteRole(authority);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -299,7 +297,8 @@ public class UsuariosController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             userName = jsonpObject.get("userName").getAsString();
-            this.usuarioService.deleteRole(userName,"ROLE_RECEPCION");
+            Authority authority = usuarioService.getAuthority(userName,"ROLE_RECEPCION");
+            this.usuarioService.deleteRole(authority);
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -367,11 +366,14 @@ public class UsuariosController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             userName = jsonpObject.get("userName").getAsString();
-            this.usuarioService.deleteRole(userName,"ROLE_ANALISTA");
-
-            this.autoridadesService.bajaAutoridadAreas(userName);
-
-            this.autoridadesService.bajaAutoridadExamenesByUserName(userName);
+            Authority authority = usuarioService.getAuthority(userName,"ROLE_ANALISTA");
+            this.usuarioService.deleteRole(authority);
+            try {
+                this.autoridadesService.bajaAutoridadAnalista(userName);
+            }catch (Exception ex){
+                this.usuarioService.addAuthority(authority);
+                throw new Exception(ex);
+            }
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -439,7 +441,8 @@ public class UsuariosController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             userName = jsonpObject.get("userName").getAsString();
-            this.usuarioService.deleteRole(userName,"ROLE_DIR");
+            Authority authority = usuarioService.getAuthority(userName,"ROLE_DIR");
+            this.usuarioService.deleteRole(authority);
 
             this.autoridadesService.bajaAutoridadDireccion(userName);
 
@@ -509,7 +512,8 @@ public class UsuariosController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             userName = jsonpObject.get("userName").getAsString();
-            this.usuarioService.deleteRole(userName,"ROLE_JEFE");
+            Authority authority = usuarioService.getAuthority(userName,"ROLE_JEFE");
+            this.usuarioService.deleteRole(authority);
 
             this.autoridadesService.bajaAutoridadDepartamento(userName);
 

@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.concepto;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.LazyCollection;
@@ -15,7 +16,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "catalogo_lista", schema = "laboratorio")
-public class Catalogo_Lista implements Serializable {
+public class Catalogo_Lista implements Serializable, Auditable {
 
    Integer idCatalogoLista;
    String valor;
@@ -86,5 +87,37 @@ public class Catalogo_Lista implements Serializable {
 
     public void setFechaHRegistro(Timestamp fechaHRegistro) {
         this.fechaHRegistro = fechaHRegistro;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechaHRegistro") || fieldname.matches("usarioRegistro"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "idCatalogoLista=" + idCatalogoLista +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Catalogo_Lista)) return false;
+
+        Catalogo_Lista that = (Catalogo_Lista) o;
+
+        if (!idCatalogoLista.equals(that.idCatalogoLista)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idCatalogoLista.hashCode();
     }
 }

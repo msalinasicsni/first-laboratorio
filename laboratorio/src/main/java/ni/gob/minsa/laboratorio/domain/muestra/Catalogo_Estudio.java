@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
@@ -15,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "catalogo_estudio", schema = "laboratorio")
-public class Catalogo_Estudio implements Serializable {
+public class Catalogo_Estudio implements Serializable, Auditable {
 
     private static final long serialVersionUID = 5110985758665058146L;
     private Integer idEstudio;
@@ -99,4 +100,31 @@ public class Catalogo_Estudio implements Serializable {
         this.usuarioRegistro = usuarioRegistro;
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(idEstudio);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Catalogo_Estudio)) return false;
+
+        Catalogo_Estudio that = (Catalogo_Estudio) o;
+
+        if (idEstudio != null ? !idEstudio.equals(that.idEstudio) : that.idEstudio != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idEstudio != null ? idEstudio.hashCode() : 0;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechaRegistro") || fieldname.matches("usuarioRegistro")) return false;
+        return  true;
+    }
 }

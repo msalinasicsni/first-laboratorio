@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.examen;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "catalogo_area", schema = "laboratorio")
-public class Area {
+public class Area implements Auditable {
 
     Integer idArea;
     String nombre;
@@ -70,5 +71,38 @@ public class Area {
 
     public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("nombre") || fieldname.matches("pasivo"))
+            return true;
+        else
+            return false;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "idArea=" + idArea +
+                ", nombre='" + nombre + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Area)) return false;
+
+        Area area = (Area) o;
+
+        if (!idArea.equals(area.idArea)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idArea.hashCode();
     }
 }

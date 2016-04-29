@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.irag;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import org.hibernate.annotations.ForeignKey;
@@ -15,10 +16,10 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "da_vacunas_irag", schema = "alerta")
-public class DaVacunasIrag implements Serializable {
+public class DaVacunasIrag implements Serializable, Auditable {
 
 
-
+    private static final long serialVersionUID = -6541039785829475122L;
     private Integer idVacuna;
     private DaIrag idNotificacion;
     private Vacuna codVacuna;
@@ -42,7 +43,7 @@ public class DaVacunasIrag implements Serializable {
 
 
     @ManyToOne()
-    @JoinColumn(name="ID_NOTIFICACION", referencedColumnName = "ID_NOTIFICACION")
+    @JoinColumn(name="ID_NOTIFICACION", referencedColumnName = "ID_FICHA")
     @ForeignKey(name = "ID_NOTI_VAC_FK")
     public DaIrag getIdNotificacion() {
         return idNotificacion;
@@ -112,4 +113,33 @@ public class DaVacunasIrag implements Serializable {
 
     public void setUsuario(Usuarios usuario) { this.usuario = usuario; }
 
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("idVacuna") || fieldname.matches("idNotificacion") || fieldname.matches("fechaRegistro") || fieldname.matches("usuario"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "idVacuna=" + idVacuna;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DaVacunasIrag)) return false;
+
+        DaVacunasIrag that = (DaVacunasIrag) o;
+
+        if (!idVacuna.equals(that.idVacuna)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idVacuna.hashCode();
+    }
 }

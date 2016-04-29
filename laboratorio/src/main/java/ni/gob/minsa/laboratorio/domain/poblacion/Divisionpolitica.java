@@ -200,4 +200,25 @@ public class Divisionpolitica implements Serializable {
 		this.dependenciaSilais = dependenciaSilais;
 	}
 
+    @Override
+    public String toString() {
+        return  divisionpoliticaId + " - " + nombre;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Divisionpolitica)) return false;
+
+        Divisionpolitica that = (Divisionpolitica) o;
+
+        if (divisionpoliticaId != that.divisionpoliticaId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (divisionpoliticaId ^ (divisionpoliticaId >>> 32));
+    }
 }
