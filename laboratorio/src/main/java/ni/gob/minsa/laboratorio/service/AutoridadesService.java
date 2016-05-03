@@ -171,14 +171,13 @@ public class AutoridadesService {
         try {
 
 
-            String hqlBaja = "update AutoridadArea set pasivo=true where user.username = :userName and pasivo = false ";
-            updateEntities = s.createQuery(hqlBaja)
+            String hqlBajaExam = "update AutoridadExamen ex set pasivo=true where autoridadArea.idAutoridadArea in( select idAutoridadArea from AutoridadArea where user.username = :userName and pasivo = false)";
+            updateEntities2 = s.createQuery(hqlBajaExam)
                     .setString("userName", userName)
                     .executeUpdate();
 
-            //String hqlBaja2 = "update AutoridadExamen ex set pasivo=true where ex.autoridadArea.user.username = :userName and pasivo = false ";
-            String hqlBaja3 = "update AutoridadExamen ex set pasivo=true where autoridadArea.idAutoridadArea in( select idAutoridadArea from AutoridadArea where user.username = :userName and pasivo = false)";
-            updateEntities2 = s.createQuery(hqlBaja3)
+            String hqlBajaArea = "update AutoridadArea set pasivo=true where user.username = :userName and pasivo = false ";
+            updateEntities = s.createQuery(hqlBajaArea)
                     .setString("userName", userName)
                     .executeUpdate();
 
