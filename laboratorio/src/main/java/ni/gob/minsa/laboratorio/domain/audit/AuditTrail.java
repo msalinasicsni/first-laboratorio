@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "audit_trail", schema = "laboratorio")
+@Table(name = "lab_audit_trail", schema = "laboratorio")
 public class AuditTrail {
 	
 	private int id;
@@ -49,7 +49,7 @@ public class AuditTrail {
 	public void setId(int id) {
 		this.id = id;
 	}
-	@Column(name = "ENTITY_ID", nullable = true, length =50)
+	@Column(name = "ENTITY_ID", nullable = true, length =100)
 	public String getEntityId() {
 		return entityId;
 	}

@@ -69,7 +69,8 @@ PostDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
 	            session.getTransaction().commit();  
 	            session.close();  
             }
-        } catch (HibernateException e) {  
+        } catch (HibernateException e) {
+            e.printStackTrace();
             LOG.error("Unable to process audit log for DELETE operation", e);  
         }  
 	}
@@ -118,7 +119,8 @@ PostDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
 	            session.getTransaction().commit();  
 	            session.close(); 
             }
-        } catch (HibernateException e) {  
+        } catch (HibernateException e) {
+            e.printStackTrace();
             LOG.error("Unable to process audit log for INSERT operation", e);  
         }  
 	}
@@ -174,7 +176,8 @@ PostDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
 	            session.getTransaction().commit();  
 	            session.close(); 
             }
-        } catch (HibernateException e) {  
+        } catch (HibernateException e) {
+            e.printStackTrace();
             LOG.error("Unable to process audit log for UPDATE operation", e);  
         }
 	}

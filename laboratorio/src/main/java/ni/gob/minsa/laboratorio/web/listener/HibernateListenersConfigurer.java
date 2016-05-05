@@ -22,14 +22,11 @@ public class HibernateListenersConfigurer {
     @Autowired
     private HibernateAuditLogListener hibernateAuditLogListener;
 
-    @Autowired
-    private HibernateAuditLogListener2 hibernateAuditLogListener2;
-
     @PostConstruct
     public void registerListeners() {
         EventListenerRegistry registry = ((SessionFactoryImpl) sessionFactory).getServiceRegistry().getService(EventListenerRegistry.class);
         registry.getEventListenerGroup(EventType.POST_UPDATE).appendListener(hibernateAuditLogListener);
-        registry.getEventListenerGroup(EventType.POST_DELETE).appendListener(hibernateAuditLogListener2);
+        registry.getEventListenerGroup(EventType.POST_DELETE).appendListener(hibernateAuditLogListener);
 
     }
 }
