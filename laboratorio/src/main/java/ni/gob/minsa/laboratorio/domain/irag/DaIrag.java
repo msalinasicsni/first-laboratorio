@@ -573,8 +573,8 @@ public class DaIrag implements Serializable, Auditable {
 
     @Override
     public String toString() {
-        return "DaIrag{" +
-                "idNotificacion=" + idNotificacion.getIdNotificacion() +
+        return "{" +
+                "idDaIrag=" + id +
                 '}';
     }
 
@@ -585,14 +585,13 @@ public class DaIrag implements Serializable, Auditable {
 
         DaIrag daIrag = (DaIrag) o;
 
-        if (idNotificacion != null ? !idNotificacion.getIdNotificacion().equals(daIrag.idNotificacion.getIdNotificacion()) : daIrag.idNotificacion.getIdNotificacion() != null)
-            return false;
+        if (id != null ? !id.equals(daIrag.id) : daIrag.id != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return idNotificacion != null ? idNotificacion.hashCode() : 0;
+        return id != null ? id.hashCode() : 0;
     }
 }

@@ -98,8 +98,10 @@ public class AuditTrail {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+
 	@Column(name = "OPERATION_DATE", nullable = true)
-	public Date getOperationDate() {
+    @Temporal(TemporalType.DATE)
+    public Date getOperationDate() {
 		return operationDate;
 	}
 	public void setOperationDate(Date operationDate) {
