@@ -61,7 +61,7 @@ public class ExamenesService {
     public List<CatalogoExamenes> getExamenesByIdDx(int idDx){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select ex from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
-                "where dx.idDiagnostico = :idDx");
+                "where dx.idDiagnostico = :idDx and edx.pasivo = false and ex.pasivo = false");
         q.setParameter("idDx",idDx);
         return q.list();
     }
@@ -76,7 +76,7 @@ public class ExamenesService {
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select edx from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
                 "where dx.idDiagnostico = :idDx "+
-                " and ex.idExamen in("+ idExamenes +")");
+                " and ex.idExamen in("+ idExamenes +") and edx.pasivo = false and ex.pasivo = false ");
         q.setParameter("idDx",idDx);
         return q.list();
     }
@@ -89,7 +89,7 @@ public class ExamenesService {
     public List<CatalogoExamenes> getExamenesByIdsExamenes(String idExamenes){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("from CatalogoExamenes as ex" +
-                " where ex.idExamen in("+ idExamenes +")");
+                " where ex.idExamen in("+ idExamenes +") and ex.pasivo = false ");
         return q.list();
     }
 
@@ -128,7 +128,7 @@ public class ExamenesService {
     public List<CatalogoExamenes> getExamenesByIdEstudio(int idEstudio){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select ex from Examen_Estudio as eex inner join eex.examen as ex inner join eex.estudio as dx " +
-                "where dx.idEstudio = :idEstudio");
+                "where dx.idEstudio = :idEstudio and eex.pasivo =false and ex.pasivo = false");
         q.setParameter("idEstudio",idEstudio);
         return q.list();
     }

@@ -41,8 +41,10 @@ public class ExamenesSolicitudService {
         Session session = sessionFactory.getCurrentSession();
         Criteria cr = session.createCriteria(Examen_Dx.class, "exaDx");
         cr.createAlias("exaDx.diagnostico", "dx");
+        cr.createAlias("exaDx.examen", "examen");
         cr.add(Restrictions.eq("dx.idDiagnostico", id));
         cr.add(Restrictions.eq("exaDx.pasivo", false));
+        cr.add(Restrictions.eq("examen.pasivo", false));
         return cr.list();
     }
 
@@ -55,8 +57,10 @@ public class ExamenesSolicitudService {
         Session session = sessionFactory.getCurrentSession();
         Criteria cr = session.createCriteria(Examen_Estudio.class, "exaEst");
         cr.createAlias("exaEst.estudio", "est");
+        cr.createAlias("exaEst.examen", "examen");
         cr.add(Restrictions.eq("est.idEstudio", id));
         cr.add(Restrictions.eq("exaEst.pasivo", false));
+        cr.add(Restrictions.eq("examen.pasivo", false));
         return cr.list();
     }
 
