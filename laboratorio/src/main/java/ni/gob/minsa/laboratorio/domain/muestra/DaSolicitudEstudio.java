@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -23,7 +24,7 @@ public class DaSolicitudEstudio implements Serializable, Auditable {
     private Catalogo_Estudio tipoEstudio;
     private Usuarios usarioRegistro;
     private Date fechaAprobacion;
-    private Usuarios usuarioAprobacion;
+    private User usuarioAprobacion;
     private Boolean aprobada;
 
 
@@ -95,13 +96,13 @@ public class DaSolicitudEstudio implements Serializable, Auditable {
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_APROBACION", referencedColumnName = "USUARIO_ID")
-    @ForeignKey(name = "USUARIO_APROBACION_FK")
-    public Usuarios getUsuarioAprobacion() {
+    @JoinColumn(name = "USUARIO_APROBACION", referencedColumnName = "username")
+    @ForeignKey(name = "USUARIO_APROBACION_EST_FK")
+    public User getUsuarioAprobacion() {
         return usuarioAprobacion;
     }
 
-    public void setUsuarioAprobacion(Usuarios usuarioAprobacion) {
+    public void setUsuarioAprobacion(User usuarioAprobacion) {
         this.usuarioAprobacion = usuarioAprobacion;
     }
 

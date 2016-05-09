@@ -23,6 +23,8 @@ var SearchFinalResult = function () {
     return {
         //main function to initiate the module
         init: function (parametros) {
+            var text_selected_all = $("#text_selected_all").val();
+            var text_selected_none = $("#text_selected_none").val();
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
                 tablet: 1024,
@@ -30,9 +32,20 @@ var SearchFinalResult = function () {
             };
             var table1 = $('#orders_result').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "T" +
                     "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true, //"T<'clear'>"+
+                "columns": [
+                    null, null, null, null, null, null, null,null,
+                    {
+                        "className": 'details-control',
+                        "orderable": false,
+                        "data": null,
+                        "defaultContent": ''
+                    },
+                    null
+                ],
                 "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -44,6 +57,14 @@ var SearchFinalResult = function () {
                 },
                 "drawCallback": function (oSettings) {
                     responsiveHelper_dt_basic.respond();
+                },
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
                 }
             });
 
@@ -76,7 +97,7 @@ var SearchFinalResult = function () {
             function getMxResultadosFinal(showAll) {
                 var filtros = {};
                 if (showAll) {
-                    filtros['nombreApellido'] = '';
+                    //filtros['nombreApellido'] = '';
                     filtros['fechaInicioRecep'] = '';
                     filtros['fechaFinRecepcion'] = '';
                     filtros['codSilais'] = '';
@@ -87,7 +108,7 @@ var SearchFinalResult = function () {
                     filtros['nombreSolicitud'] = '';
                     filtros['conResultado'] = 'Si';
                 } else {
-                    filtros['nombreApellido'] = $('#txtfiltroNombre').val();
+                    //filtros['nombreApellido'] = $('#txtfiltroNombre').val();
                     filtros['fechaInicioRecep'] = $('#fecInicioRecep').val();
                     filtros['fechaFinRecepcion'] = $('#fecFinRecep').val();
                     filtros['codSilais'] = $('#codSilais').find('option:selected').val();
@@ -98,6 +119,8 @@ var SearchFinalResult = function () {
                     filtros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     filtros['nombreSolicitud'] = $('#nombreSoli').val();
                     filtros['conResultado'] = 'Si';
+                    filtros['fecInicioProc'] = $('#fecInicioProc').val();
+                    filtros['fecFinProc'] = $('#fecFinProc').val();
 
                 }
                 bloquearUI(parametros.blockMess);
@@ -111,8 +134,8 @@ var SearchFinalResult = function () {
                         for (var i = 0; i < len; i++) {
                             var actionUrl = parametros.sActionUrl + dataToLoad[i].idSolicitud;
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='" + dataToLoad[i].idSolicitud + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud," <input type='hidden' value='" + dataToLoad[i].resultados + "'/>", '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     } else {
                         $.smallBox({
@@ -160,6 +183,135 @@ var SearchFinalResult = function () {
                 $('#codUnidadSalud').val('').change();
                 desbloquearUI();
             });
+
+            /*PARA MOSTRAR TABLA DETALLE RESULTADO*/
+            function format(d, indice) {
+                // `d` is the original data object for the row
+                var texto = d[indice]; //indice donde esta el input hidden
+                var resultado = $(texto).val();
+                var json = JSON.parse(resultado);
+                var len = Object.keys(json).length;
+                console.log(json);
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                    '<tr><td style="font-weight: bold">' + $('#text_response').val() + '</td><td style="font-weight: bold">' + $('#text_value').val() + '</td><td style="font-weight: bold">' + $('#text_date').val() + '</td></tr>';
+                for (var i = 1; i <= len; i++) {
+                    childTable = childTable +
+                        '<tr></tr><tr><td>' + json[i].respuesta + '</td><td>' + json[i].valor + '</td><td>' + json[i].fechaResultado + '</td></tr>';
+                }
+                childTable = childTable + '</table>';
+                return childTable;
+            }
+
+            $('#orders_result tbody').on('click', 'td.details-control', function () {
+                var tr = $(this).closest('tr');
+                var row = table1.api().row(tr);
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    tr.removeClass('shown');
+                }
+                else {
+                    // Open this row
+                    row.child(format(row.data(), 8)).show();
+                    tr.addClass('shown');
+                }
+            });
+            /// FIN MOSTRAR TABLA DETALLE RESULTADO
+
+            //APROBACION MASIVA
+
+            $("#approve_selected").click(function () {
+                aprobarSeleccionadas();
+            });
+
+            function aprobarSeleccionadas() {
+                var oTT = TableTools.fnGetInstance('orders_result');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                if (len > 0) {
+                    $.SmartMessageBox({
+                        title: $("#msg_approval_confirm_t").val(),
+                        content: $("#msg_approval_confirm_c").val(),
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            bloquearUI(parametros.blockMess);
+                            var idSolicitudes = {};
+                            //el input hidden debe estar siempre en la primera columna
+                            for (var i = 0; i < len; i++) {
+                                var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                var input = texto.substring(texto.lastIndexOf("<"), texto.length);
+                                idSolicitudes[i] = $(input).val();
+                            }
+                            console.log(idSolicitudes);
+                            var ordenesObj = {};
+                            ordenesObj['strSolicitudes'] = idSolicitudes;
+                            ordenesObj['mensaje'] = '';
+                            ordenesObj['cantAprobaciones'] = len;
+                            ordenesObj['cantAprobProc'] = '';
+                            ordenesObj['numeroHoja'] = '';
+                            $.ajax(
+                                {
+                                    url: parametros.sApprovalMassiveUrl,
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: JSON.stringify(ordenesObj),
+                                    contentType: 'application/json',
+                                    mimeType: 'application/json',
+                                    success: function (data) {
+                                        desbloquearUI();
+                                        if (data.mensaje.length > 0) {
+                                            $.smallBox({
+                                                title: data.mensaje,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#C46A69",
+                                                iconSmall: "fa fa-warning",
+                                                timeout: 4000
+                                            });
+                                        } else {
+                                            var msg = $("#msg_approval_succes").val();
+                                            msg = msg.replace(/\{0\}/, data.cantAprobProc);
+                                            $.smallBox({
+                                                title: msg,
+                                                content: $("#smallBox_content").val(),
+                                                color: "#739E73",
+                                                iconSmall: "fa fa-success",
+                                                timeout: 4000
+                                            });
+                                            getMxResultadosFinal(false);
+                                        }
+                                    },
+                                    error: function (jqXHR) {
+                                        desbloquearUI();
+                                        validateLogin(jqXHR);
+                                    }
+                                });
+
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msg_approval_cancel").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                color: "#C79121",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 4000
+                            });
+                        }
+
+                    });
+                } else {
+                    $.smallBox({
+                        title: $("#msg_approval_select_order").val(),
+                        content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                        color: "#C79121",
+                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                        timeout: 4000
+                    });
+                }
+
+            }
         }
     };
 

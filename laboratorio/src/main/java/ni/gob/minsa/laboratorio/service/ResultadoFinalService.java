@@ -66,7 +66,7 @@ public class ResultadoFinalService {
             }
         }
         // se filtra por nombre y apellido persona
-        if (filtro.getNombreApellido()!=null) {
+        /*if (filtro.getNombreApellido()!=null) {
             //crit.createAlias("noti.persona", "person");
             String[] partes = filtro.getNombreApellido().split(" ");
             String[] partesSnd = filtro.getNombreApellido().split(" ");
@@ -79,13 +79,6 @@ public class ResultadoFinalService {
                 }
             }
             for (int i = 0; i < partes.length; i++) {
-                /*Junction conditionGroup = Restrictions.disjunction();
-                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
-                crit.add(conditionGroup);*/
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("noti.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
                         .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
@@ -100,7 +93,7 @@ public class ResultadoFinalService {
 
                 crit.add(conditGroup);
             }
-        }
+        }*/
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){
             crit.createAlias("noti.codSilaisAtencion","silais");
@@ -216,6 +209,14 @@ public class ResultadoFinalService {
                         .setProjection(Property.forName("dx.idSolicitudDx"))));
             }
         }
+        //filtro por fecha de procesamiento
+        if (filtro.getFechaInicioProcesamiento()!=null && filtro.getFechaFinProcesamiento()!=null){
+            crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
+                    .createAlias("solicitudDx", "dx").add(Restrictions.eq("pasivo",false))
+                    .add(Restrictions.between("fechahRegistro", filtro.getFechaInicioProcesamiento(),filtro.getFechaFinProcesamiento()))
+                    .setProjection(Property.forName("dx.idSolicitudDx"))));
+
+        }
 
         //se filtra que la solicitud este aprobada. (SOLO CUANDO ES CONSULTA DE RESULTADOS APROBADOS)
         if (filtro.getSolicitudAprobada()!=null && filtro.getSolicitudAprobada()){
@@ -230,13 +231,6 @@ public class ResultadoFinalService {
 
         //se filtra que usuario tenga autorizado laboratorio en el que se proceso la solicitud(rutina)
         if (filtro.getNombreUsuario()!=null) {
-            /*crit.createAlias("tomaMx.envio","envioMx");
-            crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                    .createAlias("laboratorio", "labautorizado")
-                    .createAlias("user", "usuario")
-                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))));*/
             //se filtra que laboratorio que procesa solicitud
             crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
@@ -320,7 +314,7 @@ public class ResultadoFinalService {
                     Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
         }
         // se filtra por nombre y apellido persona
-        if (filtro.getNombreApellido()!=null) {
+        /*if (filtro.getNombreApellido()!=null) {
             crit.createAlias("noti.persona", "person");
             String[] partes = filtro.getNombreApellido().split(" ");
             String[] partesSnd = filtro.getNombreApellido().split(" ");
@@ -341,7 +335,7 @@ public class ResultadoFinalService {
                         .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
                 crit.add(conditionGroup);
             }
-        }
+        }*/
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){
             crit.createAlias("noti.codSilaisAtencion","silais");
@@ -453,6 +447,15 @@ public class ResultadoFinalService {
                         .createAlias("solicitudEstudio", "estudio").add(Restrictions.eq("pasivo",false))
                         .setProjection(Property.forName("estudio.idSolicitudEstudio"))));
             }
+        }
+
+        //filtro por fecha de procesamiento
+        if (filtro.getFechaInicioProcesamiento()!=null && filtro.getFechaFinProcesamiento()!=null){
+            crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultadoFinal.class)
+                    .createAlias("solicitudEstudio", "estudio").add(Restrictions.eq("pasivo",false))
+                    .add(Restrictions.between("fechahRegistro", filtro.getFechaInicioProcesamiento(),filtro.getFechaFinProcesamiento()))
+                    .setProjection(Property.forName("estudio.idSolicitudEstudio"))));
+
         }
 
         //se filtra que la solicitud de estudio ya este aprobada

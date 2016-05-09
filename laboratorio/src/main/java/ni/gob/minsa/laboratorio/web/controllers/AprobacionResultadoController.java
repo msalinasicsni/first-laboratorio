@@ -107,7 +107,7 @@ public class AprobacionResultadoController {
         FiltroMx filtroMx= jsonToFiltroDx(filtro);
         List<DaSolicitudDx> dxList = resultadoFinalService.getDxByFiltro(filtroMx);
         List<DaSolicitudEstudio> solicitudEstudioList = resultadoFinalService.getEstudioByFiltro(filtroMx);
-        return solicitudDx_Est_ToJson(dxList, solicitudEstudioList, false);
+        return solicitudDx_Est_ToJson(dxList, solicitudEstudioList, true);
     }
 
     private FiltroMx jsonToFiltroDx(String strJson) throws Exception {
@@ -126,6 +126,8 @@ public class AprobacionResultadoController {
         String nombreSolicitud = null;
         String conResultado = null;
         Boolean solicitudAprobada=null;
+        Date fechaInicioProc = null;
+        Date fechaFinProc = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -153,6 +155,10 @@ public class AprobacionResultadoController {
             conResultado = jObjectFiltro.get("conResultado").getAsString();
         if (jObjectFiltro.get("solicitudAprobada") != null && !jObjectFiltro.get("solicitudAprobada").getAsString().isEmpty())
             solicitudAprobada = jObjectFiltro.get("solicitudAprobada").getAsBoolean();
+        if (jObjectFiltro.get("fecInicioProc") != null && !jObjectFiltro.get("fecInicioProc").getAsString().isEmpty())
+            fechaInicioProc = DateUtil.StringToDate(jObjectFiltro.get("fecInicioProc").getAsString()+" 00:00:00");
+        if (jObjectFiltro.get("fecFinProc") != null && !jObjectFiltro.get("fecFinProc").getAsString().isEmpty())
+            fechaFinProc =DateUtil. StringToDate(jObjectFiltro.get("fecFinProc").getAsString()+" 23:59:59");
         String nombreUsuario = seguridadService.obtenerNombreUsuario();
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -171,6 +177,8 @@ public class AprobacionResultadoController {
         filtroMx.setNombreUsuario(nombreUsuario);
         filtroMx.setNivelLaboratorio(seguridadService.esDirector(nombreUsuario)?3:seguridadService.esJefeDepartamento(nombreUsuario)?2:1);
         filtroMx.setIncluirTraslados(true);
+        filtroMx.setFechaInicioProcesamiento(fechaInicioProc);
+        filtroMx.setFechaFinProcesamiento(fechaFinProc);
         return filtroMx;
     }
 
@@ -481,9 +489,7 @@ public class AprobacionResultadoController {
             if (solicitudEstudio == null && solicitudDx == null){
                 throw new Exception(messageSource.getMessage("msg.approve.result.solic.not.found",null,null));
             }else {
-                long idUsuario = seguridadService.obtenerIdUsuario(request);
-                Usuarios usuario = usuarioService.getUsuarioById((int) idUsuario);
-                //se obtiene datos de los conceptos a registrar
+                User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
                 if (solicitudDx!=null){
                     solicitudDx.setAprobada(true);
                     solicitudDx.setFechaAprobacion(new Date());
@@ -507,6 +513,65 @@ public class AprobacionResultadoController {
         }finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idSolicitud",idSolicitud);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    @RequestMapping(value = "approveMassiveResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void approveMassiveResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String idSolicitud="";
+        Integer cantAprobProc = 0;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            String strSolicitudes = jsonpObject.get("strSolicitudes").toString();
+
+            JsonObject jObjectSolicitudes = new Gson().fromJson(strSolicitudes, JsonObject.class);
+
+            Integer cantAprobaciones = jsonpObject.get("cantAprobaciones").getAsInt();
+
+            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+
+            for (int i = 0; i < cantAprobaciones; i++){
+                idSolicitud = jObjectSolicitudes.get(String.valueOf(i)).getAsString();
+                DaSolicitudDx solicitudDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
+                DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
+                if (solicitudEstudio == null && solicitudDx == null) {
+                    throw new Exception(messageSource.getMessage("msg.approve.result.solic.not.found", null, null));
+                } else {
+                    if (solicitudDx != null) {
+                        solicitudDx.setAprobada(true);
+                        solicitudDx.setFechaAprobacion(new Date());
+                        solicitudDx.setUsuarioAprobacion(usuario);
+                        tomaMxService.updateSolicitudDx(solicitudDx);
+                    }
+                    if (solicitudEstudio != null) {
+                        solicitudEstudio.setAprobada(true);
+                        solicitudEstudio.setFechaAprobacion(new Date());
+                        solicitudEstudio.setUsuarioAprobacion(usuario);
+                        tomaMxService.updateSolicitudEstudio(solicitudEstudio);
+                    }
+                    cantAprobProc++;
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.approve.result.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("strSolicitudes","-");
+            map.put("cantAprobaciones","-");
+            map.put("cantAprobProc",cantAprobProc.toString());
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());

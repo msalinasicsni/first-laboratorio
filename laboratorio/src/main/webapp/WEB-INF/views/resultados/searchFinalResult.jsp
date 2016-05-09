@@ -8,9 +8,18 @@
 <!-- BEGIN HEAD -->
 <head>
     <jsp:include page="../fragments/headTag.jsp" />
+    <spring:url value="/resources/img/plus.png" var="plus"/>
+    <spring:url value="/resources/img/minus.png" var="minus"/>
     <style>
         textarea {
             resize: none;
+        }
+        td.details-control {
+            background: url("${plus}") no-repeat center center;
+            cursor: pointer;
+        }
+        tr.shown td.details-control {
+            background: url("${minus}") no-repeat center center;
         }
     </style>
 </head>
@@ -82,16 +91,41 @@
                 <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                 <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
                 <input id="txtEsLaboratorio" type="hidden" value="false"/>
+                <input id="text_value" type="hidden" value="<spring:message code="lbl.result.value"/>"/>
+                <input id="text_date" type="hidden" value="<spring:message code="lbl.result.date"/>"/>
+                <input id="text_response" type="hidden" value="<spring:message code="lbl.approve.response"/>"/>
+                <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
+                <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
+                <input id="msg_approval_select_order" type="hidden" value="<spring:message code="msg.approve.select.order"/>"/>
+                <input id="msg_approval_cancel" type="hidden" value="<spring:message code="msg.approve.cancel"/>"/>
+                <input id="msg_approval_confirm_t" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                <input id="msg_approval_confirm_c" type="hidden" value="<spring:message code="msg.approve.confirm.content"/>"/>
+                <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                <input id="msg_approval_succes" type="hidden" value="<spring:message code="msg.approve.successfully"/>"/>
                 <form id="searchResults-form" class="smart-form" autocomplete="off">
                     <fieldset>
                         <div class="row">
-                            <section class="col col-sm-12 col-md-12 col-lg-5">
+                            <section class="col col-sm-6 col-md-4 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.receipt.person.applicant.name" />
+                                    <spring:message code="lbl.prc.start.date" />
                                 </label>
-                                <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
-                                    <input type="text" id="txtfiltroNombre" name="filtroNombre" placeholder="<spring:message code="lbl.receipt.person.applicant.name"/>">
-                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.receipt.person.applicant.name"/></b>
+                                <label class="input">
+                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
+                                    <input type="text" name="fecInicioProc" id="fecInicioProc"
+                                           placeholder="<spring:message code="lbl.date.format"/>"
+                                           class="form-control from_date" data-date-end-date="+0d"/>
+                                </label>
+                            </section>
+                            <section class="col col-sm-6 col-md-4 col-lg-3">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.prc.end.date" />
+                                </label>
+                                <label class="input">
+                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
+                                    <input type="text" name="fecFinProc" id="fecFinProc"
+                                           placeholder="<spring:message code="lbl.date.format"/>"
+                                           class="form-control to_date" data-date-end-date="+0d"/>
                                 </label>
                             </section>
                             <section class="col col-sm-6 col-md-4 col-lg-3">
@@ -103,7 +137,6 @@
                                     <input type="text" name="fecInicioRecep" id="fecInicioRecep"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control from_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.check-in.startdate"/></b>
                                 </label>
                             </section>
                             <section class="col col-sm-6 col-md-4 col-lg-3">
@@ -115,7 +148,6 @@
                                     <input type="text" name="fecFinRecep" id="fecFinRecep"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control to_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.check-in.enddate"/></b>
                                 </label>
                             </section>
 
@@ -241,9 +273,15 @@
                         <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                         <th><spring:message code="lbl.solic.short"/></th>
                         <th></th>
+                        <th></th>
                     </tr>
                     </thead>
                 </table>
+                <form id="sendOrders-form" class="smart-form" autocomplete="off">
+                    <footer>
+                        <button type="button" id="approve_selected" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-send"></i> <spring:message code="act.approve.selected" /></button>
+                    </footer>
+                </form>
             </div>
             <!-- end widget content -->
         </div>
@@ -323,6 +361,7 @@
 
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 <c:url var="sApprovalUrl" value="/aprobacion/create/"/>
+<c:url var="sApprovalMassiveUrl" value="/aprobacion/approveMassiveResult"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
@@ -331,7 +370,9 @@
             sUnidadesUrl : "${unidadesURL}",
             blockMess: "${blockMess}",
             sActionUrl : "${sApprovalUrl}",
-            sEsIngreso : 'false'
+            sEsIngreso : 'false',
+            sTableToolsPath : "${tabletools}",
+            sApprovalMassiveUrl : "${sApprovalMassiveUrl}"
         };
         SearchFinalResult.init(parametros);
 

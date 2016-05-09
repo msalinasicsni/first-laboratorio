@@ -571,8 +571,7 @@ public class RecepcionMxController {
                 }
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
                 if (mxInadecuada){
-                    long idUsuario = seguridadService.obtenerIdUsuario(request);
-                    Usuarios usuApro = usuarioService.getUsuarioById((int) idUsuario);
+                    User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
                     if (!esEstudio) {
                         List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(idTomaMx, labUsuario.getCodigo());
                         for (DaSolicitudDx solicitudDx : solicitudDxList) {
@@ -736,8 +735,7 @@ public class RecepcionMxController {
                     trasladosService.saveTrasladoMx(trasladoMxActivo);
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
                 if (mxInadecuada){
-                    long idUsuario = seguridadService.obtenerIdUsuario(request);
-                    Usuarios usuApro = usuarioService.getUsuarioById((int) idUsuario);
+                    User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
                     if (!esEstudio) {
                         List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
                         for (DaSolicitudDx solicitudDx : solicitudDxList) {

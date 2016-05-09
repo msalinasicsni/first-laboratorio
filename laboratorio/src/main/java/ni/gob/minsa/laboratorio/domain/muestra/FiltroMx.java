@@ -32,6 +32,8 @@ public class FiltroMx {
     String area;
     String resultadoFinal;
     String codLaboratio;
+    Date fechaInicioProcesamiento;
+    Date fechaFinProcesamiento;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -204,4 +206,20 @@ public class FiltroMx {
     public String getResultadoFinal() { return resultadoFinal; }
 
     public void setResultadoFinal(String resultadoFinal) { this.resultadoFinal = resultadoFinal; }
+
+    public Date getFechaInicioProcesamiento() {
+        return fechaInicioProcesamiento;
+    }
+
+    public void setFechaInicioProcesamiento(Date fechaInicioProcesamiento) {
+        this.fechaInicioProcesamiento = fechaInicioProcesamiento;
+    }
+
+    public Date getFechaFinProcesamiento() {
+        return fechaFinProcesamiento;
+    }
+
+    public void setFechaFinProcesamiento(Date fechaFinProcesamiento) {
+        this.fechaFinProcesamiento = fechaFinProcesamiento;
+    }
 }

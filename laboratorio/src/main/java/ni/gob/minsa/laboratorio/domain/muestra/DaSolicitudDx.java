@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.web.servlet.tags.EditorAwareTag;
@@ -23,7 +24,7 @@ public class DaSolicitudDx implements Auditable {
     private Catalogo_Dx codDx;
     private Usuarios usarioRegistro;
     private Date fechaAprobacion;
-    private Usuarios usuarioAprobacion;
+    private User usuarioAprobacion;
     private Boolean aprobada;
     private Boolean controlCalidad;
     private Laboratorio labProcesa;
@@ -96,13 +97,13 @@ public class DaSolicitudDx implements Auditable {
     }
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "USUARIO_APROBACION", referencedColumnName = "USUARIO_ID")
+    @JoinColumn(name = "USUARIO_APROBACION", referencedColumnName = "username")
     @ForeignKey(name = "USUARIO_APROBACION_FK")
-    public Usuarios getUsuarioAprobacion() {
+    public User getUsuarioAprobacion() {
         return usuarioAprobacion;
     }
 
-    public void setUsuarioAprobacion(Usuarios usuarioAprobacion) {
+    public void setUsuarioAprobacion(User usuarioAprobacion) {
         this.usuarioAprobacion = usuarioAprobacion;
     }
 
