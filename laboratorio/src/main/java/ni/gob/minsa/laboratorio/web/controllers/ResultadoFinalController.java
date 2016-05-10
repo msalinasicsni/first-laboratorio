@@ -349,61 +349,62 @@ public class ResultadoFinalController {
         Integer indice = 0;
 
             for (OrdenExamen examen : examsList) {
-                Map<String, String> map = new HashMap<String, String>();
-                if (examen.getSolicitudDx() != null) {
-                    map.put("idSolicitud", examen.getSolicitudDx().getIdSolicitudDx());
-                    map.put("fechaSolicitud", DateUtil.DateToString(examen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                    map.put("nombreSolicitud", examen.getSolicitudDx().getCodDx().getNombre());
-                    map.put("codigoUnicoMx", examen.getSolicitudDx().getIdTomaMx().getCodigoLab());
-                    map.put("tipoMx", examen.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
-                    map.put("tipoNotificacion", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
-                    map.put("idOrdenExamen", examen.getIdOrdenExamen());
-                    map.put("NombreExamen", examen.getCodExamen().getNombre());
+                if (!examen.isAnulado()) {
+                    Map<String, String> map = new HashMap<String, String>();
+                    if (examen.getSolicitudDx() != null) {
+                        map.put("idSolicitud", examen.getSolicitudDx().getIdSolicitudDx());
+                        map.put("fechaSolicitud", DateUtil.DateToString(examen.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                        map.put("nombreSolicitud", examen.getSolicitudDx().getCodDx().getNombre());
+                        map.put("codigoUnicoMx", examen.getSolicitudDx().getIdTomaMx().getCodigoLab());
+                        map.put("tipoMx", examen.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
+                        map.put("tipoNotificacion", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
+                        map.put("idOrdenExamen", examen.getIdOrdenExamen());
+                        map.put("NombreExamen", examen.getCodExamen().getNombre());
 
-                    //Si hay persona
-                    if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                        /// se obtiene el nombre de la persona asociada a la ficha
-                        String nombreCompleto = "";
-                        nombreCompleto = examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                        if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                        if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                        map.put("persona", nombreCompleto);
-                    } else if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
-                        map.put("persona", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-                    }else {
-                        map.put("persona", " ");
-                    }
+                        //Si hay persona
+                        if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                            /// se obtiene el nombre de la persona asociada a la ficha
+                            String nombreCompleto = "";
+                            nombreCompleto = examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                            if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                            nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                            if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                nombreCompleto = nombreCompleto + " " + examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                            map.put("persona", nombreCompleto);
+                        } else if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                            map.put("persona", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                        } else {
+                            map.put("persona", " ");
+                        }
 
-                } else {
-                    //examenes para estudio
-                    map.put("idSolicitud", examen.getSolicitudEstudio().getIdSolicitudEstudio());
-                    map.put("fechaSolicitud", DateUtil.DateToString(examen.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                    map.put("nombreSolicitud", examen.getSolicitudEstudio().getTipoEstudio().getNombre());
-                    map.put("codigoUnicoMx", examen.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx());
-                    map.put("tipoMx", examen.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
-                    map.put("tipoNotificacion", examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
-                    map.put("idOrdenExamen", examen.getIdOrdenExamen());
-                    map.put("NombreExamen", examen.getCodExamen().getNombre());
-
-                    //Si hay persona
-                    if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                        /// se obtiene el nombre de la persona asociada a la ficha
-                        String nombreCompleto = "";
-                        nombreCompleto = examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                        if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                        if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                        map.put("persona", nombreCompleto);
                     } else {
-                        map.put("persona", " ");
-                    }
+                        //examenes para estudio
+                        map.put("idSolicitud", examen.getSolicitudEstudio().getIdSolicitudEstudio());
+                        map.put("fechaSolicitud", DateUtil.DateToString(examen.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                        map.put("nombreSolicitud", examen.getSolicitudEstudio().getTipoEstudio().getNombre());
+                        map.put("codigoUnicoMx", examen.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx());
+                        map.put("tipoMx", examen.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
+                        map.put("tipoNotificacion", examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
+                        map.put("idOrdenExamen", examen.getIdOrdenExamen());
+                        map.put("NombreExamen", examen.getCodExamen().getNombre());
 
-                }
+                        //Si hay persona
+                        if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                            /// se obtiene el nombre de la persona asociada a la ficha
+                            String nombreCompleto = "";
+                            nombreCompleto = examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                            if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                            nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                            if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                            map.put("persona", nombreCompleto);
+                        } else {
+                            map.put("persona", " ");
+                        }
+
+                    }
                     //detalle resultado examen
                     List<DetalleResultado> resultList = resultadoFinalService.getResultDetailExaByIdOrden(examen.getIdOrdenExamen());
                     Map<Integer, Object> mapResList = new HashMap<Integer, Object>();
@@ -414,17 +415,16 @@ public class ResultadoFinalController {
                         if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                             Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
                             mapRes.put("valor", cat_lista.getValor());
-                        }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")){
-                            if (res.getValor().equals("false")){
-                                mapRes.put("valor", messageSource.getMessage("lbl.no",null,null));
-                            }else{
-                                mapRes.put("valor", messageSource.getMessage("lbl.yes",null,null));
+                        } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            if (res.getValor().equals("false")) {
+                                mapRes.put("valor", messageSource.getMessage("lbl.no", null, null));
+                            } else {
+                                mapRes.put("valor", messageSource.getMessage("lbl.yes", null, null));
                             }
-                        }
-                        else {
+                        } else {
                             mapRes.put("valor", res.getValor());
                         }
-                        mapRes.put("respuesta",res.getRespuesta().getNombre());
+                        mapRes.put("respuesta", res.getRespuesta().getNombre());
                         mapRes.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
                         subIndice++;
                         mapResList.put(subIndice, mapRes);
@@ -432,12 +432,13 @@ public class ResultadoFinalController {
                     }
 
                     map.put("resultado", new Gson().toJson(mapResList));
-                    map.put("laboratorio",examen.getLabProcesa().getNombre());
-                    map.put("procesado",(mapResList.size()>0?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
+                    map.put("laboratorio", examen.getLabProcesa().getNombre());
+                    map.put("procesado", (mapResList.size() > 0 ? messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
 
                     mapResponse.put(indice, map);
                     indice++;
 
+                }
             }
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
