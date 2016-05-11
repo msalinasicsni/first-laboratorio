@@ -122,7 +122,7 @@
                                         <label class="label"><fmt:message key="login.username"/></label>
                                         <label class="input"> <i class="icon-append fa fa-user"></i>
                                             <input required="" type="text" class="form-control" id="username"
-                                                   name='j_username' value=''
+                                                   name='j_username' value='' autofocus="true"
                                                    placeholder="<fmt:message key="login.username"/>">
                                             <%--<b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i><fmt:message key="login.username.tooltip"/> </b>--%>
                                         </label>

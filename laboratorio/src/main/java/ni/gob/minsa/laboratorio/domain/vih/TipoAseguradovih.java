@@ -17,7 +17,7 @@ import javax.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorValue(value = "TPOAS")
+@DiscriminatorValue(value = "TPOASVIH")
 public class TipoAseguradovih extends Catalogo {
 
     private static final long serialVersionUID = -8537799539873362151L;
