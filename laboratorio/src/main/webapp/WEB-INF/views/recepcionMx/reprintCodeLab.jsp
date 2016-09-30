@@ -288,6 +288,7 @@
     <!-- a blank row to get started -->
     <div class="col-sm-12">
         <!-- your contents here -->
+        <div id="siteloader"></div>
     </div>
 </div>
 <!-- end row -->
@@ -350,7 +351,7 @@
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="searchUrl" value="/reprint/searchReceptionRecords"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-<spring:url var="printUrl" value="/resultados/printBC/"/>
+<spring:url var="printUrl" value="/print/barcode"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
