@@ -103,7 +103,7 @@ public class RespuestasSolicitudService {
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdDx(Integer idDx) throws Exception {
-        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaSolicitud as r inner join r.concepto tdc " +
+        String query = "Select distinct a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaSolicitud as r inner join r.concepto tdc " +
                 "where a.pasivo = false and tdl.idConcepto = tdc.idConcepto and r.diagnostico.idDiagnostico =:idDx" +
                 " order by  a.valor";
         Session session = sessionFactory.getCurrentSession();
@@ -113,7 +113,7 @@ public class RespuestasSolicitudService {
     }
 
     public List<Catalogo_Lista> getCatalogoListaConceptoByIdEstudio(Integer idEstudio) throws Exception {
-        String query = "Select a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaSolicitud as r inner join r.concepto tdc " +
+        String query = "Select distinct a from Catalogo_Lista as a inner join a.idConcepto tdl , RespuestaSolicitud as r inner join r.concepto tdc " +
                 "where a.pasivo = false and tdl.idConcepto = tdc.idConcepto and r.estudio.idEstudio =:idEstudio" +
                 " order by  a.valor";
         Session session = sessionFactory.getCurrentSession();
