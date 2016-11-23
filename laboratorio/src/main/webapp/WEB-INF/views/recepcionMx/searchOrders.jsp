@@ -353,7 +353,7 @@
     <c:url var="sAddReceiptUrl" value="/recepcionMx/create/"/>
     <c:url var="sCreateReceiptUrl" value="/recepcionMx/create/"/>
     <c:url var="sCreateReceiptMassUrl" value="/recepcionMx/recepcionMasivaGral"/>
-    <spring:url var="sPrintUrl" value="/resultados/printBC/"/>
+    <spring:url var="sPrintUrl" value="/print/barcode"/>
 
     <script type="text/javascript">
 		$(document).ready(function() {

@@ -1,20 +1,10 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
-import ni.gob.minsa.laboratorio.service.SeguridadService;
-import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,10 +18,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("print")
 public class ImprimirCodigoController {
-    private static final Logger logger = LoggerFactory.getLogger(RecepcionMxController.class);
-    @Autowired
-    @Qualifier(value = "seguridadService")
-    private SeguridadService seguridadService;
 
     @RequestMapping(value = "barcode", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
