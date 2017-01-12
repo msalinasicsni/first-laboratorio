@@ -400,7 +400,7 @@ var ReceiptOrders = function () {
                         buttons: '[' + opcSi + '][' + opcNo + ']'
                     }, function (ButtonPressed) {
                         if (ButtonPressed === opcSi) {
-                            var urlImpresion = '';
+                            var codUnicosFormat = '';
                             bloquearUI(parametros.blockMess);
                             var idRecepciones = {};
                             //el input hidden debe estar siempre en la primera columna
@@ -443,9 +443,7 @@ var ReceiptOrders = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
-                                            var codUnicosFormat = reemplazar(data.codigosUnicosMx, ".", "*");
-                                            var loc = window.location;
-                                            urlImpresion = 'http://' + loc.host + parametros.sPrintUrl + codUnicosFormat;
+                                            codUnicosFormat = reemplazar(data.codigosUnicosMx, ".", "*");
                                             getMxs(false);
                                         }
                                         desbloquearUI();
@@ -455,7 +453,7 @@ var ReceiptOrders = function () {
                                         validateLogin(jqXHR);
                                     }
                                 });
-                            imprimir(urlImpresion);
+                            imprimir(codUnicosFormat);
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({
@@ -568,7 +566,7 @@ var ReceiptOrders = function () {
             <!-- para guardar recepción general -->
             function guardarRecepcion() {
                 bloquearUI(parametros.blockMess);
-                var urlImpresion = '';
+                var codUnicoFormat = '';
                 var recepcionObj = {};
                 recepcionObj['idRecepcion'] = '';
                 recepcionObj['mensaje'] = '';
@@ -607,9 +605,7 @@ var ReceiptOrders = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
-                                var codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
-                                var loc = window.location;
-                                urlImpresion = 'http://' + loc.host + parametros.sPrintUrl + codUnicoFormat;
+                                codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
                                 limpiarDatosRecepcion();
                                 setTimeout(function () {
                                     window.location.href = parametros.sSearchReceiptUrl
@@ -622,13 +618,41 @@ var ReceiptOrders = function () {
                             validateLogin(jqXHR);
                         }
                     });
-                imprimir(urlImpresion);
+                imprimir(codUnicoFormat);
             }
 
-            function imprimir(urlImpresion) {
-                if (urlImpresion.length > 0) {
-                    window.open(urlImpresion, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
-                }
+            function imprimir(strBarCodes){
+                $.getJSON(parametros.sPrintUrl, {
+                    strBarCodes: strBarCodes,
+                    ajax: 'true'
+                }, function (data) {
+                    var len = Object.keys(data).length;
+                    console.log(data);
+                    if (len > 0) {
+                        console.log(data.respuesta.length);
+                        if (data.respuesta.length>0){
+                            $.smallBox({
+                                title: data.respuesta,
+                                content: $("#smallBox_content").val(),
+                                color: "#C46A69",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        }else{
+                            $.smallBox({
+                                title: "etiquetas impresas",
+                                content: $("#smallBox_content").val(),
+                                color: "#739E73",
+                                iconSmall: "fa fa-success",
+                                timeout: 4000
+                            });
+                        }
+
+                    }
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
             }
 
             <!-- para guardar recepción en laboratorio -->

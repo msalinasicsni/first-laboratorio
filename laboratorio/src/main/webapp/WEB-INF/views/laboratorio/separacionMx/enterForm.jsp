@@ -315,7 +315,7 @@
 <c:url var="getAliquots" value="/separacionMx/getAliquots"/>
 <c:url var="overrideAliquot" value="/separacionMx/overrideAliquot/"/>
 <c:url var="getTestOrders" value="/separacionMx/getTestOrders"/>
-<spring:url var="sPrintUrl" value="/resultados/printBC/"/>
+<spring:url var="sPrintUrl" value="/print/barcode"/>
 <c:url var="getVolume" value="/separacionMx/getVolume"/>
 
 <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>

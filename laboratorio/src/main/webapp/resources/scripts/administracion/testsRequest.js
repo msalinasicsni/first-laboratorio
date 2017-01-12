@@ -78,7 +78,7 @@ var TestsRequest  = function () {
             function detailExa(){
                 var data =  $(this.innerHTML).data('id');
                 if(data != null){
-                    var detalle = data.split(",");
+                    var detalle = data.split("^");
                     var id= detalle[0];
                     var tipo = detalle[1];
                     var nombre = detalle[2];
@@ -158,7 +158,7 @@ var TestsRequest  = function () {
                     var len = Object.keys(data).length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "," + data[i].tipo + "," + data[i].nombre + ","+ data[i].idArea +
+                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "^" + data[i].tipo + "^" + data[i].nombre + "^"+ data[i].idArea +
                             '" > <i class="fa fa-list"></i>' ;
 
                         catalogueTable.fnAddData(

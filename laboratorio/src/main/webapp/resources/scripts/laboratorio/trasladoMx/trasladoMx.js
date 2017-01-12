@@ -270,9 +270,6 @@ var TrasladoMx = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
-                                            //var codUnicosFormat = reemplazar(data.codigosUnicosMx,".","*");
-                                            //var loc = window.location;
-                                            //urlImpresion = 'http://'+loc.host+parametros.sPrintUrl+codUnicosFormat;
                                             getMxs(false);
                                         }
                                         desbloquearUI();

@@ -349,7 +349,7 @@
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
 <c:url var="generateAliquot" value="/separacionMx/create/"/>
 <c:url var="sImpresionMasivaAliquot" value="/separacionMx/impresionMasiva"/>
-<spring:url var="sPrintUrl" value="/resultados/printBC/"/>
+<spring:url var="sPrintUrl" value="/print/barcode"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();

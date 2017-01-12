@@ -207,7 +207,6 @@ var ReprintCodeLab = function () {
                 var len = aSelectedTrs.length;
                 var opcSi = $("#yes").val();
                 var opcNo = $("#no").val();
-                var urlImpresion = '';
                 if (len > 0) {
                     $.SmartMessageBox({
                         title: $("#msg_confirm_print").val(),
@@ -230,9 +229,7 @@ var ReprintCodeLab = function () {
                                 unBlockUI();
                             }
                             codesLab = reemplazar(codesLab, ".", "*");
-                            var loc = window.location;
-                            urlImpresion = 'http://' + loc.host + parametros.printUrl + codesLab;
-                            imprimir(urlImpresion);
+                            imprimir(codesLab);
 
                         }
                         if (ButtonPressed === opcNo) {
@@ -258,10 +255,39 @@ var ReprintCodeLab = function () {
 
             }
 
-            function imprimir(urlImpresion) {
-                if (urlImpresion.length > 0) {
-                    window.open(urlImpresion, '', 'width=600,height=400,left=50,top=50,toolbar=yes');
-                }
+
+            function imprimir(strBarCodes){
+                $.getJSON(parametros.printUrl, {
+                    strBarCodes: strBarCodes,
+                    ajax: 'true'
+                }, function (data) {
+                    var len = Object.keys(data).length;
+                    console.log(data);
+                    if (len > 0) {
+                        console.log(data.respuesta.length);
+                        if (data.respuesta.length>0){
+                            $.smallBox({
+                                title: data.respuesta,
+                                content: $("#disappear").val(),
+                                color: "#C46A69",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        }else{
+                            $.smallBox({
+                                title: "etiquetas impresas",
+                                content: $("#disappear").val(),
+                                color: "#739E73",
+                                iconSmall: "fa fa-success",
+                                timeout: 4000
+                            });
+                        }
+
+                    }
+                }).fail(function (jqXHR) {
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
             }
 
             function reemplazar(texto, buscar, nuevo) {

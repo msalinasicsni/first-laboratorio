@@ -520,7 +520,7 @@
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
-    <spring:url var="sPrintUrl" value="/resultados/printBC/"/>
+    <spring:url var="sPrintUrl" value="/print/barcode"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
