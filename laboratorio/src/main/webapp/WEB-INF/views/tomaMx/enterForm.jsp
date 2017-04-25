@@ -88,8 +88,6 @@
                                                 <spring:message code="lbl.notification.type" /> </label>
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                                <c:choose>
-                                                    <c:when test="${esNuevaNoti}">
                                                         <select id="codTipoNoti" name="codTipoNoti"
                                                                 class="select2">
                                                             <option value=""><spring:message code="lbl.select" />...</option>
@@ -104,24 +102,6 @@
                                                                 </c:choose>
                                                             </c:forEach>
                                                         </select>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <select id="codTipoNoti" disabled name="codTipoNoti"
-                                                                class="select2">
-                                                            <option value=""><spring:message code="lbl.select" />...</option>
-                                                            <c:forEach items="${notificaciones}" var="tipoNoti">
-                                                                <c:choose>
-                                                                    <c:when test="${tipoNoti.codigo eq noti.codTipoNotificacion.codigo}">
-                                                                        <option selected value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                            </c:forEach>
-                                                        </select>
-                                                    </c:otherwise>
-                                                </c:choose>
                                             </div>
                                         </section>
                                     </div>
@@ -283,18 +263,9 @@
                                             <div class="">
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
-                                                    <c:choose>
-                                                        <c:when test="${esNuevaNoti}">
                                                             <input name="fechaInicioSintomas" id="fechaInicioSintomas" value="<fmt:formatDate value="${noti.fechaInicioSintomas}" pattern="dd/MM/yyyy" />" type='text'
                                                                    class="form-control date-picker" data-date-end-date="+0d"
                                                                    placeholder="<spring:message code="lbl.receipt.symptoms.start.date.full" />"/>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <input name="fechaInicioSintomas" disabled id="fechaInicioSintomas" value="<fmt:formatDate value="${noti.fechaInicioSintomas}" pattern="dd/MM/yyyy" />" type='text'
-                                                                   class="form-control"
-                                                                   placeholder="<spring:message code="lbl.receipt.symptoms.start.date.full" />"/>
-                                                        </c:otherwise>
-                                                    </c:choose>
                                                 </label>
                                             </div>
                                         </section>

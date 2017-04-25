@@ -105,6 +105,7 @@
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
                                     <input id="msg_review_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel.test"/>"/>
                                     <input id="msg_review_added" type="hidden" value="<spring:message code="msg.receipt.add.test"/>"/>
+                                    <input id="msg_request_added" type="hidden" value="<spring:message code="msg.receipt.add.request"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <input id="txtEsLaboratorio" type="hidden" value="true"/>
                                     <form id="receiptOrdersLab-form" class="smart-form" autocomplete="off">
@@ -337,44 +338,24 @@
                                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.DateTime"/></th>
                                                             <th data-hide="phone"><spring:message code="lbl.solic.area.prc"/></th>
                                                             <th data-hide="phone"><spring:message code="lbl.cc"/></th>
+                                                            <th data-hide="phone"><spring:message code="act.cancel"/></th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <c:choose>
-                                                            <c:when test="${not empty dxList}">
-                                                                <c:forEach items="${dxList}" var="record">
-                                                                    <tr>
-                                                                        <td><spring:message code="lbl.routine" /></td>
-                                                                        <td><c:out value="${record.codDx.nombre}" /></td>
-                                                                        <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
-                                                                        <td><c:out value="${record.codDx.area.nombre}" /></td>
-                                                                        <c:choose>
-                                                                            <c:when test="${record.controlCalidad}">
-                                                                                <td><spring:message code="lbl.yes" /></td>
-                                                                            </c:when>
-                                                                            <c:otherwise>
-                                                                                <td><spring:message code="lbl.no" /></td>
-                                                                            </c:otherwise>
-                                                                        </c:choose>
-                                                                    </tr>
-                                                                </c:forEach>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <c:forEach items="${estudiosList}" var="record">
-                                                                    <tr>
-                                                                        <td><spring:message code="lbl.study" /></td>
-                                                                        <td><c:out value="${record.tipoEstudio.nombre}" /></td>
-                                                                        <td><fmt:formatDate value="${record.fechaHSolicitud}" pattern="dd/MM/yyyy hh:mm:ss a" /></td>
-                                                                        <td><c:out value="${record.tipoEstudio.area.nombre}" /></td>
-                                                                        <td><spring:message code="lbl.no" /></td>
-                                                                    </tr>
-                                                                </c:forEach>
-                                                            </c:otherwise>
-                                                        </c:choose>
 
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                <div class="row">
+                                                    <section class="col col-sm-12 col-md-12 col-lg-12">
+                                                        <button type="button" id="btnAddDx" class="btn btn-primary styleButton" data-toggle="modal"
+                                                                data-target="modalSolicitudes">
+                                                            <i class="fa fa-plus icon-white"></i>
+                                                            <spring:message code="act.add"/> <spring:message code="lbl.request.large"/>
+                                                        </button>
+                                                    </section>
+                                                </div>
+
                                             </div>
                                         <c:if test="${not empty datosList}">
                                             <div>
@@ -615,6 +596,74 @@
             </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
 
+            <div class="modal fade" id="modalSolicitudes" aria-hidden="true" data-backdrop="static"> <!--tabindex="-1" role="dialog" -->
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <spring:message code="lbl.receipt.widgettitle.modal.request" />
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="modal-body"> <!--  no-padding -->
+                            <form id="addDx-form" class="smart-form" novalidate="novalidate">
+                                <fieldset>
+                                    <div class="row">
+                                        <c:choose>
+                                            <c:when test="${esEstudio}">
+                                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.study.type" />
+                                                    </label>
+                                                    <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-location-arrow fa-fw"></i>
+                                </span>
+                                                        <select  class="select2" id="codEstudioNuevo" name="codEstudioNuevo" >
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                        </select>
+                                                    </div>
+                                                </section>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.type" />
+                                                    </label>
+                                                    <div class="input-group">
+                                <span class="input-group-addon">
+                                    <i class="fa fa-location-arrow fa-fw"></i>
+                                </span>
+                                                        <select  class="select2" id="codDXNuevo" name="codDXNuevo" >
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                        </select>
+                                                    </div>
+                                                </section>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                </fieldset>
+
+                                <footer>
+                                    <button type="submit" class="btn btn-success" id="btnAgregarDx">
+                                        <i class="fa fa-save"></i> <spring:message code="act.save" />
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.end" />
+                                    </button>
+
+                                </footer>
+
+                            </form>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
             <!-- Modal -->
             <div class="modal fade" id="modalOverride" aria-hidden="true" data-backdrop="static">
                 <div class="modal-dialog">
@@ -713,6 +762,7 @@
     <c:url var="sAddReceiptUrl" value="/recepcionMx/receiptLaboratory"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/initLab"/>
     <c:url var="sAnularExamenUrl" value="/recepcionMx/anularExamen"/>
+    <c:url var="sAgregarSolicitudUrl" value="/recepcionMx/agregarSolicitud"/>
     <c:url var="sAgregarOrdenExamenUrl" value="/recepcionMx/agregarOrdenExamen"/>
     <c:url var="sgetOrdenesExamenUrl" value="/recepcionMx/getOrdenesExamen"/>
     <c:url var="sDxURL" value="/api/v1/getDiagnosticos"/>
@@ -720,6 +770,7 @@
     <c:url var="sEstudiosURL" value="/api/v1/getEstudios"/>
     <c:url var="sExamenesEstURL" value="/api/v1/getExamenesEstudio"/>
     <c:url var="sReglasExamenesURL" value="/administracion/examenes/obtenerReglasExamenes"/>
+    <c:url var="sGetSolicitudesUrl" value="/recepcionMx/getSolicitudes"/>
 
     <script type="text/javascript">
 		$(document).ready(function() {
@@ -735,9 +786,11 @@
                 sDxURL : "${sDxURL}",
                 sExamenesURL : "${sExamenesURL}",
                 sAgregarOrdenExamenUrl : "${sAgregarOrdenExamenUrl}",
+                sAgregarSolicitudUrl : "${sAgregarSolicitudUrl}",
                 sEstudiosURL : "${sEstudiosURL}",
                 sExamenesEstURL : "${sExamenesEstURL}",
                 sReglasExamenesURL : "${sReglasExamenesURL}",
+                sGetSolicitudesUrl : "${sGetSolicitudesUrl}",
                 noRules : "${noRules}"
             };
 			ReceiptOrders.init(parametros);

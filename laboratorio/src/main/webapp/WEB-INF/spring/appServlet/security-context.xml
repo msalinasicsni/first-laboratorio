@@ -23,6 +23,8 @@
         <intercept-url pattern="/recepcionMx/createLab/*" access="ROLE_ADMIN,ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/searchOrdersLab" access="ROLE_ADMIN,ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/getOrdenesExamen" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/getSolicitudes" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/agregarSolicitud" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/agregarOrdenExamen" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/anularExamen" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/receiptLaboratory" access="ROLE_ANALISTA" />

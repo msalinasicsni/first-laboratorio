@@ -131,11 +131,7 @@ var EnterFormTomaMx = function () {
                 objetoTomaMx['idNotificacion'] = $("#idNotificacion").val();
                 objetoTomaMx['codSilais'] = $('#codSilaisAtencion').find('option:selected').val();
                 objetoTomaMx['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
-                if ($('#esNuevaNoti').val()=='true'){
-                    objetoTomaMx['codTipoNoti'] = $('#codTipoNoti').find('option:selected').val();
-                }else{
-                    objetoTomaMx['codTipoNoti'] = '';
-                }
+                objetoTomaMx['codTipoNoti'] = $('#codTipoNoti').find('option:selected').val();
                 if (document.getElementById('fechaInicioSintomas')){
                     objetoTomaMx['fechaInicioSintomas'] = $("#fechaInicioSintomas").val();
                 }else{

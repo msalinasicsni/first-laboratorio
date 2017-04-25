@@ -614,6 +614,14 @@ public class TomaMxService {
         session.save(orden);
     }
 
+    /**
+     * Agrega solicitud estudio
+     */
+    public void addSolicitudEstudio(DaSolicitudEstudio orden) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(orden);
+    }
+
     public Integer deleteSolicitudesDxByTomaMx(String idTomaMx) {
         // Retrieve session from Hibernate
         Session s = sessionFactory.openSession();

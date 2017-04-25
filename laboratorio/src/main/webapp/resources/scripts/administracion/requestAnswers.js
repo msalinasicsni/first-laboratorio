@@ -50,13 +50,14 @@ var DxAnswers = function () {
                 "columns": [
                     null, null,
                     {
-                        "className":      'addC',
+                        "className":      'addD',
                         "orderable":      false
                     },
                     {
-                        "className":      'addD',
+                        "className":      'addC',
                         "orderable":      false
                     }
+
                 ],
 
                 "preDrawCallback": function () {

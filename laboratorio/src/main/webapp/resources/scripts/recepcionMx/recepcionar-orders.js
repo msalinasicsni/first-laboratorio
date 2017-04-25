@@ -136,6 +136,7 @@ var ReceiptOrders = function () {
             });
 
             if ($("#txtEsLaboratorio").val() == 'true') {
+                getRequest();
                 getOrdersReview();
             }
             <!-- formulario de búsqueda de ordenes -->
@@ -200,6 +201,22 @@ var ReceiptOrders = function () {
                 },
                 submitHandler: function (form) {
                     guardarRecepcionLab();
+                }
+            });
+
+            <!-- formulario para agregar solicitud -->
+            $('#addDx-form').validate({
+                // Rules for form validation
+                rules: {
+                    codDXNuevo: {required: true},
+                    codEstudioNuevo: {required: true}
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    guardarSolicitud();
                 }
             });
 
@@ -337,6 +354,48 @@ var ReceiptOrders = function () {
                         setTimeout($.unblockUI, 10);
                         validateLogin(jqXHR);
                     });
+            }
+
+            function getRequest() {
+                if (parametros.sGetSolicitudesUrl!=null) {
+                    $.getJSON(parametros.sGetSolicitudesUrl, {
+                        idTomaMx: $("#idTomaMx").val(),
+                        contentType: "charset=ISO-8859-1",
+                        ajax: 'true'
+                    }, function (response) {
+                        table3.fnClearTable();
+                        var len = Object.keys(response).length;
+                        var idExamenes = "";
+                        for (var i = 0; i < len; i++) {
+                            if (i==0) {
+                                idExamenes = response[i].idSolicitud;
+                            } else {
+                                idExamenes = idExamenes +','+response[i].idSolicitud;
+                            }
+                            table3.fnAddData(
+                                [response[i].tipo,response[i].nombre, response[i].fechaSolicitud, response[i].nombreAreaPrc, response[i].cc,
+                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +','+response[i].tipo+ '><i class="fa fa-times"></i></a>']);
+
+                        }
+                        $(".anularSolicitud").on("click", function () {
+                            //anularExamen($(this).data('id'));
+                            $("#idOrdenExamen").val($(this).data('id'));
+                            //showModalOverrideTest();
+                        });
+
+                        //al paginar se define nuevamente la función de cargar el detalle
+                        $(".dataTables_paginate").on('click', function () {
+                            $(".anularSolicitud").on('click', function () {
+                                //anularExamen($(this).data('id'));
+                                $("#idOrdenExamen").val($(this).data('id'));
+                                //showModalOverrideTest();
+                            });
+                        });
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                }
             }
 
             function getOrdersReview() {
@@ -755,6 +814,51 @@ var ReceiptOrders = function () {
                     });
             }
 
+            function guardarSolicitud() {
+                var nuevaSolicitudObj = {};
+                nuevaSolicitudObj['idTomaMx'] = $("#idTomaMx").val();
+                nuevaSolicitudObj['idDiagnostico'] = $('#codDXNuevo').find('option:selected').val();
+                nuevaSolicitudObj['idEstudio'] = $('#codEstudioNuevo').find('option:selected').val();
+                nuevaSolicitudObj['esEstudio'] = $('#esEstudio').val();
+                nuevaSolicitudObj['mensaje'] = '';
+                blockUI();
+                $.ajax(
+                    {
+                        url: parametros.sAgregarSolicitudUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(nuevaSolicitudObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0) {
+                                $.smallBox({
+                                    title: unicodeEscape(data.mensaje),
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            } else {
+                                getOrdersReview();
+                                var msg = $("#msg_review_added").val();
+                                $.smallBox({
+                                    title: msg,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            unBlockUI();
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
+                    });
+            }
+
             function guardarExamen() {
                 var ordenExamenObj = {};
                 ordenExamenObj['idTomaMx'] = $("#idTomaMx").val();
@@ -856,11 +960,22 @@ var ReceiptOrders = function () {
                     $('#dvCausa').hide();
             });
 
+            $("#btnAddDx").click(function () {
+                if ($("#esEstudio").val() == 'true') {
+                    getEstudios($("#idTipoMx").val(), $("#codTipoNoti").val(),true);
+                } else {
+                    getDiagnosticos($("#idTipoMx").val(), $("#codTipoNoti").val(),true);
+                }
+                $("#modalSolicitudes").modal({
+                    show: true
+                });
+            });
+
             $("#btnAddTest").click(function () {
                 if ($("#esEstudio").val() == 'true') {
-                    getEstudios($("#idTipoMx").val(), $("#codTipoNoti").val());
+                    getEstudios($("#idTipoMx").val(), $("#codTipoNoti").val(),false);
                 } else {
-                    getDiagnosticos($("#idTipoMx").val(), $("#codTipoNoti").val());
+                    getDiagnosticos($("#idTipoMx").val(), $("#codTipoNoti").val(),false);
                 }
                 $("#myModal").modal({
                     show: true
@@ -868,7 +983,7 @@ var ReceiptOrders = function () {
             });
 
             <!-- cargar dx -->
-            function getDiagnosticos(idTipoMx, codTipoNoti) {
+            function getDiagnosticos(idTipoMx, codTipoNoti, esSolicitud) {
                 $.getJSON(parametros.sDxURL, {
                     codMx: idTipoMx, tipoNoti: codTipoNoti, idTomaMx: $("#idTomaMx").val(),
                     ajax: 'true'
@@ -881,7 +996,10 @@ var ReceiptOrders = function () {
                             + data[i].diagnostico.nombre
                             + '</option>';
                     }
-                    $('#codDX').html(html);
+                    if (!esSolicitud)
+                        $('#codDX').html(html);
+                    else
+                        $('#codDXNuevo').html(html);
                 }).fail(function (jqXHR) {
                     setTimeout($.unblockUI, 10);
                     validateLogin(jqXHR);
@@ -889,7 +1007,7 @@ var ReceiptOrders = function () {
             }
 
             <!-- cargar estudios -->
-            function getEstudios(idTipoMx, codTipoNoti) {
+            function getEstudios(idTipoMx, codTipoNoti, esSolicitud) {
                 $.getJSON(parametros.sEstudiosURL, {
                     codMx: idTipoMx, tipoNoti: codTipoNoti, idTomaMx: $("#idTomaMx").val(),
                     ajax: 'true'
@@ -902,7 +1020,10 @@ var ReceiptOrders = function () {
                             + data[i].estudio.nombre
                             + '</option>';
                     }
-                    $('#codEstudio').html(html);
+                    if (!esSolicitud)
+                        $('#codEstudio').html(html);
+                    else
+                        $('#codEstudioNuevo').html(html);
                 })
                     .fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);

@@ -187,8 +187,8 @@
                     <th data-hide="phone"><i
                             class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message
                             code="lbl.receipt.pcr.area"/></th>
-                    <th><spring:message code="lbl.response.title"/></th>
                     <th><spring:message code="lbl.data"/></th>
+                    <th><spring:message code="lbl.results"/></th>
                 </tr>
                 </thead>
             </table>

@@ -827,6 +827,29 @@ public class RecepcionMxController {
         return OrdenesExamenToJson(ordenExamenList, trasladoMx);
     }
 
+    @RequestMapping(value = "getSolicitudes", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getSolicitudes(@RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
+        logger.info("antes getSolicitudes");
+        TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
+        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(idTomaMx, seguridadService.obtenerNombreUsuario());
+        List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdMxUser(idTomaMx, seguridadService.obtenerNombreUsuario());
+        List<DaSolicitudDx> dxMostrar = new ArrayList<DaSolicitudDx>();
+        if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
+            for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                if (trasladoActivo.getAreaDestino().getIdArea().equals(solicitudDx.getCodDx().getArea().getIdArea())){
+                    dxMostrar.add(solicitudDx);
+                }
+            }
+        }else{
+            dxMostrar = solicitudDxList;
+        }
+
+        logger.info("despues getSolicitudes");
+        return SolicutudesToJson(dxMostrar,solicitudEstudios);
+    }
+
     /**
      * Método para anular una orden de examen
      * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a anular
@@ -885,6 +908,48 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", idOrdenExamen);
             map.put("causaAnulacion",causaAnulacion);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    /**
+     * Método para agregar una solicitud de dx o estudio para una mx
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a agregar
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws ServletException
+     * @throws IOException
+     */
+    @RequestMapping(value = "agregarSolicitud", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void agregarSolicitud(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        boolean esEstudio=false;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            esEstudio = jsonpObject.get("esEstudio").getAsBoolean();
+            if(esEstudio)
+                resultado = agregarSolicitudEstudio(jsonpObject);
+            else
+                resultado = agregarSolicitudDx(jsonpObject, request);
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.receipt.request.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idTomaMx","tmp");
+            map.put("idDiagnostico", "tmp");
+            map.put("idExamen", "tmp");
+            map.put("esEstudio",String.valueOf(esEstudio));
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
@@ -1250,6 +1315,87 @@ public class RecepcionMxController {
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
         }
+    }
+
+    private String agregarSolicitudDx(JsonObject jsonpObject, HttpServletRequest request) throws Exception {
+        String resultado = "";
+        String idTomaMx = "";
+        int idDiagnostico = 0;
+        idTomaMx = jsonpObject.get("idTomaMx").getAsString();
+        idDiagnostico = jsonpObject.get("idDiagnostico").getAsInt();
+        //se valida si existe una orden activa para la muestra, el diagnóstico y el examen
+        DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
+        if (solicitudDx!=null){
+            Catalogo_Dx dx = tomaMxService.getDxById(String.valueOf(idDiagnostico));
+            resultado = messageSource.getMessage("msg.receipt.add.request.error2", null, null);
+            resultado = resultado.replace("{0}", dx.getNombre());
+        }else{
+            try {
+                Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+
+                DaSolicitudDx soli = new DaSolicitudDx();
+                soli.setCodDx(tomaMxService.getDxById(String.valueOf(idDiagnostico)));
+                soli.setFechaHSolicitud(new Timestamp(new Date().getTime()));
+                Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
+                if (pUsuarioRegistro != null) {
+                    long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
+                    soli.setUsarioRegistro(usuarioService.getUsuarioById((int) idUsuario));
+                }
+                soli.setIdTomaMx(tomaMxService.getTomaMxById(idTomaMx));
+                soli.setAprobada(false);
+                soli.setLabProcesa(labUsuario);
+                soli.setControlCalidad(false);
+                tomaMxService.addSolicitudDx(soli);
+
+            } catch (Exception ex) {
+                resultado = messageSource.getMessage("msg.receipt.add.request.error", null, null);
+                resultado = resultado + ". \n " + ex.getMessage();
+                ex.printStackTrace();
+            }
+
+        }
+
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(resultado);
+    }
+
+
+    private String agregarSolicitudEstudio(JsonObject jsonpObject) throws Exception {
+        String resultado = "";
+        String idTomaMx = "";
+        int idEstudio = 0;
+        idTomaMx = jsonpObject.get("idTomaMx").getAsString();
+        idEstudio = jsonpObject.get("idEstudio").getAsInt();
+        //se valida si existe una orden activa para la muestra, el diagnóstico y el examen
+        DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudesEstudioByMxEst(idTomaMx, idEstudio);
+        if (solicitudEstudio!=null){
+            Catalogo_Estudio estudio = tomaMxService.getEstudioById(idEstudio);
+            resultado = messageSource.getMessage("msg.receipt.add.request.error2", null, null);
+            resultado = resultado.replace("{0}", estudio.getNombre());
+        }else{
+            try {
+                DaSolicitudEstudio soli = new DaSolicitudEstudio();
+                soli.setTipoEstudio(tomaMxService.getEstudioById(idEstudio));
+                soli.setFechaHSolicitud(new Timestamp(new Date().getTime()));
+                Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
+                if (pUsuarioRegistro != null) {
+                    long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
+                    soli.setUsarioRegistro(usuarioService.getUsuarioById((int) idUsuario));
+                }
+                soli.setIdTomaMx(tomaMxService.getTomaMxById(idTomaMx));
+                soli.setAprobada(false);
+                tomaMxService.addSolicitudEstudio(soli);
+
+            } catch (Exception ex) {
+                resultado = messageSource.getMessage("msg.receipt.add.request.error", null, null);
+                resultado = resultado + ". \n " + ex.getMessage();
+                ex.printStackTrace();
+            }
+
+        }
+
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(resultado);
     }
 
     private String agregarOrdenExamenVigRut(JsonObject jsonpObject, HttpServletRequest request) throws Exception {
@@ -1644,6 +1790,54 @@ public class RecepcionMxController {
                 mapResponse.put(indice, map);
                 indice ++;
             }
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+    /**
+     * Método para convertir una lista de Ordenes Examen a un string con estructura Json
+     * @param dxList lista con las solicitudes de diagnósticos a convertir
+     * @param estudioList lista con las solicitudes de estudio a convertir
+     * @return String
+     * @throws UnsupportedEncodingException
+     */
+    private String SolicutudesToJson(List<DaSolicitudDx> dxList, List<DaSolicitudEstudio> estudioList) throws UnsupportedEncodingException {
+        String jsonResponse="";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice=0;
+        boolean agregarExamenDx = true;
+        for(DaSolicitudDx dx : dxList){
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idTomaMx", dx.getIdTomaMx().getIdTomaMx());
+            map.put("idSolicitud", dx.getIdSolicitudDx());
+            map.put("nombre", dx.getCodDx().getNombre());
+            map.put("nombreAreaPrc", dx.getCodDx().getArea().getNombre());
+            map.put("fechaSolicitud", DateUtil.DateToString(dx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("tipo", messageSource.getMessage("lbl.routine",null,null));
+            if (dx.getControlCalidad())
+                map.put("cc", messageSource.getMessage("lbl.yes", null, null));
+            else
+                map.put("cc", messageSource.getMessage("lbl.no", null, null));
+
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+
+        for(DaSolicitudEstudio estudio : estudioList)
+        {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idTomaMx", estudio.getIdTomaMx().getIdTomaMx());
+            map.put("idSolicitud", estudio.getIdSolicitudEstudio() );
+            map.put("nombre", estudio.getTipoEstudio().getNombre());
+            map.put("nombreAreaPrc", estudio.getTipoEstudio().getArea().getNombre());
+            map.put("fechaSolicitud", DateUtil.DateToString(estudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("tipo",messageSource.getMessage("lbl.study",null,null));
+            map.put("cc",messageSource.getMessage("lbl.no",null,null));
+            mapResponse.put(indice, map);
+            indice ++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
