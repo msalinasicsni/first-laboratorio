@@ -106,6 +106,7 @@
                                     <input id="msg_review_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel.test"/>"/>
                                     <input id="msg_review_added" type="hidden" value="<spring:message code="msg.receipt.add.test"/>"/>
                                     <input id="msg_request_added" type="hidden" value="<spring:message code="msg.receipt.add.request"/>"/>
+                                    <input id="msg_request_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel.request"/>"/>
                                     <input id="msg_receipt_cancel" type="hidden" value="<spring:message code="msg.receipt.cancel"/>"/>
                                     <input id="txtEsLaboratorio" type="hidden" value="true"/>
                                     <form id="receiptOrdersLab-form" class="smart-form" autocomplete="off">
@@ -665,6 +666,56 @@
             </div><!-- /.modal -->
 
             <!-- Modal -->
+            <div class="modal fade" id="modalOverrideSoli" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-times"></i>
+                                    <spring:message code="lbl.override" /> <spring:message code="lbl.request1" />
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="modal-body"> <!--  no-padding -->
+                            <form id="override-sol-form" class="smart-form" novalidate="novalidate">
+                                <input id="idSolicitud" type="hidden" value=""/>
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.annulment.cause" /> </label>
+                                            <div class="">
+                                                <label class="textarea">
+                                                    <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                    <textarea class="form-control" rows="3" name="causaAnulacion" id="causaAnulacion"
+                                                              placeholder="<spring:message code="lbl.annulment.cause" />"></textarea>
+                                                    <b class="tooltip tooltip-bottom-right"> <i
+                                                            class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.annulment.cause"/>
+                                                    </b>
+                                                </label>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-save"></i> <spring:message code="act.ok" />
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.cancel" />
+                                    </button>
+                                </footer>
+                            </form>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+            <!-- Modal -->
             <div class="modal fade" id="modalOverride" aria-hidden="true" data-backdrop="static">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -762,6 +813,7 @@
     <c:url var="sAddReceiptUrl" value="/recepcionMx/receiptLaboratory"/>
     <c:url var="sSearchReceiptUrl" value="/recepcionMx/initLab"/>
     <c:url var="sAnularExamenUrl" value="/recepcionMx/anularExamen"/>
+    <c:url var="sAnularSolicitudUrl" value="/recepcionMx/anularSolicitud"/>
     <c:url var="sAgregarSolicitudUrl" value="/recepcionMx/agregarSolicitud"/>
     <c:url var="sAgregarOrdenExamenUrl" value="/recepcionMx/agregarOrdenExamen"/>
     <c:url var="sgetOrdenesExamenUrl" value="/recepcionMx/getOrdenesExamen"/>
@@ -791,6 +843,7 @@
                 sExamenesEstURL : "${sExamenesEstURL}",
                 sReglasExamenesURL : "${sReglasExamenesURL}",
                 sGetSolicitudesUrl : "${sGetSolicitudesUrl}",
+                sAnularSolicitudUrl : "${sAnularSolicitudUrl}",
                 noRules : "${noRules}"
             };
 			ReceiptOrders.init(parametros);

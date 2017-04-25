@@ -432,6 +432,38 @@ public class TomaMxService {
         session.update(solicitud);
     }
 
+    public Integer bajaSolicitudDx(String userName, String idSolicitud, String causa) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+        int updateEntities = 0,updateEntities2=0;
+        try {
+
+
+            String hqlBajaExam = "update OrdenExamen ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where solicitudDx.idSolicitudDx = :idSolicitud";
+            updateEntities2 = s.createQuery(hqlBajaExam)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
+
+            String hqlBajaArea = "update DaSolicitudDx ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where idSolicitudDx = :idSolicitud";
+            updateEntities2 = s.createQuery(hqlBajaArea)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
+
+            tx.commit();
+        }catch (Exception ex){
+            tx.rollback();
+            throw ex;
+        }finally {
+            s.close();
+        }
+        return updateEntities+updateEntities2;
+    }
+
 /****************************************************************
  * MUESTRAS DE ESTUDIOS
 ******************************************************************/

@@ -236,6 +236,31 @@ var ReceiptOrders = function () {
                 }
             });
 
+            function showModalOverrideRequest() {
+                $("#causaAnulacion").val('');
+                $("#modalOverrideSoli").modal({
+                    show: true
+                });
+            }
+
+            function hideModalOverrideRequest() {
+                $('#modalOverrideSoli').modal('hide');
+            }
+
+            <!-- formulario para anular examen -->
+            $('#override-sol-form').validate({
+                // Rules for form validation
+                rules: {
+                    causaAnulacion: {required: true}
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    anularSolicitud($("#idSolicitud").val());
+                }
+            });
 
             function showModalOverrideTest() {
                 $("#causaAnulacionEx").val('');
@@ -374,21 +399,21 @@ var ReceiptOrders = function () {
                             }
                             table3.fnAddData(
                                 [response[i].tipo,response[i].nombre, response[i].fechaSolicitud, response[i].nombreAreaPrc, response[i].cc,
-                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +','+response[i].tipo+ '><i class="fa fa-times"></i></a>']);
+                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
 
                         }
                         $(".anularSolicitud").on("click", function () {
                             //anularExamen($(this).data('id'));
-                            $("#idOrdenExamen").val($(this).data('id'));
-                            //showModalOverrideTest();
+                            $("#idSolicitud").val($(this).data('id'));
+                            showModalOverrideRequest();
                         });
 
                         //al paginar se define nuevamente la función de cargar el detalle
                         $(".dataTables_paginate").on('click', function () {
                             $(".anularSolicitud").on('click', function () {
                                 //anularExamen($(this).data('id'));
-                                $("#idOrdenExamen").val($(this).data('id'));
-                                //showModalOverrideTest();
+                                $("#idSolicitud").val($(this).data('id'));
+                                showModalOverrideRequest();
                             });
                         });
                     }).fail(function (jqXHR) {
@@ -814,6 +839,51 @@ var ReceiptOrders = function () {
                     });
             }
 
+            function anularSolicitud(idSolicitud) {
+                var anulacionObj = {};
+                anulacionObj['idSolicitud'] = idSolicitud;
+                anulacionObj['causaAnulacion'] = $("#causaAnulacionEx").val();
+                anulacionObj['mensaje'] = '';
+                blockUI();
+                $.ajax(
+                    {
+                        url: parametros.sAnularSolicitudUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(anulacionObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0) {
+                                $.smallBox({
+                                    title: data.mensaje,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            } else {
+                                getRequest();
+                                getOrdersReview();
+                                hideModalOverrideRequest();
+                                var msg = $("#msg_request_cancel").val();
+                                $.smallBox({
+                                    title: msg,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            unBlockUI();
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
+                    });
+            }
+
             function guardarSolicitud() {
                 var nuevaSolicitudObj = {};
                 nuevaSolicitudObj['idTomaMx'] = $("#idTomaMx").val();
@@ -840,8 +910,8 @@ var ReceiptOrders = function () {
                                     timeout: 4000
                                 });
                             } else {
-                                getOrdersReview();
-                                var msg = $("#msg_review_added").val();
+                                getRequest();
+                                var msg = $("#msg_request_added").val();
                                 $.smallBox({
                                     title: msg,
                                     content: $("#smallBox_content").val(),

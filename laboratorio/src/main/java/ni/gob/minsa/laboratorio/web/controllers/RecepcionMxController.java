@@ -916,6 +916,71 @@ public class RecepcionMxController {
     }
 
     /**
+     * Método para anular una orden de examen
+     * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a anular
+     * @param response para notificar al cliente del resultado de la operación
+     * @throws Exception
+     */
+    @RequestMapping(value = "anularSolicitud", method = RequestMethod.POST)
+    protected void anularSolicitud(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        logger.debug("anular solicitud dx o estudio");
+        String urlValidacion;
+        String idSolicitud = "";
+        String causaAnulacion = "";
+        String json="";
+        String resultado = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idSolicitud = jsonpObject.get("idSolicitud").getAsString();
+            causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
+            DaSolicitudDx solicitudDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
+            if(solicitudDx!=null){
+                //solicitudDx.setAnulado(true);
+                //solicitudDx.setUsuarioAnulacion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                //solicitudDx.setCausaAnulacion(causaAnulacion);
+                try{
+                    tomaMxService.bajaSolicitudDx(seguridadService.obtenerNombreUsuario(),idSolicitud, causaAnulacion);
+                }catch (Exception ex){
+                    logger.error("Error al anular solicitud dx",ex);
+                    resultado = messageSource.getMessage("msg.receipt.request.cancel.error2", null, null);
+                    resultado = resultado + ". \n " + ex.getMessage();
+                }
+            }else{
+                DaSolicitudEstudio solicitudEst = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
+                if(solicitudEst!=null){
+                    //solicitudEst.setAnulado(true);
+                    //solicitudEst.setUsuarioAnulacion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                    //solicitudEst.setCausaAnulacion(causaAnulacion);
+                    try{
+                        tomaMxService.updateSolicitudEstudio(solicitudEst);
+                    }catch (Exception ex){
+                        logger.error("Error al anular solicitud de estudio",ex);
+                        resultado = messageSource.getMessage("msg.receipt.request.cancel.error2", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
+                    }
+                }else{
+                    throw new Exception(messageSource.getMessage("msg.receipt.request.notfound", null, null));
+                }
+            }
+
+        }catch (Exception ex){
+            logger.error("Sucedio un error al anular orden de examen",ex);
+            resultado = messageSource.getMessage("msg.receipt.request.cancel.error1", null, null);
+            resultado = resultado + ". \n " + ex.getMessage();
+        } finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idSolicitud", idSolicitud);
+            map.put("causaAnulacion",causaAnulacion);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
+    /**
      * Método para agregar una solicitud de dx o estudio para una mx
      * @param request para obtener información de la petición del cliente. Contiene en un parámetro la estructura json del registro a agregar
      * @param response para notificar al cliente del resultado de la operación
@@ -948,7 +1013,7 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idTomaMx","tmp");
             map.put("idDiagnostico", "tmp");
-            map.put("idExamen", "tmp");
+            map.put("idEstudio", "tmp");
             map.put("esEstudio",String.valueOf(esEstudio));
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);

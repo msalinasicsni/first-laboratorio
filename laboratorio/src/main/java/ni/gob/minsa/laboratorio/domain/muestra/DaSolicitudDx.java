@@ -28,6 +28,9 @@ public class DaSolicitudDx implements Auditable {
     private Boolean aprobada;
     private Boolean controlCalidad;
     private Laboratorio labProcesa;
+    private boolean anulado;
+    private User usuarioAnulacion;
+    private String causaAnulacion;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -136,6 +139,37 @@ public class DaSolicitudDx implements Auditable {
 
     public void setLabProcesa(Laboratorio labProcesa) {
         this.labProcesa = labProcesa;
+    }
+
+    @Basic
+    @Column(name = "ANULADO", nullable = true, insertable = true, updatable = true)
+    public boolean isAnulado() {
+        return anulado;
+    }
+
+    public void setAnulado(boolean anulado) {
+        this.anulado = anulado;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "USUARIO_ANULACION", referencedColumnName = "username")
+    @ForeignKey(name = "SD_USUARIO_ANUL_FK")
+    public User getUsuarioAnulacion() {
+        return usuarioAnulacion;
+    }
+
+    public void setUsuarioAnulacion(User usuarioAnulacion) {
+        this.usuarioAnulacion = usuarioAnulacion;
+    }
+
+    @Basic
+    @Column(name = "CAUSA_ANULACION", nullable = true, insertable = true, updatable = true, length = 255)
+    public String getCausaAnulacion() {
+        return causaAnulacion;
+    }
+
+    public void setCausaAnulacion(String causaAnulacion) {
+        this.causaAnulacion = causaAnulacion;
     }
 
     @Override
