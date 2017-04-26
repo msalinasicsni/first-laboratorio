@@ -79,6 +79,7 @@ var Users = function () {
                 valueObj['userName'] = $('#username').val();
                 valueObj['nombreCompleto'] = $('#completeName').val();
                 valueObj['email'] = $('#correoe').val();
+                valueObj['labAsignado'] = $('#laboratorio').find('option:selected').val();
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {

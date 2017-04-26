@@ -553,6 +553,7 @@ public class UsuariosController {
         String userName="";
         String nombreCompleto="";
         String email=null;
+        String labAsignado = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -563,6 +564,7 @@ public class UsuariosController {
             if (jsonpObject.get("email")!=null && !jsonpObject.get("email").getAsString().isEmpty())
                 email = jsonpObject.get("email").getAsString();
             habilitado = jsonpObject.get("habilitado").getAsBoolean();
+            labAsignado = jsonpObject.get("labAsignado").getAsString();
 
             User user = usuarioService.getUser(userName);
             user.setCompleteName(nombreCompleto);
@@ -570,6 +572,33 @@ public class UsuariosController {
             user.setEnabled(habilitado);
 
             this.usuarioService.updateUser(user);
+
+            AutoridadLaboratorio actualLab = autoridadesService.getAutoridadLabByUser(userName);
+            if (actualLab == null || !actualLab.getLaboratorio().getCodigo().equalsIgnoreCase(labAsignado))
+            {
+                if (actualLab != null) {
+                    actualLab.setPasivo(true);
+                    autoridadesService.updateAuthorityLab(actualLab);
+                }
+                Laboratorio laboratorio = laboratoriosService.getLaboratorioByCodigo(labAsignado);
+                AutoridadLaboratorio autoridadLaboratorio = new AutoridadLaboratorio();
+                autoridadLaboratorio.setFechaRegistro(new Date());
+                autoridadLaboratorio.setLaboratorio(laboratorio);
+                autoridadLaboratorio.setUser(user);
+                autoridadLaboratorio.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                autoridadLaboratorio.setPasivo(false);
+                try {
+                    this.autoridadesService.addAuthorityLab(autoridadLaboratorio);
+                } catch (Exception ex) {
+                    if (actualLab != null) {
+                        actualLab.setPasivo(false);
+                        autoridadesService.updateAuthorityLab(actualLab);
+                    }
+                    logger.error(ex.getMessage(), ex);
+                    ex.printStackTrace();
+                    resultado = messageSource.getMessage("msg.user.add.error1", null, null);
+                }
+            }
 
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -583,6 +612,7 @@ public class UsuariosController {
             map.put("nombreCompleto", nombreCompleto);
             map.put("email", email);
             map.put("habilitado",String.valueOf(habilitado));
+            map.put("labAsignado",labAsignado);
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());

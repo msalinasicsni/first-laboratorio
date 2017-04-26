@@ -462,7 +462,7 @@ public class RecepcionMxController {
     @RequestMapping(value = "searchOrders", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo las ordenes de examen pendienetes según filtros en JSON");
+        logger.info("Obteniendo las ordenes de examen pendientes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
         return tomaMxToJson(tomaMxList);
@@ -937,9 +937,6 @@ public class RecepcionMxController {
             causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
             DaSolicitudDx solicitudDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
             if(solicitudDx!=null){
-                //solicitudDx.setAnulado(true);
-                //solicitudDx.setUsuarioAnulacion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                //solicitudDx.setCausaAnulacion(causaAnulacion);
                 try{
                     tomaMxService.bajaSolicitudDx(seguridadService.obtenerNombreUsuario(),idSolicitud, causaAnulacion);
                 }catch (Exception ex){
@@ -950,11 +947,8 @@ public class RecepcionMxController {
             }else{
                 DaSolicitudEstudio solicitudEst = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
                 if(solicitudEst!=null){
-                    //solicitudEst.setAnulado(true);
-                    //solicitudEst.setUsuarioAnulacion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                    //solicitudEst.setCausaAnulacion(causaAnulacion);
                     try{
-                        tomaMxService.updateSolicitudEstudio(solicitudEst);
+                        tomaMxService.bajaSolicitudEstudio(seguridadService.obtenerNombreUsuario(),idSolicitud, causaAnulacion);
                     }catch (Exception ex){
                         logger.error("Error al anular solicitud de estudio",ex);
                         resultado = messageSource.getMessage("msg.receipt.request.cancel.error2", null, null);

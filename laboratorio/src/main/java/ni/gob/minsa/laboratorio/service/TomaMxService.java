@@ -174,10 +174,12 @@ public class TomaMxService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "idTomaMx")
                         .setProjection(Property.forName("idTomaMx.idTomaMx"))));
             }else{
                 crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "idTomaMx")
                         .setProjection(Property.forName("idTomaMx.idTomaMx"))));
             }
@@ -189,11 +191,13 @@ public class TomaMxService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .setProjection(Property.forName("idTomaMx.idTomaMx"))));
                 } else {
                     crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .setProjection(Property.forName("idTomaMx.idTomaMx"))));
@@ -202,10 +206,12 @@ public class TomaMxService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .setProjection(Property.forName("idTomaMx.idTomaMx"))))
                         .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado",false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .setProjection(Property.forName("idTomaMx.idTomaMx"))));
@@ -252,11 +258,13 @@ public class TomaMxService {
            Junction conditGroup = Restrictions.disjunction();
             conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                     .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                    .add(Restrictions.eq("anulado",false))
                     .createAlias("idTomaMx", "toma")
                     .setProjection(Property.forName("toma.idTomaMx"))))
 
                     .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                             .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));
 
@@ -268,6 +276,7 @@ public class TomaMxService {
         if (filtro.getControlCalidad()!=null) {
             if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", sólo incluir rutinas
                 crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado",false))
                         .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
                         .createAlias("idTomaMx", "toma")
                                 //.createAlias("labProcesa","labProcesa")
@@ -281,6 +290,7 @@ public class TomaMxService {
             }else { //si hay filtro por control de calidad y es "No", siempre incluir los estudios
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado",false))
                         .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
                         .createAlias("idTomaMx", "toma")
                                 //.createAlias("labProcesa","labProcesa")
@@ -303,7 +313,7 @@ public class TomaMxService {
 
     public List<DaSolicitudDx> getSolicitudesDxByIdToma(String idTomaMx, String codigoLab){
         String query = "select distinct sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
-                "where mx.idTomaMx = :idTomaMx " +
+                "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
                 "and (sdx.labProcesa.codigo = :codigoLab" +
                 " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
                 "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) " +
@@ -318,7 +328,7 @@ public class TomaMxService {
     public List<DaSolicitudDx> getSolicitudesDxByIdTomaAreaLabUser(String idTomaMx, String username){
         String query = "select distinct sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx ," +
                 "AutoridadLaboratorio al, AutoridadArea aa " +
-                "where mx.idTomaMx = :idTomaMx " +
+                "where al.pasivo = false and sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
                 "and al.user.username = :username and aa.user.username = :username " +
                 "and (sdx.labProcesa.codigo = al.laboratorio.codigo" +
                 " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
@@ -334,7 +344,7 @@ public class TomaMxService {
 
     public List<DaSolicitudEstudio> getSolicitudesEstudioByIdMxUser(String idTomaMx, String username){
         String query = "select sde from DaSolicitudEstudio sde, AutoridadArea aa " +
-                "where sde.idTomaMx.idTomaMx = :idTomaMx " +
+                "where sde.anulado = false and sde.idTomaMx.idTomaMx = :idTomaMx " +
                 "and aa.user.username = :username and aa.area.idArea = sde.tipoEstudio.area.idArea " +
                 "ORDER BY sde.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
@@ -344,7 +354,7 @@ public class TomaMxService {
     }
 
     public DaSolicitudDx getSolicitudesDxByMxDx(String idTomaMx,  Integer idDiagnostico){
-        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and idTomaMx.envio.laboratorioDestino.codigo = labProcesa.codigo " +
+        String query = "from DaSolicitudDx where anulado = false and idTomaMx.idTomaMx = :idTomaMx and idTomaMx.envio.laboratorioDestino.codigo = labProcesa.codigo " +
                 "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -464,6 +474,38 @@ public class TomaMxService {
         return updateEntities+updateEntities2;
     }
 
+    public Integer bajaSolicitudEstudio(String userName, String idSolicitud, String causa) {
+        // Retrieve session from Hibernate
+        Session s = sessionFactory.openSession();
+        Transaction tx = s.beginTransaction();
+        int updateEntities = 0,updateEntities2=0;
+        try {
+
+
+            String hqlBajaExam = "update OrdenExamen ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where solicitudEstudio.idSolicitudEstudio = :idSolicitud";
+            updateEntities2 = s.createQuery(hqlBajaExam)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
+
+            String hqlBajaArea = "update DaSolicitudEstudio ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where idSolicitudEstudio = :idSolicitud";
+            updateEntities2 = s.createQuery(hqlBajaArea)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
+
+            tx.commit();
+        }catch (Exception ex){
+            tx.rollback();
+            throw ex;
+        }finally {
+            s.close();
+        }
+        return updateEntities+updateEntities2;
+    }
+
 /****************************************************************
  * MUESTRAS DE ESTUDIOS
 ******************************************************************/
@@ -497,7 +539,7 @@ public class TomaMxService {
     }
 
     public DaSolicitudEstudio getSolicitudesEstudioByMxEst(String idTomaMx, Integer idEstudio){
-        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx " +
+        String query = "from DaSolicitudEstudio where anulado = false and idTomaMx.idTomaMx = :idTomaMx " +
                 "and tipoEstudio.idEstudio= :idEstudio ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -573,7 +615,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public DaSolicitudDx getSoliDxByCodigo(String codigoUnico, String userName){
         String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
+                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
         q.setParameter("userName",userName);
@@ -583,7 +625,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSolicitudesDxCodigo(String codigo, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx = :codigo ORDER BY sdx.fechaHSolicitud";
+                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx = :codigo ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigo",codigo);
         q.setParameter("userName",userName);
@@ -593,7 +635,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSoliDxAprobByTomaAndUser(String idToma, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
+                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idToma",idToma);
         q.setParameter("userName",userName);
@@ -603,7 +645,7 @@ public class TomaMxService {
 
     public DaSolicitudDx getSolicitudDxByIdSolicitudUser(String idSolicitud, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx = :idSolicitud ORDER BY sdx.fechaHSolicitud";
+                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx = :idSolicitud ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idSolicitud",idSolicitud);
         q.setParameter("userName",userName);
@@ -762,7 +804,7 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea, String username){
-        String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al where sdx.idTomaMx.idTomaMx = :idTomaMx " +
+        String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al where al.pasivo = false and sdx.idTomaMx.idTomaMx = :idTomaMx " +
                 "and sdx.labProcesa.codigo = al.laboratorio.codigo and sdx.codDx.area.idArea = :idArea and al.user.username = :username " +
                 "ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);

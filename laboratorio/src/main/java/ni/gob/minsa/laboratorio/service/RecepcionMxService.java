@@ -106,14 +106,19 @@ public class RecepcionMxService {
     }
 
     public RecepcionMx getRecepcionMxByCodUnicoMx(String codigoUnicoMx, String codLaboratorio){
-        String query = "select a from RecepcionMx as a inner join a.tomaMx as t where (t.codigoUnicoMx= :codigoUnicoMx or t.codigoLab = :codigoUnicoMx) " +
-                "and a.labRecepcion.codigo = :codLaboratorio";
+        try {
+            String query = "select a from RecepcionMx as a inner join a.tomaMx as t where (t.codigoUnicoMx= :codigoUnicoMx or t.codigoLab = :codigoUnicoMx) " +
+                    "and a.labRecepcion.codigo = :codLaboratorio";
 
-        Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery(query);
-        q.setString("codigoUnicoMx", codigoUnicoMx);
-        q.setString("codLaboratorio",codLaboratorio);
-        return  (RecepcionMx)q.uniqueResult();
+            Session session = sessionFactory.getCurrentSession();
+            Query q = session.createQuery(query);
+            q.setString("codigoUnicoMx", codigoUnicoMx);
+            q.setString("codLaboratorio",codLaboratorio);
+            return  (RecepcionMx)q.uniqueResult();
+        }catch (Exception ex){
+            throw  ex;
+        }
+
     }
 
     public RecepcionMx getMaxRecepcionMxByCodUnicoMx(String codigoUnicoMx) {
@@ -245,11 +250,12 @@ public class RecepcionMxService {
             }else{
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .createAlias("idTomaMx", "toma")
+                        .add(Restrictions.eq("anulado", false))
                         .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                                 .createAlias("laboratorio", "labautorizado")
                                 .createAlias("user", "usuario")
-                                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                                .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                                .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
                                 .setProjection(Property.forName("labautorizado.codigo"))))
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }
@@ -260,12 +266,14 @@ public class RecepcionMxService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("solicitudtomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado", false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));
                 } else {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado", false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
@@ -275,11 +283,13 @@ public class RecepcionMxService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado", false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .createAlias("idTomaMx", "toma")

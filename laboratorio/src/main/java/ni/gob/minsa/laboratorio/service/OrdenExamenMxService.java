@@ -97,14 +97,14 @@ public class OrdenExamenMxService {
         */
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx inner join oe.solicitudDx.codDx as dx, " +
                 "AutoridadArea as aa, AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and  dx.area.idArea = aa.area.idArea " +
-                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username");
+                "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username and al.pasivo = false ");
 
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("username",username);
         ordenExamenList = q.list();
         //se toman las que son de estudio
         Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio.idTomaMx as mx inner join oe.solicitudEstudio.tipoEstudio as es, " +
-                "AutoridadArea as aa,AutoridadLaboratorio  al where oe.labProcesa.codigo = al.laboratorio.codigo and es.area.idArea = aa.area.idArea " +
+                "AutoridadArea as aa,AutoridadLaboratorio  al where al.pasivo = false and oe.labProcesa.codigo = al.laboratorio.codigo and es.area.idArea = aa.area.idArea " +
                 "and mx.idTomaMx =:idTomaMx and aa.user.username = :username and al.user.username = :username ");
         q2.setParameter("idTomaMx",idTomaMx);
         q2.setParameter("username",username);
@@ -147,7 +147,7 @@ public class OrdenExamenMxService {
     public List<OrdenExamen> getOrdExamenNoAnulByIdMxIdDxIdExamen(String idTomaMx, int idDx, int idExamen, String userName){
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join sdx.idTomaMx as mx, AutoridadLaboratorio as al " +
-                "where al.laboratorio.codigo = oe.labProcesa.codigo and  mx.idTomaMx =:idTomaMx " +
+                "where al.pasivo = false and al.laboratorio.codigo = oe.labProcesa.codigo and  mx.idTomaMx =:idTomaMx " +
                 "and sdx.codDx.idDiagnostico = :idDx and oe.codExamen.idExamen = :idExamen and al.user.username = :userName and oe.anulado = false order by oe.fechaHOrden");
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idDx",idDx);
@@ -176,6 +176,7 @@ public class OrdenExamenMxService {
         crit.add( Restrictions.and(
                        Restrictions.eq("solicitudDx.aprobada", false))
         );
+        crit.add(Restrictions.eq("solicitudDx.anulado",false));
         //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
@@ -261,10 +262,12 @@ public class OrdenExamenMxService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }else{
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }
@@ -276,12 +279,14 @@ public class OrdenExamenMxService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));
                 } else {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
@@ -291,11 +296,13 @@ public class OrdenExamenMxService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado",false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .createAlias("idTomaMx", "toma")
@@ -361,6 +368,7 @@ public class OrdenExamenMxService {
         crit.add( Restrictions.and(
                         Restrictions.eq("solicitudEstudio.aprobada", false))
         );
+        crit.add(Restrictions.eq("solicitudEstudio.anulado",false));
         //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
             crit.add(Restrictions.and(
@@ -426,10 +434,12 @@ public class OrdenExamenMxService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }else{
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }
@@ -441,12 +451,14 @@ public class OrdenExamenMxService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));
                 } else {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "tom")
@@ -456,11 +468,13 @@ public class OrdenExamenMxService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado",false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .createAlias("idTomaMx", "toma")
@@ -494,6 +508,13 @@ public class OrdenExamenMxService {
                     .add(Restrictions.and(Restrictions.eq("autoridadArea.pasivo",false)))  //autoridad area que pertenece examen activa
                     .add(Restrictions.and(Restrictions.eq("autoridadArea.user.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("examen.idExamen"))));
+
+            crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));
         }
 
 
@@ -511,6 +532,8 @@ public class OrdenExamenMxService {
         crit.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
         );
+        //la solicitud que no este anulada
+        crit.add(Restrictions.eq("solicitudEstudio.anulado",false));
         //siempre se tomam las ordenes que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("ordenEx.anulado", false))

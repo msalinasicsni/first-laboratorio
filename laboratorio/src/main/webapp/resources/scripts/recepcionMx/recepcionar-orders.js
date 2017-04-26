@@ -403,7 +403,6 @@ var ReceiptOrders = function () {
 
                         }
                         $(".anularSolicitud").on("click", function () {
-                            //anularExamen($(this).data('id'));
                             $("#idSolicitud").val($(this).data('id'));
                             showModalOverrideRequest();
                         });
@@ -411,7 +410,6 @@ var ReceiptOrders = function () {
                         //al paginar se define nuevamente la función de cargar el detalle
                         $(".dataTables_paginate").on('click', function () {
                             $(".anularSolicitud").on('click', function () {
-                                //anularExamen($(this).data('id'));
                                 $("#idSolicitud").val($(this).data('id'));
                                 showModalOverrideRequest();
                             });
@@ -842,7 +840,7 @@ var ReceiptOrders = function () {
             function anularSolicitud(idSolicitud) {
                 var anulacionObj = {};
                 anulacionObj['idSolicitud'] = idSolicitud;
-                anulacionObj['causaAnulacion'] = $("#causaAnulacionEx").val();
+                anulacionObj['causaAnulacion'] = $("#causaAnulacion").val();
                 anulacionObj['mensaje'] = '';
                 blockUI();
                 $.ajax(

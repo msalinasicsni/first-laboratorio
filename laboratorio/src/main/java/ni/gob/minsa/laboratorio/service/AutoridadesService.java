@@ -49,6 +49,10 @@ public class AutoridadesService {
         session.save(auth);
     }
 
+    public void updateAuthorityLab(AutoridadLaboratorio auth){
+        Session session = sessionFactory.getCurrentSession();
+        session.update(auth);
+    }
     public void updateAuthorityArea(AutoridadArea auth) {
         Session session = sessionFactory.getCurrentSession();
         session.update(auth);
@@ -113,8 +117,16 @@ public class AutoridadesService {
     public List<AutoridadLaboratorio> getAutoridadesLab() {
         // Retrieve session from Hibernate
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("FROM AutoridadLaboratorio as a");
+        Query query = session.createQuery("FROM AutoridadLaboratorio as a where a.pasivo = false ");
         return query.list();
+    }
+
+    public AutoridadLaboratorio getAutoridadLabByUser(String usuario) {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM AutoridadLaboratorio as a where a.user.username = :usuario and a.pasivo = false ");
+        query.setParameter("usuario",usuario);
+        return (AutoridadLaboratorio)query.uniqueResult();
     }
 
     public List<AutoridadArea> getAutoridadesArea(String userName) {

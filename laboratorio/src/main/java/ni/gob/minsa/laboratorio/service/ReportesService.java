@@ -80,10 +80,12 @@ public class ReportesService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "idTomaMx")
                         .setProjection(Property.forName("idTomaMx.idTomaMx"))));
             }else{
                 crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("idTomaMx", "idTomaMx")
                         .setProjection(Property.forName("idTomaMx.idTomaMx"))));
             }
@@ -95,11 +97,13 @@ public class ReportesService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .setProjection(Property.forName("idTomaMx.idTomaMx"))));
                 } else {
                     crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado",false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .setProjection(Property.forName("idTomaMx.idTomaMx"))));
@@ -108,10 +112,12 @@ public class ReportesService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado",false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .setProjection(Property.forName("idTomaMx.idTomaMx"))))
                         .add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado",false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .setProjection(Property.forName("idTomaMx.idTomaMx"))));
@@ -177,25 +183,11 @@ public class ReportesService {
             );
         }
 
-        //se filtra por tipo de solicitud
-        if(filtro.getCodTipoSolicitud()!=null){
-            if(filtro.getCodTipoSolicitud().equals("Rutina")){
-                crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                        .createAlias("idTomaMx", "idTomaMx")
-                        .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-            }
-
-        }
-
         //nombre solicitud
         if (filtro.getNombreSolicitud() != null) {
-                            crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                            .createAlias("codDx", "dx")
-                            .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-
-
+            crit.add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"));
         }
+
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {
             crit.createAlias("toma.envio","envioMx");
@@ -268,24 +260,11 @@ public class ReportesService {
             );
         }
 
-        //se filtra por tipo de solicitud
-        if(filtro.getCodTipoSolicitud()!=null){
-            if(filtro.getCodTipoSolicitud().equals("Estudio")){
-                crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                        .createAlias("idTomaMx", "idTomaMx")
-                        .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-            }
-        }
-
         //nombre solicitud
         if (filtro.getNombreSolicitud() != null) {
-            if (filtro.getCodTipoSolicitud() != null) {
-                if (filtro.getCodTipoSolicitud().equals("Estudio")) {
-                    crit.add(Subqueries.propertyIn("toma.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
-                            .createAlias("tipoEstudio", "estudio")
-                            .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
-                            .setProjection(Property.forName("idTomaMx.idTomaMx"))));
-                }
+            //nombre solicitud
+            if (filtro.getNombreSolicitud() != null) {
+                crit.add(Restrictions.ilike("tEstudio.nombre", "%" + filtro.getNombreSolicitud() + "%"));
             }
         }
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
@@ -324,6 +303,7 @@ public class ReportesService {
     public List<DaSolicitudDx> getQCRoutineRequestByFilter(FiltroMx filtro) throws UnsupportedEncodingException {
         Session session = sessionFactory.getCurrentSession();
         Criteria crit = session.createCriteria(DaSolicitudDx.class, "rutina");
+        crit.add(Restrictions.eq("anulado",false));
         crit.createAlias("rutina.idTomaMx", "toma");
         crit.createAlias("toma.idNotificacion", "notif");
         crit.createAlias("rutina.codDx", "dx");
