@@ -53,7 +53,9 @@ public class ResultadoFinalService {
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado según filtro
+        );
+        crit.add(Restrictions.eq("diagnostico.anulado", false));
+        //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
@@ -154,10 +156,12 @@ public class ResultadoFinalService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }else{
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }
@@ -169,6 +173,7 @@ public class ResultadoFinalService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Rutina")) {
                              crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                             .add(Restrictions.eq("anulado", false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
@@ -178,11 +183,13 @@ public class ResultadoFinalService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado", false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .createAlias("idTomaMx", "toma")
@@ -243,6 +250,7 @@ public class ResultadoFinalService {
             //nivel analista
             if (filtro.getNivelLaboratorio() == 1) {
                 crit.add(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
@@ -255,6 +263,7 @@ public class ResultadoFinalService {
             //nivel jefe departamento
             if (filtro.getNivelLaboratorio() == 2) {
                 crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -274,6 +283,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 3) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -396,10 +406,12 @@ public class ResultadoFinalService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }else{
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }
@@ -410,6 +422,7 @@ public class ResultadoFinalService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado", false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
@@ -419,11 +432,13 @@ public class ResultadoFinalService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado", false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .createAlias("idTomaMx", "toma")
@@ -483,6 +498,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 1) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
@@ -496,6 +512,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 2) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -515,6 +532,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 3) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -864,6 +882,7 @@ public class ResultadoFinalService {
             if (filtro.getCodTipoSolicitud() != null) {
                 if (filtro.getCodTipoSolicitud().equals("Estudio")) {
                     crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado", false))
                             .createAlias("tipoEstudio", "estudio")
                             .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
@@ -871,6 +890,7 @@ public class ResultadoFinalService {
                 }
                 if (filtro.getCodTipoSolicitud().equals("Rutina")) {
                     crit2.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado", false))
                             .createAlias("codDx", "dx")
                             .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                             .createAlias("idTomaMx", "toma")
@@ -880,11 +900,13 @@ public class ResultadoFinalService {
 
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .add(Restrictions.ilike("estudio.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("anulado", false))
                                 .createAlias("codDx", "dx")
                                 .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                                 .createAlias("idTomaMx", "toma")
@@ -909,6 +931,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 1) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
@@ -918,6 +941,7 @@ public class ResultadoFinalService {
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx")))));
                 crit2.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
@@ -931,6 +955,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 2) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -948,6 +973,7 @@ public class ResultadoFinalService {
                         .setProjection(Property.forName("toma.idTomaMx")))));
 
                 crit2.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -968,6 +994,7 @@ public class ResultadoFinalService {
             if (filtro.getNivelLaboratorio() == 3) {
                 //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
                         .createAlias("estudio.area", "area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -988,6 +1015,7 @@ public class ResultadoFinalService {
                         .setProjection(Property.forName("toma.idTomaMx")))));
 
                 crit2.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
                         .createAlias("dx.area","area")
                         .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AreaDepartamento.class)
@@ -1076,6 +1104,7 @@ public class ResultadoFinalService {
                         Restrictions.eq("noti.idNotificacion", idNotificacion))
         );
         crit.add(Restrictions.and(Restrictions.eq("diagnostico.aprobada", true)));
+        crit.add(Restrictions.eq("diagnostico.anulado", false));
 
         return crit.list();
     }
@@ -1097,7 +1126,7 @@ public class ResultadoFinalService {
                         Restrictions.eq("noti.idNotificacion", idNotificacion))
         );
         crit.add(Restrictions.and(Restrictions.eq("estudio.aprobada", true)));
-
+        crit.add(Restrictions.eq("estudio.anulado", false));
         return crit.list();
     }
 

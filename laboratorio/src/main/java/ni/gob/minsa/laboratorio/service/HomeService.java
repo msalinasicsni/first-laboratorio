@@ -40,13 +40,13 @@ public class HomeService {
         String sQuery = "select count(mx.idTomaMx) as total, dx.idDiagnostico, dx.nombre " +
                 "from DaSolicitudDx as sdx inner join sdx.idTomaMx as mx " +
                 "inner join sdx.codDx as dx " +
-                "where sdx.labProcesa.codigo = :laboratorio and (mx.estadoMx.codigo = 'ESTDMX|ENV' or mx.estadoMx.codigo = 'ESTDMX|TRAS')" +
+                "where sdx.anulado = false and sdx.labProcesa.codigo = :laboratorio and (mx.estadoMx.codigo = 'ESTDMX|ENV' or mx.estadoMx.codigo = 'ESTDMX|TRAS')" +
                 "group by dx.idDiagnostico, dx.nombre";
 
         String sQuery2 = "select count(mx.idTomaMx) as total, es.idEstudio, es.nombre " +
                 "from DaSolicitudEstudio as sde inner join sde.idTomaMx as mx " +
                 "inner join sde.tipoEstudio as es " +
-                "where mx.envio.laboratorioDestino.codigo = :laboratorio and mx.estadoMx.codigo = 'ESTDMX|ENV'" +
+                "where sde.anulado = false and mx.envio.laboratorioDestino.codigo = :laboratorio and mx.estadoMx.codigo = 'ESTDMX|ENV'" +
                 "group by es.idEstudio, es.nombre";
 
 
