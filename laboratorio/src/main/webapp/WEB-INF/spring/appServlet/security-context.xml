@@ -19,11 +19,11 @@
         <intercept-url pattern="/resources/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/usuarios/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
         <intercept-url pattern="/sendMxReceipt/**" access="ROLE_RECEPCION" />
-        <intercept-url pattern="/recepcionMx/initLab" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/recepcionMx/createLab/*" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/recepcionMx/searchOrdersLab" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/recepcionMx/getOrdenesExamen" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/recepcionMx/getSolicitudes" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/initLab" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/createLab/*" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/searchOrdersLab" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/getOrdenesExamen" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/getSolicitudes" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/agregarSolicitud" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/agregarOrdenExamen" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/anularExamen" access="ROLE_ANALISTA" />
@@ -31,7 +31,7 @@
         <intercept-url pattern="/recepcionMx/receiptLaboratory" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/recepcionMasivaLab" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/**" access="ROLE_RECEPCION" />
-        <intercept-url pattern="/generacionAlicuota/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/generacionAlicuota/**" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestas/getRespuestasActivasExamen" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestasSolicitud/getRespuestasActivas" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/examenes/obtenerReglasExamenes" access="ROLE_ADMIN,ROLE_ANALISTA,ROLE_JEFE,ROLE_DIR" />
@@ -47,28 +47,28 @@
         <intercept-url pattern="/searchMx/*" access="ROLE_RECEPCION" />
         <intercept-url pattern="/administracion/request/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/solicitante/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
-        <intercept-url pattern="/viewNoti/*" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/viewNoti/*" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/general/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/qualityControl/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/administracion/file/**" access="ROLE_ADMIN" />
-        <intercept-url pattern="/aprobacion/**" access="ROLE_ADMIN,ROLE_DIR,ROLE_ANALISTA" />
+        <intercept-url pattern="/aprobacion/**" access="ROLE_DIR,ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/**" access="ROLE_ADMIN" />
-        <intercept-url pattern="/separacionMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/resultados/**" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
-        <intercept-url pattern="/resultadoFinal/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
-        <intercept-url pattern="/aprobacion/**" access="ROLE_DIR,ROLE_JEFE,ROLE_ADMIN" />
+        <intercept-url pattern="/separacionMx/**" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/resultados/**" access="ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR" />
+        <intercept-url pattern="/resultadoFinal/**" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/aprobacion/**" access="ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/tomaMx/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/reprint/**" access="ROLE_RECEPCION,ROLE_ANALISTA" />
         <intercept-url pattern="/personas/persons" access="ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/personas/**" access="ROLE_ADMIN" />
-        <intercept-url pattern="/workSheet/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
-        <intercept-url pattern="/trasladoMx/**" access="ROLE_ADMIN,ROLE_ANALISTA" />
+        <intercept-url pattern="/workSheet/**" access="ROLE_RECEPCION" />
+        <intercept-url pattern="/trasladoMx/**" access="ROLE_ANALISTA" />
         <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/print/**" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->
-        <intercept-url pattern="/" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR" />
+        <intercept-url pattern="/" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
 
         <form-login login-page="/login" default-target-url="/"
                     authentication-failure-url="/loginfailed" />
