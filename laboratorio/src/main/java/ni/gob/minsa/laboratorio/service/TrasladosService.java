@@ -176,6 +176,7 @@ public class TrasladosService {
 
         //se filtran sólo las muestras de rutina
         crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                .add(Restrictions.eq("anulado", false))
                 .createAlias("idTomaMx", "idTomaMx")
                 .setProjection(Property.forName("idTomaMx.idTomaMx"))));
 
@@ -187,6 +188,7 @@ public class TrasladosService {
         //nombre solicitud de rutina
         if (filtro.getNombreSolicitud() != null) {
             crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                    .add(Restrictions.eq("anulado", false))
                     .createAlias("codDx", "dx")
                     .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                     .setProjection(Property.forName("idTomaMx.idTomaMx"))));
@@ -207,11 +209,13 @@ public class TrasladosService {
         if (filtro.getSolicitudAprobada() != null) {
             Junction conditGroup = Restrictions.disjunction();
             conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    .add(Restrictions.eq("anulado", false))
                     .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
                     .createAlias("idTomaMx", "toma")
                     .setProjection(Property.forName("toma.idTomaMx"))))
 
                     .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado", false))
                             .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));
@@ -300,6 +304,7 @@ public class TrasladosService {
 
         //se filtran sólo las muestras de rutina
         crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                .add(Restrictions.eq("anulado", false))
                 .createAlias("idTomaMx", "idTomaMx")
                 .setProjection(Property.forName("idTomaMx.idTomaMx"))));
 
@@ -311,6 +316,7 @@ public class TrasladosService {
         //nombre solicitud de rutina
         if (filtro.getNombreSolicitud() != null) {
             crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                    .add(Restrictions.eq("anulado", false))
                     .createAlias("codDx", "dx")
                     .add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"))
                     .setProjection(Property.forName("idTomaMx.idTomaMx"))));
@@ -331,11 +337,13 @@ public class TrasladosService {
         if (filtro.getSolicitudAprobada() != null) {
             Junction conditGroup = Restrictions.disjunction();
             conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    .add(Restrictions.eq("anulado", false))
                     .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
                     .createAlias("idTomaMx", "toma")
                     .setProjection(Property.forName("toma.idTomaMx"))))
 
                     .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.eq("anulado", false))
                             .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));

@@ -302,6 +302,7 @@ public class TomaMxService {
                                 .setProjection(Property.forName("labautorizado.codigo"))))
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Restrictions.or(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                                .add(Restrictions.eq("anulado",false))
                                 .createAlias("idTomaMx", "idTomaMx")
                                 .setProjection(Property.forName("idTomaMx.idTomaMx")))));
                 crit.add(conditGroup);
@@ -510,7 +511,7 @@ public class TomaMxService {
  * MUESTRAS DE ESTUDIOS
 ******************************************************************/
     public List<DaSolicitudEstudio> getSolicitudesEstudioByIdTomaMx(String idTomaMx){
-        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
+        String query = "from DaSolicitudEstudio where anulado = false and idTomaMx.idTomaMx = :idTomaMx ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
@@ -525,7 +526,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti, String idTomaMx) throws Exception {
         String query = "select est from Estudio_TipoMx_TipoNoti est, DaSolicitudEstudio as dse inner join dse.tipoEstudio as tes " +
-                "where est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
+                "where dse.anulado = false and est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
                 "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " +
                 "and tes.idEstudio = est.estudio.idEstudio " +
                 "and dse.idTomaMx.idTomaMx = :idTomaMx" ;
@@ -574,7 +575,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSoliDxAprobByIdToma(String idTomaMx){
-        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and  aprobada = true ORDER BY fechaHSolicitud";
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and anulado = false and  aprobada = true ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
@@ -582,7 +583,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DaSolicitudEstudio> getSoliEstudioAprobByIdTomaMx(String idTomaMx){
-        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx and aprobada = true ORDER BY fechaHSolicitud";
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx and anulado = false and aprobada = true ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
@@ -590,7 +591,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DaSolicitudEstudio> getSoliEAprobByIdTomaMxOrderCodigo(String idTomaMx){
-        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
+        String query = "from DaSolicitudEstudio where idTomaMx.idTomaMx = :idTomaMx and anulado = false and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
@@ -598,7 +599,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DaSolicitudEstudio> getSoliEAprobByCodigo(String codigoUnico){
-        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx = :codigoUnico and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
+        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx = :codigoUnico and anulado = false and aprobada = true ORDER BY  idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico + "%");
         return q.list();
@@ -606,7 +607,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
      public DaSolicitudEstudio getSoliEstByCodigo(String codigoUnico){
-        String query = "from DaSolicitudEstudio where idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
+        String query = "from DaSolicitudEstudio where anulado = false and idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
         return (DaSolicitudEstudio) q.uniqueResult();
@@ -615,7 +616,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public DaSolicitudDx getSoliDxByCodigo(String codigoUnico, String userName){
         String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
+                "where al.pasivo = false and sdx.anulado = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username = :userName and sdx.idTomaMx.codigoUnicoMx = :codigoUnico ORDER BY  sdx.idTomaMx.codigoUnicoMx";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoUnico",codigoUnico);
         q.setParameter("userName",userName);
@@ -625,7 +626,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSolicitudesDxCodigo(String codigo, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx = :codigo ORDER BY sdx.fechaHSolicitud";
+                "where al.pasivo = false and sdx.anulado = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.codigoUnicoMx = :codigo ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigo",codigo);
         q.setParameter("userName",userName);
@@ -635,7 +636,7 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSoliDxAprobByTomaAndUser(String idToma, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
+                "where al.pasivo = false and sdx.anulado = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idToma",idToma);
         q.setParameter("userName",userName);
@@ -645,7 +646,7 @@ public class TomaMxService {
 
     public DaSolicitudDx getSolicitudDxByIdSolicitudUser(String idSolicitud, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where al.pasivo = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx = :idSolicitud ORDER BY sdx.fechaHSolicitud";
+                "where al.pasivo = false and sdx.anulado = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx = :idSolicitud ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idSolicitud",idSolicitud);
         q.setParameter("userName",userName);
@@ -762,14 +763,14 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSolicitudesDxPrioridadByIdToma(String idTomaMx){
-        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         return q.list();
     }
 
     public List<DaSolicitudDx> getSoliDxPrioridadByTomaAndLab(String idTomaMx, String lab){
-        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.idTomaMx.idTomaMx = :idTomaMx and sdx.labProcesa.codigo =:lab ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx and sdx.labProcesa.codigo =:lab ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("lab",lab);
@@ -778,8 +779,8 @@ public class TomaMxService {
 
     public DaSolicitudDx getMaxSoliByToma(String tomaMx) {
         Session session = sessionFactory.getCurrentSession();
-        String query = "select sol from DaSolicitudDx as sol  inner join sol.idTomaMx as t where t.idTomaMx= :tomaMx and sol.fechaHSolicitud= (SELECT MAX(tsdx.fechaHSolicitud) " +
-                "FROM DaSolicitudDx as tsdx where tsdx.idTomaMx.idTomaMx = t.idTomaMx)";
+        String query = "select sol from DaSolicitudDx as sol  inner join sol.idTomaMx as t where sol.anulado = false and t.idTomaMx= :tomaMx and sol.fechaHSolicitud= (SELECT MAX(tsdx.fechaHSolicitud) " +
+                "FROM DaSolicitudDx as tsdx where tsdx.anulado = false  and tsdx.idTomaMx.idTomaMx = t.idTomaMx)";
         Query q = session.createQuery(query);
         q.setParameter("tomaMx", tomaMx);
         return (DaSolicitudDx)q.uniqueResult();
@@ -793,7 +794,7 @@ public class TomaMxService {
      */
     public List<DaSolicitudDx> getSolicitudesDxSinTrasladoByIdToma(String idTomaMx){
         String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx t inner join sdx.codDx dx, RecepcionMx r " +
-                "where r.tomaMx.idTomaMx = t.idTomaMx and t.idTomaMx = :idTomaMx " +
+                "where sdx.anulado = false and r.tomaMx.idTomaMx = t.idTomaMx and t.idTomaMx = :idTomaMx " +
                 "and dx.area.idArea not in ( " +
                 "           select rl.area.idArea from RecepcionMxLab rl where rl.recepcionMx.idRecepcion = r.idRecepcion) " +
                 "ORDER BY dx.prioridad asc";
@@ -804,7 +805,7 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSolicitudesDxByIdTomaArea(String idTomaMx, int idArea, String username){
-        String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al where al.pasivo = false and sdx.idTomaMx.idTomaMx = :idTomaMx " +
+        String query = "select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al where al.pasivo = false and sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx " +
                 "and sdx.labProcesa.codigo = al.laboratorio.codigo and sdx.codDx.area.idArea = :idArea and al.user.username = :username " +
                 "ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
@@ -821,7 +822,7 @@ public class TomaMxService {
      */
     public List<DaSolicitudDx> getSolicitudesDxQCAprobByToma(String codigoMx){
         String query = " select sdx from DaSolicitudDx sdx " +
-                "where sdx.idTomaMx.codigoUnicoMx = :codigoMx and sdx.aprobada = true and sdx.controlCalidad = true ORDER BY sdx.fechaHSolicitud";
+                "where sdx.idTomaMx.codigoUnicoMx = :codigoMx and sdx.anulado = false and sdx.aprobada = true and sdx.controlCalidad = true ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("codigoMx",codigoMx);
         return q.list();
@@ -865,7 +866,7 @@ public class TomaMxService {
      */
     public List<DaSolicitudDx> getSolicitudesDxTrasladoExtByIdToma(String idTomaMx, String codigoLab){
         String query = "select distinct sdx from OrdenExamen oe inner join oe.solicitudDx sdx inner join sdx.idTomaMx mx " +
-                "where mx.idTomaMx = :idTomaMx " +
+                "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
                 "and oe.labProcesa.codigo = :codigoLab ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -874,7 +875,7 @@ public class TomaMxService {
     }
 
     public DaSolicitudDx getSolicitudDxByMxDxNoCC(String idTomaMx,  Integer idDiagnostico){
-        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and controlCalidad = false  " +
+        String query = "from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx and anulado = false and controlCalidad = false  " +
                 "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);

@@ -245,6 +245,7 @@ public class RecepcionMxService {
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("anulado", false))
                         .createAlias("idTomaMx", "toma")
                         .setProjection(Property.forName("toma.idTomaMx"))));
             }else{
@@ -315,6 +316,7 @@ public class RecepcionMxService {
                     Junction conditGroup = Restrictions.disjunction();
 
                     conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                            .add(Restrictions.eq("anulado", false))
                             .createAlias("tipoEstudio", "estudio")
                             .createAlias("estudio.area", "area")
                             .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
@@ -324,6 +326,7 @@ public class RecepcionMxService {
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("idTomaMx.idTomaMx"))))
                             .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                    .add(Restrictions.eq("anulado", false))
                                     .createAlias("codDx", "dx")
                                     .createAlias("dx.area","area")
                                     .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
@@ -371,6 +374,7 @@ public class RecepcionMxService {
             }else { //si hay filtro por control de calidad y es "No", siempre incluir los estudios
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                        .add(Restrictions.eq("anulado", false))
                         .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
                         .createAlias("idTomaMx", "toma")
                         .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
@@ -381,6 +385,7 @@ public class RecepcionMxService {
                                 .setProjection(Property.forName("labautorizado.codigo"))))
                         .setProjection(Property.forName("toma.idTomaMx"))))
                         .add(Restrictions.or(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                                .add(Restrictions.eq("anulado", false))
                                 .createAlias("idTomaMx", "idTomaMx")
                                 .setProjection(Property.forName("idTomaMx.idTomaMx")))));
                 crit.add(conditGroup);
@@ -390,6 +395,7 @@ public class RecepcionMxService {
         if (filtro.getSolicitudAprobada() != null) {
             Junction conditGroup = Restrictions.disjunction();
             conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    .add(Restrictions.eq("anulado", false))
                     .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
                     .createAlias("idTomaMx", "toma")
                     .setProjection(Property.forName("toma.idTomaMx"))))

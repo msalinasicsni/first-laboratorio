@@ -234,7 +234,7 @@ public class ReportesService {
         crit.createAlias("estudio.idTomaMx", "toma");
         crit.createAlias("toma.idNotificacion", "notif");
         crit.createAlias("estudio.tipoEstudio", "tEstudio");
-
+        crit.add(Restrictions.eq("estudio.anulado", false));
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
         }
