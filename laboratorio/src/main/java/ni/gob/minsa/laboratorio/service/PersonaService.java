@@ -1,7 +1,9 @@
 package ni.gob.minsa.laboratorio.service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.Normalizer;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.naming.InitialContext;
@@ -36,6 +38,14 @@ public class PersonaService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(PersonaService.class);
     private PersonaUTMService personaUTMService;
     private InitialContext initialContext;
+    public static final Pattern DIACRITICS_AND_FRIENDS
+            = Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
+
+    private static String stripDiacritics(String str) {
+        str = Normalizer.normalize(str, Normalizer.Form.NFD);
+        str = DIACRITICS_AND_FRIENDS.matcher(str).replaceAll("");
+        return str;
+    }
 
     @SuppressWarnings("unchecked")
     public List<SisPersona> getPersonas(String filtro){
@@ -52,14 +62,16 @@ public class PersonaService {
                                     Restrictions.eq("telefonoMovil", filtro))
                     )
                     .list();
-        }else if(filtro.matches("[a-zA-Zí\\s]*")){
+        }else if(filtro.matches("[a-zA-ZñÑáéíóúÁÉÍÓÚ\\s]*")){
             Soundex varSoundex = new Soundex();
+
             Criteria crit = session.createCriteria(SisPersona.class);
             String[] partes = filtro.split(" ");
             String[] partesSnd = filtro.split(" ");
             for(int i=0;i<partes.length;i++){
                 try{
-                    partesSnd[i] = varSoundex.encode(partes[i]);
+                    String noDiacri = stripDiacritics(partes[i]);
+                    partesSnd[i] = varSoundex.encode(noDiacri);
                 }
                 catch (IllegalArgumentException e){
                     partesSnd[i] = "0000";
