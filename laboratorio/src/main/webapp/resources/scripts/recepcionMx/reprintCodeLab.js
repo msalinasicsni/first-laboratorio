@@ -228,8 +228,8 @@ var ReprintCodeLab = function () {
 
                                 unBlockUI();
                             }
-                            codesLab = reemplazar(codesLab, ".", "*");
-                            imprimir(codesLab);
+                            //codesLab = reemplazar(codesLab, ".", "*");
+                            imprimir2(codesLab);
 
                         }
                         if (ButtonPressed === opcNo) {
@@ -255,6 +255,26 @@ var ReprintCodeLab = function () {
 
             }
 
+            function imprimir2(strBarCodes){
+                $.getJSON("http://localhost:13001/print", {
+                    barcodes: strBarCodes,
+                    copias: 1,
+                    ajax:'false'
+                }, function (data) {
+                    console.log(data);
+                    $.smallBox({
+                        title: "etiquetas impresas",
+                        content: $("#disappear").val(),
+                        color: "#739E73",
+                        iconSmall: "fa fa-success",
+                        timeout: 4000
+                    });
+                }).fail(function (jqXHR) {
+                    console.log(jqXHR);
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
+            }
 
             function imprimir(strBarCodes){
                 $.getJSON(parametros.printUrl, {

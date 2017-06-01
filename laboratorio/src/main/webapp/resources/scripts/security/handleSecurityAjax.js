@@ -23,7 +23,7 @@ function validateLogin(jqXHR){
             iconSmall: "fa fa-warning",
             timeout: 4000
         });
-    }else if (jqXHR.status!=200){
+    }else if (jqXHR.status!=200 && jqXHR.status!=0){
         $.smallBox({
             title: $("#txtErrorAjax").val() ,
             content: "error: "+ jqXHR.status + "-" + jqXHR.statusText ,

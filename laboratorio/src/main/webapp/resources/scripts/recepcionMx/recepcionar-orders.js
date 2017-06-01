@@ -525,8 +525,9 @@ var ReceiptOrders = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
-                                            codUnicosFormat = reemplazar(data.codigosUnicosMx, ".", "*");
-                                            getMxs(false);
+                                            //codUnicosFormat = reemplazar(data.codigosUnicosMx, ".", "*");
+                                            codUnicosFormat = data.codigosUnicosMx;
+                                                getMxs(false);
                                         }
                                         desbloquearUI();
                                     },
@@ -535,7 +536,7 @@ var ReceiptOrders = function () {
                                         validateLogin(jqXHR);
                                     }
                                 });
-                            imprimir(codUnicosFormat);
+                            imprimir2(codUnicosFormat);
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({
@@ -687,8 +688,9 @@ var ReceiptOrders = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
-                                codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
-                                limpiarDatosRecepcion();
+                                //codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
+                                codUnicoFormat = data.codigoUnicoMx;
+                                    limpiarDatosRecepcion();
                                 setTimeout(function () {
                                     window.location.href = parametros.sSearchReceiptUrl
                                 }, 4000);
@@ -700,7 +702,28 @@ var ReceiptOrders = function () {
                             validateLogin(jqXHR);
                         }
                     });
-                imprimir(codUnicoFormat);
+                imprimir2(codUnicoFormat);
+            }
+
+            function imprimir2(strBarCodes){
+                $.getJSON("http://localhost:13001/print", {
+                    barcodes: strBarCodes,
+                    copias: 1,
+                    ajax:'false'
+                }, function (data) {
+                    console.log(data);
+                    $.smallBox({
+                        title: "etiquetas impresas",
+                        content: $("#disappear").val(),
+                        color: "#739E73",
+                        iconSmall: "fa fa-success",
+                        timeout: 4000
+                    });
+                }).fail(function (jqXHR) {
+                    console.log(jqXHR);
+                    setTimeout($.unblockUI, 10);
+                    validateLogin(jqXHR);
+                });
             }
 
             function imprimir(strBarCodes){

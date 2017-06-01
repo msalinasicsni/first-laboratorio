@@ -173,7 +173,7 @@ var DxAnswers = function () {
                          //   var action2Url = parametros.sDataConcepstUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
 
                             table1.fnAddData(
-                                [dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, btnAdd , btnDataEntry]);
+                                [dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, btnDataEntry, btnAdd ]);
                         }
                     } else {
                         $.smallBox({

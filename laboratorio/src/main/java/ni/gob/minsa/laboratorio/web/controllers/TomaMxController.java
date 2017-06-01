@@ -381,6 +381,7 @@ public class TomaMxController {
         String codTipoNoti="";
         String horaTomaMx="";
         String fechaInicioSintomas="";
+        String codigoGenerado = "";
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -481,6 +482,7 @@ public class TomaMxController {
             tomaMx.setCodigoUnicoMx(codigo);
             //todas deben tener codigo lab, porque son rutinas
             tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo()));
+            codigoGenerado = tomaMx.getCodigoLab();
             tomaMx.setEnvio(envioOrden);
             try {
                 tomaMxService.addTomaMx(tomaMx);
@@ -550,6 +552,7 @@ public class TomaMxController {
             map.put("codTipoNoti",codTipoNoti);
             map.put("horaTomaMx",horaTomaMx);
             map.put("fechaInicioSintomas",fechaInicioSintomas);
+            map.put("codigoLab", codigoGenerado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
