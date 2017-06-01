@@ -162,15 +162,15 @@ var DxAnswers = function () {
 
                             var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
                                 '" > <i class="fa fa-list"></i>' ;
-                     //       var actionUrl = parametros.sActionUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
+                            //       var actionUrl = parametros.sActionUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
 
-                           var btnDataEntry = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
-                               '" > <i class="fa fa-list"></i>' ;
+                            var btnDataEntry = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
+                                '" > <i class="fa fa-list"></i>' ;
                             if (dataToLoad[i].tipoSolicitud == 'Estudio') {
                                 btnDataEntry = '<button type="button" disabled class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
                                     '" > <i class="fa fa-list"></i>';
                             }
-                         //   var action2Url = parametros.sDataConcepstUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
+                            //   var action2Url = parametros.sDataConcepstUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
 
                             table1.fnAddData(
                                 [dataToLoad[i].nombreDx, dataToLoad[i].nombreArea, btnDataEntry, btnAdd ]);
@@ -292,9 +292,9 @@ var DxAnswers = function () {
                 minlength: 2
             });
 
-          /*  if (parametros.sFormConcept == 'SI') {
-                getResponses();
-            }*/
+            /*  if (parametros.sFormConcept == 'SI') {
+             getResponses();
+             }*/
 
             $('#respuesta-form').validate({
                 // Rules for form validation
@@ -486,7 +486,7 @@ var DxAnswers = function () {
                                     timeout: 4000
                                 });
                             } else {
-                              var strParametros = $('#idRequest').val() + ',' + $('#tipoR').val();
+                                var strParametros = $('#idRequest').val() + ',' + $('#tipoR').val();
                                 getResponses(strParametros);
                                 var msg = $("#msg_response_cancel").val();
                                 $.smallBox({
