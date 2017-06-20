@@ -79,9 +79,12 @@ var SearchPerson = function () {
                             nombreMuniRes = data[i].municipioResidencia.nombre;
                         }
                         var actionUrl = parametros.sActionUrl + '/' + data[i].personaId;
+                        var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
 
                         table1.fnAddData(
-                            [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, nombreMuniRes, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                            [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, nombreMuniRes,
+                                    '<a href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-edit"></i></a>',
+                                    '<a href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
 
                     }
                     setTimeout($.unblockUI, 500);

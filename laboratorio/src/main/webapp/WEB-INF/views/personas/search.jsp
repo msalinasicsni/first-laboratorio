@@ -14,6 +14,7 @@
 	<!-- #NAVIGATION -->
 	<jsp:include page="../fragments/bodyNavigation.jsp" />
     <spring:url value="/personas/update" var="sActionUrl"/>
+    <spring:url value="/tomaMx/noticesrut" var="sActionNotiPacienteUrl"/>
     <!-- MAIN PANEL -->
 	<div id="main" data-role="main">
 		<!-- RIBBON -->
@@ -122,6 +123,7 @@
 												<th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.fecnac"/></th>
 												<th data-hide="phone,tablet"><i class="fa fa-fw fa-map-marker text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.mun.res"/></th>
 												<th></th>
+                                                <th></th>
 											</tr>
 										</thead>
                                         <c:if test="${not empty persona}">
@@ -134,7 +136,8 @@
                                                 <td>${persona.segundoApellido}</td>
                                                 <td>${persona.fechaNacimiento}</td>
                                                 <td>${persona.muniResiNombre}</td>
-                                                <td><a href="${sActionUrl}/${persona.personaId}" class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a></td>
+                                                <td><a href="${sActionUrl}/${persona.personaId}" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></a></td>
+                                                <td><a href="${sActionNotiPacienteUrl}/${persona.personaId}" class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a></td>
                                             </tr>
                                             </tbody>
                                         </c:if>
@@ -198,7 +201,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
-			var parametros = {sPersonUrl: "${sPersonUrl}", sActionUrl: "${sActionUrl}",
+			var parametros = {sPersonUrl: "${sPersonUrl}", sActionUrl: "${sActionUrl}", sActionNotiPacienteUrl : "${sActionNotiPacienteUrl}",
                 sCreatePersonUrl: "${sCreatePersonUrl}", blockMess : $("#blockUI_message").val()};
 			SearchPerson.init(parametros);
 	    	$("li.mantenimiento").addClass("open");
