@@ -107,19 +107,13 @@ public class WorkSheetController {
         List<DaSolicitudDx> solicitudDxList;
         List<DaSolicitudEstudio> solicitudEstudioList;
 
-        String workingDir = System.getProperty("user.dir");
         String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(new Date());
         List<DaTomaMx> tomasHoja = new ArrayList<DaTomaMx>();
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
         String[] hojasArray = hojas.split(",");
-
         for (String numHoja : hojasArray) {
             List<String[]> filasSolicitudes = new ArrayList<String[]>();
-            float inY = 750;
-            float m = 20;
-            float m1 = 50;
-            String textoImprimir="";
             //Prepare the document.
             PDPage page = GeneralUtils.addNewPage(doc);
             PDPageContentStream stream = new PDPageContentStream(doc, page);
@@ -137,97 +131,62 @@ public class WorkSheetController {
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.work.sheet", null, null), 630, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
 
             //draw worksheet info
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", 590, 30, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), 590, 120, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", 610, 30, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), 610, 120, stream, 12, PDType1Font.HELVETICA);
 
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", 590, 310, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), 590, 410, stream, 12, PDType1Font.HELVETICA);
-
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", 610, 310, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), 610, 410, stream, 12, PDType1Font.HELVETICA);
+            float y = 590;
 
             for (DaTomaMx tomaMx_hoja : tomasHoja) {
-                float y = 540;
 
                 //cod_mx, solicitud,lab_destino,techa toma mx, fec_inicio_sintomas
                 Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-                solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx_hoja.getIdTomaMx(),labUser.getCodigo());
+                solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx_hoja.getIdTomaMx(), labUser.getCodigo());
                 solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx_hoja.getIdTomaMx());
-                //int numFila = 0;
                 String[] content = null;
                 String fis = "";
-                String controlCalidad = messageSource.getMessage("lbl.no",null,null);
+                String controlCalidad = messageSource.getMessage("lbl.no", null, null);
                 TrasladoMx trasladoMxActivo = trasladosService.getTrasladoCCMx(tomaMx_hoja.getIdTomaMx());
-                if (trasladoMxActivo!=null) {
+                if (trasladoMxActivo != null) {
                     if (trasladoMxActivo.isControlCalidad()) {
-                        controlCalidad = messageSource.getMessage("lbl.yes",null,null);
+                        controlCalidad = messageSource.getMessage("lbl.yes", null, null);
                     }
                 }
-                String solicitudes="";
-                String areaEntrega="";
-                int prioridad =100;
+                String solicitudes = "";
+                String areaEntrega = "";
+                int prioridad = 100;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                    /*content = new String[6];
-                    y = y - 20;
-                    if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
-                        fis = DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
-                    }
-                    content[0] = solicitudDx.getIdTomaMx().getCodigoLab();
-                    content[1] = solicitudDx.getCodDx().getNombre();
-                    content[2] = solicitudDx.getCodDx().getArea().getNombre();
-                    content[3] = DateUtil.DateToString(solicitudDx.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
-                            (solicitudDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudDx.getIdTomaMx().getHoraTomaMx():"");
-                    content[4] = fis;
-                    content[5] = controlCalidad;
-                    */
-                    solicitudes += (solicitudes.isEmpty()?"":",")+solicitudDx.getCodDx().getNombre();
-                    //filasSolicitudes.add(content);
-                    //numFila++;
-                    if(prioridad>=solicitudDx.getCodDx().getPrioridad())
-                    areaEntrega += areaEntrega.isEmpty()?solicitudDx.getCodDx().getArea().getNombre():"";
+                    solicitudes += (solicitudes.isEmpty() ? "" : ",") + solicitudDx.getCodDx().getNombre();
+                    if (prioridad >= solicitudDx.getCodDx().getPrioridad())
+                        areaEntrega += areaEntrega.isEmpty() ? solicitudDx.getCodDx().getArea().getNombre() : "";
 
                 }
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
-                    /*content = new String[6];
-                    y = y - 20;
-                    if (solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null) {
-                        fis = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
-                    }
-                    content[0] = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
-                    content[1] = solicitudEstudio.getTipoEstudio().getNombre();
-                    content[2] = solicitudEstudio.getTipoEstudio().getArea().getNombre();
-                    content[3] = DateUtil.DateToString(solicitudEstudio.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
-                            (solicitudEstudio.getIdTomaMx().getHoraTomaMx()!=null?" "+solicitudEstudio.getIdTomaMx().getHoraTomaMx():"");
-                    content[4] = fis;
-                    content[5] = controlCalidad;
-                    filasSolicitudes.add(content);*/
-                    solicitudes += (solicitudes.isEmpty()?"":",")+solicitudEstudio.getTipoEstudio().getNombre();
-                    areaEntrega += areaEntrega.isEmpty()?solicitudEstudio.getTipoEstudio().getArea().getNombre():"";
-                    //numFila++;
-
+                    solicitudes += (solicitudes.isEmpty() ? "" : ",") + solicitudEstudio.getTipoEstudio().getNombre();
+                    areaEntrega += areaEntrega.isEmpty() ? solicitudEstudio.getTipoEstudio().getArea().getNombre() : "";
                 }
-                if (tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas()!=null) {
+                if (tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas() != null) {
                     fis = DateUtil.DateToString(tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
                 }
 
                 content = new String[6];
-                y = y - 20;
-
-                content[0] = tomaMx_hoja.getCodigoLab()!=null?tomaMx_hoja.getCodigoLab():tomaMx_hoja.getCodigoUnicoMx();
+                content[0] = tomaMx_hoja.getCodigoLab() != null ? tomaMx_hoja.getCodigoLab() : tomaMx_hoja.getCodigoUnicoMx();
                 content[1] = solicitudes;
                 content[2] = areaEntrega;
-                content[3] = DateUtil.DateToString(tomaMx_hoja.getFechaHTomaMx(), "dd/MM/yyyy")+
-                        (tomaMx_hoja.getHoraTomaMx()!=null?" "+tomaMx_hoja.getHoraTomaMx():"");
+                content[3] = DateUtil.DateToString(tomaMx_hoja.getFechaHTomaMx(), "dd/MM/yyyy") +
+                        (tomaMx_hoja.getHoraTomaMx() != null ? " " + tomaMx_hoja.getHoraTomaMx() : "");
                 content[4] = fis;
                 content[5] = controlCalidad;
 
                 filasSolicitudes.add(content);
-
+            }
                 //Initialize table
                 float margin = 30;
                 float tableWidth = 530;
-                float yStartNewPage = 560;
-                float yStart = yStartNewPage;
+                float yStartNewPage = 600;
                 float bottomMargin = 45;
-                BaseTable table = new BaseTable(yStart, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+                BaseTable table = new BaseTable(yStartNewPage, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
 
                 //Create Fact header row
                 Row factHeaderrow = table.createRow(15f);
@@ -266,7 +225,57 @@ public class WorkSheetController {
 
                 for (String[] fact : filasSolicitudes) {
 
+                    if (y < 220){
+                        table.draw();
+                        stream.close();
+                        page = GeneralUtils.addNewPage(doc);
+                        stream = new PDPageContentStream(doc, page);
+                        y = 700;
+                        //dibujar encabezado pag y pie de pagina
+                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
+
+                        pageNumber = String.valueOf(doc.getNumberOfPages());
+                        GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
+
+                        pageNumber= String.valueOf(doc.getNumberOfPages());
+                        GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
+
+                        table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
+                        factHeaderrow = table.createRow(15f);
+                        cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
+                        cell.setFont(PDType1Font.HELVETICA_BOLD);
+                        cell.setFontSize(10);
+                        cell.setFillColor(Color.LIGHT_GRAY);
+
+                        cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
+                        cell.setFillColor(Color.lightGray);
+                        cell.setFont(PDType1Font.HELVETICA_BOLD);
+                        cell.setFontSize(10);
+
+                        cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
+                        cell.setFillColor(Color.lightGray);
+                        cell.setFont(PDType1Font.HELVETICA_BOLD);
+                        cell.setFontSize(10);
+
+                        cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
+                        cell.setFillColor(Color.lightGray);
+                        cell.setFont(PDType1Font.HELVETICA_BOLD);
+                        cell.setFontSize(10);
+
+                        cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+                        cell.setFillColor(Color.lightGray);
+                        cell.setFont(PDType1Font.HELVETICA_BOLD);
+                        cell.setFontSize(10);
+
+                        cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
+                        cell.setFillColor(Color.lightGray);
+                        cell.setFont(PDType1Font.HELVETICA_BOLD);
+                        cell.setFontSize(10);
+                        y -= 15;
+                    }
+
                     row = table.createRow(15f);
+                    y -= 15;
                     for (int i = 0; i < fact.length; i++) {
                         if (i==0) {
                             cell = row.createCell(16, fact[i]);
@@ -288,7 +297,7 @@ public class WorkSheetController {
                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
                 GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
 
-            }
+
             stream.close();
         }
 
