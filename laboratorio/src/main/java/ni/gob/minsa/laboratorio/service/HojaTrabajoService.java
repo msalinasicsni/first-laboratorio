@@ -57,7 +57,7 @@ public class HojaTrabajoService {
 
     public List<DaTomaMx> getTomaMxByHojaTrabajo(int numeroHoja, String codLaboratorio){
         String query = "select b from Mx_HojaTrabajo as a inner join a.tomaMx as b inner join a.hojaTrabajo as c " +
-                "where c.numero =:numero and c.laboratorio.codigo = :codLaboratorio";
+                "where c.numero =:numero and c.laboratorio.codigo = :codLaboratorio order by b.codigoLab asc";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setInteger("numero", numeroHoja);
