@@ -39,7 +39,7 @@ public class SeparacionMxService {
 
     public List<Alicuota> getAlicuotasByTRecSoliTMx(Integer solicitud, Integer tipoMx, String tipoRecepcion) throws Exception {
         Session session = sessionFactory.getCurrentSession();
-        List<Alicuota> aliquotList = new ArrayList<>();
+        List<Alicuota> aliquotList = new ArrayList<Alicuota>();
         String query = "from Alicuota as a where a.tipoRecepcionMx= :tipoRecepcion and a.tipoMuestra = :tipoMx and a.estudio= :solicitud";
         Query q = session.createQuery(query);
         q.setString("tipoRecepcion", tipoRecepcion);

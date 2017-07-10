@@ -587,7 +587,7 @@ public class SeparacionMxController {
         headers.set("Content-Type", "application/json");
         Gson gson = new Gson();
         String json = gson.toJson(o);
-        return new ResponseEntity<>(json, headers, HttpStatus.CREATED);
+        return new ResponseEntity<String>(json, headers, HttpStatus.CREATED);
     }
 
     private void addAliq(HttpServletRequest request, Integer quantity, Alicuota alicuotaCat, String codigoUnico, DaSolicitudEstudio estudio, DaSolicitudDx dx ) throws Exception {

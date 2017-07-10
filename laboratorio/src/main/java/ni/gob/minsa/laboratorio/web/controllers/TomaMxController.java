@@ -337,7 +337,7 @@ public class TomaMxController {
         headers.set("Content-Type", "application/json");
         Gson gson = new Gson();
         String json = gson.toJson(o);
-        return new ResponseEntity<>(json, headers, HttpStatus.CREATED);
+        return new ResponseEntity<String>(json, headers, HttpStatus.CREATED);
     }
 
     /**
