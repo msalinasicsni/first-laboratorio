@@ -241,39 +241,49 @@ public class AprobacionResultadoController {
             if (incluirResultados){
                 //detalle resultado final solicitud
                 List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
-                int subIndice=1;
-                Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                //int subIndice=1;
+                //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                String resultados="";
                 for(DetalleResultadoFinal res: resultList){
-                    Map<String, String> mapResp = new HashMap<String, String>();
+                    //Map<String, String> mapResp = new HashMap<String, String>();
                     if (res.getRespuesta()!=null) {
+                        resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
                         if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                             Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            mapResp.put("valor", cat_lista.getValor());
+                            //mapResp.put("valor", cat_lista.getValor());
+                            resultados+=": "+cat_lista.getValor();
                         }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                             String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                            //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                            resultados+=": "+valorBoleano;
                         } else {
-                            mapResp.put("valor", res.getValor());
+                            //mapResp.put("valor", res.getValor());
+                            resultados+=": "+res.getValor();
                         }
-                        mapResp.put("respuesta", res.getRespuesta().getNombre());
+                        //mapResp.put("respuesta", res.getRespuesta().getNombre());
 
                     }else if (res.getRespuestaExamen()!=null){
+                        resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                         if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                             Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            mapResp.put("valor", cat_lista.getValor());
+                            //mapResp.put("valor", cat_lista.getValor());
+                            resultados+=": "+cat_lista.getValor();
                         } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                             String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                            //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                            resultados+=": "+valorBoleano;
                         }else {
-                            mapResp.put("valor", res.getValor());
+                            //mapResp.put("valor", res.getValor());
+                            resultados+=": "+res.getValor();
                         }
-                        mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                        //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
                     }
-                    mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-                    mapResponseResp.put(subIndice,mapResp);
-                    subIndice++;
+                    //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                    //mapResponseResp.put(subIndice,mapResp);
+                    //subIndice++;
                 }
-                map.put("resultados",new Gson().toJson(mapResponseResp));
+                //map.put("resultados",new Gson().toJson(mapResponseResp));
+                map.put("resultados",resultados);
             }
             mapResponse.put(indice, map);
             indice ++;
@@ -320,41 +330,51 @@ public class AprobacionResultadoController {
                 map.put("fechaAprobacion","");
             }
             if (incluirResultados){
+                String resultados="";
                 //detalle resultado final solicitud
                 List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(estudio.getIdSolicitudEstudio());
-                int subIndice=1;
-                Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                //int subIndice=1;
+                //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
                 for(DetalleResultadoFinal res: resultList){
-                    Map<String, String> mapResp = new HashMap<String, String>();
+                    //Map<String, String> mapResp = new HashMap<String, String>();
                     if (res.getRespuesta()!=null) {
+                        resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
                         if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                             Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            mapResp.put("valor", cat_lista.getValor());
+                            //mapResp.put("valor", cat_lista.getValor());
+                            resultados+=": "+cat_lista.getValor();
                         }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                             String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                            //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                            resultados+=": "+valorBoleano;
                         } else {
-                            mapResp.put("valor", res.getValor());
+                            //mapResp.put("valor", res.getValor());
+                            resultados+=": "+res.getValor();
                         }
-                        mapResp.put("respuesta", res.getRespuesta().getNombre());
+                        //mapResp.put("respuesta", res.getRespuesta().getNombre());
 
                     }else if (res.getRespuestaExamen()!=null){
+                        resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                         if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                             Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            mapResp.put("valor", cat_lista.getValor());
+                            //mapResp.put("valor", cat_lista.getValor());
+                            resultados+=": "+cat_lista.getValor();
                         } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                             String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                            //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                            resultados+=": "+valorBoleano;
                         }else {
-                            mapResp.put("valor", res.getValor());
+                            //mapResp.put("valor", res.getValor());
+                            resultados+=": "+res.getValor();
                         }
-                        mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                        //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
                     }
-                    mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-                    mapResponseResp.put(subIndice,mapResp);
-                    subIndice++;
+                    //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                    //mapResponseResp.put(subIndice,mapResp);
+                    //subIndice++;
                 }
-                map.put("resultados",new Gson().toJson(mapResponseResp));
+                //map.put("resultados",new Gson().toJson(mapResponseResp));
+                map.put("resultados",resultados);
             }
 
             mapResponse.put(indice, map);
@@ -793,39 +813,49 @@ public class AprobacionResultadoController {
 
             //detalle resultado final solicitud
             List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResPasivosBySolicitud(idSolicitud);
-            int subIndice=1;
-            Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+            //int subIndice=1;
+            //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+            String resultados="";
             for(DetalleResultadoFinal res: resultList){
-                Map<String, String> mapResp = new HashMap<String, String>();
+                //Map<String, String> mapResp = new HashMap<String, String>();
                 if (res.getRespuesta()!=null) {
+                    resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
                     if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                         Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                        mapResp.put("valor", cat_lista.getValor());
+                        //mapResp.put("valor", cat_lista.getValor());
+                        resultados+=": "+cat_lista.getValor();
                     }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                        mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                        //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                        resultados+=": "+valorBoleano;
                     } else {
-                        mapResp.put("valor", res.getValor());
+                        //mapResp.put("valor", res.getValor());
+                        resultados+=": "+res.getValor();
                     }
-                    mapResp.put("respuesta", res.getRespuesta().getNombre());
+                    //mapResp.put("respuesta", res.getRespuesta().getNombre());
 
                 }else if (res.getRespuestaExamen()!=null){
+                    resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                     if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                         Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                        mapResp.put("valor", cat_lista.getValor());
+                        //mapResp.put("valor", cat_lista.getValor());
+                        resultados+=": "+cat_lista.getValor();
                     } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                        mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                        //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                        resultados+=": "+valorBoleano;
                     }else {
-                        mapResp.put("valor", res.getValor());
+                        //mapResp.put("valor", res.getValor());
+                        resultados+=": "+res.getValor();
                     }
-                    mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                    //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
                 }
-                mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-                mapResponseResp.put(subIndice,mapResp);
-                subIndice++;
+                //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                //mapResponseResp.put(subIndice,mapResp);
+                //subIndice++;
             }
-            map.put("resultados",new Gson().toJson(mapResponseResp));
+            //map.put("resultados",new Gson().toJson(mapResponseResp));
+            map.put("resultados",resultados);
             mapResponse.put(indice, map);
             indice++;
         }

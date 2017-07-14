@@ -585,6 +585,20 @@ public class TrasladoMxController {
                     mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
                     mapSolicitud.put("tipo", "Rutina");
                     mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    //obtener los examenes solicitados para la solicitud
+                    List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                    int cont = 0;
+                    String ordenesEx = "";
+                    for (OrdenExamen ordenExamen : ordenes) {
+                        cont++;
+                        if (cont == ordenes.size()) {
+                            ordenesEx += ordenExamen.getCodExamen().getNombre();
+                        } else {
+                            ordenesEx += ordenExamen.getCodExamen().getNombre() + ", ";
+                        }
+
+                    }
+                    mapSolicitud.put("examenes", ordenesEx);
                     subIndice++;
                     mapSolicitudesList.put(subIndice, mapSolicitud);
                     mapSolicitud = new HashMap<String, String>();
@@ -597,6 +611,20 @@ public class TrasladoMxController {
                     mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
                     mapSolicitud.put("tipo", "Estudio");
                     mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    //obtener los examenes solicitados para la solicitud
+                    List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudEstudio.getIdSolicitudEstudio());
+                    int cont = 0;
+                    String ordenesEx = "";
+                    for (OrdenExamen ordenExamen : ordenes) {
+                        cont++;
+                        if (cont == ordenes.size()) {
+                            ordenesEx += ordenExamen.getCodExamen().getNombre();
+                        } else {
+                            ordenesEx += ordenExamen.getCodExamen().getNombre() + ", ";
+                        }
+                    }
+                    mapSolicitud.put("examenes", ordenesEx);
+
                     subIndice++;
                     mapSolicitudesList.put(subIndice, mapSolicitud);
                     mapSolicitud = new HashMap<String, String>();

@@ -68,7 +68,7 @@ public class ResultadoFinalService {
             }
         }
         // se filtra por nombre y apellido persona
-        /*if (filtro.getNombreApellido()!=null) {
+        if (filtro.getNombreApellido()!=null) {
             //crit.createAlias("noti.persona", "person");
             String[] partes = filtro.getNombreApellido().split(" ");
             String[] partesSnd = filtro.getNombreApellido().split(" ");
@@ -95,7 +95,7 @@ public class ResultadoFinalService {
 
                 crit.add(conditGroup);
             }
-        }*/
+        }
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){
             crit.createAlias("noti.codSilaisAtencion","silais");
@@ -324,7 +324,7 @@ public class ResultadoFinalService {
                     Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
         }
         // se filtra por nombre y apellido persona
-        /*if (filtro.getNombreApellido()!=null) {
+        if (filtro.getNombreApellido()!=null) {
             crit.createAlias("noti.persona", "person");
             String[] partes = filtro.getNombreApellido().split(" ");
             String[] partesSnd = filtro.getNombreApellido().split(" ");
@@ -345,7 +345,7 @@ public class ResultadoFinalService {
                         .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
                 crit.add(conditionGroup);
             }
-        }*/
+        }
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){
             crit.createAlias("noti.codSilaisAtencion","silais");

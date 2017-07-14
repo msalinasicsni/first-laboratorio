@@ -35,12 +35,12 @@ var RejectedResults = function () {
                 "autoWidth": true, //"T<'clear'>"+
                 "columns": [
                     null, null, null, null, null, null, null,
-                    {
+                    null/*{ //PARA MOSTRAR TABLA DETALLE RESULTADO
                         "className": 'details-control',
                         "orderable": false,
                         "data": null,
                         "defaultContent": ''
-                    }
+                    }*/
                 ],
                 "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
@@ -153,7 +153,7 @@ var RejectedResults = function () {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
                                 [dataToLoad[i].nombreSolicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaRechazo, dataToLoad[i].codigoUnicoMx,
-                                    dataToLoad[i].tipoMx, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);
+                                    dataToLoad[i].tipoMx, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].resultados]);
                         }
                     } else {
                         $.smallBox({

@@ -100,6 +100,7 @@ var SearchMx = function () {
                     mxFiltros['codUnidadSalud'] = '';
                     mxFiltros['codTipoMx'] = '';
                     mxFiltros['esLab'] = $('#txtEsLaboratorio').val();
+                    mxFiltros['codigoUnicoMx'] = '';
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
                     mxFiltros['solicitudAprobada'] = '';

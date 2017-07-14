@@ -122,12 +122,14 @@ var TrasladoMx = function () {
                 var json = JSON.parse(diagnosticos);
                 var len = Object.keys(json).length;
                 var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
-                    '<tr><td style="font-weight: bold">' + $('#text_request').val() + '</td><td style="font-weight: bold">' + $('#text_request_date').val() + '</td><td style="font-weight: bold">' + $('#text_request_type').val() + '</td></tr>';
+                    '<tr><td style="font-weight: bold">' + $('#text_request').val() + '</td><td style="font-weight: bold">' + $('#text_request_date').val() + '</td><td style="font-weight: bold">' + $('#text_request_type').val() + '</td><td style="font-weight: bold">' + $('#label_tests').val() + '</td></tr>';
                 for (var i = 1; i <= len; i++) {
                     childTable = childTable +
                         '<tr><td>' + json[i].nombre + '</td>' +
                         '<td>' + json[i].fechaSolicitud + '</td>' +
-                        '<td>' + json[i].tipo + '</td></tr>';
+                        '<td>' + json[i].tipo + '</td>' +
+                        '<td>' + json[i].examenes + '</td>' +
+                        '</tr>';
                 }
                 childTable = childTable + '</table>';
                 return childTable;

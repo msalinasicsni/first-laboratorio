@@ -198,6 +198,9 @@
                     <li class="receptionReport">
                         <a href="<spring:url value="/reports/reception/init" htmlEscape="true "/>" title="<spring:message code="menu.reception.report" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.reception.report" /></a>
                     </li>
+                    <li class="consolReceptionReport">
+                        <a href="<spring:url value="/reports/consolidated/init" htmlEscape="true "/>" title="<spring:message code="menu.consolidated.reception.report" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.consolidated.reception.report" /></a>
+                    </li>
                     <li class="generalReport">
                         <a href="<spring:url value="/reports/general/init" htmlEscape="true "/>" title="<spring:message code="lbl.general.report.results" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="lbl.general.report.results" /></a>
                     </li>

@@ -76,7 +76,13 @@
 								<!-- widget content -->
 								<div class="widget-body no-padding">
                                 <input value="${esNuevaNoti}" hidden="hidden" type="text" id="esNuevaNoti" name="esNuevaNoti"/>
-
+                                <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                <input id="msg_action_canceled" type="hidden" value="<spring:message code="msg.sampling.cancel"/>"/>
+                                <input id="msg_sin_SILAIS" type="hidden" value="<spring:message code="msg.sample.no.SILAIS"/>"/>
+                                <input id="msg_sin_US" type="hidden" value="<spring:message code="msg.sample.no.US"/>"/>
+                                <input id="msg_sin_SILAIS_US" type="hidden" value="<spring:message code="msg.sample.no.SILAIS.US"/>"/>
+                                <input id="yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                                <input id="no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                 <form id="datos-noti" class="smart-form"  autocomplete="off">
                                 <fieldset >
                                     <legend class="text-left txt-color-blue font-md"> <spring:message code="lbl.notification.data"/>
@@ -269,6 +275,65 @@
                                                 </label>
                                             </div>
                                         </section>
+                                        <section class="col col-3">
+                                            <label class="text-left txt-color-blue font-md hidden-xs">
+                                                <spring:message code="lbl.urgent" />
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"> <i class="fa fa-exclamation-triangle fa-fw"></i></span>
+                                                <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.urgent" />" name="urgente" id="urgente" class="select2">
+                                                    <option value=""></option>
+                                                    <c:forEach items="${catResp}" var="cresp">
+                                                        <c:choose>
+                                                            <c:when test="${cresp.codigo eq noti.urgente.codigo}">
+                                                                <option selected value="${cresp.codigo}">${cresp.valor}</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <option value="${cresp.codigo}">${cresp.valor}</option>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                        </section>
+                                        <c:if test="${noti.persona.sexo.codigo eq 'SEXO|F'}">
+                                        <div id="datoEmbarazo" class="col col-3">
+                                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm hidden-xs"></i>
+                                            <label class="text-left txt-color-blue font-md hidden-xs">
+                                                <spring:message code="lbl.pregnant" />
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon"> <i class="fa fa-child fa-fw"></i></span>
+                                                <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.pregnant" />" name="embarazada" id="embarazada" class="select2">
+                                                    <option value=""></option>
+                                                    <c:forEach items="${catResp}" var="cresp">
+                                                        <c:choose>
+                                                            <c:when test="${cresp.codigo eq noti.embarazada.codigo}">
+                                                                <option selected value="${cresp.codigo}">${cresp.valor}</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <option value="${cresp.codigo}">${cresp.valor}</option>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="sihayemb" hidden="hidden" class="col col-3">
+                                            <label class="text-left txt-color-blue font-md hidden-xs">
+                                                <spring:message code="lbl.pregnancy.time" />
+                                            </label>
+                                            <div>
+                                                <label class="input">
+                                                    <i class="icon-prepend fa fa-child"></i> <i class="icon-append fa fa-calendar"></i>
+                                                    <input class="form-control" type="text" name="semanasEmbarazo" id="semanasEmbarazo"
+                                                           value="${noti.semanasEmbarazo}"
+                                                           placeholder=" <spring:message code="lbl.pregnancy.time" />">
+                                                    <b class="tooltip tooltip-top-left"> <i class="fa fa-info"></i> <spring:message code="lbl.pregnancy.time" /></b>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        </c:if>
                                     </div>
                                     <!-- END ROW -->
                                 </fieldset>
@@ -490,6 +555,7 @@
                 language : "${pageContext.request.locale.language}"
             };
             EnterFormTomaMx.init(parametros);
+            $('#embarazada').change();
             handleInputMasks();
             handleDatePickers("${pageContext.request.locale.language}");
             SeleccionUnidad.init(parametros);

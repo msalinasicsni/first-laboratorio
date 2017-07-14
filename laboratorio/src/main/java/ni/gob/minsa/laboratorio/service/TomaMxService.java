@@ -108,6 +108,11 @@ public class TomaMxService {
                         Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
             }
         }
+        if(filtro.getCodigoUnicoMx()!=null){
+            crit.add(Restrictions.or(
+                            Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
+            );
+        }
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
             //crit.createAlias("notifi.persona", "person");
@@ -828,13 +833,13 @@ public class TomaMxService {
         return q.list();
     }
 
-    public String estaEmbarazada(String strIdNotificacion){
+    /*public String estaEmbarazada(String strIdNotificacion){
         String embarazo = "No";
         Session session = sessionFactory.getCurrentSession();
         //IRAG
-        /*String query = "select irag from DaIrag as irag, DaCondicionesPreviasIrag cIrag where irag.idNotificacion.idNotificacion = cIrag.idNotificacion.idNotificacion.idNotificacion" +
-                " and irag.idNotificacion.idNotificacion = :idNotificacion" +
-                " and cIrag.codCondicion.codigo = :codCondicion";*/
+        //String query = "select irag from DaIrag as irag, DaCondicionesPreviasIrag cIrag where irag.idNotificacion.idNotificacion = cIrag.idNotificacion.idNotificacion.idNotificacion" +
+        //        " and irag.idNotificacion.idNotificacion = :idNotificacion" +
+        //        " and cIrag.codCondicion.codigo = :codCondicion";
         String query = "from DaIrag where idNotificacion.idNotificacion = :idNotificacion and condiciones like :codCondicion";
         Query q = session.createQuery(query);
         q.setParameter("idNotificacion", strIdNotificacion);
@@ -855,7 +860,7 @@ public class TomaMxService {
             embarazo="Si";
 
         return embarazo;
-    }
+    }*/
 
     /**
      *

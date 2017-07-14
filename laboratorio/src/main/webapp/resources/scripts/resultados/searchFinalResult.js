@@ -38,12 +38,12 @@ var SearchFinalResult = function () {
                 "autoWidth": true, //"T<'clear'>"+
                 "columns": [
                     null, null, null, null, null, null, null,null,
-                    {
+                    /*{ //PARA MOSTRAR TABLA DETALLE RESULTADO
                         "className": 'details-control',
                         "orderable": false,
                         "data": null,
                         "defaultContent": ''
-                    },
+                    }*/null,
                     null
                 ],
                 "preDrawCallback": function () {
@@ -133,9 +133,13 @@ var SearchFinalResult = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var actionUrl = parametros.sActionUrl + dataToLoad[i].idSolicitud;
-                            table1.fnAddData(
+                            /*table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='" + dataToLoad[i].idSolicitud + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud," <input type='hidden' value='" + dataToLoad[i].resultados + "'/>", '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    */
+                            table1.fnAddData(
+                                [dataToLoad[i].codigoUnicoMx+" <input type='hidden' value='" + dataToLoad[i].idSolicitud + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud, dataToLoad[i].resultados, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     } else {
                         $.smallBox({

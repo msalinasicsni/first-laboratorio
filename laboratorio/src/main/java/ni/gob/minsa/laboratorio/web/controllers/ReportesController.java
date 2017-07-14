@@ -106,19 +106,19 @@ public class ReportesController {
 
 
     /**
-     * Método que se llama al entrar a la opción de menu de Reportes "Reporte Recepcion Mx".
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu de Reportes "Reporte Recepcion Mx".
      *
-     * @param request para obtener información de la petición del cliente
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
      * @return ModelAndView
      * @throws Exception
      */
     @RequestMapping(value = "/reception/init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
-        logger.debug("Iniciando Reporte de Recepción");
+        logger.debug("Iniciando Reporte de Recepciï¿½n");
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         } catch (Exception e) {
@@ -140,9 +140,9 @@ public class ReportesController {
 
 
     /**
-     * Método para realizar la búsqueda de Mx recepcionadas
+     * Mï¿½todo para realizar la bï¿½squeda de Mx recepcionadas
      *
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Rango Fec Recepcion, Tipo Mx, SILAIS, unidad salud, tipo solicitud, descripcion)
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Rango Fec Recepcion, Tipo Mx, SILAIS, unidad salud, tipo solicitud, descripcion)
      * @return String con las Mx encontradas
      * @throws Exception
      */
@@ -150,16 +150,16 @@ public class ReportesController {
     public
     @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
-        logger.info("Obteniendo las mx recepcionadas según filtros en JSON");
+        logger.info("Obteniendo las mx recepcionadas segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<RecepcionMx> receivedList = reportesService.getReceivedSamplesByFiltro(filtroMx);
         return receivedToJson(receivedList);
     }
 
     /**
-     * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
+     * Mï¿½todo para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar bï¿½squeda de Mx(Vigilancia) y Recepciï¿½n Mx(Laboratorio)
      *
-     * @param strJson String con la información de los filtros
+     * @param strJson String con la informaciï¿½n de los filtros
      * @return FiltroMx
      * @throws Exception
      */
@@ -224,7 +224,7 @@ public class ReportesController {
 
 
     /**
-     * Método que convierte una lista de mx a un string con estructura Json
+     * Mï¿½todo que convierte una lista de mx a un string con estructura Json
      *
      * @param receivedList lista con las mx recepcionadas a convertir
      * @return String
@@ -277,7 +277,7 @@ public class ReportesController {
                 map.put("persona", " ");
             }
 
-            //se arma estructura de diagnósticos o estudios
+            //se arma estructura de diagnï¿½sticos o estudios
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(receivedMx.getTomaMx().getIdTomaMx(), labUser.getCodigo());
             DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(receivedMx.getTomaMx().getCodigoUnicoMx());
@@ -308,7 +308,7 @@ public class ReportesController {
             indice++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
-        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        //escapar caracteres especiales, escape de los caracteres con valor numï¿½rico mayor a 127
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
     }
@@ -617,7 +617,7 @@ public class ReportesController {
             }
             table.draw();
 
-            //fecha impresión
+            //fecha impresiï¿½n
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null), 100, 605, stream, 10, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(fechaImpresion, 100, 710, stream, 10, PDType1Font.HELVETICA);
             stream.close();
@@ -677,9 +677,9 @@ public class ReportesController {
     }
 
     /**
-     * Método que se llama al entrar a la opción de menu de Reportes "Reporte Resultados Positivos".
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu de Reportes "Reporte Resultados Positivos".
      *
-     * @param request para obtener información de la petición del cliente
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
      * @return ModelAndView
      * @throws Exception
      */
@@ -689,7 +689,7 @@ public class ReportesController {
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         } catch (Exception e) {
@@ -711,9 +711,9 @@ public class ReportesController {
     }
 
     /**
-     * Método para realizar la búsqueda de Resultados positivos
+     * Mï¿½todo para realizar la bï¿½squeda de Resultados positivos
      *
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
@@ -721,7 +721,7 @@ public class ReportesController {
     public
     @ResponseBody
     String fetchRequestJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
-        logger.info("Obteniendo las solicitudes positivas según filtros en JSON");
+        logger.info("Obteniendo las solicitudes positivas segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaSolicitudDx> positiveRoutineReqList = null;
         List<DaSolicitudEstudio> positiveStudyReqList = null;
@@ -742,7 +742,7 @@ public class ReportesController {
     }
 
     /**
-     * Método que convierte una lista de solicitudes a un string con estructura Json
+     * Mï¿½todo que convierte una lista de solicitudes a un string con estructura Json
      *
      * @param positiveRoutineReqList lista con las mx recepcionadas a convertir
      * @return String
@@ -916,7 +916,7 @@ public class ReportesController {
             }
         }
         jsonResponse = new Gson().toJson(mapResponse);
-        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        //escapar caracteres especiales, escape de los caracteres con valor numï¿½rico mayor a 127
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
     }
@@ -1198,7 +1198,7 @@ public class ReportesController {
             }
             table.draw();
 
-            //fecha impresión
+            //fecha impresiï¿½n
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null), 100, 605, stream, 10, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(fechaImpresion, 100, 710, stream, 10, PDType1Font.HELVETICA);
 
@@ -1216,9 +1216,9 @@ public class ReportesController {
 
 
     /**
-     * Método que se llama al entrar a la opción de menu de Reportes "Reporte Resultados Positivos y Negativos".
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu de Reportes "Reporte Resultados Positivos y Negativos".
      *
-     * @param request para obtener información de la petición del cliente
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
      * @return ModelAndView
      * @throws Exception
      */
@@ -1228,7 +1228,7 @@ public class ReportesController {
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         } catch (Exception e) {
@@ -1251,9 +1251,9 @@ public class ReportesController {
 
 
     /**
-     * Método para realizar la búsqueda de Resultados positivos
+     * Mï¿½todo para realizar la bï¿½squeda de Resultados positivos
      *
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
@@ -1261,7 +1261,7 @@ public class ReportesController {
     public
     @ResponseBody
     String fetchPosNegRequestJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
-        logger.info("Obteniendo las solicitudes positivas y negativas según filtros en JSON");
+        logger.info("Obteniendo las solicitudes positivas y negativas segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaSolicitudDx> positiveRoutineReqList = null;
         List<DaSolicitudEstudio> positiveStudyReqList = null;
@@ -1282,7 +1282,7 @@ public class ReportesController {
     }
 
     /**
-     * Método que convierte una lista de solicitudes a un string con estructura Json
+     * Mï¿½todo que convierte una lista de solicitudes a un string con estructura Json
      *
      * @param posNegRoutineReqList lista con las mx recepcionadas a convertir
      * @return String
@@ -1438,7 +1438,7 @@ public class ReportesController {
             }
         }
         jsonResponse = new Gson().toJson(mapResponse);
-        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        //escapar caracteres especiales, escape de los caracteres con valor numï¿½rico mayor a 127
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
     }
@@ -1890,7 +1890,7 @@ public class ReportesController {
             }
             table.draw();
 
-            //fecha impresión
+            //fecha impresiï¿½n
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null), 100, 605, stream, 10, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(fechaImpresion, 100, 710, stream, 10, PDType1Font.HELVETICA);
 
@@ -1907,15 +1907,15 @@ public class ReportesController {
     }
 
     /**
-     * Método que se llama al entrar a la opción de menu de Reportes "Control de Calidad".
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu de Reportes "Control de Calidad".
      *
-     * @param request para obtener información de la petición del cliente
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
      * @return ModelAndView
      * @throws Exception
      */
     @RequestMapping(value = "/qualityControl/init", method = RequestMethod.GET)
     public ModelAndView initSearchQCForm(HttpServletRequest request) throws Exception {
-        logger.debug("Iniciando Reporte de Recepción");
+        logger.debug("Iniciando Reporte de Recepciï¿½n");
         ModelAndView mav = new ModelAndView();
         List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
         List<Laboratorio> laboratorios = laboratoriosService.getLaboratoriosRegionales();
@@ -1928,9 +1928,9 @@ public class ReportesController {
     }
 
     /**
-     * Método para realizar la búsqueda de Mx recepcionadas
+     * Mï¿½todo para realizar la bï¿½squeda de Mx recepcionadas
      *
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Rango Fec Recepcion, Tipo Mx, SILAIS, unidad salud, tipo solicitud, descripcion)
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Rango Fec Recepcion, Tipo Mx, SILAIS, unidad salud, tipo solicitud, descripcion)
      * @return String con las Mx encontradas
      * @throws Exception
      */
@@ -1938,7 +1938,7 @@ public class ReportesController {
     public
     @ResponseBody
     String fetchMxQCJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
-        logger.info("Obteniendo las mx recepcionadas según filtros en JSON");
+        logger.info("Obteniendo las mx recepcionadas segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         filtroMx.setControlCalidad(true);
         List<DaSolicitudDx> receivedList = reportesService.getQCRoutineRequestByFilter(filtroMx);
@@ -2693,9 +2693,9 @@ public class ReportesController {
     }
 
     /**
-     * Método que se llama al entrar a la opción de menu de Reportes "Reporte General de Resultados".
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu de Reportes "Reporte General de Resultados".
      *
-     * @param request para obtener información de la petición del cliente
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
      * @return ModelAndView
      * @throws Exception
      */
@@ -2705,7 +2705,7 @@ public class ReportesController {
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         } catch (Exception e) {
@@ -2728,9 +2728,9 @@ public class ReportesController {
     }
 
     /**
-     * Método para realizar la búsqueda de Resultados positivos
+     * Mï¿½todo para realizar la bï¿½squeda de Resultados positivos
      *
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Rango Fec Aprob, SILAIS, unidad salud, tipo solicitud, descripcion)
      * @return String con las solicitudes encontradas
      * @throws Exception
      */
@@ -2738,7 +2738,7 @@ public class ReportesController {
     public
     @ResponseBody
     String fetchReqJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
-        logger.info("Obteniendo las solicitudes según filtros en JSON");
+        logger.info("Obteniendo las solicitudes segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaSolicitudDx> reqList = null;
         List<DaSolicitudEstudio> studiesList = null;
@@ -2759,7 +2759,7 @@ public class ReportesController {
     }
 
     /**
-     * Método que convierte una lista de solicitudes a un string con estructura Json
+     * Mï¿½todo que convierte una lista de solicitudes a un string con estructura Json
      *
      * @param reqList     lista con las mx recepcionadas a convertir
      * @param studiesList lista con las mx estudio recepcionadas a convertir
@@ -2858,7 +2858,7 @@ public class ReportesController {
         }
 
         jsonResponse = new Gson().toJson(mapResponse);
-        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        //escapar caracteres especiales, escape de los caracteres con valor numï¿½rico mayor a 127
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
 
@@ -3165,7 +3165,7 @@ public class ReportesController {
             }
             table.draw();
 
-            //fecha impresión
+            //fecha impresiï¿½n
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null), 100, 605, stream, 10, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(fechaImpresion, 100, 710, stream, 10, PDType1Font.HELVETICA);
 
@@ -3231,6 +3231,89 @@ public class ReportesController {
 
         }
         return valorResultado;
+    }
+
+    /**
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu de Reportes "Consolidado de Recepcion Mx".
+     *
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
+     * @return ModelAndView
+     * @throws Exception
+     */
+    @RequestMapping(value = "/consolidated/init", method = RequestMethod.GET)
+    public ModelAndView initConsolidatedReceipt(HttpServletRequest request) throws Exception {
+        logger.debug("Iniciando Reporte Consolidad de recepciÃ³n de mx");
+        String urlValidacion;
+        try {
+            urlValidacion = seguridadService.validarLogin(request);
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
+            if (urlValidacion.isEmpty())
+                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            urlValidacion = "404";
+        }
+        ModelAndView mav = new ModelAndView();
+        if (urlValidacion.isEmpty()) {
+            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+            List<Area> areas = areaService.getAreas();
+            mav.addObject("areas", areas);
+            mav.addObject("entidades", entidadesAdtvases);
+            mav.addObject("tipoMuestra", tipoMxList);
+            mav.setViewName("reportes/consolidatedReception");
+        } else
+            mav.setViewName(urlValidacion);
+
+        return mav;
+    }
+
+    @RequestMapping(value = "getResumenRecepcionMxSILAIS", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getResumenMuestrasSILAIS(@RequestParam(value = "fechaInicio", required = false) String fechaInicio, @RequestParam(value = "fechaFin", required = false) String fechaFin) throws Exception {
+        String jsonResponse = "";
+        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        if (laboratorio!=null) {
+            List<Object[]> resumen = reportesService.getResumenRecepcionMuestrasSILAIS(laboratorio.getCodigo(), DateUtil.StringToDate(fechaInicio, "dd/MM/yyyy"), DateUtil.StringToDate(fechaFin+" 23:59:59", "dd/MM/yyyy HH:mm:ss"));
+            Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+            Integer indice = 0;
+            for (Object[] obj : resumen) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("total", obj[0] != null ? obj[0].toString() : "");
+                map.put("entidad", obj[2] != null ? obj[2].toString() : "SIN SILAIS");
+                mapResponse.put(indice, map);
+                indice++;
+            }
+            jsonResponse = new Gson().toJson(mapResponse);
+        }
+        //escapar caracteres especiales, escape de los caracteres con valor numÃ©rico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+    @RequestMapping(value = "getResumenRecepcionMxSolicitud", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getResumenMuestrasSolicitud(@RequestParam(value = "fechaInicio", required = false) String fechaInicio, @RequestParam(value = "fechaFin", required = false) String fechaFin) throws Exception {
+        String jsonResponse = "";
+        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        if (laboratorio!=null) {
+            List<Object[]> resumen = reportesService.getResumenRecepcionMuestrasSolicitud(laboratorio.getCodigo(), DateUtil.StringToDate(fechaInicio, "dd/MM/yyyy"), DateUtil.StringToDate(fechaFin+" 23:59:59", "dd/MM/yyyy HH:mm:ss"));
+            Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+            Integer indice = 0;
+            for (Object[] obj : resumen) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("total", obj[0] != null ? obj[0].toString() : "");
+                map.put("entidad", obj[2] != null ? obj[2].toString() : "SIN DX");
+                mapResponse.put(indice, map);
+                indice++;
+            }
+            jsonResponse = new Gson().toJson(mapResponse);
+        }
+        //escapar caracteres especiales, escape de los caracteres con valor numÃ©rico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
     }
 
 }

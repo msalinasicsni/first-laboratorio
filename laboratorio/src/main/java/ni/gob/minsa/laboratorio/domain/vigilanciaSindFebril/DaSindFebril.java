@@ -15,7 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
-@Table(name = "da_ficha_sindfeb", schema = "alerta")
+@Table(name = "da_ficha_sindfeb", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = {"ID_NOTIFICACION"}))
 public class DaSindFebril implements Serializable, Auditable {
 
     /**

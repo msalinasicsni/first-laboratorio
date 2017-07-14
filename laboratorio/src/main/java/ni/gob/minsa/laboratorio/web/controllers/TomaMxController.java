@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
+import ni.gob.minsa.laboratorio.domain.irag.Respuesta;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
@@ -173,6 +174,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
 
+            List<Respuesta> catResp =catalogoService.getRespuesta();
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -181,6 +183,7 @@ public class TomaMxController {
             mav.addObject("municipios",municipios);
             mav.addObject("unidades",unidades);
             mav.addObject("notificaciones",tiposNotificacion);
+            mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",true);
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
@@ -223,6 +226,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
 
+            List<Respuesta> catResp =catalogoService.getRespuesta();
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -231,6 +235,7 @@ public class TomaMxController {
             mav.addObject("municipios",municipios);
             mav.addObject("unidades",unidades);
             mav.addObject("notificaciones",tiposNotificacion);
+            mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",false);
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
@@ -382,6 +387,9 @@ public class TomaMxController {
         String horaTomaMx="";
         String fechaInicioSintomas="";
         String codigoGenerado = "";
+        String urgente = "";
+        String embarazada = "";
+        Integer semanasEmbarazo=null;
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -421,6 +429,13 @@ public class TomaMxController {
 
             horaRefrigeracion = jsonpObject.get("horaRefrigeracion").getAsString();
 
+            if (jsonpObject.get("urgente")!=null && !jsonpObject.get("urgente").getAsString().isEmpty())
+                urgente = jsonpObject.get("urgente").getAsString();
+            if (jsonpObject.get("embarazada")!=null && !jsonpObject.get("embarazada").getAsString().isEmpty())
+                embarazada = jsonpObject.get("embarazada").getAsString();
+            if (jsonpObject.get("semanasEmbarazo")!=null && !jsonpObject.get("semanasEmbarazo").getAsString().isEmpty())
+                semanasEmbarazo = jsonpObject.get("semanasEmbarazo").getAsInt();
+
             Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
             Usuarios usuarioRegistro = new Usuarios();
             if(pUsuarioRegistro!=null) {
@@ -449,15 +464,26 @@ public class TomaMxController {
             DaNotificacion notificacion = daNotificacionService.getNotifById(idNotificacion);
             if (codSilais!=null){
                 notificacion.setCodSilaisAtencion(entidadAdmonService.getSilaisByCodigo(codSilais));
+                tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
             }
             if (codUnidadSalud!=null){
                 notificacion.setCodUnidadAtencion(unidadesService.getUnidadByCodigo(codUnidadSalud));
+                tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
             }
             if (!codTipoNoti.isEmpty()){
                 notificacion.setCodTipoNotificacion(catalogoService.getTipoNotificacion(codTipoNoti));
             }
             if (!fechaInicioSintomas.isEmpty()){
                 notificacion.setFechaInicioSintomas(DateUtil.StringToDate(fechaInicioSintomas,"dd/MM/yyyyy"));
+            }
+            if (!urgente.isEmpty()) {
+                notificacion.setUrgente(catalogoService.getRespuesta(urgente));
+            }
+            if (!embarazada.isEmpty()) {
+                notificacion.setEmbarazada(catalogoService.getRespuesta(embarazada));
+            }
+            if (semanasEmbarazo!=null) {
+                notificacion.setSemanasEmbarazo(semanasEmbarazo);
             }
             tomaMx.setIdNotificacion(notificacion);
             if(fechaHTomaMx != null){
@@ -505,7 +531,6 @@ public class TomaMxController {
             }
             //se procede a registrar los diagnósticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
             if (saveDxRequest(tomaMx.getIdTomaMx(), dx, strRespuestas, cantRespuestas)) {
-
                 //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepción de la misma
                 RecepcionMx recepcionMx = new RecepcionMx();
                 recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
@@ -536,7 +561,7 @@ public class TomaMxController {
             resultado =  messageSource.getMessage("msg.add.receipt.error",null,null);
             resultado=resultado+". \n "+ex.getMessage();
 
-        }finally {
+        } finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idNotificacion",idNotificacion);
             map.put("canTubos",String.valueOf(canTubos));
@@ -562,18 +587,41 @@ public class TomaMxController {
     private void crearFicha(DaNotificacion notificacion){
         switch (notificacion.getCodTipoNotificacion().getCodigo()){
             case "TPNOTI|SINFEB": {
-                DaSindFebril sindFebril = new DaSindFebril();
+                DaSindFebril sindFebril = sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion());
+                if (sindFebril==null) {
+                    sindFebril = new DaSindFebril();
+                    sindFebril.setFechaFicha(new Date());
+                }
                 sindFebril.setIdNotificacion(notificacion);
-                sindFebril.setFechaFicha(new Date());
-                sindFebril.setMesesEmbarazo(0);
+                if (notificacion.getSemanasEmbarazo()!=null) {
+                    sindFebril.setMesesEmbarazo(notificacion.getSemanasEmbarazo());
+                }else {
+                    sindFebril.setMesesEmbarazo(0);
+                }
+                if (notificacion.getEmbarazada()!=null){
+                    sindFebril.setEmbarazo(notificacion.getEmbarazada());
+                }
                 sindFebrilService.saveSindFebril(sindFebril);
                 break;
             }
             case "TPNOTI|IRAG": {
-                DaIrag irag = new DaIrag();
+                DaIrag irag = daIragService.getFormById(notificacion.getIdNotificacion());
+                if (irag==null) {
+                    irag = new DaIrag();
+                    irag.setFechaRegistro(new Timestamp(new Date().getTime()));
+                    irag.setUsuario(notificacion.getUsuarioRegistro());
+                }
                 irag.setIdNotificacion(notificacion);
-                irag.setFechaRegistro(new Timestamp(new Date().getTime()));
-                irag.setUsuario(notificacion.getUsuarioRegistro());
+                if (notificacion.getEmbarazada()!=null){
+                    if (irag.getCondiciones()!=null) {
+                        if (!irag.getCondiciones().contains("CONDPRE|EMB"))
+                            irag.setCondiciones(irag.getCondiciones() + ",CONDPRE|EMB");
+                    }
+                    else irag.setCondiciones("CONDPRE|EMB");
+                }
+                if (notificacion.getSemanasEmbarazo()!=null) {
+                    irag.setSemanasEmbarazo(notificacion.getSemanasEmbarazo());
+                }
                 daIragService.saveOrUpdateIrag(irag);
                 break;
             }

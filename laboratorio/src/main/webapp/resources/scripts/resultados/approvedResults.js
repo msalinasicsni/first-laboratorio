@@ -35,12 +35,12 @@ var ApprovedResults = function () {
                 "autoWidth": true, //"T<'clear'>"+
                 "columns": [
                     null, null, null, null, null, null, null,
-                    {
+                    null/*{ //PARA MOSTRAR TABLA DETALLE RESULTADO
                         "className": 'details-control',
                         "orderable": false,
                         "data": null,
                         "defaultContent": ''
-                    }
+                    }*/
                 ],
                 "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
@@ -153,10 +153,13 @@ var ApprovedResults = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            console.log(dataToLoad[i].resultados);
+                            //console.log(dataToLoad[i].resultados);
+                            /*table1.fnAddData(
+                                [dataToLoad[i].solicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaAprobacion, dataToLoad[i].codigoUnicoMx,
+                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);*/
                             table1.fnAddData(
                                 [dataToLoad[i].solicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaAprobacion, dataToLoad[i].codigoUnicoMx,
-                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);
+                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].resultados]);
                         }
                     } else {
                         $.smallBox({

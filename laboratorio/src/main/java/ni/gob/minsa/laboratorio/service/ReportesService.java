@@ -8,6 +8,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.*;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -411,6 +413,59 @@ public class ReportesService {
         }*/
 
         return crit.list();
+    }
+
+    public List<Object[]> getResumenRecepcionMuestrasSILAIS(String laboratorio, Date fechaInicio, Date fechaFin){
+        Session session = sessionFactory.getCurrentSession();
+        String sQuery = "select coalesce(count(r.idRecepcion),0) as total, sa.entidadAdtvaId, sa.nombre " +
+                "from RecepcionMx as r inner join r.tomaMx as mx left join mx.codSilaisAtencion as sa " +
+                "where r.labRecepcion.codigo = :laboratorio " +
+                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                "group by sa.entidadAdtvaId, sa.nombre";
+
+        Query q = session.createQuery(sQuery);
+
+        q.setParameter("laboratorio",laboratorio);
+        q.setParameter("fechaInicio", fechaInicio);
+        q.setParameter("fechaFin", fechaFin);
+
+        List<Object[]> resumenMxSilais= (List<Object[]>)q.list();
+        return resumenMxSilais;
+    }
+
+    public List<Object[]> getResumenRecepcionMuestrasSolicitud(String laboratorio, Date fechaInicio, Date fechaFin){
+        Session session = sessionFactory.getCurrentSession();
+        String sQuery = "select count(r.idRecepcion) as total, dx.idDiagnostico, dx.nombre " +
+                "from RecepcionMx as r, DaSolicitudDx as sdx inner join sdx.idTomaMx as mx " +
+                "inner join sdx.codDx as dx " +
+                "where r.tomaMx.idTomaMx = mx.idTomaMx and sdx.anulado = false and sdx.labProcesa.codigo = :laboratorio " +
+                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                "group by dx.idDiagnostico, dx.nombre";
+
+        String sQuery2 = "select count(r.idRecepcion) as total, es.idEstudio, es.nombre " +
+                "from RecepcionMx as r, DaSolicitudEstudio as sde inner join sde.idTomaMx as mx " +
+                "inner join sde.tipoEstudio as es " +
+                "where r.tomaMx.idTomaMx = mx.idTomaMx and sde.anulado = false and mx.envio.laboratorioDestino.codigo = :laboratorio " +
+                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                "group by es.idEstudio, es.nombre";
+
+
+        Query q = session.createQuery(sQuery);
+
+        q.setParameter("laboratorio",laboratorio);
+        q.setParameter("fechaInicio", fechaInicio);
+        q.setParameter("fechaFin", fechaFin);
+
+        List<Object[]> resumenMxSolicitud= (List<Object[]>)q.list();
+
+        q = session.createQuery(sQuery2);
+        q.setParameter("laboratorio",laboratorio);
+        q.setParameter("fechaInicio", fechaInicio);
+        q.setParameter("fechaFin", fechaFin);
+
+        resumenMxSolicitud.addAll(q.list());
+
+        return resumenMxSolicitud;
     }
 
 }

@@ -69,17 +69,15 @@ var finalResult = function () {
                                 + data[i].nombre
                                 + '</option>';
                         }
-                        //$('#codUnidadSalud').html(html);
+                        $('#codUnidadSalud').html(html).val('').change();
                     }).fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);
                         validateLogin(jqXHR);
                     });
                 }
-                /*else{
-
-                 $('#codUnidadSalud').html(html);
-                 }*/
-                $('#codUnidadSalud').html(html).val('').change();
+                else{
+                    $('#codUnidadSalud').html(html).val('').change();
+                 }
                 unBlockUI();
             });
 

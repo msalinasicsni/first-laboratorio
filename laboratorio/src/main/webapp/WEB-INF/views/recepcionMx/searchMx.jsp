@@ -224,6 +224,14 @@
                                                         </select>
                                                     </div>
                                                 </section>
+                                            <section class="col col-sm-12 col-md-6 col-lg-3">
+                                                <label class="text-left txt-color-blue font-md">
+                                                    <spring:message code="lbl.unique.code.mx" /> </label>
+                                                <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
+                                                    <input type="text" id="txtCodUnicoMx" name="txtCodUnicoMx" placeholder="<spring:message code="lbl.unique.code.mx"/>">
+                                                    <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.unique.code.mx"/></b>
+                                                </label>
+                                            </section>
                                             </div>
                                         </fieldset>
                                         <footer>
@@ -355,8 +363,6 @@
     <c:url var="searchUrl" value="/searchMx/searchMx"/>
     <c:url var="printUrl" value="/searchMx/printResults"/>
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
-
-
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();

@@ -5,6 +5,7 @@ import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
+import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -433,11 +435,13 @@ public class RecepcionMxService {
      */
     public String obtenerCodigoLab(String codigoLaboratorio){
         String codigoLab=null;
+        String anioActual = DateUtil.DateToString(new Date(), "yyyy");
         String query = "select concat(to_char((count(a.idRecepcion)+1)),concat('-',to_char(current_date,'YY'))) " +
-                "from RecepcionMx as a where a.labRecepcion.codigo = :codLab and a.tipoRecepcionMx.codigo = 'TPRECPMX|VRT'";
+                "from RecepcionMx as a where a.labRecepcion.codigo = :codLab and a.tipoRecepcionMx.codigo = 'TPRECPMX|VRT' and to_char(a.fechaHoraRecepcion,'YYYY') =:anio";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("codLab", codigoLaboratorio);
+        q.setParameter("anio", anioActual);
         Object oNumero  = q.uniqueResult();
         if (oNumero!=null){
             codigoLab = oNumero.toString();

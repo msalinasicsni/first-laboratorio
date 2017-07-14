@@ -80,6 +80,16 @@ var EnterFormTomaMx = function () {
                 });
             });
 
+            $('#embarazada').change(function () {
+                if ($('#embarazada').val() != "") {
+                    if ($('#embarazada').val() == "RESP|S") {
+                        $('#sihayemb').fadeIn('slow');
+                    } else {
+                        $('#sihayemb').fadeOut('slow');
+                        $('#semanasEmbarazo').val(0);
+                    }
+                }
+            });
 
             var $validator = $("#registroMx").validate({
                 rules: {
@@ -102,6 +112,12 @@ var EnterFormTomaMx = function () {
                 rules: {
                     fechaInicioSintomas:{
                         required: true
+                    },
+                    embarazada:{
+                        required: true
+                    },
+                    semanasEmbarazo:{
+                        required: true
                     }
                 },
                 errorPlacement: function (error, element) {
@@ -120,7 +136,41 @@ var EnterFormTomaMx = function () {
                         $validator.focusInvalid();
                         return false;
                     } else {
-                        save();
+                        var mensaje = '';
+                        if ($('#codSilaisAtencion').find('option:selected').val().length<=0 && $('#codUnidadAtencion').find('option:selected').val().length<=0){
+                            mensaje = $("#msg_sin_SILAIS_US").val();
+                        }else if ($('#codSilaisAtencion').find('option:selected').val()===undefined || $('#codSilaisAtencion').find('option:selected').val().length<=0){
+                            mensaje = $("#msg_sin_SILAIS").val();
+                        }else if ($('#codSilaisAtencion').find('option:selected').val().length>0 &&
+                            ($('#codUnidadAtencion').find('option:selected').val()===undefined || $('#codUnidadAtencion').find('option:selected').val().length<=0)){
+                            mensaje = $("#msg_sin_US").val();
+                        }
+                        if (mensaje.length<=0)
+                        {
+                            save();
+                        }else{
+                            var opcSi = $("#yes").val();
+                            var opcNo = $("#no").val();
+                            $.SmartMessageBox({
+                                title: $("#msg_confirm_title").val(),
+                                content: mensaje,
+                                buttons: '[' + opcSi + '][' + opcNo + ']'
+                            }, function (ButtonPressed) {
+                                if (ButtonPressed === opcSi) {
+                                    save();
+                                }
+                                if (ButtonPressed === opcNo) {
+                                    $.smallBox({
+                                        title: $("#msg_action_canceled").val(),
+                                        content: "<i class='fa fa-clock-o'></i> <i>" + $("#disappear").val() + "</i>",
+                                        color: "#C46A69",
+                                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                        timeout: 4000
+                                    });
+                                }
+
+                            });
+                        }
                     }
                 }
             });
@@ -137,6 +187,22 @@ var EnterFormTomaMx = function () {
                 }else{
                     objetoTomaMx['fechaInicioSintomas'] = '';
                 }
+                if (document.getElementById('urgente')){
+                    objetoTomaMx['urgente'] = $('#urgente').find('option:selected').val();
+                }else{
+                    objetoTomaMx['urgente'] = '';
+                }
+                if (document.getElementById('embarazada')){
+                    objetoTomaMx['embarazada'] = $('#embarazada').find('option:selected').val();
+                }else{
+                    objetoTomaMx['embarazada'] = '';
+                }
+                if (document.getElementById('semanasEmbarazo')){
+                    objetoTomaMx['semanasEmbarazo'] = $('#semanasEmbarazo').val();
+                }else{
+                    objetoTomaMx['semanasEmbarazo'] = '';
+                }
+
                 objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();
                 objetoTomaMx['horaTomaMx'] = $("#horaTomaMx").val();
                 objetoTomaMx['canTubos'] = $("#canTubos").val();

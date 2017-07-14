@@ -328,8 +328,13 @@ var ReceiptOrders = function () {
                     mxFiltros['controlCalidad'] = '';
                 } else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    if ($('#txtEsLaboratorio').val() == 'true') {
+                        mxFiltros['fechaInicioRecep'] = $('#fecInicioTomaMx').val();
+                        mxFiltros['fechaFinRecepcion'] = $('#fecFinTomaMx').val();
+                    }else {
+                        mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
+                        mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    }
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
@@ -354,7 +359,8 @@ var ReceiptOrders = function () {
                                 idLoad = dataToLoad[i].idRecepcion;
                                 actionUrl = actionUrl + idLoad;
                                 table1.fnAddData(
-                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                //[dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                             } else {
                                 idLoad = dataToLoad[i].idTomaMx;
                                 actionUrl = actionUrl + idLoad;

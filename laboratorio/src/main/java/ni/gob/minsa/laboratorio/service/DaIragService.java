@@ -32,7 +32,7 @@ public class DaIragService {
 
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createQuery("FROM DaIrag vi where vi.idNotificacion = '" + id + "'");
+        Query query = session.createQuery("FROM DaIrag vi where vi.idNotificacion.idNotificacion = '" + id + "'");
         return (DaIrag) query.uniqueResult();
 
     }
