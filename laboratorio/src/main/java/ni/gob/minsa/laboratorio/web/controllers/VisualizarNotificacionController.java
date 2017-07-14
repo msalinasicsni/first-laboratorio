@@ -155,11 +155,11 @@ public class VisualizarNotificacionController {
 
     private String RecepcionMxToJson(List<RecepcionMx> recepcionMxList) {
         String jsonResponse;
-        Map<Integer, Object> mapResponse = new HashMap<>();
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
         for (RecepcionMx recepcion : recepcionMxList) {
             boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx()).size() > 0;
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<String, String>();
             map.put("idNotificacion", recepcion.getTomaMx().getIdNotificacion().getIdNotificacion());
             map.put("codigoUnicoMx", esEstudio ? recepcion.getTomaMx().getCodigoUnicoMx() : recepcion.getTomaMx().getCodigoLab());
             map.put("idRecepcion", recepcion.getIdRecepcion());
@@ -214,8 +214,8 @@ public class VisualizarNotificacionController {
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
 
 
-            Map<Integer, Object> mapDxList = new HashMap<>();
-            Map<String, String> mapDx = new HashMap<>();
+            Map<Integer, Object> mapDxList = new HashMap<Integer, Object>();
+            Map<String, String> mapDx = new HashMap<String, String>();
             int subIndice = 0;
 
             if (!solicitudDxList.isEmpty()) {
@@ -225,7 +225,7 @@ public class VisualizarNotificacionController {
                     mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     subIndice++;
                     mapDxList.put(subIndice, mapDx);
-                    mapDx = new HashMap<>();
+                    mapDx = new HashMap<String, String>();
                 }
             } else {
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEList) {
@@ -234,7 +234,7 @@ public class VisualizarNotificacionController {
                     mapDx.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     subIndice++;
                     mapDxList.put(subIndice, mapDx);
-                    mapDx = new HashMap<>();
+                    mapDx = new HashMap<String, String>();
                 }
             }
 
@@ -1406,8 +1406,8 @@ public class VisualizarNotificacionController {
                         if (!diagnosticosList.isEmpty()) {
                             int con = 0;
                             for (DaSolicitudDx soli : diagnosticosList) {
-                                List<String[]> reqList = new ArrayList<>();
-                                List<String[]> dxList = new ArrayList<>();
+                                List<String[]> reqList = new ArrayList<String[]>();
+                                List<String[]> dxList = new ArrayList<String[]>();
                                 con++;
                                 if (con >= 2) {
                                     y = y1;
@@ -1534,8 +1534,8 @@ public class VisualizarNotificacionController {
                         if(!estudiosList.isEmpty()){
                             int cn = 0;
                             for (DaSolicitudEstudio est : estudiosList) {
-                                List<String[]> reqList1 = new ArrayList<>();
-                                List<String[]> dxList1 = new ArrayList<>();
+                                List<String[]> reqList1 = new ArrayList<String[]>();
+                                List<String[]> dxList1 = new ArrayList<String[]>();
                                 cn++;
 
                                 if (cn >= 2) {
@@ -2759,8 +2759,8 @@ public class VisualizarNotificacionController {
                     if (!diagnosticosList.isEmpty()) {
                         int con = 0;
                         for (DaSolicitudDx soli : diagnosticosList) {
-                            List<String[]> reqList = new ArrayList<>();
-                            List<String[]> dxList = new ArrayList<>();
+                            List<String[]> reqList = new ArrayList<String[]>();
+                            List<String[]> dxList = new ArrayList<String[]>();
                             con++;
                             if (con >= 2) {
                                 y = y1;
