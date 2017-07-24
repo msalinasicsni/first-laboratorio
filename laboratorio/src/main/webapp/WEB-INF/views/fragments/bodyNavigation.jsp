@@ -85,6 +85,9 @@
                     <li class="reprintLabCode">
                         <a href="<spring:url value="/reprint/init" htmlEscape="true "/>" title="<spring:message code="lbl.reprint.codelab" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="lbl.reprint.codelab" /></a>
                     </li>
+                    <li class="printresults">
+                        <a href="<spring:url value="/recepcionMx/printResults" htmlEscape="true "/>" title="<spring:message code="menu.print.result" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="menu.print.result" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="laboratorio">

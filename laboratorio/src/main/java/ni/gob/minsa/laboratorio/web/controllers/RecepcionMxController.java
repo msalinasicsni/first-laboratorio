@@ -2,15 +2,18 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
+import ni.gob.minsa.laboratorio.domain.examen.Direccion;
 import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
@@ -19,7 +22,14 @@ import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
+import org.apache.pdfbox.exceptions.COSVisitorException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +44,12 @@ import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by Miguel Salinas on 12/10/2014.
@@ -107,6 +117,15 @@ public class RecepcionMxController {
 
     @Resource(name = "datosSolicitudService")
     private DatosSolicitudService datosSolicitudService;
+
+    @Resource(name = "daNotificacionService")
+    private DaNotificacionService notificacionService;
+
+    @Resource(name = "resultadosService")
+    private ResultadosService resultadosService;
+
+    @Resource(name = "organizationChartService")
+    private OrganizationChartService organizationChartService;
 
     @Autowired
     MessageSource messageSource;
@@ -328,30 +347,35 @@ public class RecepcionMxController {
                             }
                         }
                         if (procesar) {
-                            //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
-                            Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
-                            if (pTipoNoti != null) {
-                                //se obtienen los id de los examenes por defecto
-                                Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
-                                if (pExamenesDefecto != null)
-                                    examenesList = examenesService.getExamenesDxByIdsExamenes(pExamenesDefecto.getValor());
-                                if (examenesList != null) {
-                                    //se registran los examenes por defecto
-                                    for (Examen_Dx examenTmp : examenesList) {
-                                        //si el área actual que debe procesa la mx es la misma area del exámen entonces se registra la orden
-                                        if (areaDestino!=null && areaDestino.getIdArea().equals(examenTmp.getExamen().getArea().getIdArea())) {
-                                            OrdenExamen ordenExamen = new OrdenExamen();
-                                            DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(recepcionMx.getTomaMx().getIdTomaMx(), examenTmp.getDiagnostico().getIdDiagnostico());
-                                            ordenExamen.setSolicitudDx(solicitudDx);
-                                            ordenExamen.setCodExamen(examenTmp.getExamen());
-                                            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                            ordenExamen.setUsuarioRegistro(usuario);
-                                            ordenExamen.setLabProcesa(labUsuario);
-                                            try {
-                                                ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                            } catch (Exception ex) {
-                                                ex.printStackTrace();
-                                                logger.error("Error al agregar orden de examen", ex);
+                            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), areaDestino.getIdArea(),seguridadService.obtenerNombreUsuario());
+                            if (solicitudDxList!=null && solicitudDxList.size()> 0) {
+                                //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
+                                Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                                if (pTipoNoti != null) {
+                                    //se obtienen los id de los examenes por defecto
+                                    Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
+                                    for(DaSolicitudDx solicitudDx : solicitudDxList) {
+                                        if (pExamenesDefecto != null) {
+                                            examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor());
+                                        }
+                                        if (examenesList != null) {
+                                            //se registran los examenes por defecto
+                                            for (Examen_Dx examenTmp : examenesList) {
+                                                //si el área actual que debe procesa la mx es la misma area del exámen entonces se registra la orden
+                                                if (areaDestino != null && areaDestino.getIdArea().equals(examenTmp.getExamen().getArea().getIdArea())) {
+                                                    OrdenExamen ordenExamen = new OrdenExamen();
+                                                    ordenExamen.setSolicitudDx(solicitudDx);
+                                                    ordenExamen.setCodExamen(examenTmp.getExamen());
+                                                    ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                    ordenExamen.setUsuarioRegistro(usuario);
+                                                    ordenExamen.setLabProcesa(labUsuario);
+                                                    try {
+                                                        ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                    } catch (Exception ex) {
+                                                        ex.printStackTrace();
+                                                        logger.error("Error al agregar orden de examen", ex);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -1551,107 +1575,114 @@ public class RecepcionMxController {
         Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         boolean esEstudio;
         for(DaTomaMx tomaMx : tomaMxList){
-            esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
-            String traslado = messageSource.getMessage("lbl.no",null,null);
-            Laboratorio labOrigen = null;
-            Map<String, String> map = new HashMap<String, String>();
-            //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
-            map.put("idTomaMx", tomaMx.getIdTomaMx());
-            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
-            //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy")+
-                    (tomaMx.getHoraTomaMx()!=null?" "+tomaMx.getHoraTomaMx():""));
-            if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
-                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
-            }else{
-                map.put("codSilais","");
-            }
-            if (tomaMx.getIdNotificacion().getCodUnidadAtencion()!=null) {
-                map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
-            }else {
-                map.put("codUnidadSalud","");
-            }
-            //notificacion urgente
-            if(tomaMx.getIdNotificacion().getUrgente()!= null){
-                map.put("urgente", tomaMx.getIdNotificacion().getUrgente().getValor());
-            }else{
-                map.put("urgente", "--");
-            }
-
-
-            //hospitalizado
-            String[] arrayHosp =  {"13", "17", "11", "16", "10", "12"};
-            boolean hosp = false;
-
-            if(tomaMx.getCodUnidadAtencion() != null){
-                int h =  Arrays.binarySearch(arrayHosp, String.valueOf(tomaMx.getCodUnidadAtencion().getTipoUnidad()));
-                hosp = h > 0;
-
-            }
-
-            if(hosp){
-                map.put("hospitalizado", messageSource.getMessage("lbl.yes",null,null));
-            }else{
-                map.put("hospitalizado", messageSource.getMessage("lbl.no",null,null));
-            }
-
-            //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
-            map.put("separadaMx",(tomaMx.getMxSeparada()!=null?(tomaMx.getMxSeparada()?"Si":"No"):""));
-            map.put("cantidadTubos", (tomaMx.getCanTubos()!=null?String.valueOf(tomaMx.getCanTubos()):""));
-            map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
-            //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
-            //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
-            if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
-            else
-                map.put("fechaInicioSintomas"," ");
-            //Si hay persona
-            if (tomaMx.getIdNotificacion().getPersona()!=null){
-                /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
-                nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-                //Se calcula la edad
-                int edad = DateUtil.calcularEdadAnios(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento());
-                map.put("edad",String.valueOf(edad));
-                //se obtiene el sexo
-                map.put("sexo",tomaMx.getIdNotificacion().getPersona().getSexo().getValor());
-                if(edad > 12 && tomaMx.getIdNotificacion().getPersona().isSexoFemenino()){
-                    //map.put("embarazada", tomaMxService.estaEmbarazada(tomaMx.getIdNotificacion().getIdNotificacion()));
-                    map.put("embarazada",(tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S")?
-                            messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
-                }else
-                    map.put("embarazada","--");
-            } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
-                map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
-                map.put("embarazada","--");
-            }else{
-                map.put("persona"," ");
-                map.put("embarazada","--");
-            }
-
+            boolean agregar = true;
+            //traslado activo por traslado externo o control de calidad
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(tomaMx.getIdTomaMx(),true);
-            if (trasladoMxActivo!=null) {
-                if (trasladoMxActivo.isControlCalidad()) {
-                    traslado = messageSource.getMessage("lbl.yes",null,null);
-                    labOrigen = trasladoMxActivo.getLaboratorioOrigen();
-                }else if (trasladoMxActivo.isTrasladoExterno()){
-                    labOrigen = trasladoMxActivo.getLaboratorioOrigen();
-                }
+            if (trasladoMxActivo==null && tomaMx.getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|TRAS")){
+                agregar = false; //es traslado interno, no mostrar en los resultado de la búsqueda
             }
-            map.put("traslado",traslado);
-            map.put("origen",labOrigen!=null?labOrigen.getNombre():"");
-            //sólo si no es traslado o si es traslado, pero el laboratorio del usuario es distinto del lab de origen del traslado se muestra en los resultados
-            //se hace asi porque la consulta de búsqueda esta tomando tanto los envios actuales como los que estan en históricos(se necesita asi en la búsqueda mx)
-            if (labOrigen==null || (!labOrigen.getCodigo().equals(labUser.getCodigo()))) {
-                mapResponse.put(indice, map);
-                indice++;
+            if (agregar) {
+                esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
+                String traslado = messageSource.getMessage("lbl.no", null, null);
+                Laboratorio labOrigen = null;
+                Map<String, String> map = new HashMap<String, String>();
+                //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
+                map.put("idTomaMx", tomaMx.getIdTomaMx());
+                map.put("codigoUnicoMx", esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab());
+                //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy") +
+                        (tomaMx.getHoraTomaMx() != null ? " " + tomaMx.getHoraTomaMx() : ""));
+                if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
+                    map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+                } else {
+                    map.put("codSilais", "");
+                }
+                if (tomaMx.getIdNotificacion().getCodUnidadAtencion() != null) {
+                    map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+                } else {
+                    map.put("codUnidadSalud", "");
+                }
+                //notificacion urgente
+                if (tomaMx.getIdNotificacion().getUrgente() != null) {
+                    map.put("urgente", tomaMx.getIdNotificacion().getUrgente().getValor());
+                } else {
+                    map.put("urgente", "--");
+                }
+
+                //hospitalizado
+                String[] arrayHosp = {"13", "17", "11", "16", "10", "12"};
+                boolean hosp = false;
+
+                if (tomaMx.getCodUnidadAtencion() != null) {
+                    int h = Arrays.binarySearch(arrayHosp, String.valueOf(tomaMx.getCodUnidadAtencion().getTipoUnidad()));
+                    hosp = h > 0;
+
+                }
+
+                if (hosp) {
+                    map.put("hospitalizado", messageSource.getMessage("lbl.yes", null, null));
+                } else {
+                    map.put("hospitalizado", messageSource.getMessage("lbl.no", null, null));
+                }
+
+                //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
+                map.put("separadaMx", (tomaMx.getMxSeparada() != null ? (tomaMx.getMxSeparada() ? "Si" : "No") : ""));
+                map.put("cantidadTubos", (tomaMx.getCanTubos() != null ? String.valueOf(tomaMx.getCanTubos()) : ""));
+                map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
+                //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
+                //Si hay fecha de inicio de sintomas se muestra
+                Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
+                if (fechaInicioSintomas != null)
+                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                else
+                    map.put("fechaInicioSintomas", " ");
+                //Si hay persona
+                if (tomaMx.getIdNotificacion().getPersona() != null) {
+                    /// se obtiene el nombre de la persona asociada a la ficha
+                    String nombreCompleto = "";
+                    nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                    if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                    if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                    map.put("persona", nombreCompleto);
+                    //Se calcula la edad
+                    int edad = DateUtil.calcularEdadAnios(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento());
+                    map.put("edad", String.valueOf(edad));
+                    //se obtiene el sexo
+                    map.put("sexo", tomaMx.getIdNotificacion().getPersona().getSexo().getValor());
+                    if (edad > 12 && tomaMx.getIdNotificacion().getPersona().isSexoFemenino()) {
+                        //map.put("embarazada", tomaMxService.estaEmbarazada(tomaMx.getIdNotificacion().getIdNotificacion()));
+                        if (tomaMx.getIdNotificacion().getEmbarazada()!=null)
+                        map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                    } else
+                        map.put("embarazada", "--");
+                } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
+                    map.put("embarazada", "--");
+                } else {
+                    map.put("persona", " ");
+                    map.put("embarazada", "--");
+                }
+
+                if (trasladoMxActivo != null) {
+                    if (trasladoMxActivo.isControlCalidad()) {
+                        traslado = messageSource.getMessage("lbl.yes", null, null);
+                        labOrigen = trasladoMxActivo.getLaboratorioOrigen();
+                    } else if (trasladoMxActivo.isTrasladoExterno()) {
+                        labOrigen = trasladoMxActivo.getLaboratorioOrigen();
+                    }
+                }
+                map.put("traslado", traslado);
+                map.put("origen", labOrigen != null ? labOrigen.getNombre() : "");
+                //sólo si no es traslado o si es traslado, pero el laboratorio del usuario es distinto del lab de origen del traslado se muestra en los resultados
+                //se hace asi porque la consulta de búsqueda esta tomando tanto los envios actuales como los que estan en históricos(se necesita asi en la búsqueda mx)
+                if (labOrigen == null || (!labOrigen.getCodigo().equals(labUser.getCodigo()))) {
+                    mapResponse.put(indice, map);
+                    indice++;
+                }
             }
         }
         jsonResponse = new Gson().toJson(mapResponse);
@@ -1670,24 +1701,24 @@ public class RecepcionMxController {
         Integer indice=0;
         for(RecepcionMx recepcion : recepcionMxList){
             boolean mostrar = true;
-            //String traslado = messageSource.getMessage("lbl.no",null,null);
-            //String areaOrigen = "";
+            String traslado = messageSource.getMessage("lbl.no",null,null);
+            String areaOrigen = "";
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(recepcion.getTomaMx().getIdTomaMx(),false);
             if (trasladoMxActivo!=null) {
                 if (trasladoMxActivo.isTrasladoExterno()) {
                     if (!seguridadService.usuarioAutorizadoLaboratorio(seguridadService.obtenerNombreUsuario(),trasladoMxActivo.getLaboratorioDestino().getCodigo())){
                         mostrar = false;
-                    }/*else{
+                    }else{
                         traslado = messageSource.getMessage("lbl.yes",null,null);
                         areaOrigen = trasladoMxActivo.getAreaOrigen().getNombre();
-                    }*/
+                    }
                 }else {
                     if (!seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
                         mostrar = false;
-                    }/*else{
+                    }else{
                         traslado = messageSource.getMessage("lbl.yes",null,null);
                         areaOrigen = trasladoMxActivo.getAreaOrigen().getNombre();
-                    }*/
+                    }
                 }
             }else {
                 //se si no hay traslado, pero tiene mas de un dx validar si el usuario tiene acceso al de mayor prioridad. Si sólo hay uno siempre se muestra
@@ -1788,8 +1819,8 @@ public class RecepcionMxController {
                     map.put("persona", " ");
                     map.put("embarazada","--");
                 }
-                //map.put("traslado",traslado);
-                //map.put("origen",areaOrigen);
+                map.put("traslado",traslado);
+                map.put("origen",areaOrigen);
 
                 //se arma estructura de diagnósticos o estudios
                 Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -2035,4 +2066,316 @@ public class RecepcionMxController {
         return codigoUnicoMx;
     }
 
+
+    /**
+     * Método que se llama al entrar a la opción de menu "Recepción Mx Vigilancia". Se encarga de inicializar las listas para realizar la búsqueda de envios de Mx
+     * @param request para obtener información de la petición del cliente
+     * @return ModelAndView
+     * @throws Exception
+     */
+    @RequestMapping(value = "printResults", method = RequestMethod.GET)
+    public ModelAndView initPrintResultsForm(HttpServletRequest request) throws Exception {
+        logger.debug("inicia formulario para imprimir resultados aprobados y liberados para los pacientes");
+        String urlValidacion;
+        try {
+            urlValidacion = seguridadService.validarLogin(request);
+            //si la url esta vacia significa que la validación del login fue exitosa
+            if (urlValidacion.isEmpty())
+                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
+        }catch (Exception e){
+            e.printStackTrace();
+            urlValidacion = "404";
+        }
+        ModelAndView mav = new ModelAndView();
+        if (urlValidacion.isEmpty()) {
+            mav.setViewName("recepcionMx/printResults");
+        }else
+            mav.setViewName(urlValidacion);
+
+        return mav;
+    }
+
+    @RequestMapping(value = "searchResults", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    String fetchAprovedResultsJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo las solicitudes con resultados aprobados");
+        FiltroMx filtroMx= jsonToFiltroMx(filtro);
+        filtroMx.setSolicitudAprobada(true);
+        filtroMx.setIncluirMxInadecuada(true);
+        filtroMx.setCodEstado("ESTDMX|RCLAB");
+
+        List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
+        return tomaMxPrintToJson(tomaMxList);
+    }
+
+    /**
+     * Método que convierte una lista de tomaMx a un string con estructura Json
+     * @param tomaMxList lista con las tomaMx a convertir
+     * @return String
+     */
+    private String tomaMxPrintToJson(List<DaTomaMx> tomaMxList){
+        String jsonResponse;
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice=0;
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        boolean esEstudio;
+        for(DaTomaMx tomaMx : tomaMxList){
+            esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
+            Map<String, String> map = new HashMap<String, String>();
+            //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
+            map.put("idTomaMx", tomaMx.getIdTomaMx());
+            map.put("codigoUnicoMx", esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab());
+            //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+            map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy") +
+                    (tomaMx.getHoraTomaMx() != null ? " " + tomaMx.getHoraTomaMx() : ""));
+            if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
+                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+            } else {
+                map.put("codSilais", "");
+            }
+            map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
+            map.put("tipoNotificacion", tomaMx.getIdNotificacion().getCodTipoNotificacion().getValor());
+
+            //Si hay persona
+            if (tomaMx.getIdNotificacion().getPersona() != null) {
+                /// se obtiene el nombre de la persona asociada a la ficha
+                String nombreCompleto = "";
+                nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                map.put("persona", nombreCompleto);
+            } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
+                map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
+            } else {
+                map.put("persona", " ");
+            }
+            //se arma estructura de diagnósticos o estudios
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
+            if (!solicitudDxList.isEmpty()) {
+                int cont = 0;
+                String dxs = "";
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (solicitudDx.getAprobada()) {
+                        cont++;
+                        if (cont == solicitudDxList.size()) {
+                            dxs += solicitudDx.getCodDx().getNombre();
+                        } else {
+                            dxs += solicitudDx.getCodDx().getNombre() + ", ";
+                        }
+                    }
+
+                }
+                map.put("solicitudes", dxs);
+            } else {
+                DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
+                if(solicitudE != null && solicitudE.getAprobada()){
+                    map.put("solicitudes", solicitudE.getTipoEstudio().getNombre());
+                }else{
+                    map.put("solicitudes", "");
+                }
+
+            }
+            mapResponse.put(indice, map);
+            indice++;
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+    @RequestMapping(value = "resultsPDF", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    String expToPDF(@RequestParam(value = "codes", required = true) String code) throws IOException, COSVisitorException, ParseException {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PDDocument doc = new PDDocument();
+        Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        String response = null;
+        String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(new Date());
+
+        try {
+
+            if (!code.isEmpty()) {
+                DaTomaMx tomaMx = tomaMxService.getTomaMxByCodLab(code);
+                //Prepare the document.
+                if (tomaMx != null) {
+
+                    String nombres = "";
+                    String apellidos = "";
+                    String edad = "";
+                    if (tomaMx.getIdNotificacion().getPersona() != null) {
+                        nombres = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                        if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombres = nombres + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+
+                        apellidos = tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                        if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            apellidos = apellidos + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                    } else {
+                        nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
+                    }
+                    if (tomaMx.getIdNotificacion().getPersona() != null) {
+                        String[] arrEdad = DateUtil.calcularEdad(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
+                        if (arrEdad[0] != null) edad = arrEdad[0] + " A";
+                        if (arrEdad[1] != null) edad = edad + " " + arrEdad[1] + " M";
+                    }
+
+                    List<Area> areaDxList = tomaMxService.getAreaSoliDxAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
+
+                    int count = 1;
+                    for (Area area : areaDxList) {
+                        PDPage page = GeneralUtils.addNewPage(doc);
+                        PDPageContentStream stream = new PDPageContentStream(doc, page);
+
+                        String nombreDireccion = "";
+                        Direccion direccion = organizationChartService.getDireccionesByLab(labProcesa.getCodigo(), area.getIdArea());
+                        if (direccion != null) nombreDireccion = direccion.getNombre();
+                        //dibujar encabezado y pie de pagina
+                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+
+                        String pageNumber = String.valueOf(doc.getNumberOfPages());
+                        GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
+
+                        drawInfoLab(stream, page, labProcesa);
+
+                        float y = 640;
+
+                        //nombre del reporte
+                        float xCenter;
+                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
+                        GeneralUtils.drawTEXT(nombreDireccion, y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                        y = y - 15;
+                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, messageSource.getMessage("lbl.lab.result", null, null).toUpperCase());
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lab.result", null, null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                        y = y - 15;
+                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
+                        GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                        y = y - 30;
+
+                        //datos personales
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(code, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.file.number", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(notificacionService.getNumExpediente(tomaMx.getIdNotificacion().getIdNotificacion()), y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        y = y - 15;
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(nombres, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lastnames", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(apellidos, y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        y = y - 15;
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 185, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(tomaMx.getCodSilaisAtencion() != null ? tomaMx.getCodSilaisAtencion().getNombre() : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion()!= null ? tomaMx.getCodUnidadAtencion().getMunicipio().getNombre() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
+                        y = y - 15;
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getNombre() : "", y, 150, stream, 10, PDType1Font.HELVETICA_BOLD);
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 400, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy"), y, 490, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        //resultados
+                        List<DaSolicitudDx> listDx = tomaMxService.getSoliDxAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
+                        y = y - 10;
+                        RecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), labProcesa.getCodigo());
+                        if (recepcionMx.getCalidadMx().getCodigo().equalsIgnoreCase("CALIDMX|IDC")) {
+                            y = y - 20;
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, null), y, 100, stream, 10, PDType1Font.HELVETICA);
+                        } else {
+                            for (DaSolicitudDx dx : listDx) {
+                                y = y - 20;
+                                List<OrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitud(dx.getIdSolicitudDx());
+                                for (OrdenExamen examen : examenes) {
+                                    List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
+                                    if (resultados.size() > 0) {
+                                        GeneralUtils.drawTEXT(examen.getCodExamen().getNombre(), y, 100, stream, 10, PDType1Font.HELVETICA);
+                                        y = y - 15;
+                                    }
+                                    String fechaProcesamiento = "";
+                                    for (DetalleResultado resultado : resultados) {
+                                        String detalleResultado = "";
+                                        if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                                            detalleResultado = cat_lista.getValor();
+                                        } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                                            detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                                        } else {
+                                            detalleResultado = resultado.getValor();
+                                        }
+                                        fechaProcesamiento = DateUtil.DateToString(resultado.getFechahRegistro(), "dd/MM/yyyy");
+                                        GeneralUtils.drawTEXT(resultado.getRespuesta().getNombre() + ": " + detalleResultado, y, 150, stream, 12, PDType1Font.HELVETICA_BOLD);
+                                        y = y - 15;
+                                    }
+                                    if (resultados.size() > 0) {
+                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.processing.date", null, null) + ": " + fechaProcesamiento, y, 150, stream, 12, PDType1Font.HELVETICA);
+                                        y = y - 15;
+                                    }
+                                }
+                            }
+                        }
+                        count++;
+                        //fecha impresi?n
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, null) + ": ", 225, 60, stream, 11, PDType1Font.HELVETICA);
+                        GeneralUtils.drawTEXT(fechaImpresion, 225, 190, stream, 10, PDType1Font.HELVETICA);
+
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, null) + ": ", 180, 60, stream, 11, PDType1Font.HELVETICA);
+
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, null) + ": ", 180, 300, stream, 11, PDType1Font.HELVETICA);
+                        stream.close();
+
+                    }
+                }
+
+                doc.save(output);
+                doc.close();
+                // generate the file
+                response = Base64.encodeBase64String(output.toByteArray());
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
+        float xCenter;
+
+        float inY = 720;
+        float m = 18;
+
+        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
+        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+        inY -= m;
+
+        if(labProcesa != null){
+
+            if(labProcesa.getDescripcion()!= null){
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
+                GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                inY -= m;
+            }
+
+            if(labProcesa.getDireccion() != null){
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getDireccion());
+                GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                inY -= m;
+            }
+
+            if(labProcesa.getTelefono() != null){
+
+                if(labProcesa.getTelefax() != null){
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono() + " " + labProcesa.getTelefax());
+                    GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                }else{
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono());
+                    GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                }
+            }
+        }
+    }
 }

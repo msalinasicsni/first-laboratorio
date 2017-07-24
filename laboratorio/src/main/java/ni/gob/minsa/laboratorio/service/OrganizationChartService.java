@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.AreaDepartamento;
 import ni.gob.minsa.laboratorio.domain.examen.DepartamentoDireccion;
+import ni.gob.minsa.laboratorio.domain.examen.Direccion;
 import ni.gob.minsa.laboratorio.domain.examen.DireccionLaboratorio;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -224,6 +225,23 @@ public class OrganizationChartService {
         Query q = session.createQuery(query);
         q.setInteger("id", id);
         return (AreaDepartamento) q.uniqueResult();
+    }
+
+    /***
+     * Obtiene la direccion a la que pertenece un area dentro de un laboratorio determinado
+     * @param codLaboratorio a filtrar
+     * @param idArea a filtrar
+     * @return Direccion
+     */
+    public Direccion getDireccionesByLab(String codLaboratorio, int idArea){
+        String query = "select dir from Direccion dir, DireccionLaboratorio  dirLab, DepartamentoDireccion  depDir, AreaDepartamento aDep " +
+                "where dir.idDireccion = dirLab.direccion.idDireccion and depDir.direccionLab.idDireccionLab = dirLab.idDireccionLab and aDep.depDireccion.idDepartDireccion = depDir.idDepartDireccion " +
+                "and dirLab.pasivo = false and dir.pasivo = false and depDir.pasivo = false and aDep.pasivo = false " +
+                "and dirLab.laboratorio.codigo = :codLaboratorio and aDep.area.idArea = :idArea";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codLaboratorio",codLaboratorio);
+        q.setParameter("idArea", idArea);
+        return (Direccion)q.uniqueResult();
     }
 
 }

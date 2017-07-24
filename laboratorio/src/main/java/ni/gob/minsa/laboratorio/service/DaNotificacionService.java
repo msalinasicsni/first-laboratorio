@@ -1,6 +1,8 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
+import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -107,6 +109,29 @@ public class DaNotificacionService {
 
     }
 
+    public String getNumExpediente(String strIdNotificacion){
+        String numExpediente = "";
+        Session session = sessionFactory.getCurrentSession();
+        //IRAG
+        String query = "from DaIrag where idNotificacion.idNotificacion = :idNotificacion";
+        Query q = session.createQuery(query);
+        q.setParameter("idNotificacion", strIdNotificacion);
 
+        //SINDROMES FEBRILES
+        String query2 = "from DaSindFebril where idNotificacion.idNotificacion = :idNotificacion";
+        Query q2 = session.createQuery(query2);
+        q2.setParameter("idNotificacion", strIdNotificacion);
+
+        DaIrag iragNoti= (DaIrag)q.uniqueResult();
+        if(iragNoti!=null && iragNoti.getCodExpediente()!=null){
+            numExpediente = iragNoti.getCodExpediente();
+        }
+        else {
+            DaSindFebril sinFebNoti= (DaSindFebril)q2.uniqueResult();
+            if (sinFebNoti!=null && sinFebNoti.getCodExpediente()!=null)
+                numExpediente = sinFebNoti.getCodExpediente();
+        }
+        return numExpediente;
+    }
 
 }

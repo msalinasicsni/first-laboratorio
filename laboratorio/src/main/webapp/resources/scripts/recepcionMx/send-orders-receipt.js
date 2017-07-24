@@ -182,11 +182,11 @@ var SendOrdersReceipt = function () {
                     encuestaFiltros['nombreSolicitud'] = $('#nombreSoli').val();
                 }
                 blockUI();
+                table1.fnClearTable();
                 $.getJSON(parametros.sOrdersUrl, {
                     strFilter: JSON.stringify(encuestaFiltros),
                     ajax: 'true'
                 }, function (dataToLoad) {
-                    table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
@@ -283,6 +283,8 @@ var SendOrdersReceipt = function () {
                                                 timeout: 4000
                                             });
                                         } else {
+                                            table1.fnClearTable();
+                                            getOrders(false);
                                             var msg = $("#msg_send_receipt_succes").val();
                                             msg = msg.replace(/\{0\}/, data.cantRecepProc);
                                             $.smallBox({
@@ -293,7 +295,6 @@ var SendOrdersReceipt = function () {
                                                 timeout: 4000
                                             });
                                             imprimirHojaTrabajo(data.numeroHoja);
-                                            getOrders(false);
                                         }
                                     },
                                     error: function (jqXHR) {

@@ -104,8 +104,8 @@ var IncomeResult = function () {
                 var filtros = {};
                 if (showAll) {
                     filtros['nombreApellido'] = '';
-                    filtros['fechaInicioTomaMx'] = '';
-                    filtros['fechaFinTomaMx'] = '';
+                    filtros['fechaInicioRecep'] = '';
+                    filtros['fechaFinRecepcion'] = '';
                     filtros['codSilais'] = '';
                     filtros['codUnidadSalud'] = '';
                     filtros['codTipoMx'] = '';
@@ -115,8 +115,8 @@ var IncomeResult = function () {
                     filtros['examenResultado'] = '';
                 } else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    filtros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    filtros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    filtros['fechaInicioRecep'] = $('#fecInicioTomaMx').val();
+                    filtros['fechaFinRecepcion'] = $('#fecFinTomaMx').val();
                     filtros['codSilais'] = $('#codSilais option:selected').val();
                     filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
                     filtros['codTipoMx'] = $('#codTipoMx option:selected').val();

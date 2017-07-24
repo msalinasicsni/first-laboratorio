@@ -267,8 +267,8 @@
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <%--<th data-hide="phone"><spring:message code="lbl.health.unit"/></th>--%>
                                             <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
-                                            <%--<th data-hide="phone"><spring:message code="lbl.transfer"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.transfer.origin.area"/></th>--%>
+                                            <th data-hide="phone"><spring:message code="lbl.transfer"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.transfer.origin.area"/></th>
                                             <th data-hide="phone"><i class="fa fa-child fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.pregnant.short"/></th>
                                             <%--<th data-hide="phone"><i class="fa fa-hospital-o fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.hosp"/></th>--%>
                                             <th data-hide="phone"><i class="fa fa-exclamation-triangle fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.urgent"/></th>

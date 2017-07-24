@@ -257,7 +257,13 @@ public class OrdenExamenMxService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
+//Se filtra por rango de fecha de recepción
+        if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
+            crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                    .setProjection(Property.forName("toma.idTomaMx"))));
 
+        }
         //se filtra por tipo de solicitud
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
