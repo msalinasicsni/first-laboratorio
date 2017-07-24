@@ -274,7 +274,8 @@
                                 <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                                 <th><spring:message code="lbl.request.large"/></th>
                                 <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.with.result"/></th>
-
+                                <th><spring:message code="lbl.final.result"/></th>
+                                <th><spring:message code="lbl.pending"/></th>
                                 <th></th>
 
                             </tr>

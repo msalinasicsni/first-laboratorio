@@ -644,4 +644,21 @@ public class OrdenExamenMxService {
         ordenExamenList.addAll(q2.list());
         return ordenExamenList;
     }
+
+    public List<OrdenExamen> getOrdenesExamenNoAnuladasSinResulByIdSolicitud(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx, DetalleResultado as a " +
+                "where oe.idOrdenExamen = a.examen.idOrdenExamen and sdx.idSolicitudDx =:idSolicitud and oe.anulado = false and a.pasivo = false ");
+
+        q.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se, DetalleResultado as a " +
+                "where oe.idOrdenExamen = a.examen.idOrdenExamen and se.idSolicitudEstudio =:idSolicitud and oe.anulado = false and a.pasivo = false ");
+        q2.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
+    }
 }

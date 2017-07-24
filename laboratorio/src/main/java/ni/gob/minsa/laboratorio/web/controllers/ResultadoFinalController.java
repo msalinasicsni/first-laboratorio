@@ -65,6 +65,9 @@ public class ResultadoFinalController {
     @Resource(name= "respuestasSolicitudService")
     private RespuestasSolicitudService respuestasSolicitudService;
 
+    @Resource(name= "ordenExamenMxService")
+    private OrdenExamenMxService ordenExamenMxService;
+    
     @Autowired
     MessageSource messageSource;
 
@@ -151,32 +154,32 @@ public class ResultadoFinalController {
                     map.put("fechaInicioSintomas"," ");
 
                 //Si hay persona
+                /// se obtiene el nombre de la persona asociada a la ficha
+                String nombreCompleto = " ";
                 if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona()!=null){
-                    /// se obtiene el nombre de la persona asociada a la ficha
-                    String nombreCompleto = "";
                     nombreCompleto = diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
                     if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
                         nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
                     nombreCompleto = nombreCompleto+" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
                     if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
                         nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                    map.put("persona",nombreCompleto);
-                }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
-                    map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-                }else{
-                    map.put("persona"," ");
-                }
 
+                }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                    nombreCompleto = diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                }
+                map.put("persona",nombreCompleto);
                 map.put("diagnostico", diagnostico.getCodDx().getNombre());
                 map.put("idSolicitud", diagnostico.getIdSolicitudDx());
 
-
-                if(!resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx()).isEmpty()){
-                    map.put("resultadoS", "Si");
-                }else{
-                    map.put("resultadoS", "No");
+                List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
+                if (!resFinal.isEmpty()) {
+                    map.put("resultadoS", messageSource.getMessage("lbl.yes", null, null));
+                } else {
+                    map.put("resultadoS", messageSource.getMessage("lbl.no", null, null));
                 }
-
+                map.put("detResultado",parseResultDetails(resFinal));
+                List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasSinResulByIdSolicitud(diagnostico.getIdSolicitudDx());
+                map.put("pendientes", parsePendingTests(ordenExamenList));
                 mapResponse.put(indice, map);
                 indice ++;
             }
@@ -208,29 +211,31 @@ public class ResultadoFinalController {
                       map.put("fechaInicioSintomas", " ");
 
                   //Si hay persona
+                  /// se obtiene el nombre de la persona asociada a la ficha
+                  String nombreCompleto = " ";
                   if (estudio.getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                      /// se obtiene el nombre de la persona asociada a la ficha
-                      String nombreCompleto = "";
                       nombreCompleto = estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
                       if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
                           nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
                       nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
                       if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                           nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                      map.put("persona", nombreCompleto);
-                  } else {
-                      map.put("persona", " ");
                   }
+                  map.put("persona", nombreCompleto);
 
                   map.put("diagnostico", estudio.getTipoEstudio().getNombre());
                   map.put("idSolicitud", estudio.getIdSolicitudEstudio());
 
-
-                  if (!resultadoFinalService.getDetResActivosBySolicitud(estudio.getIdSolicitudEstudio()).isEmpty()) {
-                      map.put("resultadoS", "Si");
+                  List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(estudio.getIdSolicitudEstudio());
+                  if (!resFinal.isEmpty()) {
+                      map.put("resultadoS", messageSource.getMessage("lbl.yes", null, null));
                   } else {
-                      map.put("resultadoS", "No");
+                      map.put("resultadoS", messageSource.getMessage("lbl.no", null, null));
                   }
+                  map.put("detResultado",parseResultDetails(resFinal));
+
+                  List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasSinResulByIdSolicitud(estudio.getIdSolicitudEstudio());
+                  map.put("pendientes", parsePendingTests(ordenExamenList));
 
                   mapResponse.put(indice, map);
                   indice++;
@@ -242,6 +247,43 @@ public class ResultadoFinalController {
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
+    }
+
+    private String parsePendingTests(List<OrdenExamen> ordenExamenList){
+        String examenesPen = "";
+        for(OrdenExamen examen : ordenExamenList){
+            examenesPen+=(examenesPen.isEmpty()?examen.getCodExamen().getNombre():", "+examen.getCodExamen().getNombre());
+        }
+        return examenesPen;
+    }
+    private String parseResultDetails(List<DetalleResultadoFinal> resultList){
+        String resultados="";
+        for(DetalleResultadoFinal res: resultList){
+            if (res.getRespuesta()!=null) {
+                resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados+=": "+cat_lista.getValor();
+                }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    resultados+=": "+valorBoleano;
+                } else {
+                    resultados+=": "+res.getValor();
+                }
+            }else if (res.getRespuestaExamen()!=null){
+                resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados+=": "+cat_lista.getValor();
+                } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    resultados+=": "+valorBoleano;
+                }else {
+                    resultados+=": "+res.getValor();
+                }
+            }
+        }
+        return resultados;
     }
 
     private FiltroMx jsonToFiltroDx(String strJson) throws Exception {

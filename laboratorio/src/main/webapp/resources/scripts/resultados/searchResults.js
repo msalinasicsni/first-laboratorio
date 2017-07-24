@@ -179,9 +179,8 @@ var finalResult = function () {
                         for (var i = 0; i < len; i++) {
                             var actionUrl = parametros.actionUrl + dataToLoad[i].idSolicitud;
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].diagnostico, dataToLoad[i].resultadoS, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-
+                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,
+                                    dataToLoad[i].persona, dataToLoad[i].diagnostico, dataToLoad[i].resultadoS, dataToLoad[i].detResultado, dataToLoad[i].pendientes, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     } else {
                         $.smallBox({
