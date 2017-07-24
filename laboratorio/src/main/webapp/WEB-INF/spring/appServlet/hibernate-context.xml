@@ -40,6 +40,7 @@
 				p:maxPoolSize="100"
 				p:maxStatements="50"
 				p:minPoolSize="10"
+                p:maxIdleTime="600"
 				p:maxStatementsPerConnection="100" />
 
 	<!-- Declare a transaction manager org.springframework.orm.hibernate3.HibernateTransactionManager-->
