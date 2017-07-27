@@ -470,19 +470,32 @@ public class TomaMxService {
         // Retrieve session from Hibernate
         Session s = sessionFactory.openSession();
         Transaction tx = s.beginTransaction();
-        int updateEntities = 0,updateEntities2=0;
+        int updateEntities = 0,updateEntities2=0,updateEntities3=0,updateEntities4=0;
         try {
 
+            String hqlBajaResExam = "update DetalleResultado o set pasivo=true, fechahAnulacion = current_date, usuarioAnulacion.username = :usuario, razonAnulacion = :causa " +
+                    "where examen.idOrdenExamen in (select idOrdenExamen from OrdenExamen where solicitudDx.idSolicitudDx = :idSolicitud)";
+            updateEntities3 = s.createQuery(hqlBajaResExam)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud).executeUpdate();
 
-            String hqlBajaExam = "update OrdenExamen ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where solicitudDx.idSolicitudDx = :idSolicitud";
-            updateEntities2 = s.createQuery(hqlBajaExam)
+            String hqlBajaExam = "update OrdenExamen ex set anulado=true, fechaAnulacion = current_date, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where solicitudDx.idSolicitudDx = :idSolicitud and anulado = false ";
+            updateEntities = s.createQuery(hqlBajaExam)
                     .setString("usuario", userName)
                     .setString("causa",causa)
                     .setString("idSolicitud", idSolicitud)
                     .executeUpdate();
 
-            String hqlBajaArea = "update DaSolicitudDx ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where idSolicitudDx = :idSolicitud";
-            updateEntities2 = s.createQuery(hqlBajaArea)
+            String hqlBajaResDx = "update DetalleResultadoFinal ex set pasivo=true, fechahAnulacion = current_date, usuarioAnulacion.username = :usuario, razonAnulacion = :causa where solicitudDx.idSolicitudDx = :idSolicitud and pasivo = false ";
+            updateEntities4 = s.createQuery(hqlBajaResDx)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
+
+            String hqlBajaDx = "update DaSolicitudDx ex set anulado=true, fechaAnulacion = current_date, aprobada = false, usuarioAprobacion = null, fechaAprobacion = null, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where idSolicitudDx = :idSolicitud";
+            updateEntities2 = s.createQuery(hqlBajaDx)
                     .setString("usuario", userName)
                     .setString("causa",causa)
                     .setString("idSolicitud", idSolicitud)
@@ -491,30 +504,45 @@ public class TomaMxService {
             tx.commit();
         }catch (Exception ex){
             tx.rollback();
+            ex.printStackTrace();
             throw ex;
         }finally {
             s.close();
         }
-        return updateEntities+updateEntities2;
+        return updateEntities+updateEntities2+updateEntities3+updateEntities4;
     }
 
     public Integer bajaSolicitudEstudio(String userName, String idSolicitud, String causa) {
         // Retrieve session from Hibernate
         Session s = sessionFactory.openSession();
         Transaction tx = s.beginTransaction();
-        int updateEntities = 0,updateEntities2=0;
+        int updateEntities = 0,updateEntities2=0,updateEntities3=0,updateEntities4=0;
         try {
 
+            String hqlBajaResExam = "update DetalleResultado o set pasivo=true, fechahAnulacion = current_date, usuarioAnulacion.username = :usuario, razonAnulacion = :causa " +
+                    "where examen.idOrdenExamen in (select idOrdenExamen from OrdenExamen where solicitudEstudio.idSolicitudEstudio = :idSolicitud)";
+            updateEntities3 = s.createQuery(hqlBajaResExam)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
 
-            String hqlBajaExam = "update OrdenExamen ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where solicitudEstudio.idSolicitudEstudio = :idSolicitud";
+            String hqlBajaExam = "update OrdenExamen ex set anulado=true, fechaAnulacion = current_date, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where solicitudEstudio.idSolicitudEstudio = :idSolicitud";
             updateEntities2 = s.createQuery(hqlBajaExam)
                     .setString("usuario", userName)
                     .setString("causa",causa)
                     .setString("idSolicitud", idSolicitud)
                     .executeUpdate();
 
-            String hqlBajaArea = "update DaSolicitudEstudio ex set anulado=true, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where idSolicitudEstudio = :idSolicitud";
-            updateEntities2 = s.createQuery(hqlBajaArea)
+            String hqlBajaResEst = "update DetalleResultadoFinal ex set pasivo=true, fechahAnulacion = current_date, usuarioAnulacion.username = :usuario, razonAnulacion = :causa where solicitudEstudio.idSolicitudEstudio = :idSolicitud";
+            updateEntities4 = s.createQuery(hqlBajaResEst)
+                    .setString("usuario", userName)
+                    .setString("causa",causa)
+                    .setString("idSolicitud", idSolicitud)
+                    .executeUpdate();
+
+            String hqlBajaEst = "update DaSolicitudEstudio ex set anulado=true, fechaAnulacion = current_date, aprobada = false, usuarioAprobacion = null, fechaAprobacion = null, usuarioAnulacion.username = :usuario, causaAnulacion = :causa where idSolicitudEstudio = :idSolicitud";
+            updateEntities2 = s.createQuery(hqlBajaEst)
                     .setString("usuario", userName)
                     .setString("causa",causa)
                     .setString("idSolicitud", idSolicitud)
@@ -527,7 +555,7 @@ public class TomaMxService {
         }finally {
             s.close();
         }
-        return updateEntities+updateEntities2;
+        return updateEntities+updateEntities2+updateEntities3+updateEntities4;
     }
 
 /****************************************************************

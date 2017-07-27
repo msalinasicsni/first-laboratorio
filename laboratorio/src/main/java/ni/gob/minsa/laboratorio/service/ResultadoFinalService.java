@@ -147,9 +147,17 @@ public class ResultadoFinalService {
 
         // filtro examenes con resultado
         if (filtro.getSolicitudAprobada()==null) {
-            crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
-                    .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado", false)).add(Restrictions.eq("pasivo", false))
-                    .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
+            //fecha de procesamiento de examenes (SOLO PARA BUSQUEDA DE RESULTADO FINAL)
+            if (filtro.getFechaInicioProcesamiento()!=null && filtro.getFechaFinProcesamiento()!=null){
+                crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado", false)).add(Restrictions.eq("pasivo", false))
+                        .add(Restrictions.between("fechahRegistro",filtro.getFechaInicioProcesamiento(), filtro.getFechaFinProcesamiento()))
+                        .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
+            }else {
+                crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
+                        .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado", false)).add(Restrictions.eq("pasivo", false))
+                        .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
+            }
         }
 
         //se filtra por tipo de solicitud
@@ -200,10 +208,6 @@ public class ResultadoFinalService {
 
         }
 
-         //ordenar por fecha
-        crit.addOrder(Order.desc("fechaHSolicitud"));
-
-
         //filtro dx con resultado activo
         if(filtro.getResultado() != null){
             if (filtro.getResultado().equals("Si")){
@@ -233,6 +237,12 @@ public class ResultadoFinalService {
         }else{
             crit.add( Restrictions.and(
                             Restrictions.eq("diagnostico.aprobada", false))
+            );
+        }
+        //Se filtra por rango de fecha de aprobacion
+        if (filtro.getFechaInicioAprob()!=null && filtro.getFechaFinAprob()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("diagnostico.fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob()))
             );
         }
 
@@ -303,6 +313,9 @@ public class ResultadoFinalService {
                         .setProjection(Property.forName("idSolicitudDx")))));
             }
         }
+
+        //ordenar por fecha
+        crit.addOrder(Order.desc("fechaHSolicitud"));
 
         return crit.list();
     }
@@ -481,6 +494,12 @@ public class ResultadoFinalService {
         }else {
             crit.add( Restrictions.and(
                             Restrictions.eq("estudio.aprobada", false))
+            );
+        }
+        //Se filtra por rango de fecha de aprobacion
+        if (filtro.getFechaInicioAprob()!=null && filtro.getFechaFinAprob()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("estudio.fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob()))
             );
         }
 

@@ -299,7 +299,8 @@ public class ResultadoFinalController {
         String codTipoSolicitud = null;
         String nombreSolicitud = null;
         String resultado = null;
-
+        Date fechaInicioProc = null;
+        Date fechaFinProc = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -321,6 +322,10 @@ public class ResultadoFinalController {
             nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
         if (jObjectFiltro.get("resultado") != null && !jObjectFiltro.get("resultado").getAsString().isEmpty())
            resultado = jObjectFiltro.get("resultado").getAsString();
+        if (jObjectFiltro.get("fechaInicioProc") != null && !jObjectFiltro.get("fechaInicioProc").getAsString().isEmpty())
+            fechaInicioProc = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioProc").getAsString() + " 00:00:00");
+        if (jObjectFiltro.get("fechaFinProc") != null && !jObjectFiltro.get("fechaFinProc").getAsString().isEmpty())
+            fechaFinProc = DateUtil.StringToDate(jObjectFiltro.get("fechaFinProc").getAsString() + " 23:59:59");
 
         String nombreUsuario = seguridadService.obtenerNombreUsuario();
         filtroDx.setCodSilais(codSilais);
@@ -338,6 +343,8 @@ public class ResultadoFinalController {
         filtroDx.setNombreUsuario(nombreUsuario);
         filtroDx.setNivelLaboratorio(seguridadService.esDirector(nombreUsuario)?3:seguridadService.esJefeDepartamento(nombreUsuario)?2:1);
         filtroDx.setIncluirTraslados(true);
+        filtroDx.setFechaInicioProcesamiento(fechaInicioProc);
+        filtroDx.setFechaFinProcesamiento(fechaFinProc);
         return filtroDx;
     }
 

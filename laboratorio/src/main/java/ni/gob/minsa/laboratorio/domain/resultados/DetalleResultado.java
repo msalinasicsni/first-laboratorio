@@ -33,7 +33,7 @@ public class DetalleResultado implements Serializable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
-    @Column(name = "ID_DETALLE", nullable = false, insertable = true, updatable = true, length = 36)
+    @Column(name = "ID_DETALLE", nullable = false, insertable = true, updatable = false, length = 36)
     public String getIdDetalle() {
         return idDetalle;
     }
@@ -53,7 +53,7 @@ public class DetalleResultado implements Serializable {
     }
 
     @Basic
-    @Column(name = "PASIVO", nullable = false, insertable = true)
+    @Column(name = "PASIVO", nullable = false, insertable = true, updatable = true)
     public boolean isPasivo() {
         return pasivo;
     }

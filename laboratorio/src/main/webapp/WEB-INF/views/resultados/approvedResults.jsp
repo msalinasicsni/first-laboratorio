@@ -109,26 +109,26 @@
                             </section>
                             <section class="col col-sm-6 col-md-4 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.receipt.start.date.mx" />
+                                    <spring:message code="lbl.start.approval.date" />
                                 </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
                                     <input type="text" name="fecInicioTomaMx" id="fecInicioTomaMx"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control from_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
+                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.start.approval.date"/></b>
                                 </label>
                             </section>
                             <section class="col col-sm-6 col-md-4 col-lg-3">
                                 <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.receipt.end.date.mx" />
+                                    <spring:message code="lbl.end.approval.date" />
                                 </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
                                     <input type="text" name="fecFinTomaMx" id="fecFinTomaMx"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control to_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
+                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.end.approval.date"/></b>
                                 </label>
                             </section>
 

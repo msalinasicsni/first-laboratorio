@@ -126,13 +126,6 @@ public class TrasladosService {
                 }
             }
             for (int i = 0; i < partes.length; i++) {
-                /*Junction conditionGroup = Restrictions.disjunction();
-                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
-                crit.add(conditionGroup);*/
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("notifi.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
                         .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
@@ -184,6 +177,19 @@ public class TrasladosService {
             crit.add(Restrictions.or(
                             Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
+        }
+
+        //Se filtra por rango de fecha de recepción en laboratorio
+        if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
+            crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma")
+                    .add(Subqueries.propertyIn("idRecepcion", DetachedCriteria.forClass(RecepcionMxLab.class)
+                                    .createAlias("recepcionMx","recGen")
+                                    .add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                                    .setProjection(Property.forName("recGen.idRecepcion")))
+                    )
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+
         }
         //nombre solicitud de rutina
         if (filtro.getNombreSolicitud() != null) {

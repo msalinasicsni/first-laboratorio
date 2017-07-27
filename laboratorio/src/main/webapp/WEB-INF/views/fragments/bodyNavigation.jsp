@@ -113,6 +113,9 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="editarMx">
+                        <a href="<spring:url value="/editarMx/init" htmlEscape="true "/>" title="<spring:message code="menu.edit.request.mx" />"><i class="fa fa-lg fa-fw fa-pencil"></i> <spring:message code="menu.edit.request.mx" /></a>
+                    </li>
                     <li class="viewNoti">
                         <a href="<spring:url value="/viewNoti/init" htmlEscape="true "/>" title="<spring:message code="lbl.view.noti" />"><i class="fa fa-lg fa-fw fa-file-pdf-o"></i> <spring:message code="lbl.view.noti" /></a>
                     </li>

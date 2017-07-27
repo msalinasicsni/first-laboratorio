@@ -128,6 +128,8 @@ public class AprobacionResultadoController {
         Boolean solicitudAprobada=null;
         Date fechaInicioProc = null;
         Date fechaFinProc = null;
+        Date fechaInicioAprob = null;
+        Date fechaFinAprob = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -159,6 +161,10 @@ public class AprobacionResultadoController {
             fechaInicioProc = DateUtil.StringToDate(jObjectFiltro.get("fecInicioProc").getAsString()+" 00:00:00");
         if (jObjectFiltro.get("fecFinProc") != null && !jObjectFiltro.get("fecFinProc").getAsString().isEmpty())
             fechaFinProc =DateUtil. StringToDate(jObjectFiltro.get("fecFinProc").getAsString()+" 23:59:59");
+        if (jObjectFiltro.get("fechaInicioAprob") != null && !jObjectFiltro.get("fechaInicioAprob").getAsString().isEmpty())
+            fechaInicioAprob = DateUtil.StringToDate(jObjectFiltro.get("fechaInicioAprob").getAsString() + " 00:00:00");
+        if (jObjectFiltro.get("fechaFinAprob") != null && !jObjectFiltro.get("fechaFinAprob").getAsString().isEmpty())
+            fechaFinAprob = DateUtil.StringToDate(jObjectFiltro.get("fechaFinAprob").getAsString() + " 23:59:59");
         String nombreUsuario = seguridadService.obtenerNombreUsuario();
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -179,6 +185,8 @@ public class AprobacionResultadoController {
         filtroMx.setIncluirTraslados(true);
         filtroMx.setFechaInicioProcesamiento(fechaInicioProc);
         filtroMx.setFechaFinProcesamiento(fechaFinProc);
+        filtroMx.setFechaInicioAprob(fechaInicioAprob);
+        filtroMx.setFechaFinAprob(fechaFinAprob);
         return filtroMx;
     }
 

@@ -60,7 +60,7 @@ public class DateUtil {
         long milis2 = cal2.getTimeInMillis();
         // calcular la diferencia en milisengundos
         long diff = milis2 - milis1;
-        // calcular la diferencia en horas
+        // calcular la diferencia en dias
         Long diffHours = diff / (24 * 60 * 60 * 1000);
         return diffHours.intValue();
     }

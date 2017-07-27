@@ -119,8 +119,8 @@ var ApprovedResults = function () {
                 var filtros = {};
                 if (showAll) {
                     filtros['nombreApellido'] = '';
-                    filtros['fechaInicioTomaMx'] = '';
-                    filtros['fechaFinTomaMx'] = '';
+                    filtros['fechaInicioAprob'] = '';
+                    filtros['fechaFinAprob'] = '';
                     filtros['codSilais'] = '';
                     filtros['codUnidadSalud'] = '';
                     filtros['codTipoMx'] = '';
@@ -131,8 +131,8 @@ var ApprovedResults = function () {
                     filtros['solicitudAprobada'] = 'true';
                 } else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    filtros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    filtros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    filtros['fechaInicioAprob'] = $('#fecInicioTomaMx').val();
+                    filtros['fechaFinAprob'] = $('#fecFinTomaMx').val();
                     filtros['codSilais'] = $('#codSilais').find('option:selected').val();
                     filtros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     filtros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();

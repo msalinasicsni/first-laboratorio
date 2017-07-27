@@ -126,7 +126,7 @@
                                     <input type="text" name="fechaInicioRecep" id="fechaInicioRecep"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control from_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
+                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.check-in.startdate"/></b>
                                 </label>
                             </section>
                             <section class="col col-sm-6 col-md-4 col-lg-3">
@@ -138,7 +138,7 @@
                                     <input type="text" name="fechaFinRecepcion" id="fechaFinRecepcion"
                                            placeholder="<spring:message code="lbl.date.format"/>"
                                            class="form-control to_date" data-date-end-date="+0d"/>
-                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
+                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.check-in.enddate"/></b>
                                 </label>
                             </section>
 

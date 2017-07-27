@@ -104,7 +104,7 @@
                                     </section>
                                     <section class="col col-sm-6 col-md-4 col-lg-3">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.receipt.start.date" />
+                                            <spring:message code="lbl.prc.start.date" /> <spring:message code="lbl.receipt.test" />
                                         </label>
                                         <label class="input">
                                             <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
@@ -116,7 +116,7 @@
                                     </section>
                                     <section class="col col-sm-6 col-md-4 col-lg-3">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.receipt.end.date" />
+                                            <spring:message code="lbl.prc.end.date" /> <spring:message code="lbl.receipt.test" />
                                         </label>
                                         <label class="input">
                                             <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>

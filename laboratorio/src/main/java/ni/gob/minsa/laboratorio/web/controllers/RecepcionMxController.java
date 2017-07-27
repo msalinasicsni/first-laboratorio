@@ -984,7 +984,7 @@ public class RecepcionMxController {
             }
 
         }catch (Exception ex){
-            logger.error("Sucedio un error al anular orden de examen",ex);
+            logger.error("Sucedio un error al anular solicitud",ex);
             resultado = messageSource.getMessage("msg.receipt.request.cancel.error1", null, null);
             resultado = resultado + ". \n " + ex.getMessage();
         } finally {
@@ -1783,10 +1783,15 @@ public class RecepcionMxController {
                 //map.put("areaProcesa", ordenExamen.getOrdenExamen().getCodExamen().getArea().getNombre());
                 //Si hay fecha de inicio de sintomas se muestra
                 Date fechaInicioSintomas = recepcion.getTomaMx().getIdNotificacion().getFechaInicioSintomas();
-                if (fechaInicioSintomas != null)
+                if (fechaInicioSintomas != null) {
                     map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
-                else
+                    map.put("dias",String.valueOf(DateUtil.CalcularDiferenciaDiasFechas(fechaInicioSintomas, recepcion.getTomaMx().getFechaHTomaMx())+1));
+                }
+                else {
                     map.put("fechaInicioSintomas", " ");
+                    map.put("dias","");
+                }
+
                 //Si hay persona
                 if (recepcion.getTomaMx().getIdNotificacion().getPersona() != null) {
                     /// se obtiene el nombre de la persona asociada a la ficha

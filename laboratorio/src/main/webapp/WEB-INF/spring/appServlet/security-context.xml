@@ -65,6 +65,7 @@
         <intercept-url pattern="/trasladoMx/**" access="ROLE_ANALISTA" />
         <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/print/**" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/editarMx/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->

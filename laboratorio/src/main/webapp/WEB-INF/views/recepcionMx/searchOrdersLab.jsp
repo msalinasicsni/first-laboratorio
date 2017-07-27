@@ -115,7 +115,7 @@
                                                     <input type="text" name="fecInicioTomaMx" id="fecInicioTomaMx"
                                                            placeholder="<spring:message code="lbl.date.format"/>"
                                                            class="form-control from_date" data-date-end-date="+0d"/>
-                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
+                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.check-in.startdate"/></b>
                                                 </label>
                                             </section>
                                             <section class="col col-sm-6 col-md-4 col-lg-3">
@@ -127,7 +127,7 @@
                                                     <input type="text" name="fecFinTomaMx" id="fecFinTomaMx"
                                                            placeholder="<spring:message code="lbl.date.format"/>"
                                                            class="form-control to_date" data-date-end-date="+0d"/>
-                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
+                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.check-in.enddate"/></b>
                                                 </label>
                                             </section>
 
@@ -262,6 +262,7 @@
                                             <%--<th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>--%>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
+                                            <th data-hide="phone"><spring:message code="lbl.days"/></th>
                                             <%--<th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>--%>
                                             <%--<th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>--%>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>

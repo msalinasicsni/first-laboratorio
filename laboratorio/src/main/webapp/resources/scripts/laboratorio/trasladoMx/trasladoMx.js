@@ -165,8 +165,13 @@ var TrasladoMx = function () {
                     mxFiltros['tipoTraslado'] = $("#tipoTraslado").val();
                 } else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    if ($("#tipoTraslado").val()==='interno'){
+                        mxFiltros['fechaInicioRecep'] = $('#fecInicioTomaMx').val();
+                        mxFiltros['fechaFinRecepcion'] = $('#fecFinTomaMx').val();
+                    }else {
+                        mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
+                        mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    }
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();

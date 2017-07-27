@@ -203,13 +203,6 @@ public class OrdenExamenMxService {
                 }
             }
             for (int i = 0; i < partes.length; i++) {
-                /*Junction conditionGroup = Restrictions.disjunction();
-                conditionGroup.add(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
-                        .add(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%"));
-                crit.add(conditionGroup);*/
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("notifi.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
                         .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
@@ -257,10 +250,15 @@ public class OrdenExamenMxService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
-//Se filtra por rango de fecha de recepción
+//Se filtra por rango de fecha de recepción en laboratorio
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
-                    .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                    .createAlias("tomaMx", "toma")
+                    .add(Subqueries.propertyIn("idRecepcion", DetachedCriteria.forClass(RecepcionMxLab.class)
+                                    .createAlias("recepcionMx","recGen")
+                            .add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                           .setProjection(Property.forName("recGen.idRecepcion")))
+                    )
                     .setProjection(Property.forName("toma.idTomaMx"))));
 
         }
@@ -436,6 +434,18 @@ public class OrdenExamenMxService {
             );
         }
 
+        //Se filtra por rango de fecha de recepción en laboratorio
+        if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
+            crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
+                    .createAlias("tomaMx", "toma")
+                    .add(Subqueries.propertyIn("idRecepcion", DetachedCriteria.forClass(RecepcionMxLab.class)
+                                    .createAlias("recepcionMx","recGen")
+                                    .add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
+                                    .setProjection(Property.forName("recGen.idRecepcion")))
+                    )
+                    .setProjection(Property.forName("toma.idTomaMx"))));
+
+        }
         //se filtra por tipo de solicitud
         if(filtro.getCodTipoSolicitud()!=null){
             if(filtro.getCodTipoSolicitud().equals("Estudio")){
@@ -649,14 +659,16 @@ public class OrdenExamenMxService {
         Session session = sessionFactory.getCurrentSession();
         List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
         //se toman las que son de diagnóstico.
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx, DetalleResultado as a " +
-                "where oe.idOrdenExamen = a.examen.idOrdenExamen and sdx.idSolicitudDx =:idSolicitud and oe.anulado = false and a.pasivo = false ");
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx " +
+                "where sdx.idSolicitudDx =:idSolicitud and oe.anulado = false " +
+                "and oe.idOrdenExamen not in ( select a.examen.idOrdenExamen from DetalleResultado as a where a.pasivo = false  )");
 
         q.setParameter("idSolicitud",idSolicitud);
         ordenExamenList = q.list();
         //se toman las que son de estudio
-        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se, DetalleResultado as a " +
-                "where oe.idOrdenExamen = a.examen.idOrdenExamen and se.idSolicitudEstudio =:idSolicitud and oe.anulado = false and a.pasivo = false ");
+        Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se " +
+                "where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false " +
+                "and oe.idOrdenExamen not in ( select a.examen.idOrdenExamen from DetalleResultado as a where a.pasivo = false  )");
         q2.setParameter("idSolicitud",idSolicitud);
         ordenExamenList.addAll(q2.list());
         return ordenExamenList;
