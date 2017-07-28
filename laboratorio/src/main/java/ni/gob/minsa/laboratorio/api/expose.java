@@ -288,4 +288,13 @@ public class expose {
         return estTipoMxTipoNotis;
     }
 
+    @RequestMapping(value = "getDiagnosticosEdicion", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<Dx_TipoMx_TipoNoti> getDiagnosticosEdicion(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti,
+                                             @RequestParam(value = "idTomaMx", required = true)String idTomaMx) throws Exception {
+        logger.info("Obteniendo los dx por tipo mx en JSON");
+        return tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
+
+    }
 }

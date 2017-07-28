@@ -197,14 +197,14 @@ public class EditarSolicitudesMxController {
                         areaOrigen = trasladoMxActivo.getAreaOrigen().getNombre();
                     }
                 }else {
-                    if (!seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
+                    /*if (!seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
                         mostrar = false;
-                    }else{
+                    }else{*/
                         traslado = messageSource.getMessage("lbl.yes",null,null);
                         areaOrigen = trasladoMxActivo.getAreaOrigen().getNombre();
-                    }
+                    //}
                 }
-            }else {
+            }/*else {
                 //se si no hay traslado, pero tiene mas de un dx validar si el usuario tiene acceso al de mayor prioridad. Si sólo hay uno siempre se muestra
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcion.getTomaMx().getIdTomaMx());
                 if (solicitudDxList.size() > 1) {
@@ -212,7 +212,7 @@ public class EditarSolicitudesMxController {
                         mostrar = false;
                     }
                 }
-            }
+            }*/
             if (mostrar) {
                 boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( recepcion.getTomaMx().getIdTomaMx()).size() > 0;
                 Map<String, String> map = new HashMap<String, String>();
@@ -323,12 +323,12 @@ public class EditarSolicitudesMxController {
      * Además si es la primera vez que se carga el registro se registran ordenes de examen para los examenes configurados por defecto en la tabla
      * de parámetros según el tipo de notificación, tipo de mx, tipo dx
      * @param request para obtener información de la petición del cliente
-     * @param strIdRecepcion Id de la recepción general a recepcionar en el laboratorio
+     * @param strIdMuestra Id de la muestra a editar
      * @return ModelAndView
      * @throws Exception
      */
     @RequestMapping(value = "editLab/{strIdRecepcion}", method = RequestMethod.GET)
-    public ModelAndView createReceiptLabForm(HttpServletRequest request, @PathVariable("strIdRecepcion")  String strIdRecepcion) throws Exception {
+    public ModelAndView createReceiptLabForm(HttpServletRequest request, @PathVariable("strIdRecepcion")  String strIdMuestra) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
         String urlValidacion;
         try {
@@ -343,7 +343,7 @@ public class EditarSolicitudesMxController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             //RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(strIdRecepcion);
-            DaTomaMx tomaMx = tomaMxService.getTomaMxById(strIdRecepcion);
+            DaTomaMx tomaMx = tomaMxService.getTomaMxById(strIdMuestra);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
             List<Unidades> unidades = null;
@@ -404,9 +404,8 @@ public class EditarSolicitudesMxController {
     String getOrdenesExamen(@RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
         logger.info("antes getOrdenesExamen");
         List<OrdenExamen> ordenExamenList = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMxAndUser(idTomaMx, seguridadService.obtenerNombreUsuario());
-        TrasladoMx trasladoMx = trasladosService.getTrasladoActivoMx(idTomaMx);
         logger.info("despues getOrdenesExamen");
-        return OrdenesExamenToJson(ordenExamenList, trasladoMx);
+        return OrdenesExamenToJson(ordenExamenList);
     }
 
     /**
@@ -415,7 +414,7 @@ public class EditarSolicitudesMxController {
      * @return String
      * @throws java.io.UnsupportedEncodingException
      */
-    private String OrdenesExamenToJson(List<OrdenExamen> ordenesExamenList, TrasladoMx trasladoMx) throws UnsupportedEncodingException {
+    private String OrdenesExamenToJson(List<OrdenExamen> ordenesExamenList) throws UnsupportedEncodingException {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -423,36 +422,26 @@ public class EditarSolicitudesMxController {
         for(OrdenExamen ordenExamen : ordenesExamenList){
             Map<String, String> map = new HashMap<String, String>();
             if (ordenExamen.getSolicitudDx()!=null) {
-                //si hay traslado interno, mostrar los examenes que corresponden al area destino del traslado
-                if (trasladoMx!=null && trasladoMx.isTrasladoInterno()){
-                    if (!trasladoMx.getAreaDestino().getIdArea().equals(ordenExamen.getSolicitudDx().getCodDx().getArea().getIdArea())){
-                        agregarExamenDx = false;
-                    }
-                }
+                map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+                map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
+                map.put("idExamen", ordenExamen.getCodExamen().getIdExamen().toString());
+                map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
+                map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
+                map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
+                map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("tipo", "Rutina");
+                if (ordenExamen.getSolicitudDx().getControlCalidad())
+                    map.put("cc", messageSource.getMessage("lbl.yes", null, null));
+                else
+                    map.put("cc", messageSource.getMessage("lbl.no", null, null));
 
-                if (agregarExamenDx) {
-                    map.put("idTomaMx", ordenExamen.getSolicitudDx().getIdTomaMx().getIdTomaMx());
-                    map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
-                    map.put("idExamen", ordenExamen.getCodExamen().getIdExamen().toString());
-                    map.put("nombreExamen", ordenExamen.getCodExamen().getNombre());
-                    map.put("nombreSolic", ordenExamen.getSolicitudDx().getCodDx().getNombre());
-                    map.put("nombreAreaPrc", ordenExamen.getSolicitudDx().getCodDx().getArea().getNombre());
-                    map.put("fechaSolicitud", DateUtil.DateToString(ordenExamen.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-                    map.put("tipo", "Rutina");
-                    if (ordenExamen.getSolicitudDx().getControlCalidad())
-                        map.put("cc", messageSource.getMessage("lbl.yes", null, null));
-                    else
-                        map.put("cc", messageSource.getMessage("lbl.no", null, null));
-
-                    if (!ordenExamen.getLabProcesa().getCodigo().equals(ordenExamen.getSolicitudDx().getLabProcesa().getCodigo()))
-                        map.put("externo", messageSource.getMessage("lbl.yes", null, null));
-                    else
-                        map.put("externo", messageSource.getMessage("lbl.no", null, null));
-                    map.put("resultado", parseResultDetails(ordenExamen.getIdOrdenExamen()));
-                    mapResponse.put(indice, map);
-                    indice ++;
-                }
-                agregarExamenDx = true;
+                if (!ordenExamen.getLabProcesa().getCodigo().equals(ordenExamen.getSolicitudDx().getLabProcesa().getCodigo()))
+                    map.put("externo", messageSource.getMessage("lbl.yes", null, null));
+                else
+                    map.put("externo", messageSource.getMessage("lbl.no", null, null));
+                map.put("resultado", parseResultDetails(ordenExamen.getIdOrdenExamen()));
+                mapResponse.put(indice, map);
+                indice ++;
             }else{
                 map.put("idTomaMx", ordenExamen.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
                 map.put("idOrdenExamen", ordenExamen.getIdOrdenExamen());
@@ -480,22 +469,10 @@ public class EditarSolicitudesMxController {
     @ResponseBody
     String getSolicitudes(@RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
         logger.info("antes getSolicitudes");
-        TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
         List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(idTomaMx, seguridadService.obtenerNombreUsuario());
         List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdMxUser(idTomaMx, seguridadService.obtenerNombreUsuario());
-        List<DaSolicitudDx> dxMostrar = new ArrayList<DaSolicitudDx>();
-        if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
-            for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                if (trasladoActivo.getAreaDestino().getIdArea().equals(solicitudDx.getCodDx().getArea().getIdArea())){
-                    dxMostrar.add(solicitudDx);
-                }
-            }
-        }else{
-            dxMostrar = solicitudDxList;
-        }
-
         logger.info("despues getSolicitudes");
-        return SolicutudesToJson(dxMostrar,solicitudEstudios);
+        return SolicutudesToJson(solicitudDxList,solicitudEstudios);
     }
 
     /**

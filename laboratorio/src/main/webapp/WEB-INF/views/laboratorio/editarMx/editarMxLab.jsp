@@ -768,7 +768,7 @@
     <c:url var="sAgregarSolicitudUrl" value="/recepcionMx/agregarSolicitud"/>
     <c:url var="sAgregarOrdenExamenUrl" value="/recepcionMx/agregarOrdenExamen"/>
     <c:url var="sgetOrdenesExamenUrl" value="/editarMx/getOrdenesExamen"/>
-    <c:url var="sDxURL" value="/api/v1/getDiagnosticos"/>
+    <c:url var="sDxURL" value="/api/v1/getDiagnosticosEdicion"/>
     <c:url var="sExamenesURL" value="/api/v1/getExamenes"/>
     <c:url var="sEstudiosURL" value="/api/v1/getEstudios"/>
     <c:url var="sExamenesEstURL" value="/api/v1/getExamenesEstudio"/>

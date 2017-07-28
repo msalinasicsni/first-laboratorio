@@ -753,7 +753,7 @@ public class VisualizarNotificacionController {
                     String personFilledTab = febril.getNombreLlenoFicha() != null ? febril.getNombreLlenoFicha() : "----------";
 
 
-                    float y = 668;
+                    float y = 667;
                     float m = 11;
                     float x = 86;
                     float x1 = 86;
@@ -819,8 +819,8 @@ public class VisualizarNotificacionController {
                     x1 = x + 15;
                     GeneralUtils.drawTEXT(direccion, y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
 
+                    y -= 9;
                     if (procedencia != null) {
-                        y -= 9;
                         if (procedencia.equals("Urbano")) {
 
                             x1 = x + 55;

@@ -401,9 +401,9 @@ public class TomaMxService {
     public List<Dx_TipoMx_TipoNoti> getDx(String codMx, String tipoNoti, String userName) throws Exception {
         String query = "select dx from Dx_TipoMx_TipoNoti dx " +
                 "where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx " +
-                "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti ";
+                "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti and dx.diagnostico.pasivo = false";
         if (userName!=null) {
-          query +=  "and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.user.username = :userName)";
+          query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.user.username = :userName)";
         }
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
