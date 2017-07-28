@@ -43,6 +43,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 
@@ -166,7 +167,7 @@ public class VisualizarNotificacionController {
             map.put("idTomaMx", recepcion.getTomaMx().getIdTomaMx());
             map.put("fechaTomaMx", DateUtil.DateToString(recepcion.getTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
                     (recepcion.getTomaMx().getHoraTomaMx()!=null?" "+recepcion.getTomaMx().getHoraTomaMx():""));
-
+            map.put("tipoNoti", recepcion.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
             RecepcionMxLab recepcionMxLab = recepcionMxService.getRecepcionMxLabByIdRecepGral(recepcion.getIdRecepcion());
             if (recepcionMxLab != null)
                 map.put("fechaRecepcionLab", DateUtil.DateToString(recepcionMxLab.getFechaHoraRecepcion(), "dd/MM/yyyy hh:mm:ss a"));
@@ -304,7 +305,7 @@ public class VisualizarNotificacionController {
     @RequestMapping(value = "getPDF", method = RequestMethod.GET)
     public
     @ResponseBody
-    String getPDF(@RequestParam(value = "idNotificacion", required = true) String idNotificacion) throws Exception {
+    String getPDF(@RequestParam(value = "idNotificacion", required = true) String idNotificacion, HttpServletRequest request) throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         PDDocument doc = new PDDocument();
         DaNotificacion not = daNotificacionService.getNotifById(idNotificacion);
@@ -322,9 +323,9 @@ public class VisualizarNotificacionController {
                     doc.addPage(page);
                     PDPageContentStream stream = new PDPageContentStream(doc, page);
 
-                    String workingDir = System.getProperty("user.dir");
-
-                    BufferedImage image = ImageIO.read(new File(workingDir + "/fichaFebril.png"));
+                    String urlServer = "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+                    URL url = new URL(urlServer+"/resources/img/fichas/fichaFebril.png");
+                    BufferedImage image = ImageIO.read(url);
 
                     GeneralUtils.drawObject(stream, doc, image, 20, 30, 545, 745);
                     String silais = febril.getIdNotificacion().getCodSilaisAtencion().getNombre();
@@ -1701,9 +1702,9 @@ public class VisualizarNotificacionController {
                     PDPage page = new PDPage(PDPage.PAGE_SIZE_A4);
                     doc.addPage(page);
                     PDPageContentStream stream = new PDPageContentStream(doc, page);
-                    String workingDir = System.getProperty("user.dir");
-
-                    BufferedImage image = ImageIO.read(new File(workingDir + "/fichaIrag1.png"));
+                    String urlServer = "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+                    URL url = new URL(urlServer+"/resources/img/fichas/fichaIrag1.png");
+                    BufferedImage image = ImageIO.read(url);
 
                     GeneralUtils.drawObject(stream, doc, image, 10, 50, 580, 780);
 
@@ -2356,6 +2357,8 @@ public class VisualizarNotificacionController {
                             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.x", null, null), y, x1, stream, 7, PDType1Font.TIMES_BOLD);
 
                         }
+                    }else{
+                        y-= 56; // saltar toda la tabla de condiciones, aunque no tenga valoresw
                     }
 
                     y -= 40;
@@ -2604,6 +2607,8 @@ public class VisualizarNotificacionController {
 
                         }
 
+                    }else{
+                        y -= 73; // desplazar toda la tabla de manifestaciones aunque no tenga datos
                     }
 
                     y -= 18;
@@ -2754,7 +2759,8 @@ public class VisualizarNotificacionController {
 
 
                     float y1 = 0;
-                    BufferedImage image2 = ImageIO.read(new File(workingDir + "/fichaIrag2.png"));
+                    url = new URL(urlServer+"/resources/img/fichas/fichaIrag2.png");
+                    BufferedImage image2 = ImageIO.read(url);
                     //records request results
                     if (!diagnosticosList.isEmpty()) {
                         int con = 0;

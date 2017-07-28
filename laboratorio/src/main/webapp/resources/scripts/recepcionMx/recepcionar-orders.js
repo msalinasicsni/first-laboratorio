@@ -714,7 +714,7 @@ var ReceiptOrders = function () {
             function imprimir2(strBarCodes){
                 $.getJSON("http://localhost:13001/print", {
                     barcodes: strBarCodes,
-                    copias: 1,
+                    copias: 2,//2 de cada estiquer
                     ajax:'false'
                 }, function (data) {
                     console.log(data);

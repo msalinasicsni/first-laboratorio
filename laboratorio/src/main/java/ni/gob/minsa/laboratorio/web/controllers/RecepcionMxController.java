@@ -1428,6 +1428,7 @@ public class RecepcionMxController {
                 soli.setAprobada(false);
                 soli.setLabProcesa(labUsuario);
                 soli.setControlCalidad(false);
+                soli.setInicial(false);//no viene en la ficha, se agrega en el laboratorio
                 tomaMxService.addSolicitudDx(soli);
 
             } catch (Exception ex) {

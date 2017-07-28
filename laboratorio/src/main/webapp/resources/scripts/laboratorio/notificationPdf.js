@@ -21,7 +21,7 @@ var VisualizarPdf = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true,
                 "columns": [
-                    null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null, null,null,
                     {
                         "className": 'details-control',
                         "orderable": false,
@@ -144,7 +144,7 @@ var VisualizarPdf = function () {
 
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + json[1].idSolicitud + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].diagnosticos + "'/>", btnPdf]);
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].tipoNoti, " <input type='hidden' value='" + dataToLoad[i].diagnosticos + "'/>", btnPdf]);
 
                         }
                     } else {
@@ -197,7 +197,7 @@ var VisualizarPdf = function () {
                 }
                 else {
                     // Open this row
-                    row.child(format(row.data(), 8)).show();
+                    row.child(format(row.data(), 9)).show();
                     tr.addClass('shown');
                 }
             });
@@ -298,7 +298,7 @@ var VisualizarPdf = function () {
                             unBlockUI();
                         },
                         error: function (jqXHR) {
-                            desbloquearUI();
+                            unBlockUI();
                             validateLogin(jqXHR);
                         }
                     });

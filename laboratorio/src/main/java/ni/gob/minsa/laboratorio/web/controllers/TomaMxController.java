@@ -298,6 +298,7 @@ public class TomaMxController {
                 soli.setAprobada(false);
                 soli.setLabProcesa(laboratorio);
                 soli.setControlCalidad(false);
+                soli.setInicial(true);//es lo que viene en la ficha
                 tomaMxService.addSolicitudDx(soli);
 
                 JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
