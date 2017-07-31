@@ -277,7 +277,8 @@ var TrasladoMx = function () {
                                                 iconSmall: "fa fa-success",
                                                 timeout: 4000
                                             });
-                                            getMxs(false);
+                                            table1.fnClearTable();
+                                            //getMxs(false);
                                         }
                                         desbloquearUI();
                                     },

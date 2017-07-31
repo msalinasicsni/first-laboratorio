@@ -288,6 +288,9 @@ public class TrasladoMxController {
                     }else{//si no tien traslados, tomar el area del dx con mayor prioridad
                         trasladoMx.setAreaOrigen(solicitudDxList.get(0).getCodDx().getArea());
                     }
+                    //si el traslado tiene el mismo area de origen y destino, no procesar (puede que tenga traslado activo hacia el mismo area)
+                    if (trasladoMx.getAreaOrigen().getIdArea().equals(trasladoMx.getAreaDestino().getIdArea()))
+                        procesarTraslado = false;
                     //estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
                 }else {
                     if (tipoTraslado.equals("cc")) {
@@ -301,102 +304,102 @@ public class TrasladoMxController {
                 }
 
                 try {
-
-                    //crear solicitud dx, sólo si no existe solicitud pendiente de traslado para el nuevo dx solicitado
-                    if (tipoTraslado.equals("interno")){ //interno
-                        List<DaSolicitudDx> solicitudDxPendTrasladoList = tomaMxService.getSolicitudesDxSinTrasladoByIdToma(idTomaMx);
-                        //determinar si existe una solicitud pendiente para el nuevo tipo de dx solicitado, en caso de existir no se va a registrar nueva solicitud
-                        for (DaSolicitudDx solicitudDx : solicitudDxPendTrasladoList){
-                            if (solicitudDx.getCodDx().getIdDiagnostico().equals(dxTraslado.getIdDiagnostico())){
-                                crearSolicitud = false;
-                                break;
+                    if (procesarTraslado) {
+                        //crear solicitud dx, sólo si no existe solicitud pendiente de traslado para el nuevo dx solicitado
+                        if (tipoTraslado.equals("interno")) { //interno
+                            List<DaSolicitudDx> solicitudDxPendTrasladoList = tomaMxService.getSolicitudesDxSinTrasladoByIdToma(idTomaMx);
+                            //determinar si existe una solicitud pendiente para el nuevo tipo de dx solicitado, en caso de existir no se va a registrar nueva solicitud
+                            for (DaSolicitudDx solicitudDx : solicitudDxPendTrasladoList) {
+                                if (solicitudDx.getCodDx().getIdDiagnostico().equals(dxTraslado.getIdDiagnostico())) {
+                                    crearSolicitud = false;
+                                    break;
+                                }
                             }
-                        }
-                        if (crearSolicitud) {
-                            //sólo si no existe solicitud pendiente de traslado
-                            DaSolicitudDx solicitudDx = new DaSolicitudDx();
-                            solicitudDx.setIdTomaMx(tomaMx);
-                            solicitudDx.setAprobada(false);
-                            solicitudDx.setCodDx(dxTraslado);
-                            solicitudDx.setFechaHSolicitud(fhRegistro);
-                            solicitudDx.setControlCalidad(false);
-                            solicitudDx.setUsarioRegistro(usurioRegistro);
-                            solicitudDx.setLabProcesa(seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario()));
-                            tomaMxService.addSolicitudDx(solicitudDx);
-                        }
-                        tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
-                    }else{
-                        //se recupera la solicitud de dx existente para la muestra y el dx seleccionado por el usuario
-                        DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx,dxTraslado.getIdDiagnostico());
-                        if (solicitudDx!=null) {
-                            // control de calidad //crear envio y solicitud dx
-                            if (tipoTraslado.equals("cc")) {
-                                DaSolicitudDx solicitudDxCC = new DaSolicitudDx();
-                                solicitudDxCC.setIdTomaMx(tomaMx);
-                                solicitudDxCC.setAprobada(false);
-                                solicitudDxCC.setCodDx(dxTraslado);
-                                solicitudDxCC.setFechaHSolicitud(fhRegistro);
-                                solicitudDxCC.setControlCalidad(true);
-                                solicitudDxCC.setUsarioRegistro(usurioRegistro);
-                                solicitudDxCC.setLabProcesa(labDestino);
-                                tomaMxService.addSolicitudDx(solicitudDxCC);
-                            } else {
-                                //externo, validar si el dx tiene el examanen y el exámen sin resultado
-                                //si ya tiene registrado exámenes con resultado, no se va a trasladar
-                                String[] arrayExamenes = idExamenes.split(",");
-                                List<OrdenExamen> ordenExamenList;
-                                int contExamenesValidos = 0;
-                                for (String idExamen : arrayExamenes){
-                                    ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx,Integer.valueOf(idRutina),Integer.valueOf(idExamen),seguridadService.obtenerNombreUsuario());
-                                    if (ordenExamenList.size()>0){
-                                        if (resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
-                                            //solicitudDx.setSegundoLabProcesa2(labDestino);
-                                            //tomaMxService.updateSolicitudDx(solicitudDx);
-                                            OrdenExamen ordenProcesar = ordenExamenList.get(0);
-                                            ordenProcesar.setLabProcesa(labDestino);
-                                            ordenExamenMxService.updateOrdenExamen(ordenProcesar);
-                                            contExamenesValidos++;
+                            if (crearSolicitud) {
+                                //sólo si no existe solicitud pendiente de traslado
+                                DaSolicitudDx solicitudDx = new DaSolicitudDx();
+                                solicitudDx.setIdTomaMx(tomaMx);
+                                solicitudDx.setAprobada(false);
+                                solicitudDx.setCodDx(dxTraslado);
+                                solicitudDx.setFechaHSolicitud(fhRegistro);
+                                solicitudDx.setControlCalidad(false);
+                                solicitudDx.setUsarioRegistro(usurioRegistro);
+                                solicitudDx.setLabProcesa(seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario()));
+                                tomaMxService.addSolicitudDx(solicitudDx);
+                            }
+                            tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
+                        } else {
+                            //se recupera la solicitud de dx existente para la muestra y el dx seleccionado por el usuario
+                            DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, dxTraslado.getIdDiagnostico());
+                            if (solicitudDx != null) {
+                                // control de calidad //crear envio y solicitud dx
+                                if (tipoTraslado.equals("cc")) {
+                                    DaSolicitudDx solicitudDxCC = new DaSolicitudDx();
+                                    solicitudDxCC.setIdTomaMx(tomaMx);
+                                    solicitudDxCC.setAprobada(false);
+                                    solicitudDxCC.setCodDx(dxTraslado);
+                                    solicitudDxCC.setFechaHSolicitud(fhRegistro);
+                                    solicitudDxCC.setControlCalidad(true);
+                                    solicitudDxCC.setUsarioRegistro(usurioRegistro);
+                                    solicitudDxCC.setLabProcesa(labDestino);
+                                    tomaMxService.addSolicitudDx(solicitudDxCC);
+                                } else {
+                                    //externo, validar si el dx tiene el examanen y el exámen sin resultado
+                                    //si ya tiene registrado exámenes con resultado, no se va a trasladar
+                                    String[] arrayExamenes = idExamenes.split(",");
+                                    List<OrdenExamen> ordenExamenList;
+                                    int contExamenesValidos = 0;
+                                    for (String idExamen : arrayExamenes) {
+                                        ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, Integer.valueOf(idRutina), Integer.valueOf(idExamen), seguridadService.obtenerNombreUsuario());
+                                        if (ordenExamenList.size() > 0) {
+                                            if (resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
+                                                //solicitudDx.setSegundoLabProcesa2(labDestino);
+                                                //tomaMxService.updateSolicitudDx(solicitudDx);
+                                                OrdenExamen ordenProcesar = ordenExamenList.get(0);
+                                                ordenProcesar.setLabProcesa(labDestino);
+                                                ordenExamenMxService.updateOrdenExamen(ordenProcesar);
+                                                contExamenesValidos++;
+                                            }
                                         }
                                     }
+                                    //si ningún examen es válido para el traslado, no procesar traslado
+                                    if (contExamenesValidos <= 0)
+                                        procesarTraslado = false;
                                 }
-                                //si ningún examen es válido para el traslado, no procesar traslado
-                                if (contExamenesValidos<=0)
-                                    procesarTraslado = false;
+                            } else {//si no se encontró la solicitud, no se permite el traslado
+                                procesarTraslado = false;
+                                //throw new Exception("No se logró recuperar diagnóstico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
                             }
-                        }else {//si no se encontró la solicitud, no se permite el traslado
-                            procesarTraslado = false;
-                            //throw new Exception("No se logró recuperar diagnóstico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
-                        }
-                        if (procesarTraslado) {
-                            tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
+                            if (procesarTraslado) {
+                                tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
 
-                            DaEnvioMx envioMx = new DaEnvioMx();
-                            envioMx.setLaboratorioDestino(labDestino);
-                            envioMx.setUsarioRegistro(usurioRegistro);
-                            envioMx.setFechaHoraEnvio(fhRegistro);
-                            envioMx.setNombreTransporta(nombreTransporta);
-                            envioMx.setTemperaturaTermo(temperaturaTermo);
+                                DaEnvioMx envioMx = new DaEnvioMx();
+                                envioMx.setLaboratorioDestino(labDestino);
+                                envioMx.setUsarioRegistro(usurioRegistro);
+                                envioMx.setFechaHoraEnvio(fhRegistro);
+                                envioMx.setNombreTransporta(nombreTransporta);
+                                envioMx.setTemperaturaTermo(temperaturaTermo);
 
-                            try {
-                                tomaMxService.addEnvioOrden(envioMx);
-                            } catch (Exception ex) {
-                                resultado = messageSource.getMessage("msg.sending.error.add", null, null);
-                                resultado = resultado + ". \n " + ex.getMessage();
-                                ex.printStackTrace();
-                                throw new Exception(ex);
+                                try {
+                                    tomaMxService.addEnvioOrden(envioMx);
+                                } catch (Exception ex) {
+                                    resultado = messageSource.getMessage("msg.sending.error.add", null, null);
+                                    resultado = resultado + ". \n " + ex.getMessage();
+                                    ex.printStackTrace();
+                                    throw new Exception(ex);
+                                }
+                                //antes enviar a histórico relación mx y enviomx
+                                HistoricoEnvioMx historicoEnvioMx = new HistoricoEnvioMx();
+                                historicoEnvioMx.setEnvioMx(tomaMx.getEnvio());
+                                historicoEnvioMx.setTomaMx(tomaMx);
+                                historicoEnvioMx.setFechaHoraRegistro(fhRegistro);
+                                historicoEnvioMx.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                                trasladosService.saveHistoricoEnvioMx(historicoEnvioMx);
+                                //se setea nuevo envio
+                                tomaMx.setEnvio(envioMx);
                             }
-                            //antes enviar a histórico relación mx y enviomx
-                            HistoricoEnvioMx historicoEnvioMx = new HistoricoEnvioMx();
-                            historicoEnvioMx.setEnvioMx(tomaMx.getEnvio());
-                            historicoEnvioMx.setTomaMx(tomaMx);
-                            historicoEnvioMx.setFechaHoraRegistro(fhRegistro);
-                            historicoEnvioMx.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                            trasladosService.saveHistoricoEnvioMx(historicoEnvioMx);
-                            //se setea nuevo envio
-                            tomaMx.setEnvio(envioMx);
                         }
                     }
-
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
                     resultado = resultado + ". \n " + ex.getMessage();
@@ -527,114 +530,116 @@ public class TrasladoMxController {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-        for(DaTomaMx tomaMx : tomaMxList){
-            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx( tomaMx.getIdTomaMx()).size() > 0;
-            Map<String, String> map = new HashMap<String, String>();
-            //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
-            map.put("idTomaMx", tomaMx.getIdTomaMx());
-            map.put("codigoUnicoMx", esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
-            //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy")+
-                    (tomaMx.getHoraTomaMx()!=null?" "+tomaMx.getHoraTomaMx():""));
-            if (tomaMx.getIdNotificacion().getCodSilaisAtencion()!=null) {
-                map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
-            }else{
-                map.put("codSilais","");
-            }
-            if (tomaMx.getIdNotificacion().getCodUnidadAtencion()!=null) {
-                map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
-            }else {
-                map.put("codUnidadSalud","");
-            }
-            //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
-            map.put("separadaMx",(tomaMx.getMxSeparada()!=null?(tomaMx.getMxSeparada()?"Si":"No"):""));
-            map.put("cantidadTubos", (tomaMx.getCanTubos()!=null?String.valueOf(tomaMx.getCanTubos()):""));
-            map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
-            //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
-            //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
-            if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
-            else
-                map.put("fechaInicioSintomas"," ");
-            //Si hay persona
-            if (tomaMx.getIdNotificacion().getPersona()!=null){
-                /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
-                nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-            } else if (tomaMx.getIdNotificacion().getSolicitante()!=null){
-                map.put("persona",tomaMx.getIdNotificacion().getSolicitante().getNombre());
-            }else{
-                map.put("persona"," ");
-            }
-
-            //se arma estructura de solicitudes
-            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(),labUser.getCodigo());
-            Map<Integer, Object> mapSolicitudesList = new HashMap<Integer, Object>();
-            Map<String, String> mapSolicitud = new HashMap<String, String>();
-            if (solicitudDxList.size()>0) {
-                int subIndice=0;
-                for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                    mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
-                    mapSolicitud.put("tipo", "Rutina");
-                    mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                    //obtener los examenes solicitados para la solicitud
-                    List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
-                    int cont = 0;
-                    String ordenesEx = "";
-                    for (OrdenExamen ordenExamen : ordenes) {
-                        cont++;
-                        if (cont == ordenes.size()) {
-                            ordenesEx += ordenExamen.getCodExamen().getNombre();
-                        } else {
-                            ordenesEx += ordenExamen.getCodExamen().getNombre() + ", ";
-                        }
-
-                    }
-                    mapSolicitud.put("examenes", ordenesEx);
-                    subIndice++;
-                    mapSolicitudesList.put(subIndice, mapSolicitud);
-                    mapSolicitud = new HashMap<String, String>();
+        for(DaTomaMx tomaMx : tomaMxList) {
+            //solo muestras recepcionadas en laboratorio
+            if (tomaMx.getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|RCLAB")) {
+                boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
+                Map<String, String> map = new HashMap<String, String>();
+                //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
+                map.put("idTomaMx", tomaMx.getIdTomaMx());
+                map.put("codigoUnicoMx", esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab());
+                //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
+                map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy") +
+                        (tomaMx.getHoraTomaMx() != null ? " " + tomaMx.getHoraTomaMx() : ""));
+                if (tomaMx.getIdNotificacion().getCodSilaisAtencion() != null) {
+                    map.put("codSilais", tomaMx.getIdNotificacion().getCodSilaisAtencion().getNombre());
+                } else {
+                    map.put("codSilais", "");
                 }
-                map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
-            }else{
-                List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
-                int subIndice=0;
-                for (DaSolicitudEstudio solicitudEstudio : solicitudEstudios) {
-                    mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
-                    mapSolicitud.put("tipo", "Estudio");
-                    mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                    //obtener los examenes solicitados para la solicitud
-                    List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudEstudio.getIdSolicitudEstudio());
-                    int cont = 0;
-                    String ordenesEx = "";
-                    for (OrdenExamen ordenExamen : ordenes) {
-                        cont++;
-                        if (cont == ordenes.size()) {
-                            ordenesEx += ordenExamen.getCodExamen().getNombre();
-                        } else {
-                            ordenesEx += ordenExamen.getCodExamen().getNombre() + ", ";
-                        }
-                    }
-                    mapSolicitud.put("examenes", ordenesEx);
-
-                    subIndice++;
-                    mapSolicitudesList.put(subIndice, mapSolicitud);
-                    mapSolicitud = new HashMap<String, String>();
+                if (tomaMx.getIdNotificacion().getCodUnidadAtencion() != null) {
+                    map.put("codUnidadSalud", tomaMx.getIdNotificacion().getCodUnidadAtencion().getNombre());
+                } else {
+                    map.put("codUnidadSalud", "");
                 }
-                map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
+                //map.put("estadoOrden", tomaMx.getCodEstado().getValor());
+                map.put("separadaMx", (tomaMx.getMxSeparada() != null ? (tomaMx.getMxSeparada() ? "Si" : "No") : ""));
+                map.put("cantidadTubos", (tomaMx.getCanTubos() != null ? String.valueOf(tomaMx.getCanTubos()) : ""));
+                map.put("tipoMuestra", tomaMx.getCodTipoMx().getNombre());
+                //map.put("tipoExamen", tomaMx.getCodExamen().getNombre());
+                //Si hay fecha de inicio de sintomas se muestra
+                Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
+                if (fechaInicioSintomas != null)
+                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                else
+                    map.put("fechaInicioSintomas", " ");
+                //Si hay persona
+                if (tomaMx.getIdNotificacion().getPersona() != null) {
+                    /// se obtiene el nombre de la persona asociada a la ficha
+                    String nombreCompleto = "";
+                    nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                    if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                    if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                    map.put("persona", nombreCompleto);
+                } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
+                } else {
+                    map.put("persona", " ");
+                }
+
+                //se arma estructura de solicitudes
+                Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
+                Map<Integer, Object> mapSolicitudesList = new HashMap<Integer, Object>();
+                Map<String, String> mapSolicitud = new HashMap<String, String>();
+                if (solicitudDxList.size() > 0) {
+                    int subIndice = 0;
+                    for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                        mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
+                        mapSolicitud.put("tipo", "Rutina");
+                        mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                        //obtener los examenes solicitados para la solicitud
+                        List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                        int cont = 0;
+                        String ordenesEx = "";
+                        for (OrdenExamen ordenExamen : ordenes) {
+                            cont++;
+                            if (cont == ordenes.size()) {
+                                ordenesEx += ordenExamen.getCodExamen().getNombre();
+                            } else {
+                                ordenesEx += ordenExamen.getCodExamen().getNombre() + ", ";
+                            }
+
+                        }
+                        mapSolicitud.put("examenes", ordenesEx);
+                        subIndice++;
+                        mapSolicitudesList.put(subIndice, mapSolicitud);
+                        mapSolicitud = new HashMap<String, String>();
+                    }
+                    map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
+                } else {
+                    List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
+                    int subIndice = 0;
+                    for (DaSolicitudEstudio solicitudEstudio : solicitudEstudios) {
+                        mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
+                        mapSolicitud.put("tipo", "Estudio");
+                        mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                        //obtener los examenes solicitados para la solicitud
+                        List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudEstudio.getIdSolicitudEstudio());
+                        int cont = 0;
+                        String ordenesEx = "";
+                        for (OrdenExamen ordenExamen : ordenes) {
+                            cont++;
+                            if (cont == ordenes.size()) {
+                                ordenesEx += ordenExamen.getCodExamen().getNombre();
+                            } else {
+                                ordenesEx += ordenExamen.getCodExamen().getNombre() + ", ";
+                            }
+                        }
+                        mapSolicitud.put("examenes", ordenesEx);
+
+                        subIndice++;
+                        mapSolicitudesList.put(subIndice, mapSolicitud);
+                        mapSolicitud = new HashMap<String, String>();
+                    }
+                    map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
+                }
+                mapResponse.put(indice, map);
+                indice++;
             }
-            mapResponse.put(indice, map);
-            indice ++;
         }
-
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
