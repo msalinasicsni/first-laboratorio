@@ -438,7 +438,7 @@ public class ReportesService {
         String sQuery = "select count(r.idRecepcion) as total, dx.idDiagnostico, dx.nombre " +
                 "from RecepcionMx as r, DaSolicitudDx as sdx inner join sdx.idTomaMx as mx " +
                 "inner join sdx.codDx as dx " +
-                "where r.tomaMx.idTomaMx = mx.idTomaMx and sdx.anulado = false and sdx.labProcesa.codigo = :laboratorio " +
+                "where r.tomaMx.idTomaMx = mx.idTomaMx and sdx.anulado = false and sdx.inicial = true and sdx.labProcesa.codigo = :laboratorio " +
                 " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
                 "group by dx.idDiagnostico, dx.nombre";
 
