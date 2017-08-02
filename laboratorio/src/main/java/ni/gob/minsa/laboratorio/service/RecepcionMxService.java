@@ -430,13 +430,14 @@ public class RecepcionMxService {
 
     /**
      * Método que genera
-     * @param codigoLaboratorio
-     * @return
+     * @param codigoLaboratorio codigo del laboratorio que recepciona la muestra
+     * @param intento cantidad numeros a sumar al siguiente codigo a obtener. Intentos por que si falla la llamada, intenta obtener el siguiente mediante llamada recursiva
+     * @return String
      */
-    public String obtenerCodigoLab(String codigoLaboratorio){
+    public String obtenerCodigoLab(String codigoLaboratorio, int intento){
         String codigoLab=null;
         String anioActual = DateUtil.DateToString(new Date(), "yyyy");
-        String query = "select concat(to_char((count(a.idRecepcion)+1)),concat('-',to_char(current_date,'YY'))) " +
+        String query = "select concat(to_char((count(a.idRecepcion)+"+String.valueOf(intento)+")),concat('-',to_char(current_date,'YY'))) " +
                 "from RecepcionMx as a where a.labRecepcion.codigo = :codLab and a.tipoRecepcionMx.codigo = 'TPRECPMX|VRT' and to_char(a.fechaHoraRecepcion,'YYYY') =:anio";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -446,7 +447,18 @@ public class RecepcionMxService {
         if (oNumero!=null){
             codigoLab = oNumero.toString();
             codigoLab = codigoLaboratorio.concat("-").concat(codigoLab);
+            if (existeCodigoLab(codigoLab))
+                codigoLab = obtenerCodigoLab(codigoLaboratorio,intento+1);
         }
+
         return codigoLab;
+    }
+
+    private boolean existeCodigoLab(String codigoLab){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select codigoUnicoMx from DaTomaMx where codigoLab = :codigoLab");
+        q.setParameter("codigoLab", codigoLab);
+        Object oExiste  = q.uniqueResult();
+        return oExiste!=null;
     }
 }

@@ -508,7 +508,7 @@ public class TomaMxController {
             String codigo = generarCodigoUnicoMx();
             tomaMx.setCodigoUnicoMx(codigo);
             //todas deben tener codigo lab, porque son rutinas
-            tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo()));
+            tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(),1));
             codigoGenerado = tomaMx.getCodigoLab();
             tomaMx.setEnvio(envioOrden);
             try {
@@ -521,13 +521,14 @@ public class TomaMxController {
             }
 
             try {
-                daNotificacionService.updateNotificacion(notificacion);
+                //daNotificacionService.updateNotificacion(notificacion);
                 crearFicha(notificacion);
-            }catch (Exception ex){
+            }catch (Throwable ex){
+                tomaMxService.deleteTomaMx(tomaMx);
+                tomaMxService.deleteEnvioOrden(envioOrden);
                 resultado = messageSource.getMessage("msg.error.update.noti",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
                 ex.printStackTrace();
-                tomaMxService.deleteTomaMx(tomaMx);
                 throw ex;
             }
             //se procede a registrar los diagnósticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
@@ -545,10 +546,10 @@ public class TomaMxController {
                     recepcionMxService.addRecepcionMx(recepcionMx);
                 } catch (Exception ex) { //rollback completo
                     ex.printStackTrace();
-                    resultado=resultado+". \n "+ex.getMessage();
                     datosSolicitudService.deleteDetallesDatosRecepcionByTomaMx(tomaMx.getIdTomaMx());
                     tomaMxService.deleteSolicitudesDxByTomaMx(tomaMx.getIdTomaMx());
                     tomaMxService.deleteTomaMx(tomaMx);
+                    resultado=resultado+". \n "+ex.getMessage();
                 }
             }else{ //rollback completo
                 datosSolicitudService.deleteDetallesDatosRecepcionByTomaMx(tomaMx.getIdTomaMx());
@@ -585,7 +586,7 @@ public class TomaMxController {
         }
     }
 
-    private void crearFicha(DaNotificacion notificacion){
+    private void crearFicha(DaNotificacion notificacion) throws Exception{
         switch (notificacion.getCodTipoNotificacion().getCodigo()){
             case "TPNOTI|SINFEB": {
                 DaSindFebril sindFebril = sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion());
