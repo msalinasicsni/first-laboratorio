@@ -222,6 +222,9 @@
                     <li class="qualityControlReport">
                         <a href="<spring:url value="/reports/qualityControl/init" htmlEscape="true "/>" title="<spring:message code="menu.qualityControlReport" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.qualityControlReport" /></a>
                     </li>
+                    <li class="resultDx">
+                        <a href="<spring:url value="/reports/reportResultDx/init" htmlEscape="true "/>" title="<spring:message code="menu.report.result.dx" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.report.result.dx" /></a>
+                    </li>
 
                 </ul>
             </li>

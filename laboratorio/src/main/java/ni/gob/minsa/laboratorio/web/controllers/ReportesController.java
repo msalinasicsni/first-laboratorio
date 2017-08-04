@@ -2,15 +2,22 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.catalogos.AreaRep;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
+import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
+import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.Email.Attachment;
+import ni.gob.minsa.laboratorio.utilities.Email.EmailUtil;
+import ni.gob.minsa.laboratorio.utilities.Email.SessionData;
+import ni.gob.minsa.laboratorio.utilities.FiltrosReporte;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.BaseTable;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.Cell;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
@@ -29,12 +36,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
@@ -64,6 +76,10 @@ public class ReportesController {
     @Autowired
     @Qualifier(value = "entidadAdmonService")
     private EntidadAdmonService entidadAdmonService;
+
+    @Autowired
+    @Qualifier(value = "unidadesService")
+    private UnidadesService unidadesService;
 
     @Autowired
     @Qualifier(value = "tomaMxService")
@@ -100,6 +116,13 @@ public class ReportesController {
     @Autowired
     @Qualifier(value = "conceptoService")
     private ConceptoService conceptoService;
+
+    @Autowired
+    @Qualifier(value = "associationSR")
+    private AssociationSamplesRequestService associationSamplesRequestService;
+
+    @Resource(name = "parametrosService")
+    private ParametrosService parametrosService;
 
     @Autowired
     MessageSource messageSource;
@@ -3314,6 +3337,242 @@ public class ReportesController {
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
+    }
+
+    /*******************************************************************/
+    /************************ REPORTE POR RESULTADO DX ***********************/
+    /*******************************************************************/
+
+    @RequestMapping(value = "reportResultDx/init", method = RequestMethod.GET)
+    public String initReportResultDx(Model model,HttpServletRequest request) throws Exception {
+        logger.debug("Reporte por Resultado");
+        String urlValidacion="";
+        try {
+            urlValidacion = seguridadService.validarLogin(request);
+            //si la url esta vacia significa que la validación del login fue exitosa
+            if (urlValidacion.isEmpty())
+                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
+        }catch (Exception e){
+            e.printStackTrace();
+            urlValidacion = "404";
+        }
+        if (urlValidacion.isEmpty()) {
+            long idUsuario = seguridadService.obtenerIdUsuario(request);
+            List<EntidadesAdtvas> entidades = new ArrayList<EntidadesAdtvas>();
+            if (seguridadService.esUsuarioNivelCentral(idUsuario, ConstantsSecurity.SYSTEM_CODE)){
+                entidades = entidadAdmonService.getAllEntidadesAdtvas();
+            }else {
+                entidades = seguridadService.obtenerEntidadesPorUsuario((int) idUsuario, ConstantsSecurity.SYSTEM_CODE);
+            }
+            List<AreaRep> areas = new ArrayList<AreaRep>();
+            areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
+            areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
+            areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
+            List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+            model.addAttribute("areas", areas);
+            model.addAttribute("entidades", entidades);
+            model.addAttribute("dxs", catDx);
+            return "reportes/resultadoDx";
+        }else{
+            return  urlValidacion;
+        }
+    }
+
+    /**
+     * Método para obtener data para Reporte por Resultado dx
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
+     * @return Object
+     * @throws Exception
+     */
+    @RequestMapping(value = "dataReportResultDx", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<Object[]> fetchReportResultDxJson(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo los datos para Reporte por Resultado ");
+        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+
+        return reportesService.getDataDxResultReport(filtroRep);
+    }
+
+    /**
+     * Método para obtener data para Reporte por Resultado dx
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
+     * @return Object
+     * @throws Exception
+     */
+    @RequestMapping(value = "dataReportResultDxMail", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    String fetchReportResultDxCsv(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo los datos para Reporte por Resultado ");
+
+        try {
+            FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+
+            List<Object[]> datos = reportesService.getDataDxResultReport(filtroRep);
+            String subject = messageSource.getMessage("menu.reports", null, null) + "-" + messageSource.getMessage("menu.report.result.dx", null, null);
+            AreaRep area = catalogosService.getAreaRep(filtroRep.getCodArea());
+            String entidad = "";
+            String columnaEntidad = messageSource.getMessage("lbl.silais", null, null);
+            String desde = messageSource.getMessage("lbl.from", null, null) + DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy");
+            String hasta = messageSource.getMessage("lbl.to", null, null) + DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy");
+            if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|PAIS")) {
+                entidad = messageSource.getMessage("lbl.nic.rep", null, null);
+            } else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|SILAIS")) {
+                EntidadesAdtvas entidadesAdtva = entidadAdmonService.getSilaisById(filtroRep.getCodSilais());
+                if (entidadesAdtva != null)
+                    entidad = messageSource.getMessage("lbl.silais1", null, null) + " " + entidadesAdtva.getNombre();
+            }
+            if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|UNI")) {
+                Unidades unidad = unidadesService.getUnidadById(filtroRep.getCodUnidad());
+                if (unidad != null)
+                    entidad = messageSource.getMessage("lbl.health.unit1", null, null) + " " + unidad.getNombre();
+                columnaEntidad = messageSource.getMessage("lbl.health.unit", null, null);
+            }
+
+            String body = messageSource.getMessage("mail.body.resultDx", null, null);
+            body = String.format(body, area.getValor(), entidad, desde, hasta);
+
+            String toEmail = "";
+            Parametro parametro = parametrosService.getParametroByName("EMAIL_DEST_RESDX");
+            if (parametro!=null)
+                toEmail = parametro.getValor(); // can be any email id
+
+            Attachment attachment = new Attachment("reporteResDx.csv","application/octet-stream",createCSV(datos, columnaEntidad));
+
+            Session session = EmailUtil.openSession(getMailSessionData());
+
+            EmailUtil.sendAttachmentEmail(session, toEmail, subject, body, attachment);
+            return new Gson().toJson("OK");
+        }catch (Exception ex){
+            return new Gson().toJson(messageSource.getMessage("msg.error.sending.email",null,null)+" "+ ex.getMessage());
+        }
+    }
+
+    private SessionData getMailSessionData(){
+        SessionData sessionData = new SessionData();
+        Parametro parametro = parametrosService.getParametroByName("EMAIL_USER");
+        if (parametro!=null)
+            sessionData.setFromEmail(parametro.getValor());
+
+        parametro = parametrosService.getParametroByName("EMAIL_USER_PASS");
+        if (parametro!=null)
+            sessionData.setPassword(parametro.getValor());
+
+        parametro = parametrosService.getParametroByName("SMTP_SERVER");
+        if (parametro!=null)
+            sessionData.setSmtpHost(parametro.getValor());
+
+        parametro = parametrosService.getParametroByName("SMTP_PORT");
+        if (parametro!=null)
+            sessionData.setSmtpPort(parametro.getValor());
+
+        parametro = parametrosService.getParametroByName("SSL_PORT");
+        if (parametro!=null)
+            sessionData.setSslPort(parametro.getValor());
+
+        return sessionData;
+    }
+
+    private String createCSV(List<Object[]> datos, String columnaEntidad){
+        StringBuilder sb = new StringBuilder();
+        sb.append(columnaEntidad);
+        sb.append(',');
+        sb.append(messageSource.getMessage("lbl.total",null,null));
+        sb.append(',');
+        sb.append(messageSource.getMessage("lbl.positive",null,null));
+        sb.append(',');
+        sb.append(messageSource.getMessage("lbl.negative",null,null));
+        sb.append(',');
+        sb.append(messageSource.getMessage("lbl.without.result",null,null));
+        sb.append(',');
+        sb.append(messageSource.getMessage("lbl.sample.inadequate2",null,null));
+        sb.append(',');
+        sb.append(messageSource.getMessage("lbl.pos.percentage",null,null));
+        sb.append('\n');
+
+        for(Object[] dato : datos) {
+            sb.append(dato[0]);
+            sb.append(',');
+            sb.append(dato[2]);
+            sb.append(',');
+            sb.append(dato[3]);
+            sb.append(',');
+            sb.append(dato[4]);
+            sb.append(',');
+            sb.append(dato[5]);
+            sb.append(',');
+            sb.append(dato[7]);
+            sb.append(',');
+            sb.append(dato[6]);
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
+    /**
+     * Convierte un JSON con los filtros de búsqueda a objeto FiltrosReporte
+     * @param strJson filtros
+     * @return FiltrosReporte
+     * @throws Exception
+     */
+    private FiltrosReporte jsonToFiltroReportes(String strJson) throws Exception {
+        JsonObject jObjectFiltro = new Gson().fromJson(strJson, JsonObject.class);
+        FiltrosReporte filtroRep = new FiltrosReporte();
+        Date fechaInicio = null;
+        Date fechaFin = null;
+        Long codSilais = null;
+        Long codUnidadSalud = null;
+        String tipoNotificacion = null;
+        Integer factor= 0;
+        Long codDepartamento = null;
+        Long codMunicipio = null;
+        String codArea = null;
+        boolean subunidad = false;
+        boolean porSilais = true;//por defecto true
+        String codZona = null;
+        Integer idDx = null;
+
+        if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
+            codSilais = jObjectFiltro.get("codSilais").getAsLong();
+        if (jObjectFiltro.get("codUnidadSalud") != null && !jObjectFiltro.get("codUnidadSalud").getAsString().isEmpty())
+            codUnidadSalud = jObjectFiltro.get("codUnidadSalud").getAsLong();
+        if (jObjectFiltro.get("tipoNotificacion") != null && !jObjectFiltro.get("tipoNotificacion").getAsString().isEmpty())
+            tipoNotificacion = jObjectFiltro.get("tipoNotificacion").getAsString();
+        if (jObjectFiltro.get("codFactor") != null && !jObjectFiltro.get("codFactor").getAsString().isEmpty())
+            factor = jObjectFiltro.get("codFactor").getAsInt();
+        if (jObjectFiltro.get("fechaInicio") != null && !jObjectFiltro.get("fechaInicio").getAsString().isEmpty())
+            fechaInicio = DateUtil.StringToDate(jObjectFiltro.get("fechaInicio").getAsString() + " 00:00:00");
+        if (jObjectFiltro.get("fechaFin") != null && !jObjectFiltro.get("fechaFin").getAsString().isEmpty())
+            fechaFin = DateUtil.StringToDate(jObjectFiltro.get("fechaFin").getAsString() + " 23:59:59");
+        if (jObjectFiltro.get("codDepartamento") != null && !jObjectFiltro.get("codDepartamento").getAsString().isEmpty())
+            codDepartamento = jObjectFiltro.get("codDepartamento").getAsLong();
+        if (jObjectFiltro.get("codMunicipio") != null && !jObjectFiltro.get("codMunicipio").getAsString().isEmpty())
+            codMunicipio = jObjectFiltro.get("codMunicipio").getAsLong();
+        if (jObjectFiltro.get("codArea") != null && !jObjectFiltro.get("codArea").getAsString().isEmpty())
+            codArea = jObjectFiltro.get("codArea").getAsString();
+        if (jObjectFiltro.get("subunidades") != null && !jObjectFiltro.get("subunidades").getAsString().isEmpty())
+            subunidad = jObjectFiltro.get("subunidades").getAsBoolean();
+        if (jObjectFiltro.get("porSilais") != null && !jObjectFiltro.get("porSilais").getAsString().isEmpty())
+            porSilais = jObjectFiltro.get("porSilais").getAsBoolean();
+        if (jObjectFiltro.get("codZona") != null && !jObjectFiltro.get("codZona").getAsString().isEmpty())
+            codZona = jObjectFiltro.get("codZona").getAsString();
+        if (jObjectFiltro.get("idDx") != null && !jObjectFiltro.get("idDx").getAsString().isEmpty())
+            idDx = jObjectFiltro.get("idDx").getAsInt();
+
+        filtroRep.setSubunidades(subunidad);
+        filtroRep.setCodSilais(codSilais);
+        filtroRep.setCodUnidad(codUnidadSalud);
+        filtroRep.setFechaInicio(fechaInicio);
+        filtroRep.setFechaFin(fechaFin);
+        filtroRep.setTipoNotificacion(tipoNotificacion);
+        filtroRep.setFactor(factor);
+        filtroRep.setCodDepartamento(codDepartamento);
+        filtroRep.setCodMunicipio(codMunicipio);
+        filtroRep.setCodArea(codArea);
+        filtroRep.setAnioInicial(DateUtil.DateToString(fechaInicio, "yyyy"));
+        filtroRep.setPorSilais(porSilais);
+        filtroRep.setCodZona(codZona);
+        filtroRep.setIdDx(idDx);
+
+        return filtroRep;
     }
 
 }

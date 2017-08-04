@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.web.listener;
 
 import ni.gob.minsa.laboratorio.domain.audit.AuditTrail;
 import ni.gob.minsa.laboratorio.domain.audit.Auditable;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.StatelessSession;
 import org.hibernate.event.spi.*;
@@ -133,24 +134,30 @@ PostDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
      */
 	@Override
 	public void onPostUpdate(PostUpdateEvent event) {
-		try {  
+        StatelessSession session = null;
+        try {
             final Serializable entityId = event.getId();
             final String entityName = event.getEntity().getClass().toString();  
             final Date transTime = new Date(); // new Date(event.getSource().getTimestamp());  
             Object oldPropValue = null;
             Object newPropValue = null;
+
             if (event.getEntity() instanceof Auditable){
                 Auditable obj = (Auditable) event.getEntity();
 
                 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                 final String actorId = authentication.getName();
                 // need to have a separate session for audit save  
-	            StatelessSession session = event.getPersister().getFactory().openStatelessSession();  
+	            session = event.getPersister().getFactory().openStatelessSession();
 	            session.beginTransaction();
 
-	            // get the existing entity from session so that we can extract existing property values  
-	            Object existingEntity = session.get(event.getEntity().getClass(), entityId);  
-	  
+	            // get the existing entity from session so that we can extract existing property values
+                Object existingEntity = null;
+                if (!Hibernate.isInitialized(event.getEntity())){
+                    Hibernate.initialize(event.getEntity());
+                }
+                existingEntity = session.get(event.getEntity().getClass(), entityId);
+
 	            // cycle through property names, extract corresponding property values and insert new entry in audit trail  
 	            for (String propertyName : event.getPersister().getPropertyNames()) {  
 	            	if (obj.isFieldAuditable(propertyName)){
@@ -177,6 +184,8 @@ PostDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
 	            session.close(); 
             }
         } catch (HibernateException e) {
+            if (session!=null)
+                session.close();
             e.printStackTrace();
             LOG.error("Unable to process audit log for UPDATE operation", e);  
         }

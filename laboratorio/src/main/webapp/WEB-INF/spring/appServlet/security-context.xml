@@ -45,6 +45,7 @@
         <intercept-url pattern="/reports/positiveResults/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/posNegResults/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/consolidated/**" access="ROLE_RECEPCION,ROLE_ANALISTA" />
+        <intercept-url pattern="/reports/reportResultDx/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/searchMx/*" access="ROLE_RECEPCION" />
         <intercept-url pattern="/administracion/request/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/solicitante/**" access="ROLE_ADMIN,ROLE_RECEPCION" />

@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.catalogos.AreaRep;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
 import ni.gob.minsa.laboratorio.domain.estructura.Procedencia;
 import ni.gob.minsa.laboratorio.domain.irag.*;
@@ -1007,5 +1008,25 @@ public class CatalogoService {
         Query query = session.getNamedQuery("getCausaRechazoMxRecepLab");
         //Retrieve all
         return query.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<AreaRep> getAreaRep(){
+        //Retrieve session Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.createQuery("FROM AreaRep where pasivo = false order by orden");
+        //retrieve all
+        return query.list();
+    }
+
+    public AreaRep getAreaRep (String codigo){
+        //Retrieve session from hibernated
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.createQuery("FROM AreaRep area where area.pasivo = false and area.codigo = :codigo ");
+        query.setParameter("codigo",codigo);
+        //Retrieve all
+        return (AreaRep) query.uniqueResult();
     }
 }

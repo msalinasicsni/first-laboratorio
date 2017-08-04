@@ -73,6 +73,19 @@ public class UnidadesService {
         return  (Unidades)q.uniqueResult();
     }
 
+    /**
+     * @param idUnidad Id para obtener un objeto en especifico del tipo <code>Unidades</code>
+     * @return retorna un objeto filtrado del tipo <code>Unidades</code>
+     * @throws Exception
+     */
+    public Unidades getUnidadById(Long idUnidad) throws Exception {
+        Session session = sessionFactory.getCurrentSession();
+        String query = "from Unidades as a where unidadId=:idUnidad order by nombre asc";
+        Query q = session.createQuery(query);
+        q.setParameter("idUnidad", idUnidad);
+        return  (Unidades)q.uniqueResult();
+    }
+
     public List<Unidades> getPrimaryUnitsByMunicipio_Silais(String codMunicipio, long codSilais, String[] codTiposUnidades) throws Exception {
         List<Unidades> res = new ArrayList<Unidades>();
         try {
