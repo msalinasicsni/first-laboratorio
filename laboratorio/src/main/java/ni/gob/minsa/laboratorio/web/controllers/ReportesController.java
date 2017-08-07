@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -3401,17 +3402,25 @@ public class ReportesController {
      */
     @RequestMapping(value = "dataReportResultDxMail", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
-    String fetchReportResultDxCsv(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
+    String fetchReportResultDxCsv(@RequestParam(value = "filtro", required = true) String filtro,
+                                  @RequestParam(value = "csv", required = true) String csv) throws Exception{
         logger.info("Obteniendo los datos para Reporte por Resultado ");
 
         try {
             FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
-
-            List<Object[]> datos = reportesService.getDataDxResultReport(filtroRep);
+            //Destinatario
+            String toEmail = "";
+            Parametro parametro = parametrosService.getParametroByName("EMAIL_DEST_RESDX");
+            if (parametro!=null)
+                toEmail = parametro.getValor(); // can be any email id
+            //asunto
             String subject = messageSource.getMessage("menu.reports", null, null) + "-" + messageSource.getMessage("menu.report.result.dx", null, null);
+
+            //cuerpo
+            String body = messageSource.getMessage("mail.body.resultDx", null, null);
+
             AreaRep area = catalogosService.getAreaRep(filtroRep.getCodArea());
             String entidad = "";
-            String columnaEntidad = messageSource.getMessage("lbl.silais", null, null);
             String desde = messageSource.getMessage("lbl.from", null, null) + DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy");
             String hasta = messageSource.getMessage("lbl.to", null, null) + DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy");
             if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|PAIS")) {
@@ -3425,28 +3434,28 @@ public class ReportesController {
                 Unidades unidad = unidadesService.getUnidadById(filtroRep.getCodUnidad());
                 if (unidad != null)
                     entidad = messageSource.getMessage("lbl.health.unit1", null, null) + " " + unidad.getNombre();
-                columnaEntidad = messageSource.getMessage("lbl.health.unit", null, null);
             }
 
-            String body = messageSource.getMessage("mail.body.resultDx", null, null);
             body = String.format(body, area.getValor(), entidad, desde, hasta);
 
-            String toEmail = "";
-            Parametro parametro = parametrosService.getParametroByName("EMAIL_DEST_RESDX");
-            if (parametro!=null)
-                toEmail = parametro.getValor(); // can be any email id
+            //adjunto
+            csv = URLDecoder.decode(csv, "utf-8");
+            Attachment attachment = new Attachment("reporteResDx.csv","application/octet-stream", csv);
 
-            Attachment attachment = new Attachment("reporteResDx.csv","application/octet-stream",createCSV(datos, columnaEntidad));
-
+            //enviar correo
             Session session = EmailUtil.openSession(getMailSessionData());
-
             EmailUtil.sendAttachmentEmail(session, toEmail, subject, body, attachment);
+
             return new Gson().toJson("OK");
         }catch (Exception ex){
             return new Gson().toJson(messageSource.getMessage("msg.error.sending.email",null,null)+" "+ ex.getMessage());
         }
     }
 
+    /**
+     * Abrir sessión en servidor de correo
+     * @return SessionData
+     */
     private SessionData getMailSessionData(){
         SessionData sessionData = new SessionData();
         Parametro parametro = parametrosService.getParametroByName("EMAIL_USER");
@@ -3472,6 +3481,9 @@ public class ReportesController {
         return sessionData;
     }
 
+    /**
+     * Convertir lista de Objetos a formato CSV
+     */
     private String createCSV(List<Object[]> datos, String columnaEntidad){
         StringBuilder sb = new StringBuilder();
         sb.append(columnaEntidad);

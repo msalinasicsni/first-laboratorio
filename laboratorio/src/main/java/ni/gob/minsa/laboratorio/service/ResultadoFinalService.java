@@ -55,7 +55,7 @@ public class ResultadoFinalService {
                         Restrictions.eq("tomaMx.anulada", false))
         );
         crit.add(Restrictions.eq("diagnostico.anulado", false));
-        //y las ordenes en estado según filtro
+        //y las ordenes en estado segï¿½n filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
@@ -116,7 +116,7 @@ public class ResultadoFinalService {
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
-        //Se filtra por rango de fecha de recepción
+        //Se filtra por rango de fecha de recepciï¿½n
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
                     .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
@@ -138,7 +138,7 @@ public class ResultadoFinalService {
                     .setProjection(Property.forName("toma.idTomaMx"))));
 
         }
-        //se filtra por código de muestra(único o lab)
+        //se filtra por cï¿½digo de muestra(ï¿½nico o lab)
         if(filtro.getCodigoUnicoMx()!=null){
             crit.add(Restrictions.or(
                             Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
@@ -256,7 +256,7 @@ public class ResultadoFinalService {
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
 
-            //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
+            //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
             //nivel analista
             if (filtro.getNivelLaboratorio() == 1) {
                 crit.add(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
@@ -291,7 +291,7 @@ public class ResultadoFinalService {
             }
             //nivel director
             if (filtro.getNivelLaboratorio() == 3) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("codDx", "dx")
@@ -331,7 +331,7 @@ public class ResultadoFinalService {
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado según filtro
+        );//y las ordenes en estado segï¿½n filtro
         if (filtro.getCodEstado()!=null) {
             crit.add(Restrictions.and(
                     Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
@@ -379,7 +379,7 @@ public class ResultadoFinalService {
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
-        //Se filtra por rango de fecha de recepción
+        //Se filtra por rango de fecha de recepciï¿½n
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
                     .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
@@ -401,13 +401,13 @@ public class ResultadoFinalService {
                     .setProjection(Property.forName("toma.idTomaMx"))));
 
         }
-        //se filtra por código de muestra(único o lab)
+        //se filtra por cï¿½digo de muestra(ï¿½nico o lab)
         if(filtro.getCodigoUnicoMx()!=null){
             crit.add(Restrictions.or(
                             Restrictions.eq("tomaMx.codigoUnicoMx", filtro.getCodigoUnicoMx())).add(Restrictions.or(Restrictions.eq("tomaMx.codigoLab", filtro.getCodigoUnicoMx())))
             );
         }
-        //sólo cuando se busca desde resultado final, este filtro es null
+        //sï¿½lo cuando se busca desde resultado final, este filtro es null
         if (filtro.getSolicitudAprobada()==null) {
             // examenes con resultado
             crit.add(Subqueries.propertyIn("idSolicitudEstudio", DetachedCriteria.forClass(DetalleResultado.class)
@@ -512,10 +512,10 @@ public class ResultadoFinalService {
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
-            //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
+            //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
             //nivel analista
             if (filtro.getNivelLaboratorio() == 1) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
@@ -529,7 +529,7 @@ public class ResultadoFinalService {
             }
             //nivel jefe departamento
             if (filtro.getNivelLaboratorio() == 2) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
@@ -549,7 +549,7 @@ public class ResultadoFinalService {
             }
             //nivel director
             if (filtro.getNivelLaboratorio() == 3) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("estudio.idSolicitudEstudio", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
@@ -619,7 +619,7 @@ public class ResultadoFinalService {
 
 
     /**
-     * Obtiene un catalogo lista según el id indicado
+     * Obtiene un catalogo lista segï¿½n el id indicado
      * @param id del Catalogo Lista a obtener
      * @return Catalogo_lista
      */
@@ -639,10 +639,12 @@ public class ResultadoFinalService {
         Query q = session.createQuery(query);
         q.setParameter("idSolicitud", idSolicitud);
         resultadoFinals = q.list();
-        String query2 = "select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud ";
-        Query q2 = session.createQuery(query2);
-        q2.setParameter("idSolicitud", idSolicitud);
-        resultadoFinals.addAll(q2.list());
+        if (resultadoFinals.size()<=0) {
+            String query2 = "select a from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud ";
+            Query q2 = session.createQuery(query2);
+            q2.setParameter("idSolicitud", idSolicitud);
+            resultadoFinals.addAll(q2.list());
+        }
         return  resultadoFinals;
     }
 
@@ -776,7 +778,7 @@ public class ResultadoFinalService {
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado según filtro
+        );//y las ordenes en estado segï¿½n filtro
         Criteria crit2 = session.createCriteria(RechazoResultadoFinalSolicitud.class, "rechazo");
         crit2.createAlias("rechazo.solicitudDx","rutina");
         crit2.createAlias("rutina.idTomaMx","tomaMx");
@@ -785,7 +787,7 @@ public class ResultadoFinalService {
         //siempre se tomam las muestras que no estan anuladas
         crit2.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado según filtro
+        );//y las ordenes en estado segï¿½n filtro
         if (filtro.getCodEstado()!=null) {
             crit.add(Restrictions.and(
                     Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
@@ -854,7 +856,7 @@ public class ResultadoFinalService {
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
-        //Se filtra por rango de fecha de recepción
+        //Se filtra por rango de fecha de recepciï¿½n
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
                     .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
@@ -945,10 +947,10 @@ public class ResultadoFinalService {
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
-            //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
+            //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
             //nivel analista
             if (filtro.getNivelLaboratorio() == 1) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
@@ -972,7 +974,7 @@ public class ResultadoFinalService {
             }
             //nivel jefe departamento
             if (filtro.getNivelLaboratorio() == 2) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")
@@ -1011,7 +1013,7 @@ public class ResultadoFinalService {
             }
             //nivel director
             if (filtro.getNivelLaboratorio() == 3) {
-                //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                 crit.add(Restrictions.and(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("anulado", false))
                         .createAlias("tipoEstudio", "estudio")

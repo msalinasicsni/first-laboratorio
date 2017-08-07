@@ -4,15 +4,12 @@ package ni.gob.minsa.laboratorio.utilities.Email;
  * Created by Miguel Salinas on 8/3/2017.
  * V1.0
  */
-import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
-import ni.gob.minsa.laboratorio.service.ParametrosService;
 
 import java.util.Date;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.annotation.Resource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -43,10 +40,10 @@ public class EmailUtil {
     }
     /**
      * Utility method to send simple HTML email
-     * @param session
-     * @param toEmail
-     * @param subject
-     * @param body
+     * @param session Session abierta con el servidor de correo
+     * @param toEmail destinatarios (separados por coma)
+     * @param subject Asunto del correo
+     * @param body Cuerpo del correo
      */
     public static void sendEmail(Session session, String toEmail, String subject, String body){
         try
@@ -79,10 +76,11 @@ public class EmailUtil {
 
     /**
      * Utility method to send email with content
-     * @param session
-     * @param toEmail
-     * @param subject
-     * @param body
+     * @param session Session abierta con el servidor de correo
+     * @param toEmail destinatarios (separados por coma)
+     * @param subject Asunto del correo
+     * @param body Cuerpo del correo
+     * @param attachment Adjunto(puede ser cualquier tipo de archivo)
      */
     public static void sendAttachmentEmail(Session session, String toEmail, String subject, String body, Attachment attachment) throws Exception{
         try{
