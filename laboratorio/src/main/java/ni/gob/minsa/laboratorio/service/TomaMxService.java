@@ -575,7 +575,7 @@ public class TomaMxService {
      *
      */
     @SuppressWarnings("unchecked")
-    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti, String idTomaMx) throws Exception {
+    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti) throws Exception {
         String query = "select est from Estudio_TipoMx_TipoNoti est, DaSolicitudEstudio as dse inner join dse.tipoEstudio as tes " +
                 "where dse.anulado = false and est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
                 "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " +
@@ -585,7 +585,6 @@ public class TomaMxService {
         Query q = session.createQuery(query);
         q.setString("codTipoMx", codTipoMx);
         q.setString("codTipoNoti", codTipoNoti);
-        q.setParameter("idTomaMx",idTomaMx);
 
         return q.list();
     }

@@ -72,12 +72,13 @@ public class ExamenesService {
      * @param idExamenes String con los ids de los examenes a filtrar, separados por coma Ejm: 1,2,3
      * @return List<Examen_Dx>
      */
-    public List<Examen_Dx> getExamenesByIdDxAndIdsEx(int idDx, String idExamenes){
+    public List<Examen_Dx> getExamenesByIdDxAndIdsEx(int idDx, String idExamenes, String username){
         Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery("select edx from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx " +
-                "where dx.idDiagnostico = :idDx "+
+        Query q = session.createQuery("select edx from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx, AutoridadExamen as ae " +
+                "where ae.examen.idExamen = ex.idExamen and ae.pasivo = false and ae.autoridadArea.pasivo = false and ae.autoridadArea.user.username = :username and dx.idDiagnostico = :idDx "+
                 " and ex.idExamen in("+ idExamenes +") and edx.pasivo = false and ex.pasivo = false ");
         q.setParameter("idDx",idDx);
+        q.setParameter("username", username);
         return q.list();
     }
 

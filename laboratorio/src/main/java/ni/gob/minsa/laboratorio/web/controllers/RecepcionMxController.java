@@ -356,7 +356,8 @@ public class RecepcionMxController {
                                     Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
                                     for(DaSolicitudDx solicitudDx : solicitudDxList) {
                                         if (pExamenesDefecto != null) {
-                                            examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor());
+                                            //se recuperan los examenes por defecto que puede agregar el usuario (autoridad examen)
+                                            examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor(), usuario.getUsername());
                                         }
                                         if (examenesList != null) {
                                             //se registran los examenes por defecto
@@ -1260,7 +1261,8 @@ public class RecepcionMxController {
                                 //se obtienen los id de los examenes por defecto
                                 Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
                                 if (pExamenesDefecto != null)
-                                    examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor());
+                                    //se recuperan los examenes por defecto que puede agregar el usuario (autoridad examen)
+                                    examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor(), user.getUsername());
                                 if (examenesList != null) {
                                     //se registran los examenes por defecto
                                     for (Examen_Dx examenTmp : examenesList) {
