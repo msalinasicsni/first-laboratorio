@@ -54,6 +54,7 @@ var resultReport = function () {
                     }
                 },
                 "autoWidth" : true,
+                "pageLength": 20,
                 "preDrawCallback" : function() {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_data_result) {
@@ -284,6 +285,10 @@ var resultReport = function () {
             });
 
             function sendMail() {
+                // CSV
+                var fileHeader = $("#fileTitle").val()+'"\r\n"'+$("#from").val()+$("#initDate").val()+'  '+$("#to").val()+$("#endDate").val();
+                var csv = exportTableToCSV($('#tableRES'), $("#fileName").val()+'.csv', fileHeader);
+
                 var filtro = {};
                 //filtro['subunidades'] = $('#ckUS').is(':checked');
                 filtro['fechaInicio'] = $('#initDate').val();
@@ -301,6 +306,7 @@ var resultReport = function () {
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sMailUrl, {
                     filtro: JSON.stringify(filtro),
+                    csv : encodeURIComponent(csv),
                     ajax: 'true'
                 }, function(data) {
                     if (data==='OK'){

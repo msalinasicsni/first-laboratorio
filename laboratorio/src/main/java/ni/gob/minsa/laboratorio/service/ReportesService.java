@@ -527,14 +527,17 @@ public class ReportesService {
                         " where ent.pasivo = 0 " +
                         " order by ent.codigo ");
 
-                queryIdNoti = session.createQuery(" select noti.codSilaisAtencion.codigo, dx.idSolicitudDx " +
-                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                queryIdNoti = session.createQuery(" select noti.codSilaisAtencion.codigo, dx.idSolicitudDx, r.valor " +
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaSolicitud rr where rr.idRespuesta = r.respuesta.idRespuesta),'NULL')"+
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
+                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion " +
                         sqlRutina +sqlFechasRut +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                        " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
-                        //" and dx.aprobada = true " +
+                        " and dx.aprobada = true " +
                         " and noti.codSilaisAtencion is not null " +
                         " order by noti.codSilaisAtencion.codigo");
 
@@ -568,11 +571,14 @@ public class ReportesService {
                         "where div.dependencia is null and div.pasivo = '0'" +
                         " order by div.divisionpoliticaId ");
 
-                queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.municipio.dependencia.divisionpoliticaId, dx.idSolicitudDx " +
-                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.municipio.dependencia.divisionpoliticaId, dx.idSolicitudDx, r.valor " +
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaSolicitud rr where rr.idRespuesta = r.respuesta.idRespuesta),'NULL')"+
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
+                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion " +
                         sqlRutina +sqlFechasRut +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                        " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
                         " and dx.aprobada = true " +
@@ -618,16 +624,20 @@ public class ReportesService {
                     "where div.entidadAdtvaId = :codSilais " +
                     " order by div.entidadAdtvaId ");
 
-            queryIdNoti = session.createQuery(" select noti.codSilaisAtencion.entidadAdtvaId, dx.idSolicitudDx " +
-                    " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+            queryIdNoti = session.createQuery(" select noti.codSilaisAtencion.entidadAdtvaId, dx.idSolicitudDx, r.valor " +
+                    ", coalesce((select rr.concepto.tipo.codigo from RespuestaSolicitud rr where rr.idRespuesta = r.respuesta.idRespuesta),'NULL')"+
+                    ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
+                    " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                     " where noti.idNotificacion = mx.idNotificacion " +
                     sqlRutina +sqlFechasRut +
                     " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                    " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                     " and noti.pasivo = false and dx.anulado = false " +
                     " and mx.anulada = false " +
                     " and dx.aprobada = true " +
                     " and noti.codSilaisAtencion.entidadAdtvaId = :codSilais " +
                     " order by noti.codSilaisAtencion.entidadAdtvaId ");
+
 /*
             queryNotiDx = session.createQuery(" select div.divisionpoliticaId, div.nombre, " +
                     " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
@@ -713,11 +723,14 @@ public class ReportesService {
                         " and uni.tipoUnidad in ("+ HealthUnitType.UnidadesPrimHosp.getDiscriminator()+") " +
                         " order by uni.unidadId ");
 
-                queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.unidadId, dx.idSolicitudDx " +
-                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.unidadId, dx.idSolicitudDx, r.valor " +
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaSolicitud rr where rr.idRespuesta = r.respuesta.idRespuesta),'NULL')"+
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
+                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion " +
                         sqlRutina +sqlFechasRut +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                        " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
                         " and dx.aprobada = true " +
@@ -756,11 +769,14 @@ public class ReportesService {
                         " and uni.tipoUnidad in ("+ HealthUnitType.UnidadesPrimHosp.getDiscriminator()+") " +
                         " order by uni.unidadId ");
 
-                queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.unidadId, dx.idSolicitudDx " +
-                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.unidadId, dx.idSolicitudDx, r.valor " +
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaSolicitud rr where rr.idRespuesta = r.respuesta.idRespuesta),'NULL')"+
+                        ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
+                        " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion " +
                         sqlRutina +sqlFechasRut +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                        " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
                         " and dx.aprobada = true " +
@@ -794,80 +810,82 @@ public class ReportesService {
             int pos = 0;
             int neg = 0;
             int inadecuada = 0;
+            String idSolicitud = "";
             for (Object[] sol : resTemp2) {
-                if (sol[0].equals(reg[0])) {
+                //identidad
+                if (sol[0].equals(reg[0]) && !sol[0].equals(idSolicitud)) {
 
-                    List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(sol[1].toString());
-                    for (DetalleResultadoFinal res : finalRes) {
-                        if (res.getRespuesta() != null) {
-                            if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                                Integer idLista = Integer.valueOf(res.getValor());
-                                Catalogo_Lista valor = null;
-                                try {
-                                    valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                if (valor != null) {
-                                    if (valor.getValor().trim().toLowerCase().contains("positivo")) {
-                                        pos++;
-                                        break;
-                                    } else if (valor.getValor().trim().toLowerCase().contains("negativo")) {
-                                        neg++;
-                                        break;
-                                    }
-                                }
-
-
-                            } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                                if (res.getValor().trim().toLowerCase().contains("positivo")) {
-                                    pos++;
-                                    break;
-                                } else if (res.getValor().trim().toLowerCase().contains("negativo")) {
-                                    neg++;
-                                }else if (res.getValor().trim().toLowerCase().contains("mx inadecuada")){
-                                    inadecuada++;
-                                }
-
+                    if (!sol[3].toString().equalsIgnoreCase("NULL")){
+                        if (sol[3].toString().equalsIgnoreCase("TPDATO|LIST")) {
+                            Integer idLista = Integer.valueOf(sol[2].toString());
+                            Catalogo_Lista valor = null;
+                            try {
+                                valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
 
-                        } else if (res.getRespuestaExamen() != null) {
-                            if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                                Integer idLista = Integer.valueOf(res.getValor());
-                                Catalogo_Lista valor = null;
-                                try {
-                                    valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-
-                                if (valor != null) {
-                                    if (valor.getValor().trim().toLowerCase().contains("positivo")) {
-                                        pos++;
-                                        break;
-                                    } else if (valor.getValor().trim().toLowerCase().contains("negativo")) {
-                                        neg++;
-                                        break;
-                                    }
-                                }
-
-                            } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                                if (res.getValor().trim().toLowerCase().contains("positivo")) {
+                            if (valor != null) {
+                                if (valor.getValor().trim().toLowerCase().contains("positivo")) {
                                     pos++;
-                                    break;
-                                } else if (res.getValor().trim().toLowerCase().contains("negativo")) {
+                                    idSolicitud = sol[1].toString();
+                                } else if (valor.getValor().trim().toLowerCase().contains("negativo")) {
                                     neg++;
-                                    break;
-                                }else if (res.getValor().trim().toLowerCase().contains("mx inadecuada")){
-                                    inadecuada++;
+                                    idSolicitud = sol[1].toString();
                                 }
                             }
+
+
+                        } else if (sol[3].toString().equalsIgnoreCase("TPDATO|TXT")) {
+                            if (sol[2].toString().trim().toLowerCase().contains("positivo")) {
+                                pos++;
+                                idSolicitud = sol[1].toString();
+                            } else if (sol[2].toString().trim().toLowerCase().contains("negativo")) {
+                                neg++;
+                                idSolicitud = sol[1].toString();
+                            }else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")){
+                                inadecuada++;
+                                idSolicitud = sol[1].toString();
+                            }
+
+                        }
+                    } else if (!sol[4].toString().equalsIgnoreCase("NULL")){
+                        if (sol[4].toString().equalsIgnoreCase("TPDATO|LIST")) {
+                            Integer idLista = Integer.valueOf(sol[2].toString());
+                            Catalogo_Lista valor = null;
+                            try {
+                                valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            if (valor != null) {
+                                if (valor.getValor().trim().toLowerCase().contains("positivo")) {
+                                    pos++;
+                                    idSolicitud = sol[1].toString();
+                                } else if (valor.getValor().trim().toLowerCase().contains("negativo")) {
+                                    neg++;
+                                    idSolicitud = sol[1].toString();
+                                }
+                            }
+
+
+                        } else if (sol[4].toString().equalsIgnoreCase("TPDATO|TXT")) {
+                            if (sol[2].toString().trim().toLowerCase().contains("positivo")) {
+                                pos++;
+                                idSolicitud = sol[1].toString();
+                            } else if (sol[2].toString().trim().toLowerCase().contains("negativo")) {
+                                neg++;
+                                idSolicitud = sol[1].toString();
+                            }else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")){
+                                inadecuada++;
+                                idSolicitud = sol[1].toString();
+                            }
+
                         }
                     }
                 }
             }
-
 
             reg1[3] = pos; // Positivo
             reg1[4] = neg; // Negativo

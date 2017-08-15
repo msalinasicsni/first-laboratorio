@@ -84,7 +84,7 @@
 <!-- row -->
 <div class="row">
 <!-- NEW WIDGET START -->
-<article class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+<article class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
     <!-- Widget ID (each widget will need unique ID)-->
     <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
         <!-- widget options:
@@ -125,6 +125,8 @@
                         <!-- START ROW -->
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.dxs.large" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"> <i class="fa fa-list"></i></span>
                                     <select  name="idDx" id="idDx" data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.dxs.large" />" class="select2">
@@ -140,6 +142,8 @@
                         <!-- START ROW -->
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.level" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
                                     <select  name="codArea" id="codArea" data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.level" />" class="select2">
@@ -173,6 +177,8 @@
                         <!-- START ROW -->
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12" id="silais" hidden="hidden">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.silais" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
                                     <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.silais" />" name="codSilais" id="codSilais" class="select2">
@@ -188,6 +194,8 @@
                         <!-- START ROW -->
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12" id="unidad" hidden="hidden">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.health.unit" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
                                     <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.health.unit" />" name="codUnidadAtencion" id="codUnidadAtencion" class="select2">
@@ -217,7 +225,8 @@
                         <div class="row">
 
                             <section class="col col-sm-12 col-md-12 col-lg-6">
-
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.init.date" /> </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i
                                         class="icon-append fa fa-calendar fa-fw"></i>
@@ -231,10 +240,9 @@
                             </section>
 
                             <section class="col col-sm-12 col-md-6 col-lg-6">
-                                <%--  <label class="text-left txt-color-blue font-md">
+                                <label class="text-left txt-color-blue font-md">
                                       <spring:message code="lbl.end.date"/>
-                                  </label>--%>
-
+                                  </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i
                                         class="icon-append fa fa-calendar fa-fw"></i>
