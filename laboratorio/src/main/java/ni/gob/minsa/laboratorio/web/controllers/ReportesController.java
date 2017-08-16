@@ -2833,7 +2833,10 @@ public class ReportesController {
                     } else {
                         map.put("persona", " ");
                     }
-
+                    List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
+                    map.put("resultado",parseResultDetails(resFinal));
+                    map.put("procesa", (resFinal.size()>0?resFinal.get(0).getUsuarioRegistro().getUsername():""));
+                    map.put("aprueba", (soli.getUsuarioAprobacion()!=null?soli.getUsuarioAprobacion().getUsername():""));
                     mapResponse.put(indice, map);
                     indice++;
                 }
@@ -2875,6 +2878,10 @@ public class ReportesController {
                         map.put("persona", " ");
                     }
 
+                    List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(soliE.getIdSolicitudEstudio());
+                    map.put("resultado",parseResultDetails(resFinal));
+                    map.put("procesa", (resFinal.size()>0?resFinal.get(0).getUsuarioRegistro().getUsername():""));
+                    map.put("aprueba", (soliE.getUsuarioAprobacion()!=null?soliE.getUsuarioAprobacion().getUsername():""));
                     mapResponse.put(indice, map);
                     indice++;
                 }
@@ -2888,6 +2895,35 @@ public class ReportesController {
 
     }
 
+    private String parseResultDetails(List<DetalleResultadoFinal> resultList){
+        String resultados="";
+        for(DetalleResultadoFinal res: resultList){
+            if (res.getRespuesta()!=null) {
+                resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados+=": "+cat_lista.getValor();
+                }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    resultados+=": "+valorBoleano;
+                } else {
+                    resultados+=": "+res.getValor();
+                }
+            }else if (res.getRespuestaExamen()!=null){
+                resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados+=": "+cat_lista.getValor();
+                } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    resultados+=": "+valorBoleano;
+                }else {
+                    resultados+=": "+res.getValor();
+                }
+            }
+        }
+        return resultados;
+    }
 
     @RequestMapping(value = "/general/generalRepToPDF", method = RequestMethod.GET)
     public

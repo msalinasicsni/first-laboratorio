@@ -660,9 +660,12 @@ var ReceptionReport = function () {
                         },
                         {
                             "sExtends": "pdf",
-                            "fnClick": function () {
+                            "sTitle": "Reporte general de resultados",
+                            "sPdfSize": "A4",
+                            "sPdfOrientation": "landscape"
+                            /*"fnClick": function () {
                                 exportGenReportPDF();
-                            }
+                            }*/
                         }
 
                     ],
@@ -754,7 +757,8 @@ var ReceptionReport = function () {
                         for (var i = 0; i < len; i++) {
 
                             table4.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitud, dataToLoad[i].resultado]);
+                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].fechaAprobacion, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona,
+                                    dataToLoad[i].solicitud, dataToLoad[i].resultado, dataToLoad[i].procesa, dataToLoad[i].aprueba]);
 
                             if (i + 1 < len) {
                                 codigos += dataToLoad[i].idSolicitud + ",";
