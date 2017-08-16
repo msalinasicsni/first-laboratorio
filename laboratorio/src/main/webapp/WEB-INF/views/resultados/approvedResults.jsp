@@ -94,7 +94,12 @@
                 <input id="text_value" type="hidden" value="<spring:message code="lbl.result.value"/>"/>
                 <input id="text_date" type="hidden" value="<spring:message code="lbl.result.date"/>"/>
                 <input id="text_response" type="hidden" value="<spring:message code="lbl.approve.response"/>"/>
-
+                <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.undo.aproval.result.confirm"/>"/>
+                <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                <input id="msg_reject_cancel" type="hidden" value="<spring:message code="msg.undo.aproval.result.cancel"/>"/>
+                <input id="msg_undo_approval" type="hidden" value="<spring:message code="msg.undo.aproval.result.success"/>"/>
                 <form id="searchResults-form" class="smart-form" autocomplete="off">
                     <fieldset>
                         <div class="row">
@@ -253,6 +258,7 @@
                     <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.notification.type"/></th>
                     <th data-class="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                     <th data-class="phone"><i class="fa fa-fw fa-file-text-o  text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.final.result"/></th>
+                    <th data-class="phone"><spring:message code="act.override"/></th>
                 </tr>
                 </thead>
             </table>
@@ -332,13 +338,15 @@
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="sSearchUrl" value="/aprobacion/searchApproved"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
+<c:url var="sUndoApprovalResult" value="/aprobacion/undoApprovalResult"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
         var parametros = {
             sSearchUrl : "${sSearchUrl}",
             sUnidadesUrl : "${unidadesURL}",
-            blockMess: "${blockMess}"
+            blockMess: "${blockMess}",
+            sUndoApprovalResult: "${sUndoApprovalResult}"
         };
         ApprovedResults.init(parametros);
 

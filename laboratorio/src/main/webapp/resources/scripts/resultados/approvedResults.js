@@ -35,7 +35,7 @@ var ApprovedResults = function () {
                 "autoWidth": true, //"T<'clear'>"+
                 "columns": [
                     null, null, null, null, null, null, null,
-                    null/*{ //PARA MOSTRAR TABLA DETALLE RESULTADO
+                    null, null/*{ //PARA MOSTRAR TABLA DETALLE RESULTADO
                         "className": 'details-control',
                         "orderable": false,
                         "data": null,
@@ -159,8 +159,19 @@ var ApprovedResults = function () {
                                     dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);*/
                             table1.fnAddData(
                                 [dataToLoad[i].solicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaAprobacion, dataToLoad[i].codigoUnicoMx,
-                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].resultados]);
+                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].resultados, '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + dataToLoad[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
                         }
+                        $(".anularSolicitud").on("click", function () {
+                            confirmarDeshacerAprobacion($(this).data('id'));
+                        });
+
+                        //al paginar se define nuevamente la función de cargar el detalle
+                        $(".dataTables_paginate").on('click', function () {
+                            $(".anularSolicitud").unbind("click");
+                            $(".anularSolicitud").on('click', function () {
+                                confirmarDeshacerAprobacion($(this).data('id'));
+                            });
+                        });
                     } else {
                         $.smallBox({
                             title: $("#msg_no_results_found").val(),
@@ -175,6 +186,71 @@ var ApprovedResults = function () {
                     .fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);
                         validateLogin(jqXHR);
+                    });
+            }
+
+            function confirmarDeshacerAprobacion(idSolicitud){
+                var opcSi = $("#confirm_msg_opc_yes").val();
+                var opcNo = $("#confirm_msg_opc_no").val();
+                $.SmartMessageBox({
+                    title: $("#msg_confirm_title").val(),
+                    content: $("#msg_confirm_content").val(),
+                    buttons: '[' + opcSi + '][' + opcNo + ']'
+                }, function (ButtonPressed) {
+                    if (ButtonPressed === opcSi) {
+                        deshacerAprobacion(idSolicitud);
+                    }
+                    if (ButtonPressed === opcNo) {
+                        $.smallBox({
+                            title: $("#msg_reject_cancel").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                            color: "#3276B1",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 3000
+                        });
+                    }
+                })
+            }
+
+            function deshacerAprobacion(idSolicitud) {
+                bloquearUI(parametros.blockMess);
+                var objResultado = {};
+                objResultado["idSolicitud"] = idSolicitud;
+                objResultado["mensaje"] = '';
+                $.ajax(
+                    {
+                        url: parametros.sUndoApprovalResult,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(objResultado),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        async: false,
+                        success: function (data) {
+                            desbloquearUI();
+                            if (data.mensaje.length > 0) {
+                                $.smallBox({
+                                    title: data.mensaje,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            } else {
+                                $.smallBox({
+                                    title: $("#msg_undo_approval").val(),
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                                getResultadosAprobados(false);
+                            }
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
                     });
             }
 

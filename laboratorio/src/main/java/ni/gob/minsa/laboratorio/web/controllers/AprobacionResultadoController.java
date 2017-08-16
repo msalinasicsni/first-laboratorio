@@ -879,4 +879,49 @@ public class AprobacionResultadoController {
         logger.info("Realizando búsqueda de Toma de Mx.");
         return ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(idSolicitud);
     }
+
+    @RequestMapping(value = "undoApprovalResult", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void undoApprovalResult(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String idSolicitud="";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idSolicitud = jsonpObject.get("idSolicitud").getAsString();
+            DaSolicitudDx solicitudDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
+            DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
+            if (solicitudEstudio == null && solicitudDx == null){
+                throw new Exception(messageSource.getMessage("msg.solic.not.found",null,null));
+            }else {
+                if (solicitudDx!=null){
+                    solicitudDx.setAprobada(false);
+                    solicitudDx.setFechaAprobacion(null);
+                    solicitudDx.setUsuarioAprobacion(null);
+                    tomaMxService.updateSolicitudDx(solicitudDx);
+                } else if (solicitudEstudio!=null){
+                    solicitudEstudio.setAprobada(false);
+                    solicitudEstudio.setFechaAprobacion(null);
+                    solicitudEstudio.setUsuarioAprobacion(null);
+                    tomaMxService.updateSolicitudEstudio(solicitudEstudio);
+                }
+
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.undo.approve.result.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idSolicitud",idSolicitud);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
 }
