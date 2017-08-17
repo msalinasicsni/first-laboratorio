@@ -176,7 +176,15 @@ PostDeleteEventListener, PostInsertEventListener, PostUpdateEventListener
                                     }
                                 }
 		                	}
-		                }  
+		                }else{//si tenia valor y ahora se esta seteando en null debe registrar pista
+                            oldPropValue = event.getPersister().getPropertyValue(existingEntity, propertyName);
+                            if (oldPropValue != null && !(oldPropValue instanceof Collection)){
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("{} for: {}, ID: {}, property: {}, old value: {}, new value: {}, actor: {}, date: {}", new Object[]{OPERATION_TYPE_UPDATE, entityName, entityId, propertyName, oldPropValue, newPropValue, actorId, transTime});
+                                }
+                                session.insert(new AuditTrail(entityId.toString(), entityName, propertyName, oldPropValue.toString(), null, OPERATION_TYPE_UPDATE, actorId, transTime));
+                            }
+                        }
 	            	}
 	            }  
 	  
