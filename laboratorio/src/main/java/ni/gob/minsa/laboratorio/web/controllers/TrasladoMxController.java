@@ -235,6 +235,8 @@ public class TrasladoMxController {
             if (jsonpObject.get("idExamenes")!=null && !jsonpObject.get("idExamenes").toString().isEmpty())
                 idExamenes = jsonpObject.get("idExamenes").getAsString();
 
+            if (jsonpObject.get("labDestino")!=null && !jsonpObject.get("labDestino").toString().isEmpty())
+                codLabDestino = jsonpObject.get("labDestino").getAsString();
 
             //Se obtiene estado en que debe quedar la muestra (Trasladada)
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|TRAS");
@@ -250,7 +252,7 @@ public class TrasladoMxController {
             Catalogo_Dx dxTraslado = tomaMxService.getDxById(idRutina);
             if (!tipoTraslado.equals("interno")){
                 //codLabDestino viene cuando es traslado externo, cuando no viene es porque es control de calidad y por defecto se toma el CNDR
-                labDestino = laboratoriosService.getLaboratorioByCodigo(!codLabDestino.isEmpty()?codLabDestino:"LBCNDR");
+                labDestino = laboratoriosService.getLaboratorioByCodigo(!codLabDestino.isEmpty()?codLabDestino:"CNDR");
                 if (labDestino==null){
                     throw new Exception("No se logró recuperar laboratio destino");
                 }
