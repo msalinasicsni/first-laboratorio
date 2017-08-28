@@ -19,7 +19,7 @@ import java.util.Date;
  * Created by FIRSTICT on 12/9/2014.
  */
 @Entity
-@Table(name = "recepcion_mx", schema = "laboratorio")
+@Table(name = "recepcion_mx", schema = "laboratorio", uniqueConstraints = @UniqueConstraint(columnNames = {"CODUNICOMX","LABORATORIO_RECEP"},name = "RECEPCION_MX_CODUNICO_LAB"))
 public class RecepcionMx implements Serializable, Auditable {
 
     String idRecepcion;

@@ -209,18 +209,18 @@ var Concepts  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEditC = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+''+
+                        var btnEditC = '<button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idConcepto+ "," + data[i].nombre + "," + data[i].tipo.codigo+''+
                             '"> <i class="fa fa-edit"></i>' ;
 
-                        var btnAddList = ' <button type="button" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto + "," + data[i].nombre +
+                        var btnAddList = ' <button type="button" title="Valores de lista" class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto + "," + data[i].nombre +
                             '"> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnAddListDisabled = ' <button type="button" disabled class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+'' +
+                        var btnAddListDisabled = ' <button type="button" title="Valores de lista" disabled class="btn btn-primary btn-xs " data-id="'+data[i].idConcepto+'' +
                             '"> <i class="fa fa-list-ol"></i>';
 
 
-                        var btnOverrideC = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idConcepto+'' +
+                        var btnOverrideC = ' <button type="button" title="Anular" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idConcepto+'' +
                             '"> <i class="fa fa-times"></i>';
 
 
@@ -356,10 +356,10 @@ var Concepts  = function () {
                     valuesTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnEdit = '<button type="button" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+'' +
+                        var btnEdit = '<button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+'' +
                                     '" > <i class="fa fa-edit"></i>' ;
 
-                        var btnOverride = '<button type="button" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ '' +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ '' +
                             '" > <i class="fa fa-times"></i>' ;
 
                           valuesTable.fnAddData(

@@ -59,7 +59,7 @@ var Files = function () {
                     var len = data.length;
                     table1.fnClearTable();
                     for (var i = 0; i < len; i++) {
-                        table1.fnAddData([data[i].nombre, data[i].descripcion,"<a href='"+parametros.getFileUrl + data[i].nombre + "'><i class='fa fa-download'></i></a>"]);
+                        table1.fnAddData([data[i].nombre, data[i].descripcion,"<a title='Descargar imagen' class='btn btn-primary btn-xs' href='"+parametros.getFileUrl + data[i].nombre + "'><i class='fa fa-download'></i></a>"]);
                     }
                 }).fail(function (jqXHR) {
                     desbloquearUI();

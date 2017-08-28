@@ -138,7 +138,7 @@ var VisualizarPdf = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var json = JSON.parse(dataToLoad[i].diagnosticos);
-                            var btnPdf = '<button type="button" class="btn btn-success btn-xs" data-id="' + dataToLoad[i].idNotificacion +
+                            var btnPdf = '<button title="Ver en PDF" type="button" class="btn btn-success btn-xs" data-id="' + dataToLoad[i].idNotificacion +
                                 '" > <i class="fa fa-file-pdf-o"></i>';
 
 

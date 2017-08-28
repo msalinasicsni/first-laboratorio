@@ -134,7 +134,7 @@ var ReceiptLabOrders = function () {
 
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + json[1].idSolicitud + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].fechaRecepcionLab, dataToLoad[i].separadaMx,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].diagnosticos + "'/>", '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].diagnosticos + "'/>", '<a target="_blank" title="Ver" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
                     } else {

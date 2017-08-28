@@ -83,8 +83,8 @@ var SearchPerson = function () {
 
                         table1.fnAddData(
                             [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, nombreMuniRes,
-                                    '<a href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-edit"></i></a>',
-                                    '<a href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
+                                    '<a target="_blank" title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
+                                    '<a target="_blank" title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
 
                     }
                     setTimeout($.unblockUI, 500);

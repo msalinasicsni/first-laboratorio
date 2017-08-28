@@ -107,17 +107,17 @@
 													<spring:param name="idNotificacion" value="${noti.idNotificacion}" />
 												</spring:url>
 												<td><c:if test="${noti.pasivo==false}">
-                                                        <a href="${fn:escapeXml(editUrl)}" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>
+                                                        <a target="_blank" title="Tomar Mx" href="${fn:escapeXml(editUrl)}" class="btn btn-primary btn-xs"><i class="fa fa-eyedropper"></i></a>
                                                     </c:if>
                                                     <c:if test="${noti.pasivo==true}">
-                                                    <button type="button" disabled class="btn btn-xs btn-primary"> <i class="fa fa-edit"></i></button>
+                                                    <button type="button" title="Tomar Mx" disabled class="btn btn-xs btn-primary"> <i class="fa fa-eyedropper"></i></button>
                                                     </c:if>
                                                 </td>
                                                 <td><c:if test="${noti.pasivo==false}">
-                                                        <a href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a>
+                                                        <a target="_blank" title="Anular" href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a>
                                                     </c:if>
                                                     <c:if test="${noti.pasivo==true}">
-                                                        <button type="button" disabled class="btn btn-danger btn-xs"> <i class="fa fa-times"></i></button>
+                                                        <button type="button" title="Anular" disabled class="btn btn-danger btn-xs"> <i class="fa fa-times"></i></button>
                                                     </c:if>
                                                 </td>
 											</tr>

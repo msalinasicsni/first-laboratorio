@@ -266,7 +266,7 @@ var OrganizationChart = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="' + data[i].codigo + "," + data[i].nombre +
+                        var btnAdd = '<button type="button" title="Direcciones asociadas" class="btn btn-primary btn-xs" data-id="' + data[i].codigo + "," + data[i].nombre +
                             '" > <i class="fa fa-list"></i>';
 
                         table1.fnAddData(
@@ -363,10 +363,10 @@ var OrganizationChart = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="' + data[i].idDireccionLab + "," + data[i].direccion.nombre + "," + data[i].laboratorio.nombre +
+                        var btnDetail = '<button type="button" title="Dep. Asociados" class="btn btn-primary btn-xs" data-id="' + data[i].idDireccionLab + "," + data[i].direccion.nombre + "," + data[i].laboratorio.nombre +
                             '" > <i class="fa fa-list"></i>';
 
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="' + data[i].idDireccionLab +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="' + data[i].idDireccionLab +
                             '" > <i class="fa fa-times"></i>';
                         table2.fnAddData(
                             [data[i].direccion.nombre, btnDetail, btnOverride]);
@@ -535,11 +535,11 @@ var OrganizationChart = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="' + data[i].idDepartDireccion + "," + data[i].departamento.nombre + ","+ data[i].direccionLab.direccion.nombre + "," + data[i].direccionLab. laboratorio.nombre +
+                        var btnDetail = '<button type="button" title="Areas asociadas" class="btn btn-primary btn-xs" data-id="' + data[i].idDepartDireccion + "," + data[i].departamento.nombre + ","+ data[i].direccionLab.direccion.nombre + "," + data[i].direccionLab. laboratorio.nombre +
                             '" > <i class="fa fa-list"></i>';
 
 
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="' + data[i].idDepartDireccion +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="' + data[i].idDepartDireccion +
                             '" > <i class="fa fa-times"></i>';
                         table3.fnAddData(
                             [data[i].departamento.nombre, btnDetail, btnOverride]);
@@ -718,7 +718,7 @@ var OrganizationChart = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="' + data[i].idAreaDepartamento +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="' + data[i].idAreaDepartamento +
                             '" > <i class="fa fa-times"></i>';
                         table4.fnAddData(
                             [data[i].area.nombre, btnOverride]);

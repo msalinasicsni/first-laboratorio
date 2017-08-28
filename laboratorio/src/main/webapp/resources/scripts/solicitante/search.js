@@ -80,7 +80,7 @@ var SearchApplicant = function () {
                         if (data[i].pasivo)
                             habilitado = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
                         table1.fnAddData(
-                            [data[i].nombre, data[i].telefono, habilitado, data[i].nombreContacto, data[i].correoContacto, data[i].telefonoContacto, '<a href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>']);
+                            [data[i].nombre, data[i].telefono, habilitado, data[i].nombreContacto, data[i].correoContacto, data[i].telefonoContacto, '<a target="_blank" title="Editar" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-edit"></i></a>']);
 
                     }
                     setTimeout($.unblockUI, 500);

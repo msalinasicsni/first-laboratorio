@@ -359,13 +359,13 @@ var ReceiptOrders = function () {
                                 idLoad = dataToLoad[i].idRecepcion;
                                 actionUrl = actionUrl + idLoad;
                                 table1.fnAddData(
-                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                                 //[dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                             } else {
                                 idLoad = dataToLoad[i].idTomaMx;
                                 actionUrl = actionUrl + idLoad;
                                 table1.fnAddData(
-                                    [dataToLoad[i].tipoMuestra + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    [dataToLoad[i].tipoMuestra + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                             }
 
 
@@ -405,7 +405,7 @@ var ReceiptOrders = function () {
                             }
                             table3.fnAddData(
                                 [response[i].tipo,response[i].nombre, response[i].fechaSolicitud, response[i].nombreAreaPrc, response[i].cc,
-                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
+                                        '<a data-toggle="modal" title="Cancelar solicitud" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
 
                         }
                         $(".anularSolicitud").on("click", function () {
@@ -445,7 +445,7 @@ var ReceiptOrders = function () {
                             }
                             table2.fnAddData(
                                 [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud, response[i].cc, response[i].externo,
-                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
+                                        '<a data-toggle="modal" title="Cancelar examen" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
 
                         }
                         $(".anularExamen").on("click", function () {

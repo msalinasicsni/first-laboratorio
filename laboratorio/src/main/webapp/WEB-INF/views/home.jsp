@@ -305,7 +305,7 @@
                             }
                             var actionUrl = "${sCreateReceiptUrl}"+idLoad;
                             table1.fnAddData(
-                                    [dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, dataToLoad[i].persona, '<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    [dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, dataToLoad[i].persona, '<a target="_blank" title="Ver" href='+ actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
 

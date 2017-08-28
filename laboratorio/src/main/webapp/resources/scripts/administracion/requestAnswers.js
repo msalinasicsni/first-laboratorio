@@ -160,11 +160,11 @@ var DxAnswers = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
 
-                            var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
+                            var btnAdd = '<button type="button" title="Respuestas resultado" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
                                 '" > <i class="fa fa-list"></i>' ;
                             //       var actionUrl = parametros.sActionUrl + dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud;
 
-                            var btnDataEntry = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
+                            var btnDataEntry = '<button type="button" title="Datos ingreso recepción paciente" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
                                 '" > <i class="fa fa-list"></i>' ;
                             if (dataToLoad[i].tipoSolicitud == 'Estudio') {
                                 btnDataEntry = '<button type="button" disabled class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idDx + "," + dataToLoad[i].tipoSolicitud +
@@ -336,11 +336,11 @@ var DxAnswers = function () {
                                 botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id=' + dataToLoad[i].idRespuesta + '><i class="fa fa-times"></i></a>';
                             } else {
                                 pas = $("#val_no").val();
-                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id=' + dataToLoad[i].idRespuesta + '><i class="fa fa-times"></i></a>';
+                                botonEditar = '<a data-toggle="modal" title="Editar" class="btn btn-danger btn-xs" data-id=' + dataToLoad[i].idRespuesta + '><i class="fa fa-times"></i></a>';
                             }
                             table2.fnAddData(
                                 [dataToLoad[i].nombre, dataToLoad[i].concepto.nombre, dataToLoad[i].orden, req , pas , dataToLoad[i].minimo, dataToLoad[i].maximo, dataToLoad[i].descripcion,
-                                        '<a data-toggle="modal" class="btn btn-default btn-xs btn-primary" data-id=' + dataToLoad[i].idRespuesta + '><i class="fa fa-edit"></i></a>',
+                                        '<a data-toggle="modal" title="Anular" class="btn btn-default btn-xs btn-primary" data-id=' + dataToLoad[i].idRespuesta + '><i class="fa fa-edit"></i></a>',
                                     botonEditar]);
                         }
                     } else {
@@ -666,11 +666,11 @@ var DxAnswers = function () {
                                 botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConceptoSol+'><i class="fa fa-times"></i></a>';
                             } else {
                                 pas = $("#val_no").val();
-                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConceptoSol+'><i class="fa fa-times"></i></a>';
+                                botonEditar = '<a data-toggle="modal" title="Editar" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idConceptoSol+'><i class="fa fa-times"></i></a>';
                             }
                             dataEntryTable.fnAddData(
                                 [dataToLoad[i].nombre,dataToLoad[i].concepto.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].descripcion,
-                                        '<a data-toggle="modal" class="btn btn-default btn-xs btn-primary" data-id='+dataToLoad[i].idConceptoSol+'><i class="fa fa-edit"></i></a>',
+                                        '<a data-toggle="modal" title="Anular" class="btn btn-default btn-xs btn-primary" data-id='+dataToLoad[i].idConceptoSol+'><i class="fa fa-edit"></i></a>',
                                     botonEditar]);
                         }
                     }else{

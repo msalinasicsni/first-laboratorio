@@ -129,16 +129,16 @@ var Tests = function () {
                     var len = data.length;
                     table1.fnClearTable();
                     for (var i = 0; i < len; i++) {
-                        var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idExamen+'> <i class="fa fa-times"></i>';
-                        var btnEditar = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+'> <i class="fa fa-edit"></i>';
+                        var btnOverride = ' <button type="button" title="Anular" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idExamen+'> <i class="fa fa-times"></i>';
+                        var btnEditar = ' <button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+'> <i class="fa fa-edit"></i>';
                         var nombreFormat = replaceAll(data[i].nombre,' ','*');
-                        var btnRules = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+','+nombreFormat+'> <i class="fa fa-ban"></i>';
+                        var btnRules = ' <button type="button" title="Ver reglas sugeridas" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+','+nombreFormat+'> <i class="fa fa-ban"></i>';
                         var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
                         if (data[i].pasivo==true){
                             pasivo = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
                             btnOverride = ' <button type="button" disabled class="btn btn-default btn-xs btn-danger" data-id='+data[i].idExamen+' ' +
                                 '> <i class="fa fa-times"></i>';
-                            btnRules = ' <button type="button" disabled class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+' ' +
+                            btnRules = ' <button type="button" disabled title="Ver reglas sugeridas" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idExamen+' ' +
                                 '> <i class="fa fa-ban"></i>';
                         }
 
@@ -379,9 +379,9 @@ var Tests = function () {
                     var len = data.length;
                     table2.fnClearTable();
                     for (var i = 0; i < len; i++) {
-                        var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idRegla+' ' +
+                        var btnOverride = ' <button type="button" title="Anular" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idRegla+' ' +
                             '> <i class="fa fa-times"></i>';
-                        var btnEditar = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idRegla+' ' +
+                        var btnEditar = ' <button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id='+data[i].idRegla+' ' +
                             '> <i class="fa fa-edit"></i>';
 
                         table2.fnAddData(

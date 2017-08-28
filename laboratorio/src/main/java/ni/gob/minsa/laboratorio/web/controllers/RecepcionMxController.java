@@ -16,6 +16,7 @@ import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
@@ -126,6 +127,9 @@ public class RecepcionMxController {
 
     @Resource(name = "organizationChartService")
     private OrganizationChartService organizationChartService;
+
+    @Resource(name = "autoridadesService")
+    private AutoridadesService autoridadesService;
 
     @Autowired
     MessageSource messageSource;
@@ -1204,6 +1208,8 @@ public class RecepcionMxController {
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|RCLAB");
             //se obtiene calidad de la muestra
             CalidadMx calidadMx = catalogosService.getCalidadMx("CALIDMX|ADC");
+            //Areas sobre las que tiene autoridad el usuario
+            List<AutoridadArea> areasAutorizadas = autoridadesService.getAutoridadesArea(seguridadService.obtenerNombreUsuario());
             //se obtienen recepciones a recepcionar en lab
             JsonObject jObjectRecepciones = new Gson().fromJson(strRecepciones, JsonObject.class);
             for(int i = 0; i< cantRecepciones;i++) {
@@ -1251,38 +1257,42 @@ public class RecepcionMxController {
                 try {
                     //se procesan las ordenes de examen
                     //boolean tieneOrdenesAnuladas = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
-                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), recepcionMxLab.getArea().getIdArea(),seguridadService.obtenerNombreUsuario());
-                    if (solicitudDxList!=null && solicitudDxList.size()> 0){
-                        //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
-                        Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
-                        if (pTipoNoti != null) {
-                            for(DaSolicitudDx solicitudDx : solicitudDxList) {
-                                List<Examen_Dx> examenesList = null;
-                                //se obtienen los id de los examenes por defecto
-                                Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
-                                if (pExamenesDefecto != null)
-                                    //se recuperan los examenes por defecto que puede agregar el usuario (autoridad examen)
-                                    examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor(), user.getUsername());
-                                if (examenesList != null) {
-                                    //se registran los examenes por defecto
-                                    for (Examen_Dx examenTmp : examenesList) {
-                                        //sólo se agrega la oorden si aún no tiene registrada orden de examen, misma toma, mismo dx, mismo examen y no está anulado
-                                        if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudDx.getCodDx().getIdDiagnostico(), examenTmp.getExamen().getIdExamen(),seguridadService.obtenerNombreUsuario()).size() <= 0) {
-                                            OrdenExamen ordenExamen = new OrdenExamen();
-                                            ordenExamen.setSolicitudDx(solicitudDx);
-                                            ordenExamen.setCodExamen(examenTmp.getExamen());
-                                            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                            ordenExamen.setUsuarioRegistro(user);
-                                            ordenExamen.setLabProcesa(labUsuario);
-                                            try {
-                                                ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                                procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepción
-                                            } catch (Exception ex) {
-                                                ex.printStackTrace();
-                                                logger.error("Error al agregar orden de examen", ex);
+                    //Se valida en cada área que tenga asociada el usuario si se puede agregar el examen por defecto configurado
+                    for(AutoridadArea area : areasAutorizadas) {
+                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), recepcionMxLab.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                        //List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), area.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                        if (solicitudDxList != null && solicitudDxList.size() > 0) {
+                            //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
+                            Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                            if (pTipoNoti != null) {
+                                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                    List<Examen_Dx> examenesList = null;
+                                    //se obtienen los id de los examenes por defecto
+                                    Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
+                                    if (pExamenesDefecto != null)
+                                        //se recuperan los examenes por defecto que puede agregar el usuario (autoridad examen)
+                                        examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor(), user.getUsername());
+                                    if (examenesList != null) {
+                                        //se registran los examenes por defecto
+                                        for (Examen_Dx examenTmp : examenesList) {
+                                            //sólo se agrega la oorden si aún no tiene registrada orden de examen, misma toma, mismo dx, mismo examen y no está anulado
+                                            if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudDx.getCodDx().getIdDiagnostico(), examenTmp.getExamen().getIdExamen(), seguridadService.obtenerNombreUsuario()).size() <= 0) {
+                                                OrdenExamen ordenExamen = new OrdenExamen();
+                                                ordenExamen.setSolicitudDx(solicitudDx);
+                                                ordenExamen.setCodExamen(examenTmp.getExamen());
+                                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                ordenExamen.setUsuarioRegistro(user);
+                                                ordenExamen.setLabProcesa(labUsuario);
+                                                try {
+                                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                    procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepción
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                    logger.error("Error al agregar orden de examen", ex);
+                                                }
+                                            } else {//si ya esta registrada una orden válida, entonces se puede procesar
+                                                procesarRecepcion = true;
                                             }
-                                        }else{//si ya esta registrada una orden válida, entonces se puede procesar
-                                            procesarRecepcion = true;
                                         }
                                     }
                                 }
@@ -2267,7 +2277,7 @@ public class RecepcionMxController {
                         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
                         GeneralUtils.drawTEXT(code, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
                         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.file.number", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
-                        GeneralUtils.drawTEXT(notificacionService.getNumExpediente(tomaMx.getIdNotificacion().getIdNotificacion()), y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
+                        GeneralUtils.drawTEXT(notificacionService.getNumExpediente(tomaMx.getIdNotificacion().getIdNotificacion()), y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
                         y = y - 15;
                         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
                         GeneralUtils.drawTEXT(nombres, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);

@@ -158,7 +158,7 @@ var TestsRequest  = function () {
                     var len = Object.keys(data).length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnDetail = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "^" + data[i].tipo + "^" + data[i].nombre + "^"+ data[i].idArea +
+                        var btnDetail = '<button type="button" title="Examenes asociados" class="btn btn-primary btn-xs" data-id="'+data[i].id+ "^" + data[i].tipo + "^" + data[i].nombre + "^"+ data[i].idArea +
                             '" > <i class="fa fa-list"></i>' ;
 
                         catalogueTable.fnAddData(
@@ -181,7 +181,7 @@ var TestsRequest  = function () {
                     testsTable.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     for (var i = 0; i < len; i++) {
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id +
                             '" > <i class="fa fa-times"></i>' ;
 
                        testsTable.fnAddData(

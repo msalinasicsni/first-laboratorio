@@ -245,7 +245,7 @@ var Responses = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                           //  var actionUrl = parametros.sActionUrl+dataToLoad[i].idExamen; //+","+dataToLoad[i].idDx+","+dataToLoad[i].codNoti;
-                            var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idExamen +
+                            var btnAdd = '<button type="button" title="Respuestas asociadas" class="btn btn-primary btn-xs" data-id="'+dataToLoad[i].idExamen +
                                 '" > <i class="fa fa-list"></i>' ;
                             table1.fnAddData(
                                 [dataToLoad[i].nombreExamen//,dataToLoad[i].nombreNoti,dataToLoad[i].nombreDx,''
@@ -286,14 +286,14 @@ var Responses = function () {
                                 req = $("#val_no").val();
                             if (dataToLoad[i].pasivo==true) {
                                 pas = $("#val_yes").val();
-                                botonEditar = '<a data-toggle="modal" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
+                                botonEditar = '<a data-toggle="modal" title="Anular" disabled class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
                             } else {
                                 pas = $("#val_no").val();
-                                botonEditar = '<a data-toggle="modal" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
+                                botonEditar = '<a data-toggle="modal" title="Anular" class="btn btn-danger btn-xs" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-times"></i></a>';
                             }
                             table2.fnAddData(
                                 [dataToLoad[i].nombre,dataToLoad[i].concepto.nombre,dataToLoad[i].orden,req ,pas ,dataToLoad[i].minimo,dataToLoad[i].maximo,dataToLoad[i].descripcion,
-                                        '<a data-toggle="modal" class="btn btn-default btn-xs btn-primary" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-edit"></i></a>',
+                                        '<a data-toggle="modal" title="Editar" class="btn btn-default btn-xs btn-primary" data-id='+dataToLoad[i].idRespuesta+'><i class="fa fa-edit"></i></a>',
                                     botonEditar]);
                         }
                     }else{

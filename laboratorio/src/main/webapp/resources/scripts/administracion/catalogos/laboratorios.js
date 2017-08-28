@@ -227,16 +227,16 @@ var Laboratorio = function () {
                     var len = data.length;
                     table1.fnClearTable();
                     for (var i = 0; i < len; i++) {
-                        var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].codigo+' ' +
+                        var btnOverride = ' <button type="button" title="Anular" class="btn btn-default btn-xs btn-danger" data-id='+data[i].codigo+' ' +
                             '> <i class="fa fa-times"></i>';
-                        var btnEditar = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+' ' +
+                        var btnEditar = ' <button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+' ' +
                             '> <i class="fa fa-edit"></i>';
-                        var btnSILAIS = ' <button type="button" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+ "," + data[i].nombre +
+                        var btnSILAIS = ' <button type="button" title="SILAIS Asociados" class="btn btn-default btn-xs btn-primary" data-id='+data[i].codigo+ "," + data[i].nombre +
                             '> <i class="fa fa-list"></i>';
                         var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
                         if (data[i].pasivo==true){
                             pasivo = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
-                            btnOverride = ' <button type="button" disabled class="btn btn-default btn-xs btn-danger" data-id='+data[i].codigo+' ' +
+                            btnOverride = ' <button type="button" title="Anular" disabled class="btn btn-default btn-xs btn-danger" data-id='+data[i].codigo+' ' +
                                 '> <i class="fa fa-times"></i>';
                         }
 
@@ -446,7 +446,7 @@ var Laboratorio = function () {
                     var len = data.length;
                     table2.fnClearTable();
                     for (var i = 0; i < len; i++) {
-                        var btnOverride = ' <button type="button" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idEntidadAdtvaLab+' ' +
+                        var btnOverride = ' <button type="button" title="Anular asociación" class="btn btn-default btn-xs btn-danger" data-id='+data[i].idEntidadAdtvaLab+' ' +
                             '> <i class="fa fa-times"></i>';
 
                         table2.fnAddData(

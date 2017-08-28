@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -90,6 +92,8 @@ public class TrasladoMxController {
     @Qualifier(value = "ordenExamenMxService")
     private OrdenExamenMxService ordenExamenMxService;
 
+    @Resource(name = "examenesService")
+    private ExamenesService examenesService;
 
     @Autowired
     MessageSource messageSource;
@@ -153,15 +157,15 @@ public class TrasladoMxController {
     }
 
     /**
-     * Método para realizar la búsqueda de Mx para traslado interno
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * Mï¿½todo para realizar la bï¿½squeda de Mx para traslado interno
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
      * @return String con las Recepciones encontradas
      * @throws Exception
      */
     @RequestMapping(value = "searchMx", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchMxJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo las mxs según filtros en JSON");
+        logger.info("Obteniendo las mxs segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         logger.info("antes trasladosService.getTomaMxByFiltro(filtroMx)");
         List<DaTomaMx> tomaMxList = trasladosService.getTomaMxByFiltro(filtroMx);
@@ -170,30 +174,30 @@ public class TrasladoMxController {
     }
 
     /**
-     * Método para realizar la búsqueda de Mx para traslado de control de calidad hacia CNDR
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * Mï¿½todo para realizar la bï¿½squeda de Mx para traslado de control de calidad hacia CNDR
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
      * @return String con las Recepciones encontradas
      * @throws Exception
      */
     @RequestMapping(value = "searchMxCC", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchMxCCJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo las mxs para cc según filtros en JSON");
+        logger.info("Obteniendo las mxs para cc segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = trasladosService.getTomaMxCCByFiltro(filtroMx);
         return tomaMxToJson(tomaMxList);
     }
 
     /**
-     * Método para realizar la búsqueda de Mx para traslado de externo hacia otro LAB
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * Mï¿½todo para realizar la bï¿½squeda de Mx para traslado de externo hacia otro LAB
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
      * @return String con las Recepciones encontradas
      * @throws Exception
      */
     @RequestMapping(value = "searchMxExt", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchMxExternoJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo las mxs para cc según filtros en JSON");
+        logger.info("Obteniendo las mxs para cc segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = trasladosService.getTomaMxCCByFiltro(filtroMx);
         return tomaMxToJson(tomaMxList);
@@ -254,7 +258,7 @@ public class TrasladoMxController {
                 //codLabDestino viene cuando es traslado externo, cuando no viene es porque es control de calidad y por defecto se toma el CNDR
                 labDestino = laboratoriosService.getLaboratorioByCodigo(!codLabDestino.isEmpty()?codLabDestino:"CNDR");
                 if (labDestino==null){
-                    throw new Exception("No se logró recuperar laboratio destino");
+                    throw new Exception("No se logrï¿½ recuperar laboratio destino");
                 }
                 labOrigen = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             }
@@ -307,7 +311,7 @@ public class TrasladoMxController {
 
                 try {
                     if (procesarTraslado) {
-                        //crear solicitud dx, sólo si no existe solicitud pendiente de traslado para el nuevo dx solicitado
+                        //crear solicitud dx, sï¿½lo si no existe solicitud pendiente de traslado para el nuevo dx solicitado
                         if (tipoTraslado.equals("interno")) { //interno
                             List<DaSolicitudDx> solicitudDxPendTrasladoList = tomaMxService.getSolicitudesDxSinTrasladoByIdToma(idTomaMx);
                             //determinar si existe una solicitud pendiente para el nuevo tipo de dx solicitado, en caso de existir no se va a registrar nueva solicitud
@@ -318,7 +322,7 @@ public class TrasladoMxController {
                                 }
                             }
                             if (crearSolicitud) {
-                                //sólo si no existe solicitud pendiente de traslado
+                                //sï¿½lo si no existe solicitud pendiente de traslado
                                 DaSolicitudDx solicitudDx = new DaSolicitudDx();
                                 solicitudDx.setIdTomaMx(tomaMx);
                                 solicitudDx.setAprobada(false);
@@ -346,8 +350,8 @@ public class TrasladoMxController {
                                     solicitudDxCC.setLabProcesa(labDestino);
                                     tomaMxService.addSolicitudDx(solicitudDxCC);
                                 } else {
-                                    //externo, validar si el dx tiene el examanen y el exámen sin resultado
-                                    //si ya tiene registrado exámenes con resultado, no se va a trasladar
+                                    //externo, validar si el dx tiene el examanen y el exï¿½men sin resultado
+                                    //si ya tiene registrado exï¿½menes con resultado, no se va a trasladar
                                     String[] arrayExamenes = idExamenes.split(",");
                                     List<OrdenExamen> ordenExamenList;
                                     int contExamenesValidos = 0;
@@ -362,17 +366,36 @@ public class TrasladoMxController {
                                                 ordenExamenMxService.updateOrdenExamen(ordenProcesar);
                                                 contExamenesValidos++;
                                             }
+                                        }else{//Si examen solicitado aÃºn no esta agregado en el lab origen, se agrega para procesar en lab destino
+                                            OrdenExamen ordenExamen = new OrdenExamen();
+                                            ordenExamen.setSolicitudDx(solicitudDx);
+                                            CatalogoExamenes examen = examenesService.getExamenById(Integer.valueOf(idExamen));
+                                            ordenExamen.setCodExamen(examen);
+                                            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                            ordenExamen.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                                            ordenExamen.setLabProcesa(labDestino);
+                                            try {
+                                                ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                contExamenesValidos++;
+                                            } catch (Exception ex) {
+                                                ex.printStackTrace();
+                                                logger.error("Error al agregar orden de examen", ex);
+                                            }
                                         }
                                     }
-                                    //si ningún examen es válido para el traslado, no procesar traslado
+                                    //si ningï¿½n examen es vï¿½lido para el traslado, no procesar traslado
                                     if (contExamenesValidos <= 0)
                                         procesarTraslado = false;
                                 }
-                            } else {//si no se encontró la solicitud, no se permite el traslado
+                            } else {//si no se encontrï¿½ la solicitud, no se permite el traslado
                                 procesarTraslado = false;
-                                //throw new Exception("No se logró recuperar diagnóstico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
+                                //throw new Exception("No se logrï¿½ recuperar diagnï¿½stico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
                             }
                             if (procesarTraslado) {
+
+                                solicitudDx.setLabProcesa(labDestino);
+                                tomaMxService.updateSolicitudDx(solicitudDx);
+
                                 tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
 
                                 DaEnvioMx envioMx = new DaEnvioMx();
@@ -390,7 +413,7 @@ public class TrasladoMxController {
                                     ex.printStackTrace();
                                     throw new Exception(ex);
                                 }
-                                //antes enviar a histórico relación mx y enviomx
+                                //antes enviar a histï¿½rico relaciï¿½n mx y enviomx
                                 HistoricoEnvioMx historicoEnvioMx = new HistoricoEnvioMx();
                                 historicoEnvioMx.setEnvioMx(tomaMx.getEnvio());
                                 historicoEnvioMx.setTomaMx(tomaMx);
@@ -452,8 +475,8 @@ public class TrasladoMxController {
     }
 
     /**
-     * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx
-     * @param strJson String con la información de los filtros
+     * Mï¿½todo para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar bï¿½squeda de Mx
+     * @param strJson String con la informaciï¿½n de los filtros
      * @return FiltroMx
      * @throws Exception
      */
@@ -512,7 +535,7 @@ public class TrasladoMxController {
         filtroMx.setCodTipoMx(codTipoMx);
         filtroMx.setCodTipoSolicitud(codTipoSolicitud);
         filtroMx.setNombreSolicitud(nombreSolicitud);
-        filtroMx.setCodEstado("ESTDMX|RCLAB"); // sólo las enviadas
+        filtroMx.setCodEstado("ESTDMX|RCLAB"); // sï¿½lo las enviadas
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         if (tipoTraslado.equals("cc")){ //para traslado al CNDR la solicitud tiene que estar aprobada
@@ -524,7 +547,7 @@ public class TrasladoMxController {
     }
 
     /**
-     * Método que convierte una lista de tomaMx a un string con estructura Json
+     * Mï¿½todo que convierte una lista de tomaMx a un string con estructura Json
      * @param tomaMxList lista con las tomaMx a convertir
      * @return String
      */

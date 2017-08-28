@@ -120,7 +120,7 @@ var EditarMxLab = function () {
                             idLoad = dataToLoad[i].idTomaMx;
                             actionUrl = actionUrl + idLoad;
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a target="_blank" href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     } else {
                         $.smallBox({

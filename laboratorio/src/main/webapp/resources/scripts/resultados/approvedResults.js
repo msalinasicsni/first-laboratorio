@@ -159,16 +159,16 @@ var ApprovedResults = function () {
                                     dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);*/
                             table1.fnAddData(
                                 [dataToLoad[i].solicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaAprobacion, dataToLoad[i].codigoUnicoMx,
-                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].resultados, '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + dataToLoad[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
+                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].resultados, '<a data-toggle="modal" title="Anular aprobación" class="btn btn-danger btn-xs anularAprobacion" data-id=' + dataToLoad[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
                         }
-                        $(".anularSolicitud").on("click", function () {
+                        $(".anularAprobacion").on("click", function () {
                             confirmarDeshacerAprobacion($(this).data('id'));
                         });
 
                         //al paginar se define nuevamente la función de cargar el detalle
                         $(".dataTables_paginate").on('click', function () {
-                            $(".anularSolicitud").unbind("click");
-                            $(".anularSolicitud").on('click', function () {
+                            $(".anularAprobacion").unbind("click");
+                            $(".anularAprobacion").on('click', function () {
                                 confirmarDeshacerAprobacion($(this).data('id'));
                             });
                         });

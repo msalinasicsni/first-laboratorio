@@ -139,7 +139,7 @@ var IncomeResult = function () {
                             var actionUrl = parametros.sActionUrl + dataToLoad[i].idOrdenExamen;
                             table1.fnAddData(
                                 [/*dataToLoad[i].idAlicuota,dataToLoad[i].etiquetaPara,*/ dataToLoad[i].examen, dataToLoad[i].fechaHoraOrden, dataToLoad[i].tipoDx, dataToLoad[i].fechaHoraDx, dataToLoad[i].codigoUnicoMx, dataToLoad[i].fechaInicioSintomas,
-                                    dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].resultadoExamen, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].resultadoExamen, '<a target="_blank" title="Ingresar resultado" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     } else {
                         $.smallBox({

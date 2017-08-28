@@ -117,17 +117,17 @@ var SampleTypes = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnEdit = '<button type="button" class="btn btn-primary btn-xs" data-id="' + data[i].idTipoMx + "," + data[i].nombre + "," + data[i].pasivo +
+                        var btnEdit = '<button type="button" title="Editar" class="btn btn-primary btn-xs" data-id="' + data[i].idTipoMx + "," + data[i].nombre + "," + data[i].pasivo +
                             '" > <i class="fa fa-edit"></i>';
 
-                        var btnOverride = ' <button type="button" class="btn btn-xs btn-danger" data-id="' + data[i].idTipoMx +
+                        var btnOverride = ' <button type="button" title="Anular" class="btn btn-xs btn-danger" data-id="' + data[i].idTipoMx +
                             '"> <i class="fa fa-times"></i>';
 
                         var pasivo = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
                         if (data[i].pasivo == true) {
                             pasivo = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
 
-                            btnOverride = ' <button type="button" disabled class="btn btn-xs btn-danger" data-id="' + data[i].idTipoMx +
+                            btnOverride = ' <button type="button" title="Anular" disabled class="btn btn-xs btn-danger" data-id="' + data[i].idTipoMx +
                                 '"> <i class="fa fa-times"></i>';
                         }
 

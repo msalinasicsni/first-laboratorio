@@ -274,7 +274,7 @@ var EditarMxLab = function () {
                             }
                             table3.fnAddData(
                                 [response[i].tipo,response[i].nombre, response[i].fechaSolicitud, response[i].nombreAreaPrc, response[i].cc, response[i].resultados, aprobada,
-                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'*'+response[i].aprobada+'><i class="fa fa-times"></i></a>']);
+                                        '<a data-toggle="modal" title="Cancelar solicitud" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'*'+response[i].aprobada+'><i class="fa fa-times"></i></a>']);
 
                         }
                         $(".anularSolicitud").on("click", function () {
@@ -375,7 +375,7 @@ var EditarMxLab = function () {
                             }
                             table2.fnAddData(
                                 [response[i].nombreExamen, response[i].nombreAreaPrc, response[i].tipo, response[i].nombreSolic, response[i].fechaSolicitud, response[i].cc, response[i].externo,response[i].resultado,
-                                        '<a data-toggle="modal" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
+                                        '<a data-toggle="modal" title="Cancelar Examen" class="btn btn-danger btn-xs anularExamen" data-id=' + response[i].idOrdenExamen + '><i class="fa fa-times"></i></a>']);
 
                         }
                         $(".anularExamen").on("click", function () {

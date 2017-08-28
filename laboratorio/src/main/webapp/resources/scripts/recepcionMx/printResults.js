@@ -120,7 +120,7 @@ var PrintResults = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             //console.log(dataToLoad[i].resultados);
-                            var btnPdf = '<button type="button" class="btn btn-success btn-xs" data-id="' + dataToLoad[i].codigoUnicoMx +
+                            var btnPdf = '<button title="Resultado en Pdf" type="button" class="btn btn-success btn-xs" data-id="' + dataToLoad[i].codigoUnicoMx +
                                 '" > <i class="fa fa-file-pdf-o"></i>';
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx,dataToLoad[i].fechaTomaMx, dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion,

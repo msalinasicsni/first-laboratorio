@@ -93,7 +93,7 @@ var AssociationSamplesReq  = function () {
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
 
-                        var btnAdd = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].codigo +
+                        var btnAdd = '<button type="button" title="Tipos de muestras asociadas" class="btn btn-primary btn-xs" data-id="'+data[i].codigo +
                             '" > <i class="fa fa-list"></i>' ;
 
 
@@ -239,10 +239,10 @@ var AssociationSamplesReq  = function () {
                     mxNotiTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnAdd1 = '<button type="button" class="btn btn-primary btn-xs" data-id="'+data[i].id +
+                        var btnAdd1 = '<button type="button" title="Solicitudes asociadas" class="btn btn-primary btn-xs" data-id="'+data[i].id +
                             '" > <i class="fa fa-list"></i>' ;
 
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+data[i].id + "," + data[i].tipoNotificacion.codigo +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="'+data[i].id + "," + data[i].tipoNotificacion.codigo +
                             '" > <i class="fa fa-times"></i>' ;
                         mxNotiTable.fnAddData(
                             [data[i].tipoMx.nombre, data[i].tipoNotificacion.valor, btnAdd1, btnOverride]);
@@ -271,7 +271,7 @@ var AssociationSamplesReq  = function () {
                     detailTable.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     for (var i = 0; i < len; i++) {
-                        var btnOverride = '<button type="button" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id + "," + dataToLoad[i].tipoSolicitud + "," + dataToLoad[i].idTipoMxTipoNoti +
+                        var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id + "," + dataToLoad[i].tipoSolicitud + "," + dataToLoad[i].idTipoMxTipoNoti +
                             '" > <i class="fa fa-times"></i>' ;
 
                         detailTable.fnAddData(

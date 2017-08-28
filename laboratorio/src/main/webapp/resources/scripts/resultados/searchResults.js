@@ -180,7 +180,7 @@ var finalResult = function () {
                             var actionUrl = parametros.actionUrl + dataToLoad[i].idSolicitud;
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud,
-                                    dataToLoad[i].persona, dataToLoad[i].diagnostico, dataToLoad[i].resultadoS, dataToLoad[i].detResultado, dataToLoad[i].pendientes, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    dataToLoad[i].persona, dataToLoad[i].diagnostico, dataToLoad[i].resultadoS, dataToLoad[i].detResultado, dataToLoad[i].pendientes, '<a target="_blank" title="Ingresar resultado" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                         }
                     } else {
                         $.smallBox({

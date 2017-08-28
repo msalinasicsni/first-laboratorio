@@ -286,7 +286,7 @@
             data-widget-sortable="false"
         -->
         <header>
-            <span class="widget-icon"> <i class="fa fa-comments"></i> </span>
+            <span class="widget-icon"> <i class="fa fa-table"></i> </span>
             <h2><spring:message code="lbl.distritution.by.result"/> </h2>
         </header>
         <!-- widget div-->
