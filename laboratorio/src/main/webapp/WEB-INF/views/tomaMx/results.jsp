@@ -71,6 +71,12 @@
 									<!-- This area used as dropdown edit box -->
 									<input class="form-control" type="text">	
 								</div>
+                                <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
+                                <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                <input type="hidden" id="titleCancel"  value="<spring:message code="msg.sampling.cancel"/>"/>
+                                <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.confirmation.content"/>"/>
+                                <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                                <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
 								<!-- end widget edit box -->
 								<!-- widget content -->
 								<div class="widget-body no-padding">
@@ -107,7 +113,7 @@
 													<spring:param name="idNotificacion" value="${noti.idNotificacion}" />
 												</spring:url>
 												<td><c:if test="${noti.pasivo==false}">
-                                                        <a target="_blank" title="Tomar Mx" href="${fn:escapeXml(editUrl)}" class="btn btn-primary btn-xs"><i class="fa fa-eyedropper"></i></a>
+                                                        <a target="_blank" title="Tomar Mx" data-id= "${noti.idNotificacion}"  class="btn btn-primary btn-xs tomarmx"><i class="fa fa-eyedropper"></i></a>
                                                     </c:if>
                                                     <c:if test="${noti.pasivo==true}">
                                                     <button type="button" title="Tomar Mx" disabled class="btn btn-xs btn-primary"> <i class="fa fa-eyedropper"></i></button>
@@ -173,12 +179,16 @@
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="createUrl" value="/tomaMx/createInicial/"/>
     <c:url var="addNotificationUrl" value="/tomaMx/createnoti"/>
+    <c:url var="addMxUrl" value="/tomaMx/create/"/>
+    <spring:url value="/tomaMx/tomaMxByIdNoti" var="tomaMxUrl"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
             var parametros = {blockMess: "${blockMess}",
                 createUrl: "${createUrl}",
-                addNotificationUrl: "${addNotificationUrl}"
+                addNotificationUrl: "${addNotificationUrl}",
+                tomaMxUrl: "${tomaMxUrl}",
+                addMxUrl: "${addMxUrl}"
             };
             ResultsNotices.init(parametros);
 	    	$("li.recepcion").addClass("open");
@@ -186,7 +196,6 @@
             if ("top" != localStorage.getItem("sm-setmenu")) {
                 $("li.patient").parents("ul").slideDown(200);
             }
-
 		});
 
 	</script>

@@ -454,6 +454,10 @@ var enterFinalResult = function () {
                                             iconSmall: "fa fa-success",
                                             timeout: 4000
                                         });
+
+                                        setTimeout(function () {
+                                            window.close(); //window.location.href = parametros.sInitUrl
+                                        }, 4000);
                                     }
                                     unBlockUI();
                                 },

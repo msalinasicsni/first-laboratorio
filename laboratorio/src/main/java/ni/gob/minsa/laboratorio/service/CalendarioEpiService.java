@@ -36,33 +36,12 @@ public class CalendarioEpiService {
         CalendarioEpi aux = null;
         if (strFecha !=null && !strFecha.isEmpty()){
             try {
-                //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                //Date fechaV = simpleDateFormat.parse(strFecha);
-                //Calendar cal = Calendar.getInstance();
-                //cal.setTime(fechaV);
-                //int year = cal.get(Calendar.YEAR);
-                //int month = cal.get(Calendar.MONTH)+1;
                 Timestamp fechaB = new Timestamp(StringToDate(strFecha).getTime());
-                //String query = "from CalendarioEpi where "+
-                //        " anio = :anio and noMes-1 <= :mes and noMes+1 >= :mes";
                 Session session = sessionFactory.getCurrentSession();
                 String query2 = "from CalendarioEpi as a where a.fechaInicial <= :fecha and a.fechaFinal >= :fecha ";
                 Query q = session.createQuery(query2);
                 q.setTimestamp("fecha",fechaB);
-                //q.setInteger("anio", year);
-                //q.setInteger("mes",month);
-                //result = q.list();
                 aux = (CalendarioEpi)q.uniqueResult();
-                /*for(CalendarioEpi calTem: result){
-                    Date fechaIni = new Date(calTem.getFechaFinal().getTime());
-                    Date fechaFin = new Date(calTem.getFechaFinal().getTime());
-                    Date fechaIniFormat = StringToDate(DatetToString(fechaIni));
-                    Date fechaFinFormat = StringToDate(DatetToString(fechaFin));
-                    if (fechaIniFormat.compareTo(fechaV) > 0 && fechaFinFormat.compareTo(fechaV) > 0 ){
-                        aux = calTem;
-                        break;
-                    }
-                }*/
             }catch (Exception e){
                 e.printStackTrace();
             }

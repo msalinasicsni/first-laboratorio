@@ -225,7 +225,9 @@
                     <li class="resultDx">
                         <a href="<spring:url value="/reports/reportResultDx/init" htmlEscape="true "/>" title="<spring:message code="menu.report.result.dx" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.report.result.dx" /></a>
                     </li>
-
+                    <li class="resultDxVig">
+                        <a href="<spring:url value="/reports/reportResultDxVig/init" htmlEscape="true "/>" title="<spring:message code="menu.report.result.dx.vig" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.report.result.dx.vig" /></a>
+                    </li>
                 </ul>
             </li>
 

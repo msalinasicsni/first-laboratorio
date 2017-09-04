@@ -47,6 +47,7 @@ public class ReportesService {
 
     private static final String sqlRutina = " and dx.codDx.idDiagnostico = :idDx ";
     private static  final String sqlFechasRut =  " and mx.fechaHTomaMx between :fechaInicio and :fechaFin ";
+    private static  final String sqlFechasAproRut =  " and dx.fechaAprobacion between :fechaInicio and :fechaFin ";
 
     @SuppressWarnings("unchecked")
     public List<RecepcionMx> getReceivedSamplesByFiltro(FiltroMx filtro) throws UnsupportedEncodingException {
@@ -480,6 +481,30 @@ public class ReportesService {
         return resumenMxSolicitud;
     }
 
+    public List<DaSolicitudDx> getDiagnosticosAprobadosByFiltro(FiltrosReporte filtro){
+        Session session = sessionFactory.getCurrentSession();
+        Query queryNotiDx = null;
+        if (filtro.getCodArea().equals("AREAREP|PAIS")) {
+            queryNotiDx = session.createQuery(" select dx from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti " +
+                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlRutina + sqlFechasAproRut);
+        }else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
+            queryNotiDx = session.createQuery(" select dx from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti " +
+                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlRutina + sqlFechasAproRut +
+            "  and noti.codSilaisAtencion.entidadAdtvaId =:codSilais ");
+            queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
+        } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
+            queryNotiDx = session.createQuery(" select dx from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti " +
+                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlRutina + sqlFechasAproRut +
+            "  and noti.codUnidadAtencion.unidadId =:codUnidad ");
+            queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
+        }
+
+        queryNotiDx.setParameter("idDx", filtro.getIdDx());
+        queryNotiDx.setParameter("fechaInicio", filtro.getFechaInicio());
+        queryNotiDx.setParameter("fechaFin", filtro.getFechaFin());
+        return queryNotiDx.list();
+    }
+
     /**
      * M?todo que retornar la informaci?n para generar reporte y gr?fico de notificaciones por tipo de resultado (positivo, negativo, sin resultado y % positividad)
      * @param filtro indicando el nivel (pais, silais, departamento, municipio, unidad salud), tipo notificaci?n, rango de fechas, factor tasas de poblaci?n
@@ -898,5 +923,7 @@ public class ReportesService {
         }
         return resFinal;
     }
+
+
 
 }

@@ -25,6 +25,7 @@ public class FiltrosReporte {
     boolean porSilais;
     String codZona;
     Integer idDx;
+    boolean incluirMxInadecuadas;
 
     public String getCodArea() {
         return codArea;
@@ -152,5 +153,13 @@ public class FiltrosReporte {
 
     public void setIdDx(Integer idDx) {
         this.idDx = idDx;
+    }
+
+    public boolean isIncluirMxInadecuadas() {
+        return incluirMxInadecuadas;
+    }
+
+    public void setIncluirMxInadecuadas(boolean incluirMxInadecuadas) {
+        this.incluirMxInadecuadas = incluirMxInadecuadas;
     }
 }

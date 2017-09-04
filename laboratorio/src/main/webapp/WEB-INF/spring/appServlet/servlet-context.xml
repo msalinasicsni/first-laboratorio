@@ -44,4 +44,9 @@
 	<!-- Load Hibernate related configuration -->
 	<beans:import resource="hibernate-context.xml" />
 
+    <beans:bean id="viewResolver1" class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+        <beans:property name="order" value="1"/>
+        <beans:property name="basename" value="views"/>
+    </beans:bean>
+
 </beans:beans>

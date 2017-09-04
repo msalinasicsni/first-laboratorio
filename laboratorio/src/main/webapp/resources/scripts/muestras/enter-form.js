@@ -91,10 +91,23 @@ var EnterFormTomaMx = function () {
                 }
             });
 
+            jQuery.validator.addMethod("greaterOrEqualThan",
+                function(value, element, params) {
+                    var fecha1 = value.split("/");
+                    if (!/Invalid|NaN/.test(new Date(fecha1[2], fecha1[1]-1, fecha1[0]))) {
+                        var fecha2 = $(params).val().split("/");
+                        return new Date(fecha1[2], fecha1[1]-1, fecha1[0]) >= new Date(fecha2[2], fecha2[1]-1, fecha2[0]);
+                    }
+
+                    return isNaN(value) && isNaN($(params).val())
+                        || (Number(value) >= Number($(params).val()));
+                },'Fecha debe ser mayor o igual a {0}.');
+
             var $validator = $("#registroMx").validate({
                 rules: {
                     fechaHTomaMx: {
-                        required: true
+                        required: true,
+                        greaterOrEqualThan: "#fechaInicioSintomas"
                     },
                     codTipoMx: {
                         required: true
@@ -299,7 +312,7 @@ var EnterFormTomaMx = function () {
                                     timeout: 4000
                                 });
                                 setTimeout(function () {
-                                    window.location.href = parametros.searchUrl;
+                                    window.close(); //window.location.href = parametros.searchUrl;
                                 }, 4000);
                             }
 

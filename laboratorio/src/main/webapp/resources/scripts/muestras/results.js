@@ -137,6 +137,52 @@ var ResultsNotices = function () {
                         }
                     });
             }
+
+            //VALIDAR SI YA SE TOMO MUESTRA A LA NOTIFICACION SELECCIONADA
+            $(".tomarmx").click(function(){
+                getTomaMx($(this).data('id'));
+            });
+
+            function getTomaMx (idNotificacion){
+                bloquearUI(parametros.blockMess);
+                $.getJSON(parametros.tomaMxUrl, {
+                    idNotificacion: idNotificacion,
+                    ajax: 'true'
+                }, function (data) {
+                    var actionUrl = parametros.addMxUrl + idNotificacion;
+                    desbloquearUI();
+                    if(data.length > 0){
+                        var opcSi = $("#confirm_msg_opc_yes").val();
+                        var opcNo = $("#confirm_msg_opc_no").val();
+                        $.SmartMessageBox({
+                            title: $('#msg_confirm_title').val(),
+                            content: $('#msg_confirm_content').val(),
+                            buttons: '['+opcSi+']['+opcNo+']'
+                        }, function (ButtonPressed) {
+                            if (ButtonPressed === opcSi) {
+                                //window.location.href = actionUrl;
+                                //link.attr("href",actionUrl);
+                                window.open(actionUrl,'_blank');
+                            }
+                            if (ButtonPressed === opcNo) {
+                                $.smallBox({
+                                    title: $('#titleCancel').val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>"+$("#smallBox_content").val()+"</i>",
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                    timeout: 4000
+                                });
+                            }
+
+                        });
+                    }else{
+                        //window.location.href =  actionUrl;
+                        //link.attr("href",actionUrl);
+                        window.open(actionUrl,'_blank');
+                    }
+
+                });
+            }
         }
 
     }

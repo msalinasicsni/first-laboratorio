@@ -114,8 +114,12 @@ public class EmailUtil {
             // Second part is content
             messageBodyPart = new MimeBodyPart();
             //DataSource source = new FileDataSource(filename);
-            DataSource ds = new ByteArrayDataSource(attachment.getContent().getBytes("UTF-8"), attachment.getType());
-            messageBodyPart.setDataHandler(new DataHandler(ds));
+            if (attachment.getContent()!=null) {
+                DataSource ds = new ByteArrayDataSource(attachment.getContent().getBytes("UTF-8"), attachment.getType());
+                messageBodyPart.setDataHandler(new DataHandler(ds));
+            }else{
+                messageBodyPart.setDataHandler(new DataHandler(attachment.getFileDataSource()));
+            }
             messageBodyPart.setFileName(attachment.getFileName());
             multipart.addBodyPart(messageBodyPart);
 

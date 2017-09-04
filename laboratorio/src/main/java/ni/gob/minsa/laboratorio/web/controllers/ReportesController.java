@@ -44,11 +44,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.*;
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -2599,123 +2597,6 @@ public class ReportesController {
 
     }
 
-    private void drawInfoSample(PDPageContentStream stream, DaSolicitudDx solDx, DaSolicitudEstudio solE, float inY) throws IOException {
-        float m = 20;
-        String fechaRecepcion = null;
-        String fechaToma = null;
-        String fechaResultado = null;
-        Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario()); //laboratorio al que pertenece el usuario
-        if (solDx != null || solE != null) {
-            if (solDx != null) {
-
-                if (solDx.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solDx.getIdTomaMx().getFechaHTomaMx())+
-                            (solDx.getIdTomaMx().getHoraTomaMx()!=null?" "+solDx.getIdTomaMx().getHoraTomaMx():"");
-                }
-
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solDx.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
-                if (recepcion != null) {
-                    fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
-                }
-
-
-                Object fechaResultadoFinal = resultadoFinalService.getFechaResultadoByIdSoli(solDx.getIdSolicitudDx());
-                if (fechaResultadoFinal != null) {
-                    fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(fechaResultadoFinal);
-                }
-
-
-            } else {
-
-                if (solE.getIdTomaMx().getFechaHTomaMx() != null) {
-                    fechaToma = new SimpleDateFormat("dd/MM/yyyy").format(solE.getIdTomaMx().getFechaHTomaMx())+
-                            (solE.getIdTomaMx().getHoraTomaMx()!=null?" "+solE.getIdTomaMx().getHoraTomaMx():"");
-                }
-
-                RecepcionMx recepcion = recepcionMxService.getRecepcionMxByCodUnicoMx(solE.getIdTomaMx().getCodigoUnicoMx(), (laboratorioUsuario.getCodigo() != null ? laboratorioUsuario.getCodigo() : ""));
-                if (recepcion != null) {
-                    fechaRecepcion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(recepcion.getFechaHoraRecepcion());
-                }
-
-                Object fechaResultadoFinal = resultadoFinalService.getFechaResultadoByIdSoli(solE.getIdSolicitudEstudio());
-                if (fechaResultadoFinal != null) {
-                    fechaResultado = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(fechaResultadoFinal);
-                }
-
-            }
-
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null) + " ", inY, 15, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaToma, inY, 140, stream, 12, PDType1Font.HELVETICA);
-
-
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.reception.datetime", null, null) + " ", inY, 310, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaRecepcion!=null?fechaRecepcion:"", inY, 435, stream, 12, PDType1Font.HELVETICA);
-            inY -= m;
-
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.finalResult.datetime", null, null) + " ", inY, 15, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaResultado!=null?fechaResultado:"", inY, 180, stream, 12, PDType1Font.HELVETICA);
-
-        }
-
-    }
-
-    private void drawInfoLabVertical(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
-        float xCenter;
-
-        float inY = 700;
-        float m = 20;
-
-        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
-        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
-        inY -= m;
-
-        if (labProcesa != null) {
-
-            if (labProcesa.getDescripcion() != null) {
-                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
-                GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
-                inY -= m;
-            }
-
-            if (labProcesa.getDireccion() != null) {
-                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getDireccion());
-                GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
-                inY -= m;
-            }
-
-            if (labProcesa.getTelefono() != null) {
-
-                if (labProcesa.getTelefax() != null) {
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono() + " " + labProcesa.getTelefax());
-                    GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
-                } else {
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono());
-                    GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
-                }
-            }
-        }
-    }
-
-    private void drawFinalInfo(PDPageContentStream stream, float y, String fechaAprobacion, String fechaImpresion) throws IOException {
-        //dibujar lineas de firmas
-        stream.drawLine(90, y, 250, y);
-        stream.drawLine(340, y, 500, y);
-
-        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.analyst", null, null), y - 10, 145, stream, 10, PDType1Font.HELVETICA_BOLD);
-        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.director", null, null), y - 10, 400, stream, 10, PDType1Font.HELVETICA_BOLD);
-
-        //info reporte
-        if (fechaAprobacion != null) {
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.approval.datetime", null, null), 115, 15, stream, 10, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaAprobacion, 115, 120, stream, 10, PDType1Font.HELVETICA);
-
-        }
-
-        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null), 115, 360, stream, 10, PDType1Font.HELVETICA_BOLD);
-        GeneralUtils.drawTEXT(fechaImpresion, 115, 450, stream, 10, PDType1Font.HELVETICA);
-
-    }
-
     /**
      * M�todo que se llama al entrar a la opci�n de menu de Reportes "Reporte General de Resultados".
      *
@@ -3430,6 +3311,20 @@ public class ReportesController {
         return reportesService.getDataDxResultReport(filtroRep);
     }
 
+    /**
+     * Método para obtener data para Reporte por Resultado dx
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
+     * @return Object
+     * @throws Exception
+     */
+    @RequestMapping(value = "dataReportResultDx2", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<DaSolicitudDx> fetchReportResultDx2Json(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo los datos para Reporte por Resultado ");
+        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+
+        return reportesService.getDiagnosticosAprobadosByFiltro(filtroRep);
+    }
     /**
      * Método para obtener data para Reporte por Resultado dx
      * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda

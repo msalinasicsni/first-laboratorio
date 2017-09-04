@@ -698,7 +698,7 @@ var ReceiptOrders = function () {
                                 codUnicoFormat = data.codigoUnicoMx;
                                     limpiarDatosRecepcion();
                                 setTimeout(function () {
-                                    window.location.href = parametros.sSearchReceiptUrl
+                                    window.close(); //window.location.href = parametros.sSearchReceiptUrl
                                 }, 4000);
                             }
                             desbloquearUI();
@@ -803,7 +803,7 @@ var ReceiptOrders = function () {
                                 });
                                 limpiarDatosRecepcion();
                                 setTimeout(function () {
-                                    window.location.href = parametros.sSearchReceiptUrl
+                                    window.close(); //window.location.href = parametros.sSearchReceiptUrl
                                 }, 2000);
                             }
                             desbloquearUI();

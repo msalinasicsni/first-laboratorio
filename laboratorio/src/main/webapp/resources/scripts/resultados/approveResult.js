@@ -264,7 +264,7 @@ var ApproveResult = function () {
                                 });
 
                                 setTimeout(function () {
-                                    window.location.href = parametros.sInitUrl
+                                    window.close(); //window.location.href = parametros.sInitUrl
                                 }, 3000);
                             }
                         },
@@ -324,7 +324,7 @@ var ApproveResult = function () {
                                 });
                                 hideModalReject();
                                 setTimeout(function () {
-                                    window.location.href = parametros.sInitUrl
+                                    window.close(); //window.location.href = parametros.sInitUrl
                                 }, 3000);
                             }
                         },

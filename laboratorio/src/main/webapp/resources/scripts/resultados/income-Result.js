@@ -303,7 +303,7 @@ var IncomeResult = function () {
                                 }
                                 limpiarDatosRecepcion();
                                 setTimeout(function () {
-                                    window.location.href = parametros.sResultadosUrl
+                                    window.close(); //window.location.href = parametros.sResultadosUrl
                                 }, 3000);
                             }
                         },
