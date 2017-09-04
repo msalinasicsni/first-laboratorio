@@ -31,10 +31,9 @@ var resultReportDxVig = function () {
                 phone : 480
             };
 
-            $('#result_form').validate({
+            var $validator = $('#result_form').validate({
                 // Rules for form validation
                 rules : {
-
                     codArea : {
                         required : true
                     },
@@ -59,10 +58,6 @@ var resultReportDxVig = function () {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
-                    table1.fnClearTable();
-
-                    //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                    getData();
                 }
             });
 
@@ -140,7 +135,13 @@ var resultReportDxVig = function () {
             });
 
             $("#sendMail").click(function () {
-                sendMail();
+                var $validarForm = $("#result_form").valid();
+                if (!$validarForm) {
+                    $validator.focusInvalid();
+                    return false;
+                } else {
+                    sendMail();
+                }
             });
 
 
@@ -179,24 +180,30 @@ var resultReportDxVig = function () {
             }
 
             $("#exportExcel").click(function(){
-                var filtro = {};
-                //filtro['subunidades'] = $('#ckUS').is(':checked');
-                filtro['fechaInicio'] = $('#initDate').val();
-                filtro['fechaFin'] = $('#endDate').val();
-                filtro['codSilais'] = $('#codSilais').find('option:selected').val();
-                filtro['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
-                //filtro['codDepartamento'] = $('#codDepartamento').find('option:selected').val();
-                //filtro['codMunicipio'] = $('#codMunicipio').find('option:selected').val();
-                filtro['codArea'] = $('#codArea').find('option:selected').val();
-                //filtro['tipoNotificacion'] = $('#codTipoNoti').find('option:selected').val();
-                filtro['porSilais'] = $('input[name="rbNivelPais"]:checked', '#result_form').val();
-                //filtro['codZona'] = $('#codZona').find('option:selected').val();
-                filtro['idDx'] = $('#idDx').find('option:selected').val();
-                filtro['incluirMxInadecuadas']=($('#ckbmxinadecuada').is(':checked'));
-                $(this).attr("href",parametros.excelUrl+"?filtro="+JSON.stringify(filtro));
+                var $validarForm = $("#result_form").valid();
+                if (!$validarForm) {
+                    $validator.focusInvalid();
+                    return false;
+                } else {
+                    bloquearUI('');
+                    var filtro = {};
+                    //filtro['subunidades'] = $('#ckUS').is(':checked');
+                    filtro['fechaInicio'] = $('#initDate').val();
+                    filtro['fechaFin'] = $('#endDate').val();
+                    filtro['codSilais'] = $('#codSilais').find('option:selected').val();
+                    filtro['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
+                    //filtro['codDepartamento'] = $('#codDepartamento').find('option:selected').val();
+                    //filtro['codMunicipio'] = $('#codMunicipio').find('option:selected').val();
+                    filtro['codArea'] = $('#codArea').find('option:selected').val();
+                    //filtro['tipoNotificacion'] = $('#codTipoNoti').find('option:selected').val();
+                    filtro['porSilais'] = $('input[name="rbNivelPais"]:checked', '#result_form').val();
+                    //filtro['codZona'] = $('#codZona').find('option:selected').val();
+                    filtro['idDx'] = $('#idDx').find('option:selected').val();
+                    filtro['incluirMxInadecuadas']=($('#ckbmxinadecuada').is(':checked'));
+                    $(this).attr("href",parametros.excelUrl+"?filtro="+JSON.stringify(filtro));
+                    desbloquearUI();
+                }
             });
-
-
         }
     };
 

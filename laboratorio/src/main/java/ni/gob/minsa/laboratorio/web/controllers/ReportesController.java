@@ -3317,20 +3317,6 @@ public class ReportesController {
      * @return Object
      * @throws Exception
      */
-    @RequestMapping(value = "dataReportResultDx2", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody
-    List<DaSolicitudDx> fetchReportResultDx2Json(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo los datos para Reporte por Resultado ");
-        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
-
-        return reportesService.getDiagnosticosAprobadosByFiltro(filtroRep);
-    }
-    /**
-     * Método para obtener data para Reporte por Resultado dx
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
-     * @return Object
-     * @throws Exception
-     */
     @RequestMapping(value = "dataReportResultDxMail", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchReportResultDxCsv(@RequestParam(value = "filtro", required = true) String filtro,
