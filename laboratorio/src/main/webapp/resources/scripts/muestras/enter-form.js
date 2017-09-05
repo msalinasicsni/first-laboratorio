@@ -303,7 +303,7 @@ var EnterFormTomaMx = function () {
                                     timeout: 4000
                                 });
                             } else {
-                                imprimir2(data.codigoLab);
+                                imprimir2(data.codigoLab+"*"+data.areaPrc);
                                 $.smallBox({
                                     title: $('#msjSuccessful').val(),
                                     content: $('#disappear').val(),
@@ -333,7 +333,7 @@ var EnterFormTomaMx = function () {
 
             function imprimir2(strBarCodes){
                 $.getJSON("http://localhost:13001/print", {
-                    barcodes: strBarCodes,
+                    barcodes: unicodeEscape(strBarCodes),
                     copias: 2,
                     ajax:'false'
                 }, function (data) {

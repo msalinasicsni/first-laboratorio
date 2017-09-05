@@ -18,6 +18,7 @@ import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,7 +261,7 @@ public class TomaMxController {
             daNotificacionService.updateNotificacion(noti);
             tomaMxService.anularTomasMxByIdNotificacion(noti.getIdNotificacion(),noti.getFechaAnulacion());
             if (noti.getPersona()!=null)
-            return "redirect:/tomaMx/noticesrut/"+noti.getPersona().getPersonaId();
+                return "redirect:/tomaMx/noticesrut/"+noti.getPersona().getPersonaId();
             else
                 return "redirect:/tomaMx/notices/applicant/"+noti.getSolicitante().getIdSolicitante();
         } else {
@@ -391,6 +392,7 @@ public class TomaMxController {
         String urgente = "";
         String embarazada = "";
         Integer semanasEmbarazo=null;
+        String areaEntrega = "";
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -533,6 +535,16 @@ public class TomaMxController {
             }
             //se procede a registrar los diagnósticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
             if (saveDxRequest(tomaMx.getIdTomaMx(), dx, strRespuestas, cantRespuestas)) {
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(),labUsuario.getCodigo());
+                List<DaSolicitudEstudio> solicitudEstudioList=new ArrayList<DaSolicitudEstudio>();
+                //area que procesa la solicitud con mayor prioridad
+                if (solicitudDxList.size()> 0)
+                    areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
+                else {
+                    solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
+                    if (solicitudEstudioList.size()> 0)
+                        areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
+                }
                 //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepción de la misma
                 RecepcionMx recepcionMx = new RecepcionMx();
                 recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
@@ -564,6 +576,7 @@ public class TomaMxController {
             resultado=resultado+". \n "+ex.getMessage();
 
         } finally {
+            UnicodeEscaper escaper     = UnicodeEscaper.above(127);
             Map<String, String> map = new HashMap<String, String>();
             map.put("idNotificacion",idNotificacion);
             map.put("canTubos",String.valueOf(canTubos));
@@ -580,6 +593,7 @@ public class TomaMxController {
             map.put("horaTomaMx",horaTomaMx);
             map.put("fechaInicioSintomas",fechaInicioSintomas);
             map.put("codigoLab", codigoGenerado);
+            map.put("areaPrc",escaper.translate(areaEntrega));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -720,7 +734,7 @@ public class TomaMxController {
     @RequestMapping(value = "searchOMx", method = RequestMethod.GET)
     public String initSearchOtrasForm() throws ParseException {
         logger.debug("Crear/Buscar Toma de Mx");
-            return "tomaMx/searchOtherSamples";
+        return "tomaMx/searchOtherSamples";
     }
 
     @RequestMapping("notices/applicant/{idSolicitante}")

@@ -524,6 +524,8 @@
     <script src="${handleInputMask}"></script>
     <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
     <script src="${handleDatePickers}"></script>
+    <spring:url value="/resources/scripts/utilidades/unicodeEscaper.js" var="unicodeEsc" />
+    <script src="${unicodeEsc}"></script>
 	<!-- END PAGE LEVEL SCRIPTS -->
 	<!-- PARAMETROS LENGUAJE -->
 	<c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>

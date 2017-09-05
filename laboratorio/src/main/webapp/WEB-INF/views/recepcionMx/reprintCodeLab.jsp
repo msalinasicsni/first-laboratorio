@@ -347,6 +347,8 @@
 <script src="${handleDatePickers}"></script>
 <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
 <script src="${handleInputMask}"></script>
+<spring:url value="/resources/scripts/utilidades/unicodeEscaper.js" var="unicodeEsc" />
+<script src="${unicodeEsc}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="searchUrl" value="/reprint/searchReceptionRecords"/>

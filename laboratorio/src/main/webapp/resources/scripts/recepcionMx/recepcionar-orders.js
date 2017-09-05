@@ -695,7 +695,7 @@ var ReceiptOrders = function () {
                                     timeout: 4000
                                 });
                                 //codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
-                                codUnicoFormat = data.codigoUnicoMx;
+                                codUnicoFormat = data.codigoUnicoMx+"*"+data.area;
                                     limpiarDatosRecepcion();
                                 setTimeout(function () {
                                     window.close(); //window.location.href = parametros.sSearchReceiptUrl
@@ -713,7 +713,7 @@ var ReceiptOrders = function () {
 
             function imprimir2(strBarCodes){
                 $.getJSON("http://localhost:13001/print", {
-                    barcodes: strBarCodes,
+                    barcodes: unicodeEscape(strBarCodes),
                     copias: 2,//2 de cada estiquer
                     ajax:'false'
                 }, function (data) {

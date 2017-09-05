@@ -142,7 +142,7 @@ public class WorkSheetController {
 
                 //cod_mx, solicitud,lab_destino,techa toma mx, fec_inicio_sintomas
                 Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-                solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx_hoja.getIdTomaMx(), labUser.getCodigo());
+                solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx_hoja.getIdTomaMx(), labUser.getCodigo());
                 solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx_hoja.getIdTomaMx());
                 String[] content = null;
                 String fis = "";
@@ -158,8 +158,10 @@ public class WorkSheetController {
                 int prioridad = 100;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     solicitudes += (solicitudes.isEmpty() ? "" : ",") + solicitudDx.getCodDx().getNombre();
-                    if (prioridad >= solicitudDx.getCodDx().getPrioridad())
+                    if (prioridad >= solicitudDx.getCodDx().getPrioridad()) {
                         areaEntrega += areaEntrega.isEmpty() ? solicitudDx.getCodDx().getArea().getNombre() : "";
+                        prioridad = solicitudDx.getCodDx().getPrioridad();
+                    }
 
                 }
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
@@ -181,121 +183,121 @@ public class WorkSheetController {
 
                 filasSolicitudes.add(content);
             }
-                //Initialize table
-                float margin = 30;
-                float tableWidth = 530;
-                float yStartNewPage = 600;
-                float bottomMargin = 45;
-                BaseTable table = new BaseTable(yStartNewPage, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+            //Initialize table
+            float margin = 30;
+            float tableWidth = 530;
+            float yStartNewPage = 600;
+            float bottomMargin = 45;
+            BaseTable table = new BaseTable(yStartNewPage, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
 
-                //Create Fact header row
-                Row factHeaderrow = table.createRow(15f);
-                Cell cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
-                cell.setFillColor(Color.LIGHT_GRAY);
+            //Create Fact header row
+            Row factHeaderrow = table.createRow(15f);
+            Cell cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
+            cell.setFillColor(Color.LIGHT_GRAY);
 
-                cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
-                cell.setFillColor(Color.lightGray);
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
+            cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
+            cell.setFillColor(Color.lightGray);
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
 
-                cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
-                cell.setFillColor(Color.lightGray);
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
+            cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
+            cell.setFillColor(Color.lightGray);
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
 
-                cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
-                cell.setFillColor(Color.lightGray);
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
+            cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
+            cell.setFillColor(Color.lightGray);
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
 
-                cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
-                cell.setFillColor(Color.lightGray);
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
+            cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+            cell.setFillColor(Color.lightGray);
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
 
-                cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
-                cell.setFillColor(Color.lightGray);
-                cell.setFont(PDType1Font.HELVETICA_BOLD);
-                cell.setFontSize(10);
-                //Create row
-                Row row;
-                //Add multiple rows with random facts about Belgium
+            cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
+            cell.setFillColor(Color.lightGray);
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
+            //Create row
+            Row row;
+            //Add multiple rows with random facts about Belgium
 
-                for (String[] fact : filasSolicitudes) {
+            for (String[] fact : filasSolicitudes) {
 
-                    if (y < 220){
-                        table.draw();
-                        stream.close();
-                        page = GeneralUtils.addNewPage(doc);
-                        stream = new PDPageContentStream(doc, page);
-                        y = 700;
-                        //dibujar encabezado pag y pie de pagina
-                        GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
+                if (y < 420){
+                    table.draw();
+                    stream.close();
+                    page = GeneralUtils.addNewPage(doc);
+                    stream = new PDPageContentStream(doc, page);
+                    y = 700;
+                    //dibujar encabezado pag y pie de pagina
+                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
 
-                        pageNumber = String.valueOf(doc.getNumberOfPages());
-                        GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
+                    pageNumber = String.valueOf(doc.getNumberOfPages());
+                    GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
 
-                        pageNumber= String.valueOf(doc.getNumberOfPages());
-                        GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
+                    pageNumber= String.valueOf(doc.getNumberOfPages());
+                    GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
 
-                        table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
-                        factHeaderrow = table.createRow(15f);
-                        cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
-                        cell.setFont(PDType1Font.HELVETICA_BOLD);
-                        cell.setFontSize(10);
-                        cell.setFillColor(Color.LIGHT_GRAY);
+                    table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
+                    factHeaderrow = table.createRow(15f);
+                    cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
+                    cell.setFillColor(Color.LIGHT_GRAY);
 
-                        cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
-                        cell.setFillColor(Color.lightGray);
-                        cell.setFont(PDType1Font.HELVETICA_BOLD);
-                        cell.setFontSize(10);
+                    cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
+                    cell.setFillColor(Color.lightGray);
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
 
-                        cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
-                        cell.setFillColor(Color.lightGray);
-                        cell.setFont(PDType1Font.HELVETICA_BOLD);
-                        cell.setFontSize(10);
+                    cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
+                    cell.setFillColor(Color.lightGray);
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
 
-                        cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
-                        cell.setFillColor(Color.lightGray);
-                        cell.setFont(PDType1Font.HELVETICA_BOLD);
-                        cell.setFontSize(10);
+                    cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
+                    cell.setFillColor(Color.lightGray);
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
 
-                        cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
-                        cell.setFillColor(Color.lightGray);
-                        cell.setFont(PDType1Font.HELVETICA_BOLD);
-                        cell.setFontSize(10);
+                    cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+                    cell.setFillColor(Color.lightGray);
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
 
-                        cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
-                        cell.setFillColor(Color.lightGray);
-                        cell.setFont(PDType1Font.HELVETICA_BOLD);
-                        cell.setFontSize(10);
-                        y -= 15;
-                    }
-
-                    row = table.createRow(15f);
+                    cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
+                    cell.setFillColor(Color.lightGray);
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
                     y -= 15;
-                    for (int i = 0; i < fact.length; i++) {
-                        if (i==0) {
-                            cell = row.createCell(16, fact[i]);
-                        }else if (i==1) {
-                            cell = row.createCell(19, fact[i]);
-                        }else if (i==3) {
-                            cell = row.createCell(23, fact[i]);
-                        }else if (i==5) {
-                            cell = row.createCell(6, fact[i]);
-                        }else {
-                            cell = row.createCell(18, fact[i]);
-                        }
-                        cell.setFont(PDType1Font.HELVETICA);
-                        cell.setFontSize(10);
-                    }
                 }
-                table.draw();
 
-                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
-                GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
+                row = table.createRow(15f);
+                y -= 15;
+                for (int i = 0; i < fact.length; i++) {
+                    if (i==0) {
+                        cell = row.createCell(16, fact[i]);
+                    }else if (i==1) {
+                        cell = row.createCell(19, fact[i]);
+                    }else if (i==3) {
+                        cell = row.createCell(23, fact[i]);
+                    }else if (i==5) {
+                        cell = row.createCell(6, fact[i]);
+                    }else {
+                        cell = row.createCell(18, fact[i]);
+                    }
+                    cell.setFont(PDType1Font.HELVETICA);
+                    cell.setFontSize(10);
+                }
+            }
+            table.draw();
+
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
 
 
             stream.close();

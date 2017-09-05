@@ -843,7 +843,8 @@ public class TomaMxService {
     }
 
     public List<DaSolicitudDx> getSoliDxPrioridadByTomaAndLab(String idTomaMx, String lab){
-        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx and sdx.labProcesa.codigo =:lab ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
+        String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx and " +
+                "(sdx.labProcesa.codigo =:lab or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :lab )) ORDER BY dx.prioridad asc, sdx.fechaHSolicitud desc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("lab",lab);

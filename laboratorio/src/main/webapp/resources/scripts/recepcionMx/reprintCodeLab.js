@@ -172,7 +172,7 @@ var ReprintCodeLab = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx,
+                                ["<input type='hidden' value='" + dataToLoad[i].area + "'/>"+dataToLoad[i].codigoUnicoMx, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].fechaTomaMx,
                                     dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, " <input type='hidden' value='" + dataToLoad[i].solicitudes + "'/>"]);
                         }
                     } else {
@@ -218,12 +218,13 @@ var ReprintCodeLab = function () {
                             var codesLab = [];
                             for (var i = 0; i < len; i++) {
                                 var texto = aSelectedTrs[i].firstChild.innerHTML;
-                                var input = texto.substring(texto.lastIndexOf(">") + 1);
-
+                                var codigo = texto.substring(texto.lastIndexOf(">") + 1);
+                                var input = texto.substring(texto.lastIndexOf("<"),texto.lastIndexOf(">") + 1);
+                                var area = $(input).val();
                                 if (i + 1 < len) {
-                                    codesLab += input + ",";
+                                    codesLab += codigo+"*"+area + ",";
                                 } else {
-                                    codesLab += input;
+                                    codesLab += codigo+"*"+area;
                                 }
 
                                 unBlockUI();
@@ -257,7 +258,7 @@ var ReprintCodeLab = function () {
 
             function imprimir2(strBarCodes){
                 $.getJSON("http://localhost:13001/print", {
-                    barcodes: strBarCodes,
+                    barcodes: unicodeEscape(strBarCodes),
                     copias: 1,
                     ajax:'false'
                 }, function (data) {

@@ -532,6 +532,7 @@ public class RecepcionMxController {
         String horaRecibido = "";
         String fechaRecibido ="";
         boolean mxInadecuada = false;
+        String areaEntrega = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -557,7 +558,8 @@ public class RecepcionMxController {
 
             TipoRecepcionMx tipoRecepcionMx = null;
             //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
-            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size()>0;
+            List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
+            boolean esEstudio = solicitudEstudioList.size()>0;
             tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
             if(fechaRecibido != null && !fechaRecibido.isEmpty()){
@@ -598,11 +600,20 @@ public class RecepcionMxController {
                         }
                     }
                 }
+                //determinar area de entrega luego de recepción
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(idTomaMx, labUsuario.getCodigo());
+
+                if (solicitudDxList.size()> 0)
+                    areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
+                else {
+                    if (esEstudio) {
+                            areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
+                    }
+                }
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
                 if (mxInadecuada){
                     User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
                     if (!esEstudio) {
-                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(idTomaMx, labUsuario.getCodigo());
                         for (DaSolicitudDx solicitudDx : solicitudDxList) {
                             RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
@@ -620,7 +631,6 @@ public class RecepcionMxController {
                             tomaMxService.updateSolicitudDx(solicitudDx);
                         }
                     }else{
-                        List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(idTomaMx);
                         for (DaSolicitudEstudio solicitudEst : solicitudEstudioList){
                             RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
@@ -663,6 +673,7 @@ public class RecepcionMxController {
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
+            UnicodeEscaper escaper     = UnicodeEscaper.above(127);
             Map<String, String> map = new HashMap<String, String>();
             map.put("idRecepcion",idRecepcion);
             map.put("mensaje",resultado);
@@ -670,6 +681,7 @@ public class RecepcionMxController {
             map.put("verificaCantTb", verificaCantTb);
             map.put("verificaTipoMx", verificaTipoMx);
             map.put("codigoUnicoMx",codigoLabMx);
+            map.put("area",escaper.translate(areaEntrega));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -715,7 +727,8 @@ public class RecepcionMxController {
             //se obtiene recepción a actualizar
             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(idRecepcion);
             //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
-            boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
+            List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+            boolean esEstudio = solicitudEstudioList.size()>0;
             //se setean valores a actualizar
             //recepcionMx.setUsuarioRecepcionLab(usuario);
             //recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
@@ -750,7 +763,6 @@ public class RecepcionMxController {
                     recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
 
                 }else{ //es estudio, se toma el area del estudio. Sólo se permite un estudio por muestra
-                    List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
                     if (solicitudEstudioList.size()>0){
                         recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
                     }
@@ -784,7 +796,6 @@ public class RecepcionMxController {
                             tomaMxService.updateSolicitudDx(solicitudDx);
                         }
                     }else{
-                        List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
                         for (DaSolicitudEstudio solicitudEst : solicitudEstudioList){
                             RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
@@ -1117,7 +1128,8 @@ public class RecepcionMxController {
                 DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
                 TipoRecepcionMx tipoRecepcionMx;
                 //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
-                boolean esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
+                List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
+                boolean esEstudio = solicitudEstudioList.size() > 0;
                 tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio ? "TPRECPMX|VRT" : "TPRECPMX|EST"));
                 RecepcionMx recepcionMx = new RecepcionMx();
 
@@ -1156,10 +1168,21 @@ public class RecepcionMxController {
                     try {
                         tomaMxService.updateTomaMx(tomaMx);
                         cantMxProc++;
+                        String areaEntrega = "";
+                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(),labUsuario.getCodigo());
+
+                        //area que procesa la solicitud con mayor prioridad
+                        if (solicitudDxList.size()> 0)
+                            areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
+                        else {
+                            solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
+                            if (solicitudEstudioList.size()> 0)
+                                areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
+                        }
                         if(cantMxProc==1)
-                            codigosLabMx = esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab();
+                            codigosLabMx = (esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab())+"*"+areaEntrega;
                         else
-                            codigosLabMx += ","+ (esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab());
+                            codigosLabMx += ","+ (esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab())+"*"+areaEntrega;
                     } catch (Exception ex) {
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
@@ -1175,12 +1198,13 @@ public class RecepcionMxController {
             resultado=resultado+". \n "+ex.getMessage();
 
         }finally {
+            UnicodeEscaper escaper     = UnicodeEscaper.above(127);
             Map<String, String> map = new HashMap<String, String>();
             map.put("strMuestras",strMuestras);
             map.put("mensaje",resultado);
             map.put("cantMuestras", cantMuestras.toString());
             map.put("cantMxProc", cantMxProc.toString());
-            map.put("codigosUnicosMx",codigosLabMx);
+            map.put("codigosUnicosMx",escaper.translate(codigosLabMx));
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

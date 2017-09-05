@@ -165,9 +165,15 @@ public class ReprintCodeLabController {
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx(), labUser.getCodigo());
             Map<Integer, Object> mapSolicitudesList = new HashMap<Integer, Object>();
             Map<String, String> mapSolicitud = new HashMap<String, String>();
+            String areaEntrega = "";
+            int prioridad = 100;
             if (solicitudDxList.size() > 0) {
                 int subIndice = 0;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (prioridad >= solicitudDx.getCodDx().getPrioridad()) {
+                        areaEntrega = solicitudDx.getCodDx().getArea().getNombre();
+                        prioridad = solicitudDx.getCodDx().getPrioridad();
+                    }
                     mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
                     mapSolicitud.put("tipo", "Rutina");
                     mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
@@ -180,6 +186,7 @@ public class ReprintCodeLabController {
                 List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
                 int subIndice = 0;
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudios) {
+                    areaEntrega = solicitudEstudio.getTipoEstudio().getArea().getNombre();
                     mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
                     mapSolicitud.put("tipo", "Estudio");
                     mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudEstudio.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
@@ -189,7 +196,7 @@ public class ReprintCodeLabController {
                 }
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
             }
-
+            map.put("area",areaEntrega);
             mapResponse.put(indice, map);
             indice++;
         }

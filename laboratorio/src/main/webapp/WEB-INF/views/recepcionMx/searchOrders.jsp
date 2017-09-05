@@ -344,6 +344,8 @@
     <script src="${calculateAge}"></script>
     <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
     <script src="${handleInputMask}"></script>
+    <spring:url value="/resources/scripts/utilidades/unicodeEscaper.js" var="unicodeEsc" />
+    <script src="${unicodeEsc}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
