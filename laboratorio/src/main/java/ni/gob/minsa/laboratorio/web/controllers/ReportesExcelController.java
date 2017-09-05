@@ -151,15 +151,15 @@ public class ReportesExcelController {
 
         try {
             FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             /************ARMANDO MODELO PARA GENERAR EXCEL************/
             Map<String, Object> model = new HashMap<String, Object>();
             logger.info("Obteniendo los datos para Reporte por Resultado dx vigilancia ");
-            List<DaSolicitudDx> dxList = reportesService.getDiagnosticosAprobadosByFiltro(filtroRep);
+            List<DaSolicitudDx> dxList = reportesService.getDiagnosticosAprobadosByFiltro(filtroRep, labUser.getCodigo());
             List<Object[]> registrosPos = new ArrayList<Object[]>();
             List<Object[]> registrosNeg = new ArrayList<Object[]>();
             List<Object[]> registrosMxInadec = new ArrayList<Object[]>();
             List<String> columnas = new ArrayList<String>();
-            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             Catalogo_Dx dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
 
 
@@ -293,12 +293,12 @@ public class ReportesExcelController {
         // create some sample data
         logger.info("Obteniendo los datos para Reporte por Resultado dx vigilancia ");
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
-        List<DaSolicitudDx> dxList = reportesService.getDiagnosticosAprobadosByFiltro(filtroRep);
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        List<DaSolicitudDx> dxList = reportesService.getDiagnosticosAprobadosByFiltro(filtroRep, labUser.getCodigo());
         List<Object[]> registrosPos = new ArrayList<Object[]>();
         List<Object[]> registrosNeg = new ArrayList<Object[]>();
         List<Object[]> registrosMxInadec = new ArrayList<Object[]>();
         List<String> columnas = new ArrayList<String>();
-        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         Catalogo_Dx dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
 
 
@@ -485,11 +485,12 @@ public class ReportesExcelController {
             }
             registro[4] = edad;
             registro[5] = medidaEdad;
-            registro[6] = solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-            registro[7] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre();
-            registro[8] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre();
+            registro[6] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?
+                    solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre():"");
+            registro[7] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre():"");
+            registro[8] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():"");
             if (edad!=null && edad<18)
-                registro[9] = sindFebril.getNombPadre();
+                registro[9] = (sindFebril!=null?sindFebril.getNombPadre():"");
             else
                 registro[9] = "";
             String direccion = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getDireccionResidencia();
@@ -508,26 +509,28 @@ public class ReportesExcelController {
 
             validarPCRIgMDengue(registro, solicitudDx.getIdSolicitudDx());
 
-            CalendarioEpi calendario = calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
+            CalendarioEpi calendario = null;
+            if (sindFebril!=null)
+                calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
             if (calendario!=null) {
                 registro[18] = calendario.getNoSemana();
             }
 
             registro[20] = parseFinalResultDetails(solicitudDx.getIdSolicitudDx());
             registro[21] = solicitudDx.getFechaAprobacion();
-            registro[22] = solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia().getNombre();
-            registro[23] = sindFebril.getFechaFicha();
+            registro[22] = (solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia().getNombre():"");
+            registro[23] = (sindFebril!=null?sindFebril.getFechaFicha():"");
             registro[24] = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento();
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[25] = sexo.substring(sexo.length()-1, sexo.length());
-            registro[26] = sindFebril.getCodProcedencia().getValor();
+            registro[26] = (sindFebril!=null && sindFebril.getCodProcedencia()!=null?sindFebril.getCodProcedencia().getValor():"");
             registro[27] = (solicitudDx.getIdTomaMx().getIdNotificacion().getEmbarazada()!=null? solicitudDx.getIdTomaMx().getIdNotificacion().getEmbarazada().getValor():"");
             registro[28] = solicitudDx.getIdTomaMx().getIdNotificacion().getSemanasEmbarazo();
-            registro[29] = (sindFebril.getHosp()!=null?sindFebril.getHosp().getValor():"");
-            registro[30] = sindFebril.getFechaIngreso();
-            registro[31] = (sindFebril.getFallecido()!=null?sindFebril.getFallecido().getValor():"");
-            registro[32] = sindFebril.getFechaFallecido();
-            if (sindFebril.getDxPresuntivo()!=null && !sindFebril.getDxPresuntivo().isEmpty()) {
+            registro[29] = (sindFebril!=null && sindFebril.getHosp()!=null?sindFebril.getHosp().getValor():"");
+            registro[30] = (sindFebril!=null?sindFebril.getFechaIngreso():"");
+            registro[31] = (sindFebril!=null && sindFebril.getFallecido()!=null?sindFebril.getFallecido().getValor():"");
+            registro[32] = (sindFebril!=null?sindFebril.getFechaFallecido():"");
+            if (sindFebril!=null && sindFebril.getDxPresuntivo()!=null && !sindFebril.getDxPresuntivo().isEmpty()) {
                 registro[33] = sindFebril.getDxPresuntivo();
             } else {
                 registro[33] = parseDxs(solicitudDx.getIdTomaMx().getIdTomaMx(), codigoLab);
@@ -586,9 +589,9 @@ public class ReportesExcelController {
                 direccion+= (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil():"");
             }
             registro[6] = direccion;
-            registro[7] = solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-            registro[8] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre();
-            registro[9] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre();
+            registro[7] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre():"");
+            registro[8] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre():"");
+            registro[9] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():"");
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[10] = sexo.substring(sexo.length()-1, sexo.length());
             registro[11] = solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
@@ -643,9 +646,9 @@ public class ReportesExcelController {
             }
             registro[4] = edad;
             registro[5] = medidaEdad;
-            registro[6] = solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-            registro[7] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre();
-            registro[8] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre();
+            registro[6] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre():"");
+            registro[7] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre():"");
+            registro[8] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():"");
             String direccion = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getDireccionResidencia();
             if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoResidencia()!=null || solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil()!=null ){
                 direccion += ". TEL. ";
@@ -662,11 +665,13 @@ public class ReportesExcelController {
             registro[13] = parseFinalResultDetails(solicitudDx.getIdSolicitudDx());
             registro[14] = solicitudDx.getFechaAprobacion();
             registro[15] = (solicitudDx.getIdTomaMx().getIdNotificacion().getEmbarazada()!=null? solicitudDx.getIdTomaMx().getIdNotificacion().getEmbarazada().getValor():"");
-            registro[16] = solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia().getDependenciaSilais().getNombre();
+            registro[16] = (solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia().getDependenciaSilais().getNombre():"");
             registro[17] = "";
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[18] = sexo.substring(sexo.length() - 1, sexo.length());
-            CalendarioEpi calendario = calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
+            CalendarioEpi calendario = null;
+            if (sindFebril!=null)
+                calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
             if (calendario!=null) {
                 registro[19] = calendario.getNoSemana();
             }
@@ -725,9 +730,9 @@ public class ReportesExcelController {
                 direccion+= (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil():"");
             }
             registro[6] = direccion;
-            registro[7] = solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre();
-            registro[8] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre();
-            registro[9] = solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre();
+            registro[7] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre():"");
+            registro[8] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre():"");
+            registro[9] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():"");
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[10] = sexo.substring(sexo.length()-1, sexo.length());
             registro[11] = solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();

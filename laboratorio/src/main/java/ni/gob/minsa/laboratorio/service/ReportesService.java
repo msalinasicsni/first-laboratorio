@@ -46,8 +46,9 @@ public class ReportesService {
     private RespuestasExamenService respuestasExamenService;
 
     private static final String sqlRutina = " and dx.codDx.idDiagnostico = :idDx ";
-    private static  final String sqlFechasRut =  " and mx.fechaHTomaMx between :fechaInicio and :fechaFin ";
-    private static  final String sqlFechasAproRut =  " and dx.fechaAprobacion between :fechaInicio and :fechaFin ";
+    private static final String sqlFechasRut =  " and mx.fechaHTomaMx between :fechaInicio and :fechaFin ";
+    private static final String sqlFechasAproRut =  " and dx.fechaAprobacion between :fechaInicio and :fechaFin ";
+    private static final String sqlLab = " and dx.labProcesa.codigo = :codigoLab ";
 
     @SuppressWarnings("unchecked")
     public List<RecepcionMx> getReceivedSamplesByFiltro(FiltroMx filtro) throws UnsupportedEncodingException {
@@ -481,24 +482,24 @@ public class ReportesService {
         return resumenMxSolicitud;
     }
 
-    public List<DaSolicitudDx> getDiagnosticosAprobadosByFiltro(FiltrosReporte filtro){
+    public List<DaSolicitudDx> getDiagnosticosAprobadosByFiltro(FiltrosReporte filtro, String codigoLab){
         Session session = sessionFactory.getCurrentSession();
         Query queryNotiDx = null;
         if (filtro.getCodArea().equals("AREAREP|PAIS")) {
             queryNotiDx = session.createQuery(" select dx from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti " +
-                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlRutina + sqlFechasAproRut);
+                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlLab + sqlRutina + sqlFechasAproRut);
         }else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
             queryNotiDx = session.createQuery(" select dx from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti " +
-                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlRutina + sqlFechasAproRut +
+                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlLab + sqlRutina + sqlFechasAproRut +
             "  and noti.codSilaisAtencion.entidadAdtvaId =:codSilais ");
             queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
         } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
             queryNotiDx = session.createQuery(" select dx from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti " +
-                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlRutina + sqlFechasAproRut +
+                    "where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true "+ sqlLab + sqlRutina + sqlFechasAproRut +
             "  and noti.codUnidadAtencion.unidadId =:codUnidad ");
             queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
         }
-
+        queryNotiDx.setParameter("codigoLab", codigoLab);
         queryNotiDx.setParameter("idDx", filtro.getIdDx());
         queryNotiDx.setParameter("fechaInicio", filtro.getFechaInicio());
         queryNotiDx.setParameter("fechaFin", filtro.getFechaFin());
