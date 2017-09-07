@@ -696,7 +696,8 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getSoliDxAprobByToma_User_Area(String idToma, String userName, int idArea){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
-                "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and sdx.labProcesa.codigo = al.laboratorio.codigo " +
+                "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and " +
+                "(sdx.labProcesa.codigo = al.laboratorio.codigo or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo))" +
                 "and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.codDx.area.idArea = :idArea " +
                 "ORDER BY sdx.fechaHSolicitud";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
@@ -709,7 +710,9 @@ public class TomaMxService {
     @SuppressWarnings("unchecked")
     public List<Area> getAreaSoliDxAprobByTomaAndUser(String idToma, String userName){
         String query = "select a from Area as a where a.idArea in (select sdx.codDx.area.idArea from DaSolicitudDx as sdx, AutoridadLaboratorio as al " +
-                "where al.pasivo = false and sdx.anulado = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true " +
+                "where al.pasivo = false and sdx.anulado = false and " +
+                "(sdx.labProcesa.codigo = al.laboratorio.codigo or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo))" +
+                " and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true " +
                 "group by sdx.codDx.area.idArea)";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idToma",idToma);

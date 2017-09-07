@@ -392,10 +392,6 @@ public class TrasladoMxController {
                                 //throw new Exception("No se logr� recuperar diagn�stico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
                             }
                             if (procesarTraslado) {
-
-                                solicitudDx.setLabProcesa(labDestino);
-                                tomaMxService.updateSolicitudDx(solicitudDx);
-
                                 tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
 
                                 DaEnvioMx envioMx = new DaEnvioMx();

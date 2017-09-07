@@ -123,9 +123,9 @@ public class SearchMxController {
 
 
     /**
-     * Método que se llama al entrar a la opción de menu "Recepción Mx Vigilancia". Se encarga de inicializar las listas para realizar la búsqueda de envios de Mx
+     * Mï¿½todo que se llama al entrar a la opciï¿½n de menu "Recepciï¿½n Mx Vigilancia". Se encarga de inicializar las listas para realizar la bï¿½squeda de envios de Mx
      *
-     * @param request para obtener información de la petición del cliente
+     * @param request para obtener informaciï¿½n de la peticiï¿½n del cliente
      * @return ModelAndView
      * @throws Exception
      */
@@ -135,7 +135,7 @@ public class SearchMxController {
         String urlValidacion;
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         } catch (Exception e) {
@@ -156,9 +156,9 @@ public class SearchMxController {
     }
 
     /**
-     * Método para realizar la búsqueda de Mx para recepcionar en Mx Vigilancia general
+     * Mï¿½todo para realizar la bï¿½squeda de Mx para recepcionar en Mx Vigilancia general
      *
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda(Nombre Apellido, Rango Fec Toma Mx, Tipo Mx, SILAIS, unidad salud)
      * @return String con las Mx encontradas
      * @throws Exception
      */
@@ -166,16 +166,16 @@ public class SearchMxController {
     public
     @ResponseBody
     String fetchOrdersJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception {
-        logger.info("Obteniendo las mx según filtros en JSON");
+        logger.info("Obteniendo las mx segï¿½n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
         return tomaMxToJson(tomaMxList);
     }
 
     /**
-     * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
+     * Mï¿½todo para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar bï¿½squeda de Mx(Vigilancia) y Recepciï¿½n Mx(Laboratorio)
      *
-     * @param strJson String con la información de los filtros
+     * @param strJson String con la informaciï¿½n de los filtros
      * @return FiltroMx
      * @throws Exception
      */
@@ -239,7 +239,7 @@ public class SearchMxController {
     }
 
     /**
-     * Método que convierte una lista de tomaMx a un string con estructura Json
+     * Mï¿½todo que convierte una lista de tomaMx a un string con estructura Json
      *
      * @param tomaMxList lista con las tomaMx a convertir
      * @return String
@@ -357,7 +357,7 @@ public class SearchMxController {
                 map.put("persona", " ");
             }
 
-            //se arma estructura de diagnósticos o estudios
+            //se arma estructura de diagnï¿½sticos o estudios
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
             List<DaSolicitudEstudio> solicitudEList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
@@ -377,7 +377,11 @@ public class SearchMxController {
                         if (solicitudDx.getAprobada().equals(true)) {
                             mapDx.put("estado", (messageSource.getMessage("lbl.approval.result", null, null)));
                         } else {
-                            mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                            if (!detRes.isEmpty()) {
+                                mapDx.put("estado", (messageSource.getMessage("lbl.result.pending.approval", null, null)));
+                            } else {
+                                mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                            }
                         }
                     } else {
                         if (!detRes.isEmpty()) {
@@ -437,7 +441,7 @@ public class SearchMxController {
             indice++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
-        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        //escapar caracteres especiales, escape de los caracteres con valor numï¿½rico mayor a 127
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
     }

@@ -248,13 +248,26 @@ public class ResultadoFinalService {
 
         //se filtra que usuario tenga autorizado laboratorio en el que se proceso la solicitud(rutina)
         if (filtro.getNombreUsuario()!=null) {
-            //se filtra que laboratorio que procesa solicitud
-            crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+            //se filtra que laboratorio que procesa solicitud o si es traslado lab que procesa examen este autorizado al usuario
+            Junction conditGroup = Restrictions.disjunction();
+            conditGroup.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))));
+                    .setProjection(Property.forName("labautorizado.codigo"))))
+                    .add(Restrictions.or(Subqueries.propertyIn("diagnostico.idSolicitudDx", DetachedCriteria.forClass(OrdenExamen.class)
+                            .add(Restrictions.eq("anulado", false))
+                            .createAlias("solicitudDx", "dx")
+                            .createAlias("labProcesa", "labProcesa")
+                            .add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                    .add(Restrictions.eq("pasivo", false)) //autoridad lab activa
+                                    .createAlias("laboratorio", "labautorizadoex")
+                                    .createAlias("user", "usuario")
+                                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                                    .setProjection(Property.forName("labautorizadoex.codigo"))))
+                            .setProjection(Property.forName("dx.idSolicitudDx")))));
+            crit.add(conditGroup);
 
             //Se filtra que el �rea a la que pertenece la solicitud este asociada al usuario autenticado ya sea  analista, jefe departamento o director
             //nivel analista

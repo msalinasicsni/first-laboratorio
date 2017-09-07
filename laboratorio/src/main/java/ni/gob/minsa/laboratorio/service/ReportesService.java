@@ -5,6 +5,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudDx;
 import ni.gob.minsa.laboratorio.domain.muestra.DaSolicitudEstudio;
 import ni.gob.minsa.laboratorio.domain.muestra.FiltroMx;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
+import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
@@ -205,7 +206,7 @@ public class ReportesService {
         }
 
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
-        if (filtro.getNombreUsuario()!=null) {
+        /*if (filtro.getNombreUsuario()!=null) {
             crit.createAlias("toma.envio","envioMx");
             crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
@@ -213,7 +214,7 @@ public class ReportesService {
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
-        }
+        }*/
 
         //filtro de resultados finales aprobados
         crit.add(Restrictions.and(
@@ -286,12 +287,33 @@ public class ReportesService {
         //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
         if (filtro.getNombreUsuario()!=null) {
             crit.createAlias("toma.envio","envioMx");
-            crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+            /*crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))));
+                    .setProjection(Property.forName("labautorizado.codigo"))));*/
+
+            //se filtra que laboratorio destino o si es traslado haya historico de envio al laboratario este autorizado al usuario
+            Junction conditGroup = Restrictions.disjunction();
+            conditGroup.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))))
+                    .add(Restrictions.or(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(HistoricoEnvioMx.class)
+                            .createAlias("tomaMx", "toma")
+                            .createAlias("envioMx", "envio")
+                            .createAlias("envio.laboratorioDestino", "destino")
+                            .add(Subqueries.propertyIn("destino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                    .add(Restrictions.eq("pasivo", false)) //autoridad lab activa
+                                    .createAlias("laboratorio", "labautorizadoEnv")
+                                    .createAlias("user", "usuario")
+                                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
+                                    .setProjection(Property.forName("labautorizadoEnv.codigo"))))
+                            .setProjection(Property.forName("toma.idTomaMx")))));
+            crit.add(conditGroup);
         }
 
         //filtro de resultados finales aprobados
