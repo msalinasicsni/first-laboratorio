@@ -353,12 +353,12 @@ public class RecepcionMxService {
                         .setProjection(Property.forName("labautorizado.codigo"))));
 
         //sólo la última recepción de cada muestra
-
+/*
         DetachedCriteria maxDateQuery = DetachedCriteria.forClass(RecepcionMx.class);
         maxDateQuery.createAlias("tomaMx","mx");
         maxDateQuery.add(Restrictions.eqProperty("mx.idTomaMx","tomaMx.idTomaMx"));
         maxDateQuery.setProjection(Projections.max("fechaHoraRecepcion"));
-        crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));
+        crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));*/
 
         //filtro sólo control calidad en el laboratio del usuario
         if (filtro.getControlCalidad()!=null) {

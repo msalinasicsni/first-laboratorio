@@ -106,7 +106,7 @@
                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                     <input id="msg_no_results_found" type="hidden"
                            value="<spring:message code="msg.no.results.found"/>"/>
-
+                    <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                         <fieldset>
                             <div class="row">
