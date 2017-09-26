@@ -160,9 +160,9 @@ var ResultsNotices = function () {
                             buttons: '['+opcSi+']['+opcNo+']'
                         }, function (ButtonPressed) {
                             if (ButtonPressed === opcSi) {
-                                //window.location.href = actionUrl;
+                                window.location.href = actionUrl;   //misma pestaña
                                 //link.attr("href",actionUrl);
-                                window.open(actionUrl,'_blank');
+                                //window.open(actionUrl,'_blank');  //nueva pestaña
                             }
                             if (ButtonPressed === opcNo) {
                                 $.smallBox({

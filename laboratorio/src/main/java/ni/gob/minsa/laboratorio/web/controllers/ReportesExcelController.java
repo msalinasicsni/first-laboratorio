@@ -176,7 +176,12 @@ public class ReportesExcelController {
                 tipoReporte = "ZIKA";
                 setNombreColumnasZika(columnas);
                 setDatosZika(dxList, registrosPos, registrosNeg, labUser.getCodigo(), filtroRep.isIncluirMxInadecuadas(), registrosMxInadec);
-            }else{
+            }else if (dx.getNombre().toLowerCase().contains("leptospi")){
+                tipoReporte = "LEPTO";
+                setNombreColumnasLepto(columnas);
+                setDatosLepto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            }
+            else{
                 tipoReporte = dx.getNombre().replace(" ","_");
                 setNombreColumnasDefecto(columnas);
                 setDatosDefecto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec);
@@ -316,6 +321,10 @@ public class ReportesExcelController {
             tipoReporte = "ZIKA";
             setNombreColumnasZika(columnas);
             setDatosZika(dxList, registrosPos, registrosNeg, labUser.getCodigo(), filtroRep.isIncluirMxInadecuadas(), registrosMxInadec);
+        }else if (dx.getNombre().toLowerCase().contains("leptospi")){
+            tipoReporte = "LEPTO";
+            setNombreColumnasLepto(columnas);
+            setDatosLepto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
         }else{
             tipoReporte = dx.getNombre().replace(" ","_");
             setNombreColumnasDefecto(columnas);
@@ -327,12 +336,12 @@ public class ReportesExcelController {
         excelView.addObject("subtitulo", departamento.getNombre().toUpperCase()+"/"+dx.getNombre().toUpperCase());
 
         excelView.addObject("tablaPos", String.format(messageSource.getMessage("lbl.excel.filter", null, null),
-                messageSource.getMessage("lbl.positives", null, null),
+                messageSource.getMessage((tipoReporte.equalsIgnoreCase("LEPTO")?"lbl.reactor":"lbl.positives"), null, null),
                 DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
                 DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
 
         excelView.addObject("tablaNeg", String.format(messageSource.getMessage("lbl.excel.filter", null, null),
-                messageSource.getMessage("lbl.negatives", null, null),
+                messageSource.getMessage((tipoReporte.equalsIgnoreCase("LEPTO")?"lbl.no.reactor":"lbl.negatives"), null, null),
                 DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
                 DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
 
@@ -428,6 +437,30 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.ctzica", null, null));
         columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.week", null, null).toUpperCase());
+    }
+
+    private void setNombreColumnasLepto(List<String> columnas){
+        columnas.add(messageSource.getMessage("lbl.num", null, null));
+        columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.igm.lepto", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lepto.igm.date", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.names", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lastnames", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.muni", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.health.unit.excel", null, null));
+        columnas.add(messageSource.getMessage("lbl.address", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.age", null, null).toUpperCase().replace(":", ""));
+        columnas.add(messageSource.getMessage("lbl.age.um", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.fis.short", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.ftm", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.SILAIS.res", null, null).toUpperCase().replace(" ", "_"));
+        columnas.add(messageSource.getMessage("lbl.week", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.hosp", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.date.admission", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.deceased", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.date.deceased", null, null).toUpperCase());
     }
 
     private void setNombreColumnasDefecto(List<String> columnas){
@@ -683,6 +716,80 @@ public class ReportesExcelController {
                 registro[0]= rowCountNeg++;
                 registrosNeg.add(registro);
             } else if (incluirMxInadecuadas && registro[13].toString().toLowerCase().contains("inadecuada")){
+                registro[0]= rowCountInadec++;
+                registrosMxInadec.add(registro);
+            }
+        }
+    }
+
+    private void setDatosLepto(List<DaSolicitudDx> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec, int numColumnas) throws Exception{
+// create data rows
+        int rowCountPos = 1;
+        int rowCountNeg = 1;
+        int rowCountInadec = 1;
+        for (DaSolicitudDx solicitudDx : dxList) {
+            String nombres = "";
+            String apellidos = "";
+
+            DaSindFebril sindFebril = sindFebrilService.getDaSindFebril(solicitudDx.getIdTomaMx().getIdNotificacion().getIdNotificacion());
+            Object[] registro = new Object[numColumnas];
+            registro[1] = solicitudDx.getIdTomaMx().getCodigoLab();
+            registro[2] = parseFinalResultDetails(solicitudDx.getIdSolicitudDx());
+            registro[3] = solicitudDx.getFechaAprobacion();
+            nombres = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                nombres += " "+solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+            registro[4] = nombres;
+
+            apellidos = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                apellidos += " "+solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+            registro[5] = apellidos;
+            registro[6] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre():"");
+            registro[7] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getMunicipio().getNombre():"");
+            registro[8] = (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():"");
+            String direccion = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getDireccionResidencia();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoResidencia()!=null || solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil()!=null ){
+                direccion += ". TEL. ";
+                direccion+= (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoResidencia()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoResidencia()+",":"");
+                direccion+= (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getTelefonoMovil():"");
+            }
+            registro[9] = direccion;
+            Integer edad = null;
+            String medidaEdad = "";
+            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
+            if (arrEdad[0] != null) {
+                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
+            }else if (arrEdad[1] != null) {
+                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
+            }else if (arrEdad[2] != null) {
+                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
+            }
+            registro[10] = edad;
+            registro[11] = medidaEdad;
+            String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
+            registro[12] = sexo.substring(sexo.length() - 1, sexo.length());
+            registro[13] = solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
+            registro[14] = solicitudDx.getIdTomaMx().getFechaHTomaMx();
+            registro[15] = (solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia().getDependenciaSilais().getNombre():"");
+            CalendarioEpi calendario = null;
+            if (sindFebril!=null)
+                calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
+            if (calendario!=null) {
+                registro[16] = calendario.getNoSemana();
+            }
+            registro[17] = (sindFebril!=null && sindFebril.getHosp()!=null?sindFebril.getHosp().getValor():"");
+            registro[18] = (sindFebril!=null?sindFebril.getFechaIngreso():"");
+            registro[19] = (sindFebril!=null && sindFebril.getFallecido()!=null?sindFebril.getFallecido().getValor():"");
+            registro[20] = (sindFebril!=null?sindFebril.getFechaFallecido():"");
+            //la posición que contiene el resultado final
+            if (registro[2].toString().toLowerCase().contains("no reactor")) {
+                registro[0]= rowCountNeg++;
+                registrosNeg.add(registro);
+            }else if (registro[2].toString().toLowerCase().contains("reactor")) {
+                registro[0]= rowCountPos++;
+                registrosPos.add(registro);
+            } else if (incluirMxInadecuadas && registro[2].toString().toLowerCase().contains("inadecuada")){
                 registro[0]= rowCountInadec++;
                 registrosMxInadec.add(registro);
             }
