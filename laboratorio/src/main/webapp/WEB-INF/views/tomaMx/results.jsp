@@ -113,14 +113,14 @@
 													<spring:param name="idNotificacion" value="${noti.idNotificacion}" />
 												</spring:url>
 												<td><c:if test="${noti.pasivo==false}">
-                                                        <a target="_blank" title="Tomar Mx" data-id= "${noti.idNotificacion}"  class="btn btn-primary btn-xs tomarmx"><i class="fa fa-eyedropper"></i></a>
+                                                        <a title="Tomar Mx" data-id= "${noti.idNotificacion}"  class="btn btn-primary btn-xs tomarmx"><i class="fa fa-eyedropper"></i></a>
                                                     </c:if>
                                                     <c:if test="${noti.pasivo==true}">
                                                     <button type="button" title="Tomar Mx" disabled class="btn btn-xs btn-primary"> <i class="fa fa-eyedropper"></i></button>
                                                     </c:if>
                                                 </td>
                                                 <td><c:if test="${noti.pasivo==false}">
-                                                        <a target="_blank" title="Anular" href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a>
+                                                        <a title="Anular" href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a>
                                                     </c:if>
                                                     <c:if test="${noti.pasivo==true}">
                                                         <button type="button" title="Anular" disabled class="btn btn-danger btn-xs"> <i class="fa fa-times"></i></button>

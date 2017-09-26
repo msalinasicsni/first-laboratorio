@@ -176,9 +176,9 @@ var ResultsNotices = function () {
 
                         });
                     }else{
-                        //window.location.href =  actionUrl;
+                        window.location.href =  actionUrl;
                         //link.attr("href",actionUrl);
-                        window.open(actionUrl,'_blank');
+                        //window.open(actionUrl,'_blank');
                     }
 
                 });

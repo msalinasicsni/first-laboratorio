@@ -312,7 +312,7 @@ var EnterFormTomaMx = function () {
                                     timeout: 4000
                                 });
                                 setTimeout(function () {
-                                    window.close(); //window.location.href = parametros.searchUrl;
+                                    window.location.href = parametros.searchUrl;
                                 }, 4000);
                             }
 
