@@ -789,12 +789,16 @@ public class ReportesController {
                             Integer idLista = Integer.valueOf(res.getValor());
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                            if (valor.getValor().trim().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().trim().toLowerCase().equals("positivo")
+                                    || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
+                                    || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))) {
                                 mostrar = true;
                             }
 
                         } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().trim().toLowerCase().equals("positivo")) {
+                            if (res.getValor().trim().toLowerCase().equals("positivo")
+                                    || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
+                                    || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))) {
                                 mostrar = true;
                             }
                         }
@@ -803,12 +807,16 @@ public class ReportesController {
                             Integer idLista = Integer.valueOf(res.getValor());
                             Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                            if (valor.getValor().trim().toLowerCase().equals("positivo")) {
+                            if (valor.getValor().trim().toLowerCase().equals("positivo")
+                                    || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
+                                    || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))) {
                                 mostrar = true;
                             }
 
                         } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().trim().toLowerCase().equals("positivo")) {
+                            if (res.getValor().trim().toLowerCase().equals("positivo")
+                                    || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
+                                    || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))) {
                                 mostrar = true;
                             }
                         }
@@ -1475,13 +1483,15 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().trim().toLowerCase().equals("positivo") ||valor.getValor().trim().toLowerCase().equals("negativo") ) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo") ||valor.getValor().trim().toLowerCase().equals("negativo")
+                        || valor.getValor().trim().toLowerCase().contains("reactor") || valor.getValor().trim().toLowerCase().contains("detectado")) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().trim().toLowerCase().equals("positivo") || res.getValor().trim().toLowerCase().equals("negativo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo") || res.getValor().trim().toLowerCase().equals("negativo")
+                        || res.getValor().trim().toLowerCase().contains("reactor") || res.getValor().trim().toLowerCase().contains("detectado")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1491,13 +1501,15 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().trim().toLowerCase().equals("positivo") || valor.getValor().trim().toLowerCase().equals("negativo") ) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo") || valor.getValor().trim().toLowerCase().equals("negativo")
+                        || valor.getValor().trim().toLowerCase().contains("reactor") || valor.getValor().trim().toLowerCase().contains("detectado")) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().trim().toLowerCase().equals("positivo") || res.getValor().trim().toLowerCase().equals("negativo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo") || res.getValor().trim().toLowerCase().equals("negativo")
+                        || res.getValor().trim().toLowerCase().contains("reactor") || res.getValor().trim().toLowerCase().contains("detectado")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1516,13 +1528,17 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().toLowerCase().equals("negativo") ) {
+                if (valor.getValor().toLowerCase().equals("negativo")
+                        || valor.getValor().trim().toLowerCase().contains("no reactor")
+                        || valor.getValor().trim().toLowerCase().contains("no detectado")) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().toLowerCase().equals("negativo")) {
+                if (res.getValor().toLowerCase().equals("negativo")
+                        || res.getValor().trim().toLowerCase().contains("no reactor")
+                        || res.getValor().trim().toLowerCase().contains("no detectado")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1532,13 +1548,17 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().toLowerCase().equals("negativo") ) {
+                if (valor.getValor().toLowerCase().equals("negativo")
+                        || valor.getValor().trim().toLowerCase().contains("no reactor")
+                        || valor.getValor().trim().toLowerCase().contains("no detectado")) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().toLowerCase().equals("negativo")) {
+                if (res.getValor().toLowerCase().equals("negativo")
+                        || res.getValor().trim().toLowerCase().contains("no reactor")
+                        || res.getValor().trim().toLowerCase().contains("no detectado")) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1557,13 +1577,17 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().trim().toLowerCase().equals("positivo") ) {
+                if (valor.getValor().trim().toLowerCase().contains("positivo")
+                        || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
+                        || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().trim().toLowerCase().equals("positivo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo")
+                        || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
+                        || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1573,13 +1597,17 @@ public class ReportesController {
                 Integer idLista = Integer.valueOf(res.getValor());
                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
 
-                if (valor.getValor().trim().toLowerCase().equals("positivo")) {
+                if (valor.getValor().trim().toLowerCase().equals("positivo")
+                        || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
+                        || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
 
             } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                if (res.getValor().trim().toLowerCase().equals("positivo")) {
+                if (res.getValor().trim().toLowerCase().equals("positivo")
+                        || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
+                        || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }

@@ -24,24 +24,12 @@
 	<!-- See http://docs.jboss.org/hibernate/stable/core/api/index.html?org/hibernate/Session.html class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean" -->
     <bean id="hibernateAuditLogListener" class="ni.gob.minsa.laboratorio.web.listener.HibernateAuditLogListener"/>
     <bean id="sessionFactory"  class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
-				 p:dataSource-ref="dataSource"
-				 p:configLocation="${hibernate.config}"
-				 p:packagesToScan="ni.gob.minsa.laboratorio"/>
-	
-	<!-- Declare a datasource that has pooling capabilities-->	 
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-				destroy-method="close"
-				p:driverClass="${app.jdbc.driverClassName}"
-				p:jdbcUrl="${app.jdbc.url}"
-				p:user="${app.jdbc.username}"
-				p:password="${app.jdbc.password}"
-				p:acquireIncrement="5"
-				p:idleConnectionTestPeriod="240"
-				p:maxPoolSize="100"
-				p:maxStatements="50"
-				p:minPoolSize="10"
-                p:maxIdleTime="600"
-				p:maxStatementsPerConnection="100" />
+          p:dataSource-ref="dataSource"
+          p:configLocation="${hibernate.config}"
+          p:packagesToScan="ni.gob.minsa.laboratorio"/>
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${app.jndi.name}"/>
+    </bean>
 
 	<!-- Declare a transaction manager org.springframework.orm.hibernate3.HibernateTransactionManager-->
 	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager"

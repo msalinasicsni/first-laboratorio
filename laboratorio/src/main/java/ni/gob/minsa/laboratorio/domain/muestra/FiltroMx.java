@@ -34,6 +34,9 @@ public class FiltroMx {
     String codLaboratio;
     Date fechaInicioProcesamiento;
     Date fechaFinProcesamiento;
+    Date fechaInicioRechazo;
+    Date fechaFinRechazo;
+
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -221,5 +224,21 @@ public class FiltroMx {
 
     public void setFechaFinProcesamiento(Date fechaFinProcesamiento) {
         this.fechaFinProcesamiento = fechaFinProcesamiento;
+    }
+
+    public Date getFechaInicioRechazo() {
+        return fechaInicioRechazo;
+    }
+
+    public void setFechaInicioRechazo(Date fechaInicioRechazo) {
+        this.fechaInicioRechazo = fechaInicioRechazo;
+    }
+
+    public Date getFechaFinRechazo() {
+        return fechaFinRechazo;
+    }
+
+    public void setFechaFinRechazo(Date fechaFinRechazo) {
+        this.fechaFinRechazo = fechaFinRechazo;
     }
 }

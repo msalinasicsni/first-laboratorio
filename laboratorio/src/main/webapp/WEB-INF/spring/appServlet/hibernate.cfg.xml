@@ -4,7 +4,7 @@
 		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 		
 <hibernate-configuration>
-  <session-factory>
+  <session-factory name="java:hibernate/SessionFactory">
     <!-- org.hibernate.dialect.MySQL5InnoDBDialect or org.hibernate.dialect.PostgreSQLDialect or org.hibernate.dialect.Oracle10gDialect -->
     <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
     <!-- Enable this to see the SQL statements in the logs-->

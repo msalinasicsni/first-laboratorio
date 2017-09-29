@@ -130,8 +130,8 @@ var RejectedResults = function () {
                     filtros['conResultado'] = 'Si';
                 } else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    filtros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
-                    filtros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                    filtros['fechaInicioRechazo'] = $('#fecInicioTomaMx').val();
+                    filtros['fechaFinRechazo'] = $('#fecFinTomaMx').val();
                     filtros['codSilais'] = $('#codSilais').find('option:selected').val();
                     filtros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     filtros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();

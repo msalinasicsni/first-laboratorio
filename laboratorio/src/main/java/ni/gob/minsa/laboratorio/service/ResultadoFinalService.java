@@ -860,6 +860,7 @@ public class ResultadoFinalService {
                             Restrictions.eq("unidadS.codigo", Long.valueOf(filtro.getCodUnidadSalud())))
             );
         }
+        /*
         //Se filtra por rango de fecha de toma de muestra
         if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
             crit.add( Restrictions.and(
@@ -878,6 +879,15 @@ public class ResultadoFinalService {
                     .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
                     .setProjection(Property.forName("toma.idTomaMx"))));
 
+        }*/
+        //Se filtra por rango de fecha de toma de muestra
+        if (filtro.getFechaInicioRechazo()!=null && filtro.getFechaFinRechazo()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("fechaHRechazo", filtro.getFechaInicioRechazo(),filtro.getFechaFinRechazo()))
+            );
+            crit2.add( Restrictions.and(
+                            Restrictions.between("fechaHRechazo", filtro.getFechaInicioRechazo(),filtro.getFechaFinRechazo()))
+            );
         }
         // se filtra por tipo de muestra
         if (filtro.getCodTipoMx()!=null){
