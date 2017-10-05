@@ -64,6 +64,8 @@
 							</header>
 							<!-- widget div-->
 							<div>
+                                <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
+                                <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
 								<!-- widget edit box -->
 								<div class="jarviswidget-editbox">
 									<!-- This area used as dropdown edit box -->
@@ -142,6 +144,12 @@
                                             </tbody>
                                         </c:if>
 									</table>
+                                    <form id="paginate-form" class="smart-form" autocomplete="off">
+                                        <footer>
+                                            <button type="button" title="<spring:message code="lbl.next"/>" id="next" class="btn btn-info"><i class="fa fa-fast-forward"></i></button>
+                                            <button type="button" title="<spring:message code="lbl.prev"/>" id="prev" class="btn btn-info"><i class="fa fa-fast-backward"></i></button>
+                                        </footer>
+                                    </form>
 								</div>
 								<!-- end widget content -->
 							</div>
@@ -209,6 +217,7 @@
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.personas").parents("ul").slideDown(200);
 	    	}
+
 		});
 	</script>
 	<!-- END JAVASCRIPTS -->

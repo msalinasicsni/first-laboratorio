@@ -21,6 +21,10 @@ var SearchPerson = function () {
     return {
         //main function to initiate the module
         init: function (parametros) {
+            var page=0;
+            var rowsPage=20;
+            $("#prev").prop('disabled',true);
+            $("#next").prop('disabled',true);
             var responsiveHelper_dt_basic = undefined;
             var breakpointDefinition = {
                 tablet: 1024,
@@ -37,6 +41,8 @@ var SearchPerson = function () {
                         responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#persons_result'), breakpointDefinition);
                     }
                 },
+                "paging": false,
+                "info": false,
                 "rowCallback": function (nRow) {
                     responsiveHelper_dt_basic.createExpandIcon(nRow);
                 },
@@ -58,40 +64,84 @@ var SearchPerson = function () {
                     error.insertAfter(element.parent());
                 },
                 submitHandler: function (form) {
-                    table1.fnClearTable();
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
-                    getPersons();
+                    page=0;
+                    getPersons(page*rowsPage);
                 }
             });
 
+            $("#prev").on('click', function (event) {
+                if (page>0) {
+                    page = page - 1;
+                    getPersons(page*rowsPage);
+                }
+            });
+            $("#next").on('click', function (event) {
+                page = page+1;
+                getPersons(page*rowsPage);
 
-            function getPersons() {
+            });
+
+            function getPersons(pagina) {
+                if (page>0) {
+                    $("#prev").prop('disabled',false);
+                }else{
+                    $("#prev").prop('disabled',true);
+                }
+
+                table1.fnClearTable();
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sPersonUrl, {
                     strFilter: encodeURI($('#filtro').val()),
+                    pPaginaActual: pagina,
                     ajax: 'true'
                 }, function (data) {
                     var len = data.length;
-                    for (var i = 0; i < len; i++) {
-                        var nombreMuniRes = "";
-
-                        if (data[i].municipioResidencia != null) {
-                            nombreMuniRes = data[i].municipioResidencia.nombre;
-                        }
-                        var actionUrl = parametros.sActionUrl + '/' + data[i].personaId;
-                        var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
-
-                        table1.fnAddData(
-                            [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, nombreMuniRes,
-                                    '<a target="_blank" title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
-                                    '<a target="_blank" title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
-
+                    if (len<rowsPage) {
+                        $("#next").prop('disabled', true);
+                    }else{
+                        $("#next").prop('disabled', false);
                     }
-                    setTimeout($.unblockUI, 500);
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            var nombreMuniRes = "";
+
+                            if (data[i].municipioResidencia != null) {
+                                nombreMuniRes = data[i].municipioResidencia.nombre;
+                            }
+                            var actionUrl = parametros.sActionUrl + '/' + data[i].personaId;
+                            var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
+
+                            table1.fnAddData(
+                                [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, nombreMuniRes,
+                                        '<a title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
+                                        '<a title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
+
+                        }
+                        setTimeout($.unblockUI, 500);
+                    }else {
+                        $.smallBox({
+                            title: $("#msg_no_results_found").val(),
+                            content: $("#smallBox_content").val(),
+                            color: "#C79121",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
                 })
                     .fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);
-                        validateLogin(jqXHR);
+                        if (jqXHR.status=="200") {
+                            $.smallBox({
+                                title: $("#msg_no_results_found").val(),
+                                content: $("#smallBox_content").val(),
+                                color: "#C79121",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        }else {
+                            validateLogin(jqXHR);
+                        }
                     });
             }
 

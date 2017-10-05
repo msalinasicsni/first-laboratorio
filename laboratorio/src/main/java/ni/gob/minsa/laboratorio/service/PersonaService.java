@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.Normalizer;
 import java.util.List;
@@ -24,6 +25,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,7 +43,7 @@ public class PersonaService {
     private InitialContext initialContext;
     public static final Pattern DIACRITICS_AND_FRIENDS
             = Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
-
+    private int rowCount = 0;
     private static String stripDiacritics(String str) {
         str = Normalizer.normalize(str, Normalizer.Form.NFD);
         str = DIACRITICS_AND_FRIENDS.matcher(str).replaceAll("");
@@ -98,6 +101,137 @@ public class PersonaService {
                     )
                     .list();
         }
+    }
+
+    public List<SisPersona> getPersonas(int pPaginaActual,int pRegistrosPorPagina,String pFiltro){
+        List<SisPersona> personaList = null;
+        try {
+            pFiltro = URLDecoder.decode(pFiltro, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        try{
+            if(pFiltro!=null){
+                if(pFiltro.matches("[0-9]*")){
+                    personaList = getPersonasPorNumeroTelefono(pPaginaActual, pRegistrosPorPagina, pFiltro,null);
+                }else if(pFiltro.matches("[a-zA-ZáéíóúÑñÁÉÍÓÚÜü\\s]*")){
+                    personaList = getPersonasPorNombre(pPaginaActual, pRegistrosPorPagina, pFiltro,null);
+                }else{
+                    personaList = getPersonasPorIdentificacion(pPaginaActual, pRegistrosPorPagina, pFiltro,null);
+                }
+            }
+        }catch(Exception e){
+            personaList = null;
+        }
+
+        return personaList;
+    }
+
+    public List<SisPersona> getPersonasPorNombre(int pFilaActual,int pRegistrosPorPagina,String pNombrePersona,String pSexo){
+
+        List<SisPersona> personaList = null;
+        pNombrePersona = pNombrePersona.trim().toUpperCase();
+        String queryString = "";
+
+        try{
+            Session session = sessionFactory.getCurrentSession();
+
+            //Criteria crit = session.createCriteria(SisPersona.class);
+            String[] partes = pNombrePersona.split(" ");
+            queryString = "select {per.*} from sis.sis_personas {per} where catsearch(snd_nombre,";
+            String codigoNombre = "";
+            for(int i=0;i<partes.length;i++){
+                String codigo = ((String)session.createSQLQuery("select sis.PKG_SND.soundesp(sis.PKG_SND.remover_acentos(TRIM(REPLACE(REPLACE(REPLACE(REPLACE('"+partes[i]+"','DE LOS ',''),'DE LA ',''),'LA ',''),'DE ','')))) from dual").list().get(0)).toString();
+                if(i == 0){
+                    codigoNombre  = codigoNombre.concat(codigo);
+                }else{
+                    codigoNombre  = codigoNombre.concat( " " +codigo);
+                }
+            }
+            queryString = queryString.concat("'" + codigoNombre + "',null) > 0");
+            if(pSexo!=null) queryString = queryString.concat(" AND codigo_sexo='"+pSexo+"'");
+            
+            String queryConteo = queryString.replaceAll("\\{per.\\*}", "count(\\*)");
+            queryConteo = queryConteo.replaceAll("\\{per}","");
+            this.rowCount = ((BigDecimal)session.createSQLQuery(queryConteo).list().get(0)).intValue();
+            if(rowCount <= pFilaActual) pFilaActual -= rowCount;
+            pFilaActual = rowCount <= pFilaActual ? 0 : pFilaActual;
+            personaList = (List<SisPersona>)session.createSQLQuery(queryString).addEntity("per", SisPersona.class).setFirstResult(pFilaActual).setMaxResults(pRegistrosPorPagina).list();
+
+            if(personaList == null){
+                this.rowCount=0;
+            }
+
+        }catch(Exception e){
+            personaList = null;
+            this.rowCount = 0;
+            e.printStackTrace();
+        }
+
+        return personaList;
+    }
+
+    public List<SisPersona> getPersonasPorNumeroTelefono(int pPaginaActual,int pRegistrosPorPagina,String pNumeroTelefono,String pSexo){
+
+        List<SisPersona> personaList = null;
+        Session session = sessionFactory.getCurrentSession();
+        try{
+            if(!pNumeroTelefono.trim().equals("")){
+                Criteria critPersonas = session.createCriteria(SisPersona.class);
+                critPersonas.add(Restrictions.or(Restrictions.eq("telefonoResidencia",  pNumeroTelefono.trim().toUpperCase()), Restrictions.eq("telefonoMovil",  pNumeroTelefono.trim().toUpperCase())));
+                if(pSexo!=null) critPersonas.add(Restrictions.eq("codigoSexo", pSexo));
+
+                this.rowCount = ((Number) critPersonas.setProjection(Projections.rowCount()).uniqueResult()).intValue();
+                if(rowCount <= pPaginaActual) pPaginaActual-= rowCount;
+                pPaginaActual = rowCount <= pPaginaActual ? 0 : pPaginaActual;
+                critPersonas.setProjection(null);
+                critPersonas.setFirstResult(pPaginaActual);
+                critPersonas.setMaxResults(pRegistrosPorPagina);
+                critPersonas.addOrder(Order.asc("primerApellido"));
+                personaList = (List<SisPersona>) critPersonas.list();
+
+                if(this.rowCount < 1){
+                    personaList = null;
+                }
+            }
+
+        }catch(Exception e){
+            this.rowCount = 0;
+            personaList = null;
+        }
+
+        return personaList;
+    }
+
+    public List<SisPersona> getPersonasPorIdentificacion(int pPaginaActual,int pRegistrosPorPagina,String pIdentificacion,String pSexo){
+
+        List<SisPersona> personaList = null;
+        Session session = sessionFactory.getCurrentSession();
+        try{
+            if(!pIdentificacion.trim().equals("")){
+                Criteria critPersonas = session.createCriteria(SisPersona.class);
+                critPersonas.add(Restrictions.eq("identificacion",  pIdentificacion.trim().toUpperCase()));
+                if(pSexo!=null) critPersonas.add(Restrictions.eq("codigoSexo", pSexo));
+
+                this.rowCount = ((Number) critPersonas.setProjection(Projections.rowCount()).uniqueResult()).intValue();
+                if(rowCount <= pPaginaActual) pPaginaActual-= rowCount;
+                pPaginaActual = rowCount <= pPaginaActual ? 0 : pPaginaActual;
+                critPersonas.setProjection(null);
+                critPersonas.setFirstResult(pPaginaActual);
+                critPersonas.setMaxResults(pRegistrosPorPagina);
+                critPersonas.addOrder(Order.asc("primerApellido"));
+                personaList = (List<SisPersona>) critPersonas.list();
+
+                if(this.rowCount < 1){
+                    personaList = null;
+                }
+            }
+        }catch(Exception e){
+            this.rowCount = 0;
+            personaList = null;
+        }
+
+        return personaList;
     }
 
     public SisPersona getPersona(long idPerson){

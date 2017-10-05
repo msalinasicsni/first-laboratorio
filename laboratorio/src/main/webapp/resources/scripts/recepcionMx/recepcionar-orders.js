@@ -359,7 +359,7 @@ var ReceiptOrders = function () {
                                 idLoad = dataToLoad[i].idRecepcion;
                                 actionUrl = actionUrl + idLoad;
                                 table1.fnAddData(
-                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                                 //[dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                             } else {
                                 idLoad = dataToLoad[i].idTomaMx;
@@ -803,7 +803,7 @@ var ReceiptOrders = function () {
                                 });
                                 limpiarDatosRecepcion();
                                 setTimeout(function () {
-                                    window.location.href = parametros.sSearchReceiptUrl
+                                    window.close(); //window.location.href = parametros.sSearchReceiptUrl
                                 }, 2000);
                             }
                             desbloquearUI();

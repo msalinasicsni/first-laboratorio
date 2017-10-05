@@ -87,9 +87,11 @@ public class PersonaController {
      * @return Un arreglo JSON de personas 
      */
     @RequestMapping(value = "persons", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody List<SisPersona> fetchPersonasJson(@RequestParam(value = "strFilter", required = true) String filtro) {
+    public @ResponseBody List<SisPersona> fetchPersonasJson(@RequestParam(value = "strFilter", required = true) String filtro,
+                                                            @RequestParam(value = "pPaginaActual", required = true) int pPaginaActual) {
         logger.info("Obteniendo las personas en JSON");
-        List<SisPersona> personas = personaService.getPersonas(filtro);
+        List<SisPersona> personas = personaService.getPersonas(pPaginaActual,20,filtro); //personaService.getPersonas(filtro);
+
         if (personas == null){
         	logger.debug("Nulo");
         }

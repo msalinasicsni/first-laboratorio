@@ -63,6 +63,8 @@
 							</header>
 							<!-- widget div-->
 							<div>
+                                <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
+                                <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
 								<!-- widget edit box -->
 								<div class="jarviswidget-editbox">
 									<!-- This area used as dropdown edit box -->
@@ -80,6 +82,12 @@
 											</section>
 										</fieldset>
 										<footer>
+                                            <spring:url value="/personas/create" var="newUrl">
+                                            </spring:url>
+                                            <a href="${fn:escapeXml(newUrl)}"
+                                               class="btn btn-default btn-large btn-info pull-right"><i
+                                                    class="fa fa-plus"></i> <spring:message
+                                                    code="lbl.person" /> </a>
 											<button type="submit" id="search-person" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
 										</footer>
 									</form>						
@@ -123,10 +131,17 @@
 											</tr>
 										</thead>
 									</table>
+                                    <form id="paginate-form" class="smart-form" autocomplete="off">
+                                        <footer>
+                                            <button type="button" title="<spring:message code="lbl.next"/>" id="next" class="btn btn-primary"><i class="fa fa-fast-forward"></i></button>
+                                            <button type="button" title="<spring:message code="lbl.prev"/>" id="prev" class="btn btn-primary"><i class="fa fa-fast-backward"></i></button>
+                                        </footer>
+                                    </form>
 								</div>
 								<!-- end widget content -->
 							</div>
-							<!-- end widget div -->
+                            <!-- end widget div -->
+                            <!--
                             <div style="border: none" class="row">
                                 <spring:url value="/personas/create" var="newUrl">
                                 </spring:url>
@@ -134,7 +149,7 @@
                                    class="btn btn-default btn-large btn-primary pull-right"><i
                                         class="fa fa-plus"></i> <spring:message
                                         code="lbl.person" /> </a>
-                            </div>
+                            </div>-->
 						</div>
 						<!-- end widget -->
 					</article>

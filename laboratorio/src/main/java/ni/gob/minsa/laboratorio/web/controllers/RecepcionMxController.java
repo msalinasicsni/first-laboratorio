@@ -1742,12 +1742,12 @@ public class RecepcionMxController {
             String areaOrigen = "";
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoActivoMxRecepcion(recepcion.getTomaMx().getIdTomaMx(),false);
             if (trasladoMxActivo!=null) {
-                if (trasladoMxActivo.isTrasladoExterno()) {
+                if (trasladoMxActivo.isTrasladoExterno() || trasladoMxActivo.isControlCalidad()) {
                     if (!seguridadService.usuarioAutorizadoLaboratorio(seguridadService.obtenerNombreUsuario(),trasladoMxActivo.getLaboratorioDestino().getCodigo())){
                         mostrar = false;
                     }else{
                         traslado = messageSource.getMessage("lbl.yes",null,null);
-                        areaOrigen = trasladoMxActivo.getAreaOrigen().getNombre();
+                        areaOrigen = (trasladoMxActivo.getAreaOrigen()!=null?trasladoMxActivo.getAreaOrigen().getNombre():"");
                     }
                 }else {
                     if (!seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
