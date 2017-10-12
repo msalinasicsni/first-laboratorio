@@ -642,6 +642,12 @@ public class TomaMxController {
                 break;
             }
             default:
+                DaNotificacion noti = daNotificacionService.getNotifById(notificacion.getIdNotificacion());
+                if (noti!=null) {
+                    daNotificacionService.updateNotificacion(notificacion);
+                }else{
+                    daNotificacionService.addNotification(notificacion);
+                }
                 break;
         }
     }
