@@ -162,6 +162,24 @@
                                                             </select>
                                                         </div>
                                                     </section>
+                                                    <section class="col col-sm-6 col-md-2 col-lg-2">
+                                                        <label class="text-left txt-color-blue font-md"><spring:message code="users.nc"/></label>
+                                                        <div class="row">
+                                                            <div class="col col-4">
+                                                                <label class="checkbox">
+                                                                    <c:choose>
+                                                                        <c:when test="${user.nivelCentral}">
+                                                                            <input type="checkbox" name="checkbox-nc" id="checkbox-nc" checked>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <input type="checkbox" name="checkbox-nc" id="checkbox-nc">
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+
+                                                                    <i></i></label>
+                                                            </div>
+                                                        </div>
+                                                    </section>
                                                 </div>
                                             </fieldset>
                                             <footer>

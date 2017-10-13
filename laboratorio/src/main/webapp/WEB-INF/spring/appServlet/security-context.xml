@@ -64,7 +64,7 @@
         <intercept-url pattern="/tomaMx/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/reprint/**" access="ROLE_RECEPCION,ROLE_ANALISTA" />
         <intercept-url pattern="/personas/persons" access="ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
-        <intercept-url pattern="/personas/**" access="ROLE_ADMIN" />
+        <intercept-url pattern="/personas/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
         <intercept-url pattern="/workSheet/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/trasladoMx/**" access="ROLE_ANALISTA" />
         <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />

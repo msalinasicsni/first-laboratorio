@@ -25,7 +25,7 @@ var QualityReport = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-sm-6 col-xs-12'p>>",
                 "autoWidth": true,
                 "aaSorting": [],
-                "columns": [
+                /*"columns": [
                     null, null, null, null, null, null, null, null,
                     {
                         "className": 'details-control',
@@ -33,7 +33,7 @@ var QualityReport = function () {
                         "data": null,
                         "defaultContent": ''
                     }
-                ],
+                ],*/
                 "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -144,13 +144,13 @@ var QualityReport = function () {
                         for (var i = 0; i < len; i++) {
                             table1.fnAddData(
                                 [dataToLoad[i].solicitud, dataToLoad[i].fechaSolicitud, dataToLoad[i].fechaAprobacion, dataToLoad[i].codigoLab,
-                                    dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona, dataToLoad[i].laboratorio , " <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);
+                                    //dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion, dataToLoad[i].persona,
+                                    dataToLoad[i].laboratorio, dataToLoad[i].resultado,dataToLoad[i].resultadocc,dataToLoad[i].coincide]);
+                                        //" <input type='hidden' value='" + dataToLoad[i].resultados + "'/>"]);
                             if (i + 1 < len) {
                                 codigos += dataToLoad[i].codigoUnicoMx + ",";
-
                             } else {
                                 codigos += dataToLoad[i].codigoUnicoMx;
-
                             }
                         }
                         codigos = reemplazar(codigos, "-", "*");
@@ -204,7 +204,7 @@ var QualityReport = function () {
                 }
                 else {
                     // Open this row
-                    row.child(format(row.data(), 8)).show();
+                    row.child(format(row.data(), 5)).show();
                     tr.addClass('shown');
                 }
             });

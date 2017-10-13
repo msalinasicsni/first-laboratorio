@@ -554,6 +554,7 @@ public class UsuariosController {
         String nombreCompleto="";
         String email=null;
         String labAsignado = "";
+        boolean nivelCentral=false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -565,11 +566,13 @@ public class UsuariosController {
                 email = jsonpObject.get("email").getAsString();
             habilitado = jsonpObject.get("habilitado").getAsBoolean();
             labAsignado = jsonpObject.get("labAsignado").getAsString();
+            nivelCentral = jsonpObject.get("nivelCentral").getAsBoolean();
 
             User user = usuarioService.getUser(userName);
             user.setCompleteName(nombreCompleto);
             user.setEmail(email);
             user.setEnabled(habilitado);
+            user.setNivelCentral(nivelCentral);
 
             this.usuarioService.updateUser(user);
 
@@ -691,6 +694,7 @@ public class UsuariosController {
         String email=null;
         String password="";
         String labAsignado = "";
+        boolean nivelCentral=false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -703,6 +707,7 @@ public class UsuariosController {
             habilitado = jsonpObject.get("habilitado").getAsBoolean();
             password = jsonpObject.get("password").getAsString();
             labAsignado = jsonpObject.get("labAsignado").getAsString();
+            nivelCentral = jsonpObject.get("nivelCentral").getAsBoolean();
 
             User userExist = usuarioService.getUser(userName);
             if (userExist!=null){
@@ -721,6 +726,7 @@ public class UsuariosController {
                 user.setEmail(email);
                 user.setEnabled(habilitado);
                 user.setPassword(encodedPass);
+                user.setNivelCentral(nivelCentral);
 
                 this.usuarioService.addUser(user);
 

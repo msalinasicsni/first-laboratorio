@@ -51,7 +51,8 @@ var Consolidated = function () {
                 rules: {
                     fechaInicio: {required: true},
                     fechaFin: {required: true},
-                    tipoConsolidado: {required: true}
+                    tipoConsolidado: {required: true},
+                    codSilais: {required: true}
                 },
                 // Do not change code below
                 errorPlacement: function (error, element) {
@@ -85,6 +86,19 @@ var Consolidated = function () {
                 setTimeout($.unblockUI, 500);
             }
 
+            $('#tipoConsolidado').change(function () {
+                console.log($(this).val());
+                if ($(this).val().length > 0) {
+                    if ($(this).val() != 'Municipio') {
+                        $("#dvSilais").hide();
+                    } else {
+                        $("#dvSilais").show();
+                    }
+                } else {
+                    $("#dvSilais").hide();
+                }
+            });
+
             function getReport() {
                 var tipoConsolidado = $('#tipoConsolidado').find('option:selected').val();
                 var descTipoConsolidado = $('#tipoConsolidado').find('option:selected').text();
@@ -92,7 +106,10 @@ var Consolidated = function () {
                 if (tipoConsolidado==='SILAIS') {
                     $("#fileName").val("RecepcionMX_SILAIS");
                     urlReporte = parametros.searchUrl;
-                } else {
+                }else if (tipoConsolidado==='Municipio') {
+                    $("#fileName").val("RecepcionMX_Mun_SILAIS");
+                    urlReporte = parametros.searchUrlMun;
+                }else {
                     $("#fileName").val("RecepcionMX_Dx");
                     urlReporte = parametros.searchUrlDx;
                 }
@@ -100,6 +117,7 @@ var Consolidated = function () {
                 $.getJSON(urlReporte, {
                     fechaInicio: $("#fechaInicio").val(),
                     fechaFin: $("#fechaFin").val(),
+                    codSilais: $('#codSilais').find('option:selected').val(),
                     ajax: 'true'
                 }, function (dataToLoad) {
                     table1.fnClearTable();

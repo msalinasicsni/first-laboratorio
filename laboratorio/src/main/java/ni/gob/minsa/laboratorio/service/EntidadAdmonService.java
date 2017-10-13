@@ -85,4 +85,21 @@ public class EntidadAdmonService {
         q.setParameter("id",id);
         return  (EntidadesAdtvas)q.uniqueResult();
     }
+
+    /**
+     * Obtiene la lista de entidades administrativas asociadas a un laboratorio
+     * @param codLab laboratorio a consultar
+     * @return List<EntidadesAdtvas>
+     * @throws Exception
+     */
+    public List<EntidadesAdtvas> getEntidadesAdtvasByCodigoLab(String codLab) throws Exception {
+        String query = "select a.entidadAdtva from EntidadAdtvaLaboratorio as a " +
+                "where a.laboratorio.codigo = :codLab and a.pasivo = false and a.entidadAdtva.pasivo = :pasivo order by a.entidadAdtva.nombre asc";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("pasivo",'0');
+        q.setParameter("codLab", codLab);
+        return q.list();
+    }
 }

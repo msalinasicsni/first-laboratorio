@@ -87,6 +87,7 @@
                                         <th><spring:message code="users.desc" /></th>
                                         <th><spring:message code="users.email" /></th>
                                         <th><spring:message code="users.enabled" /></th>
+                                        <th><spring:message code="users.nc" /></th>
                                         <th><spring:message code="users.roles" /></th>
                                         <th><spring:message code="users.lab" /></th>
                                         <th style="width: 10%"><spring:message code="lbl.actions" /></th>
@@ -118,6 +119,18 @@
                                             <td><c:out value="${usuario.email}" /></td>
                                             <c:choose>
                                                 <c:when test="${usuario.enabled}">
+                                                    <td align="center">
+                                                        <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
+                                                    </td>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <td align="center">
+                                                        <span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>
+                                                    </td>
+                                                </c:otherwise>
+                                            </c:choose>
+                                            <c:choose>
+                                                <c:when test="${usuario.nivelCentral}">
                                                     <td align="center">
                                                         <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
                                                     </td>

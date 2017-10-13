@@ -83,6 +83,11 @@
                                 <input id="msg_sin_SILAIS_US" type="hidden" value="<spring:message code="msg.sample.no.SILAIS.US"/>"/>
                                 <input id="yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                 <input id="no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                                <input id="lblPersona" type="hidden" value="<spring:message code="lbl.person"/>"/>
+                                <input id="lblArea" type="hidden" value="<spring:message code="lbl.receipt.pcr.area"/>"/>
+                                <input id="lblCodigo" type="hidden" value="<spring:message code="lbl.unique.code.mx"/>"/>
+
+                                <input id="mostrarPopUpMx" type="hidden" value="${mostrarPopUpMx}" />
                                 <form id="datos-noti" class="smart-form"  autocomplete="off">
                                 <fieldset >
                                     <legend class="text-left txt-color-blue font-md"> <spring:message code="lbl.notification.data"/>
@@ -119,7 +124,7 @@
                                             <div class="">
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i><i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                    <input style="background-color: #f0fff0" disabled class="form-control" type="text" value="${noti.persona.primerNombre}" />
+                                                    <input style="background-color: #f0fff0" disabled class="form-control" id="primerNombre" type="text" value="${noti.persona.primerNombre}" />
                                                 </label>
                                             </div>
                                         </section>
@@ -131,7 +136,7 @@
                                             <div class="">
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i><i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                    <input style="background-color: #f0fff0" disabled class="form-control" type="text" value="${noti.persona.segundoNombre}"/>
+                                                    <input style="background-color: #f0fff0" disabled class="form-control" id="segundoNombre" type="text" value="${noti.persona.segundoNombre}"/>
                                                 </label>
                                             </div>
                                         </section>
@@ -142,7 +147,7 @@
                                             <div class="">
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i><i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                    <input style="background-color: #f0fff0" disabled class="form-control" type="text" value="${noti.persona.primerApellido}"  />
+                                                    <input style="background-color: #f0fff0" disabled class="form-control" id="primerApellido" type="text" value="${noti.persona.primerApellido}"  />
                                                 </label>
                                             </div>
                                         </section>
@@ -153,7 +158,7 @@
                                             <div class="">
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i><i class="icon-append fa fa-sort-alpha-asc"></i>
-                                                    <input style="background-color: #f0fff0" disabled class="form-control" type="text" value="${noti.persona.segundoApellido}" />
+                                                    <input style="background-color: #f0fff0" disabled class="form-control" id="segundoApellido" type="text" value="${noti.persona.segundoApellido}" />
                                                 </label>
                                             </div>
                                         </section>
@@ -177,7 +182,7 @@
                                             <div class="">
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
-                                                    <input style="background-color: #f0fff0" class="form-control" disabled type="text"
+                                                    <input style="background-color: #f0fff0" class="form-control" disabled type="text" id="fechaNac"
                                                            value="<fmt:formatDate value="${noti.persona.fechaNacimiento}" pattern="dd/MM/yyyy" />"/>
                                                 </label>
                                             </div>
@@ -507,6 +512,8 @@
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<spring:url value="/resources/scripts/muestras/enter-form.js" var="enterFormTomaMx" />
 	<script src="${enterFormTomaMx}"></script>
+    <spring:url value="/resources/scripts/utilidades/generarReporte.js" var="toPdf" />
+    <script src="${toPdf}"></script>
 	<spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 	<script src="${handleDatePickers}"></script>
     <!-- BEGIN PAGE LEVEL SCRIPTS -->

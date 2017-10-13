@@ -81,6 +81,10 @@
                                 <!-- end widget edit box -->
                                 <!-- widget content -->
                                 <div class="widget-body no-padding">
+                                    <input id="mostrarPopUpMx" type="hidden" value="${mostrarPopUpMx}" />
+                                    <input id="lblPersona" type="hidden" value="<spring:message code="lbl.person"/>"/>
+                                    <input id="lblArea" type="hidden" value="<spring:message code="lbl.receipt.pcr.area"/>"/>
+                                    <input id="lblCodigo" type="hidden" value="<spring:message code="lbl.unique.code.mx"/>"/>
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_no_results_found" type="hidden" value="<spring:message code="msg.no.results.found"/>"/>
@@ -200,7 +204,7 @@
                                                     </label>
                                                 </section>
 
-                                                <section class="col col-sm-12 col-md-6 col-lg-2">
+                                                <!--<section class="col col-sm-12 col-md-6 col-lg-2">
                                                     <label class="text-left txt-color-blue font-md">
                                                         <spring:message code="lbl.cc" /> </label>
                                                     <div class="input-group">
@@ -211,7 +215,7 @@
                                                             <option value="false"><spring:message code="lbl.no" /></option>
                                                         </select>
                                                     </div>
-                                                </section>
+                                                </section>-->
                                             </div>
                                         </fieldset>
                                         <footer>

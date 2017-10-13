@@ -205,20 +205,13 @@ public class ReportesService {
             crit.add(Restrictions.ilike("dx.nombre", "%" + filtro.getNombreSolicitud() + "%"));
         }
 
-        //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
-        /*if (filtro.getNombreUsuario()!=null) {
-            crit.createAlias("toma.envio","envioMx");
-            crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                    .createAlias("laboratorio", "labautorizado")
-                    .createAlias("user", "usuario")
-                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))));
-        }*/
-
         //filtro de resultados finales aprobados
         crit.add(Restrictions.and(
                         Restrictions.eq("rutina.aprobada", true))
+        );
+        //filtro de solicitud que no sea control de calidad
+        crit.add(Restrictions.and(
+                        Restrictions.eq("rutina.controlCalidad", false))
         );
 
         //filtro de resultado final positivo
@@ -227,14 +220,15 @@ public class ReportesService {
 
         crit.addOrder(Order.asc("fechaAprobacion"));
 
-        crit.createAlias("rutina.labProcesa","labProcesa");
-        crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                .createAlias("laboratorio", "labautorizado")
-                .createAlias("user", "usuario")
-                .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                .setProjection(Property.forName("labautorizado.codigo"))));
-
+        if (!filtro.isNivelCentral()) {//si no es nivel central, filtrar solo el laboratorio al que pertenece el usuario
+            crit.createAlias("rutina.labProcesa", "labProcesa");
+            crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                    .createAlias("laboratorio", "labautorizado")
+                    .createAlias("user", "usuario")
+                    .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                    .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                    .setProjection(Property.forName("labautorizado.codigo"))));
+        }
         //filtro x area
         if(filtro.getArea() != null){
             crit.createAlias("dx.area","area");
@@ -284,9 +278,10 @@ public class ReportesService {
                 crit.add(Restrictions.ilike("tEstudio.nombre", "%" + filtro.getNombreSolicitud() + "%"));
             }
         }
-        //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
-        if (filtro.getNombreUsuario()!=null) {
-            crit.createAlias("toma.envio","envioMx");
+        if (!filtro.isNivelCentral()) {//si no es nivel central, filtrar solo el laboratorio al que pertenece el usuario
+            //se filtra que usuario tenga autorizado laboratorio al que se envio la muestra desde ALERTA
+            if (filtro.getNombreUsuario() != null) {
+                crit.createAlias("toma.envio", "envioMx");
             /*crit.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
                     .createAlias("laboratorio", "labautorizado")
                     .createAlias("user", "usuario")
@@ -294,26 +289,27 @@ public class ReportesService {
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));*/
 
-            //se filtra que laboratorio destino o si es traslado haya historico de envio al laboratario este autorizado al usuario
-            Junction conditGroup = Restrictions.disjunction();
-            conditGroup.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                    .createAlias("laboratorio", "labautorizado")
-                    .createAlias("user", "usuario")
-                    .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
-                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))))
-                    .add(Restrictions.or(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(HistoricoEnvioMx.class)
-                            .createAlias("tomaMx", "toma")
-                            .createAlias("envioMx", "envio")
-                            .createAlias("envio.laboratorioDestino", "destino")
-                            .add(Subqueries.propertyIn("destino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                                    .add(Restrictions.eq("pasivo", false)) //autoridad lab activa
-                                    .createAlias("laboratorio", "labautorizadoEnv")
-                                    .createAlias("user", "usuario")
-                                    .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
-                                    .setProjection(Property.forName("labautorizadoEnv.codigo"))))
-                            .setProjection(Property.forName("toma.idTomaMx")))));
-            crit.add(conditGroup);
+                //se filtra que laboratorio destino o si es traslado haya historico de envio al laboratario este autorizado al usuario
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("envioMx.laboratorioDestino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                        .createAlias("laboratorio", "labautorizado")
+                        .createAlias("user", "usuario")
+                        .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                        .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                        .setProjection(Property.forName("labautorizado.codigo"))))
+                        .add(Restrictions.or(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(HistoricoEnvioMx.class)
+                                .createAlias("tomaMx", "toma")
+                                .createAlias("envioMx", "envio")
+                                .createAlias("envio.laboratorioDestino", "destino")
+                                .add(Subqueries.propertyIn("destino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                                        .add(Restrictions.eq("pasivo", false)) //autoridad lab activa
+                                        .createAlias("laboratorio", "labautorizadoEnv")
+                                        .createAlias("user", "usuario")
+                                        .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                                        .setProjection(Property.forName("labautorizadoEnv.codigo"))))
+                                .setProjection(Property.forName("toma.idTomaMx")))));
+                crit.add(conditGroup);
+            }
         }
 
         //filtro de resultados finales aprobados
@@ -451,23 +447,57 @@ public class ReportesService {
         return crit.list();
     }
 
-    public List<Object[]> getResumenRecepcionMuestrasSILAIS(String laboratorio, Date fechaInicio, Date fechaFin){
+    public List<Object[]> getResumenRecepcionMuestrasSILAIS(String laboratorio, Date fechaInicio, Date fechaFin, boolean nivelCentral){
         Session session = sessionFactory.getCurrentSession();
         String sQuery = "select coalesce(count(r.idRecepcion),0) as total, sa.entidadAdtvaId, sa.nombre " +
                 "from RecepcionMx as r inner join r.tomaMx as mx left join mx.codSilaisAtencion as sa " +
-                "where r.labRecepcion.codigo = :laboratorio " +
-                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
-                "group by sa.entidadAdtvaId, sa.nombre";
+                "where r.fechaHoraRecepcion between :fechaInicio and :fechaFin ";
+                if (!nivelCentral){
+                    sQuery += "and r.labRecepcion.codigo = :laboratorio ";
+                }
+        sQuery += "group by sa.entidadAdtvaId, sa.nombre";
 
         Query q = session.createQuery(sQuery);
-
-        q.setParameter("laboratorio",laboratorio);
+        if (!nivelCentral) {
+            q.setParameter("laboratorio", laboratorio);
+        }
         q.setParameter("fechaInicio", fechaInicio);
         q.setParameter("fechaFin", fechaFin);
 
         List<Object[]> resumenMxSilais= (List<Object[]>)q.list();
         return resumenMxSilais;
     }
+
+    /**
+     * Consolida las recepciones de muestras por municipios de un SILAIS
+     * @param laboratorio
+     * @param fechaInicio
+     * @param fechaFin
+     * @return List<Object[]>
+     */
+    public List<Object[]> getResumenRecepcionMuestrasMunSILAIS(String laboratorio, Date fechaInicio, Date fechaFin, Long codSilais){
+        Session session = sessionFactory.getCurrentSession();
+        String sQuery = "select distinct " +
+                "coalesce((select count(distinct r.idRecepcion) " +
+                "from RecepcionMx as r inner join r.tomaMx as mx inner join mx.idNotificacion as noti " +
+                "where r.labRecepcion.codigo = :laboratorio and noti.codUnidadAtencion.municipio.divisionpoliticaId = divi.divisionpoliticaId " +
+                "and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                "group by noti.codUnidadAtencion.municipio.divisionpoliticaId), 0), divi.codigoNacional, divi.nombre " +
+                "from Divisionpolitica as divi, Unidades as uni " +
+                "where divi.pasivo = '0' and uni.pasivo='0' " +
+                "and uni.municipio.codigoNacional = divi.codigoNacional and uni.entidadAdtva.entidadAdtvaId = :codSilais ";
+
+        Query q = session.createQuery(sQuery);
+
+        q.setParameter("laboratorio",laboratorio);
+        q.setParameter("fechaInicio", fechaInicio);
+        q.setParameter("fechaFin", fechaFin);
+        q.setParameter("codSilais", codSilais);
+
+        List<Object[]> resumenMxSilais= (List<Object[]>)q.list();
+        return resumenMxSilais;
+    }
+
 
     public List<Object[]> getResumenRecepcionMuestrasSolicitud(String laboratorio, Date fechaInicio, Date fechaFin){
         Session session = sessionFactory.getCurrentSession();
@@ -550,7 +580,7 @@ public class ReportesService {
                 queryNotiDx = session.createQuery(" select ent.codigo, ent.nombre, " + //TOTAL RUTINAS
                         " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion and noti.codSilaisAtencion.codigo = ent.codigo " +
-                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
+                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.controlCalidad = false " +
                         sqlRutina + sqlFechasProcRut +
                         " group by noti.codSilaisAtencion.codigo) as dx, " +
                         " coalesce( " + //TOTAL RUTINAS CON RESULTADO
@@ -560,7 +590,7 @@ public class ReportesService {
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and  noti.codSilaisAtencion.codigo = ent.codigo " +
                         sqlRutina + sqlFechasProcRut +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as conresultado, " +
                         " coalesce( " + //TOTAL RUTINAS SIN RESULTADO
                         " (select  sum(case dx.aprobada when false then 1 else 0 end) " +
@@ -569,7 +599,7 @@ public class ReportesService {
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         sqlRutina + sqlFechasProcRut +
                         " and  noti.codSilaisAtencion.codigo = ent.codigo " +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as sinresultado " +
                         " from EntidadesAdtvas ent " +
                         " where ent.pasivo = 0 " +
@@ -585,7 +615,7 @@ public class ReportesService {
                         " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
-                        " and dx.aprobada = true " +
+                        " and dx.aprobada = true and dx.controlCalidad = false " +
                         " and noti.codSilaisAtencion is not null " +
                         " order by noti.codSilaisAtencion.codigo");
 
@@ -594,7 +624,7 @@ public class ReportesService {
                         " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion" +
                         " and noti.codUnidadAtencion.municipio.dependencia.divisionpoliticaId = div.divisionpoliticaId " +
-                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
+                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false and mx.anulada = false " +
                         sqlRutina + sqlFechasProcRut +
                         " group by noti.codUnidadAtencion.municipio.dependencia.divisionpoliticaId) as dx, " +
                         " coalesce( " +
@@ -604,7 +634,7 @@ public class ReportesService {
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and  noti.codUnidadAtencion.municipio.dependencia.divisionpoliticaId = div.divisionpoliticaId " +
                         sqlRutina + sqlFechasProcRut +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as conresultado, " +
                         " coalesce( " +
                         " (select  sum(case dx.aprobada when false then 1 else 0 end) " +
@@ -613,7 +643,7 @@ public class ReportesService {
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
                         sqlRutina + sqlFechasProcRut +
                         " and  noti.codUnidadAtencion.municipio.dependencia.divisionpoliticaId = div.divisionpoliticaId " +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as sinresultado " +
                         " from Divisionpolitica div " +
                         "where div.dependencia is null and div.pasivo = '0'" +
@@ -627,7 +657,7 @@ public class ReportesService {
                         sqlRutina + sqlFechasProcRut +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
                         " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false " +
                         " and dx.aprobada = true " +
                         " and noti.codUnidadAtencion is not null " +
@@ -639,6 +669,10 @@ public class ReportesService {
             queryIdNoti.setParameter("idDx", filtro.getIdDx());
             queryIdNoti.setParameter("fechaInicio", filtro.getFechaInicio());
             queryIdNoti.setParameter("fechaFin", filtro.getFechaFin());
+            if (!filtro.isNivelCentral()) {
+                queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
+                queryIdNoti.setParameter("codigoLab", filtro.getCodLaboratio());
+            }
             resTemp2.addAll(queryIdNoti.list());
 
         } else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
@@ -647,8 +681,8 @@ public class ReportesService {
                     " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                     " where noti.idNotificacion = mx.idNotificacion.idNotificacion" +
                     " and noti.codSilaisAtencion.entidadAdtvaId = div.entidadAdtvaId " +
-                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
-                    sqlRutina + sqlFechasProcRut +
+                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false and mx.anulada = false " +
+                    sqlRutina + sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                     " group by noti.codSilaisAtencion.entidadAdtvaId), " +
                     " coalesce( " +
                     " (select sum(case dx.aprobada when true then 1 else 0 end) " +
@@ -656,17 +690,17 @@ public class ReportesService {
                     " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
                     " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                     " and  noti.codSilaisAtencion.entidadAdtvaId = div.entidadAdtvaId " +
-                    sqlRutina + sqlFechasProcRut +
-                    " and noti.pasivo = false and dx.anulado = false " +
+                    sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
+                    " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                     " and mx.anulada = false),0) as conresultado, " +
                     " coalesce( " +
                     " (select  sum(case dx.aprobada when false then 1 else 0 end) " +
                     " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                     " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
                     " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
-                    sqlRutina + sqlFechasProcRut +
+                    sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                     " and  noti.codSilaisAtencion.entidadAdtvaId = div.entidadAdtvaId " +
-                    " and noti.pasivo = false and dx.anulado = false " +
+                    " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                     " and mx.anulada = false),0) as sinresultado " +
                     " from EntidadesAdtvas div " +
                     "where div.entidadAdtvaId = :codSilais " +
@@ -677,12 +711,12 @@ public class ReportesService {
                     ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
                     " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                     " where noti.idNotificacion = mx.idNotificacion " +
-                    sqlRutina + sqlFechasProcRut +
+                    sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                     " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
                     " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                     " and noti.pasivo = false and dx.anulado = false " +
                     " and mx.anulada = false " +
-                    " and dx.aprobada = true " +
+                    " and dx.aprobada = true and dx.controlCalidad = false " +
                     " and noti.codSilaisAtencion.entidadAdtvaId = :codSilais " +
                     " order by noti.codSilaisAtencion.entidadAdtvaId ");
 
@@ -693,6 +727,10 @@ public class ReportesService {
             queryIdNoti.setParameter("fechaInicio", filtro.getFechaInicio());
             queryIdNoti.setParameter("fechaFin", filtro.getFechaFin());
             queryIdNoti.setParameter("codSilais", filtro.getCodSilais());
+            if (!filtro.isNivelCentral()) {
+                queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
+                queryIdNoti.setParameter("codigoLab", filtro.getCodLaboratio());
+            }
             resTemp2.addAll(queryIdNoti.list());
 
         } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
@@ -702,8 +740,8 @@ public class ReportesService {
                         " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion" +
                         " and noti.codUnidadAtencion.codigo =  uni.codigo " +
-                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
-                        sqlRutina + sqlFechasProcRut +
+                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false and mx.anulada = false " +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                         " group by  noti.codUnidadAtencion.unidadId) as dx, " +
                         " coalesce( " +
                         " (select sum(case dx.aprobada when true then 1 else 0 end) " +
@@ -711,17 +749,17 @@ public class ReportesService {
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
-                        sqlRutina + sqlFechasProcRut +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as conresultado, " +
                         " coalesce( " +
                         " (select  sum(case dx.aprobada when false then 1 else 0 end) " +
                         " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
-                        sqlRutina + sqlFechasProcRut +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                         " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as sinresultado " +
                         "FROM Unidades uni " +
                         "where (uni.unidadId = :codUnidad" +
@@ -734,12 +772,12 @@ public class ReportesService {
                         ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
                         " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion " +
-                        sqlRutina + sqlFechasProcRut +
+                        sqlRutina + sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
                         " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
-                        " and dx.aprobada = true " +
+                        " and dx.aprobada = true and dx.controlCalidad = false " +
                         " and (noti.codUnidadAtencion.unidadId = :codUnidad " +
                         " or noti.codUnidadAtencion.unidadAdtva in (select u.codigo from Unidades u where u.unidadId = :codUnidad )) " +
                         " order by noti.codUnidadAtencion.unidadId ");
@@ -749,8 +787,8 @@ public class ReportesService {
                         " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion" +
                         " and noti.codUnidadAtencion.codigo =  uni.codigo " +
-                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
-                        sqlRutina + sqlFechasProcRut +
+                        " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false and mx.anulada = false " +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                         " group by  noti.codUnidadAtencion.unidadId) as dx, " +
                         " coalesce( " +
                         " (select sum(case dx.aprobada when true then 1 else 0 end) " +
@@ -758,17 +796,17 @@ public class ReportesService {
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
-                        sqlRutina + sqlFechasProcRut +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as conresultado, " +
                         " coalesce( " +
                         " (select  sum(case dx.aprobada when false then 1 else 0 end) " +
                         " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
-                        sqlRutina + sqlFechasProcRut +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                         " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
-                        " and noti.pasivo = false and dx.anulado = false " +
+                        " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as sinresultado " +
                         "FROM Unidades uni " +
                         "where uni.unidadId = :codUnidad" +
@@ -780,12 +818,12 @@ public class ReportesService {
                         ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
                         " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r " +
                         " where noti.idNotificacion = mx.idNotificacion " +
-                        sqlRutina + sqlFechasProcRut +
+                        sqlRutina +sqlFechasProcRut + (!filtro.isNivelCentral()?sqlLab:"") +
                         " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
                         " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
                         " and noti.pasivo = false and dx.anulado = false " +
                         " and mx.anulada = false " +
-                        " and dx.aprobada = true " +
+                        " and dx.aprobada = true and dx.controlCalidad = false " +
                         " and noti.codUnidadAtencion.unidadId = :codUnidad " +
                         " order by noti.codUnidadAtencion.unidadId ");
             }
@@ -797,6 +835,10 @@ public class ReportesService {
             queryIdNoti.setParameter("fechaInicio", filtro.getFechaInicio());
             queryIdNoti.setParameter("fechaFin", filtro.getFechaFin());
             queryIdNoti.setParameter("codUnidad", filtro.getCodUnidad());
+            if (!filtro.isNivelCentral()) {
+                queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
+                queryIdNoti.setParameter("codigoLab", filtro.getCodLaboratio());
+            }
             resTemp2.addAll(queryIdNoti.list());
 
         }
@@ -804,7 +846,6 @@ public class ReportesService {
         queryNotiDx.setParameter("idDx", filtro.getIdDx());
         queryNotiDx.setParameter("fechaInicio", filtro.getFechaInicio());
         queryNotiDx.setParameter("fechaFin", filtro.getFechaFin());
-
         resTemp1.addAll(queryNotiDx.list());
         for (Object[] reg : resTemp1) {
             Object[] reg1 = new Object[8];
@@ -883,6 +924,7 @@ public class ReportesService {
                                 }
                             }
 
+
                         } else if (sol[4].toString().equalsIgnoreCase("TPDATO|TXT")) {
                             if (sol[2].toString().trim().toLowerCase().contains("negativo")
                                     || sol[2].toString().trim().toLowerCase().contains("no reactor")
@@ -898,6 +940,7 @@ public class ReportesService {
                                 inadecuada++;
                                 idSolicitud = sol[1].toString();
                             }
+
                         }
                     }
                 }

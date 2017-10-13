@@ -11,8 +11,8 @@ import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
-import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.Email.Attachment;
 import ni.gob.minsa.laboratorio.utilities.Email.EmailUtil;
@@ -126,6 +126,9 @@ public class ReportesController {
     @Autowired
     MessageSource messageSource;
 
+    User usuario = null;
+    Laboratorio laboratorio = null;
+
 
     /**
      * M�todo que se llama al entrar a la opci�n de menu de Reportes "Reporte Recepcion Mx".
@@ -137,25 +140,13 @@ public class ReportesController {
     @RequestMapping(value = "/reception/init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte de Recepci�n");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validaci�n del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            mav.addObject("entidades", entidadesAdtvases);
-            mav.addObject("tipoMuestra", tipoMxList);
-            mav.setViewName("reportes/receptionReport");
-        } else
-            mav.setViewName(urlValidacion);
+        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        mav.addObject("entidades", entidadesAdtvases);
+        mav.addObject("tipoMuestra", tipoMxList);
+        mav.setViewName("reportes/receptionReport");
 
         return mav;
     }
@@ -234,7 +225,9 @@ public class ReportesController {
         filtroMx.setCodTipoMx(codTipoMx);
         filtroMx.setCodTipoSolicitud(codTipoSolicitud);
         filtroMx.setNombreSolicitud(nombreSolicitud);
-        filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
+        User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        filtroMx.setNombreUsuario(usuario.getUsername());
+        filtroMx.setNivelCentral(usuario.getNivelCentral());
         filtroMx.setFechaInicioAprob(fechaInicioAprob);
         filtroMx.setFechaFinAprob(fechaFinAprob);
         filtroMx.setArea(area);
@@ -267,7 +260,6 @@ public class ReportesController {
             } else {
                 map.put("calidad", "");
             }
-
 
             if (receivedMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
                 map.put("codSilais", receivedMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
@@ -310,9 +302,9 @@ public class ReportesController {
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     cont++;
                     if (cont == solicitudDxList.size()) {
-                        dxs += solicitudDx.getCodDx().getNombre();
+                        dxs += solicitudDx.getCodDx().getNombre()+(solicitudDx.getControlCalidad()?"("+messageSource.getMessage("lbl.cc", null, null)+")":"");
                     } else {
-                        dxs += solicitudDx.getCodDx().getNombre() + "," + " ";
+                        dxs += solicitudDx.getCodDx().getNombre()+(solicitudDx.getControlCalidad()?"("+messageSource.getMessage("lbl.cc", null, null)+")":"") + "," + " ";
                     }
 
                 }
@@ -708,26 +700,14 @@ public class ReportesController {
     @RequestMapping(value = "/positiveResults/init", method = RequestMethod.GET)
     public ModelAndView initForm(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte de Resultados Positivos");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validaci�n del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Area> areas = areaService.getAreas();
-            mav.addObject("entidades", entidadesAdtvases);
-            mav.addObject("areas", areas);
-            mav.setViewName("reportes/positiveResultsReport");
-        } else
-            mav.setViewName(urlValidacion);
+        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        List<Area> areas = areaService.getAreas();
+        mav.addObject("entidades", entidadesAdtvases);
+        mav.addObject("areas", areas);
+        mav.setViewName("reportes/positiveResultsReport");
 
         return mav;
     }
@@ -903,7 +883,6 @@ public class ReportesController {
                                 mostrar = true;
                             }
                         }
-
                     }
                 }
 
@@ -1255,26 +1234,14 @@ public class ReportesController {
     @RequestMapping(value = "/posNegResults/init", method = RequestMethod.GET)
     public ModelAndView initReportForm(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte de Resultados Positivos y Negativos");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validaci�n del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Area> areas = areaService.getAreas();
-            mav.addObject("entidades", entidadesAdtvases);
-            mav.addObject("areas", areas);
-            mav.setViewName("reportes/positiveNegativeResults");
-        } else
-            mav.setViewName(urlValidacion);
+        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        //List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        List<Area> areas = areaService.getAreas();
+        mav.addObject("entidades", entidadesAdtvases);
+        mav.addObject("areas", areas);
+        mav.setViewName("reportes/positiveNegativeResults");
 
         return mav;
     }
@@ -2058,40 +2025,14 @@ public class ReportesController {
 
             if (incluirResultados){
                 //detalle resultado final solicitud
-                List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
-                int subIndice=1;
-                Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
-                for(DetalleResultadoFinal res: resultList){
-                    Map<String, String> mapResp = new HashMap<String, String>();
-                    if (res.getRespuesta()!=null) {
-                        if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            mapResp.put("valor", cat_lista.getValor());
-                        }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
-                        } else {
-                            mapResp.put("valor", res.getValor());
-                        }
-                        mapResp.put("respuesta", res.getRespuesta().getNombre());
-
-                    }else if (res.getRespuestaExamen()!=null){
-                        if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            mapResp.put("valor", cat_lista.getValor());
-                        } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
-                        }else {
-                            mapResp.put("valor", res.getValor());
-                        }
-                        mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
-                    }
-                    mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-                    mapResponseResp.put(subIndice,mapResp);
-                    subIndice++;
-                }
-                map.put("resultados",new Gson().toJson(mapResponseResp));
+                List<DetalleResultadoFinal> detalleResultadoCC = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
+                String resCC = parseResultDetails(detalleResultadoCC);
+                map.put("resultadocc", resCC);
+                DaSolicitudDx solicitudNoCC = tomaMxService.getSolicitudDxByMxDxNoCC(diagnostico.getIdTomaMx().getIdTomaMx(),diagnostico.getCodDx().getIdDiagnostico());
+                List<DetalleResultadoFinal> detalleResultadoNoCC = resultadoFinalService.getDetResActivosBySolicitud(solicitudNoCC.getIdSolicitudDx());
+                String resNoCC = parseResultDetails(detalleResultadoNoCC);
+                map.put("resultado",resNoCC);
+                map.put("coincide", (resCC.equalsIgnoreCase(resNoCC)?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
             }
             mapResponse.put(indice, map);
             indice ++;
@@ -2635,27 +2576,15 @@ public class ReportesController {
     @RequestMapping(value = "/general/init", method = RequestMethod.GET)
     public ModelAndView init(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte General de Resultados");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validaci�n del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Area> areas = areaService.getAreas();
-            mav.addObject("areas", areas);
-            mav.addObject("entidades", entidadesAdtvases);
-            mav.addObject("tipoMuestra", tipoMxList);
-            mav.setViewName("reportes/generalReportResults");
-        } else
-            mav.setViewName(urlValidacion);
+        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        List<Area> areas = areaService.getAreas();
+        mav.addObject("areas", areas);
+        mav.addObject("entidades", entidadesAdtvases);
+        mav.addObject("tipoMuestra", tipoMxList);
+        mav.setViewName("reportes/generalReportResults");
 
         return mav;
     }
@@ -3212,27 +3141,22 @@ public class ReportesController {
     @RequestMapping(value = "/consolidated/init", method = RequestMethod.GET)
     public ModelAndView initConsolidatedReceipt(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte Consolidad de recepción de mx");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validaci�n del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Area> areas = areaService.getAreas();
-            mav.addObject("areas", areas);
-            mav.addObject("entidades", entidadesAdtvases);
-            mav.addObject("tipoMuestra", tipoMxList);
-            mav.setViewName("reportes/consolidatedReception");
-        } else
-            mav.setViewName(urlValidacion);
+        User usuActual = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        List<EntidadesAdtvas> entidadesAdtvases = null;
+        if (usuActual.getNivelCentral()!=null && usuActual.getNivelCentral()){
+            entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        }else {
+            Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(usuActual.getUsername());
+            if (laboratorio != null)
+                entidadesAdtvases = entidadAdmonService.getEntidadesAdtvasByCodigoLab(laboratorio.getCodigo());
+        }
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        List<Area> areas = areaService.getAreas();
+        mav.addObject("areas", areas);
+        mav.addObject("entidades", entidadesAdtvases);
+        mav.addObject("tipoMuestra", tipoMxList);
+        mav.setViewName("reportes/consolidatedReception");
 
         return mav;
     }
@@ -3242,15 +3166,43 @@ public class ReportesController {
     @ResponseBody
     String getResumenMuestrasSILAIS(@RequestParam(value = "fechaInicio", required = false) String fechaInicio, @RequestParam(value = "fechaFin", required = false) String fechaFin) throws Exception {
         String jsonResponse = "";
-        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        User usuActual = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(usuActual.getUsername());
         if (laboratorio!=null) {
-            List<Object[]> resumen = reportesService.getResumenRecepcionMuestrasSILAIS(laboratorio.getCodigo(), DateUtil.StringToDate(fechaInicio, "dd/MM/yyyy"), DateUtil.StringToDate(fechaFin+" 23:59:59", "dd/MM/yyyy HH:mm:ss"));
+            List<Object[]> resumen = reportesService.getResumenRecepcionMuestrasSILAIS(laboratorio.getCodigo(), DateUtil.StringToDate(fechaInicio, "dd/MM/yyyy"), DateUtil.StringToDate(fechaFin+" 23:59:59", "dd/MM/yyyy HH:mm:ss"), usuActual.getNivelCentral());
             Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
             Integer indice = 0;
             for (Object[] obj : resumen) {
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("total", obj[0] != null ? obj[0].toString() : "");
                 map.put("entidad", obj[2] != null ? obj[2].toString() : "SIN SILAIS");
+                mapResponse.put(indice, map);
+                indice++;
+            }
+            jsonResponse = new Gson().toJson(mapResponse);
+        }
+        //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+    @RequestMapping(value = "getResumenRecepcionMxMunSILAIS", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getResumenMuestrasMunSILAIS(@RequestParam(value = "fechaInicio", required = false) String fechaInicio,
+                                       @RequestParam(value = "fechaFin", required = false) String fechaFin,
+                                       @RequestParam(value = "codSilais", required = false) Long codSilais) throws Exception {
+        String jsonResponse = "";
+        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        if (laboratorio!=null) {
+            List<Object[]> resumen = reportesService.getResumenRecepcionMuestrasMunSILAIS(laboratorio.getCodigo(), DateUtil.StringToDate(fechaInicio, "dd/MM/yyyy"),
+                    DateUtil.StringToDate(fechaFin + " 23:59:59", "dd/MM/yyyy HH:mm:ss"), codSilais);
+            Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+            Integer indice = 0;
+            for (Object[] obj : resumen) {
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("total", obj[0] != null ? obj[0].toString() : "");
+                map.put("entidad", obj[2] != null ? obj[2].toString() : "Sin Municipio");
                 mapResponse.put(indice, map);
                 indice++;
             }
@@ -3292,36 +3244,29 @@ public class ReportesController {
     @RequestMapping(value = "reportResultDx/init", method = RequestMethod.GET)
     public String initReportResultDx(Model model,HttpServletRequest request) throws Exception {
         logger.debug("Reporte por Resultado");
-        String urlValidacion="";
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
-        if (urlValidacion.isEmpty()) {
-            long idUsuario = seguridadService.obtenerIdUsuario(request);
-            List<EntidadesAdtvas> entidades = new ArrayList<EntidadesAdtvas>();
-            if (seguridadService.esUsuarioNivelCentral(idUsuario, ConstantsSecurity.SYSTEM_CODE)){
-                entidades = entidadAdmonService.getAllEntidadesAdtvas();
-            }else {
-                entidades = seguridadService.obtenerEntidadesPorUsuario((int) idUsuario, ConstantsSecurity.SYSTEM_CODE);
-            }
-            List<AreaRep> areas = new ArrayList<AreaRep>();
+
+        User usuActual = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        List<EntidadesAdtvas> entidades = new ArrayList<EntidadesAdtvas>();
+        List<AreaRep> areas = new ArrayList<AreaRep>();
+        if (usuActual.getNivelCentral()!=null && usuActual.getNivelCentral()) {
             areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
-            areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
-            areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
-            List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
-            model.addAttribute("areas", areas);
-            model.addAttribute("entidades", entidades);
-            model.addAttribute("dxs", catDx);
-            return "reportes/resultadoDx";
+            entidades = entidadAdmonService.getAllEntidadesAdtvas();
         }else{
-            return  urlValidacion;
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(usuActual.getUsername());
+            if (labUser!=null) {
+                entidades = entidadAdmonService.getEntidadesAdtvasByCodigoLab(labUser.getCodigo());
+            }
         }
+        areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
+        areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        laboratorio = seguridadService.getLaboratorioUsuario(usuario.getUsername());
+
+        List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+        model.addAttribute("areas", areas);
+        model.addAttribute("entidades", entidades);
+        model.addAttribute("dxs", catDx);
+        return "reportes/resultadoDx";
     }
 
     /**
@@ -3529,6 +3474,8 @@ public class ReportesController {
         filtroRep.setCodZona(codZona);
         filtroRep.setIdDx(idDx);
 
+        filtroRep.setCodLaboratio(laboratorio.getCodigo());
+        filtroRep.setNivelCentral(usuario.getNivelCentral());
         return filtroRep;
     }
 

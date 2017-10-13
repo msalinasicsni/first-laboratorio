@@ -1,7 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
 import ni.gob.minsa.laboratorio.domain.audit.Auditable;
-import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,16 +15,18 @@ import java.util.Date;
 @Table(name = "catalogo_laboratorios", schema = "laboratorio")
 public class Laboratorio implements Auditable {
 
-    String codigo;
-    String nombre;
-    String codTipo;
-    String descripcion;
-    String direccion;
-    String telefono;
-    String telefax;
+    private String codigo;
+    private String nombre;
+    private String codTipo;
+    private String descripcion;
+    private String direccion;
+    private String telefono;
+    private String telefax;
     private boolean pasivo;
-    Date fechaRegistro;
-    User usuarioRegistro;
+    private Date fechaRegistro;
+    private User usuarioRegistro;
+    private Boolean popUpCodigoMx;
+
 
     @Id
     @Column(name = "CODIGO", nullable = false, insertable = true, updatable = true, length = 10)
@@ -126,6 +127,16 @@ public class Laboratorio implements Auditable {
 
     public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
+    }
+
+    @Basic
+    @Column(name = "POPUP_CODIGOS", nullable = true, insertable = true, updatable = true)
+    public Boolean getPopUpCodigoMx() {
+        return (popUpCodigoMx !=null? popUpCodigoMx :false);
+    }
+
+    public void setPopUpCodigoMx(Boolean popUpCodigoMx) {
+        this.popUpCodigoMx = popUpCodigoMx;
     }
 
     @Override

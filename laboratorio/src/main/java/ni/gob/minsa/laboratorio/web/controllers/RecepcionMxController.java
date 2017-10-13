@@ -143,25 +143,15 @@ public class RecepcionMxController {
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm(HttpServletRequest request) throws Exception {
         logger.debug("buscar ordenes para ordenExamen");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
-            List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            mav.addObject("entidades",entidadesAdtvases);
-            mav.addObject("tipoMuestra", tipoMxList);
-            mav.setViewName("recepcionMx/searchOrders");
-        }else
-            mav.setViewName(urlValidacion);
+        List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+        List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        mav.addObject("entidades",entidadesAdtvases);
+        mav.addObject("tipoMuestra", tipoMxList);
+        mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
+        mav.setViewName("recepcionMx/searchOrders");
 
         return mav;
     }
@@ -1104,6 +1094,8 @@ public class RecepcionMxController {
         String resultado = "";
         String strMuestras="";
         String codigosLabMx="";
+        String nombresCodigosLabMx="";
+        String fechasNacimiento="";
         Integer cantMuestras = 0;
         Integer cantMxProc = 0;
         try {
@@ -1179,10 +1171,24 @@ public class RecepcionMxController {
                             if (solicitudEstudioList.size()> 0)
                                 areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                         }
-                        if(cantMxProc==1)
-                            codigosLabMx = (esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab())+"*"+areaEntrega;
-                        else
-                            codigosLabMx += ","+ (esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab())+"*"+areaEntrega;
+                        String nombreCompleto;
+                        nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                        if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                        if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                        String fechaNac = (tomaMx.getIdNotificacion().getPersona().getFechaNacimiento()!=null?DateUtil.DateToString(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(),"dd/MM/yyyy"):" ");
+                        if(cantMxProc==1) {
+                            codigosLabMx = (esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab()) + "*" + areaEntrega;
+                            nombresCodigosLabMx = nombreCompleto;
+                            fechasNacimiento = fechaNac;
+                        }
+                        else {
+                            codigosLabMx += "," + (esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab()) + "*" + areaEntrega;
+                            nombresCodigosLabMx += "," + nombreCompleto;
+                            fechasNacimiento += "," + fechaNac;
+                        }
                     } catch (Exception ex) {
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
@@ -1205,6 +1211,8 @@ public class RecepcionMxController {
             map.put("cantMuestras", cantMuestras.toString());
             map.put("cantMxProc", cantMxProc.toString());
             map.put("codigosUnicosMx",escaper.translate(codigosLabMx));
+            map.put("nombresCodigosLabMx",escaper.translate(nombresCodigosLabMx));
+            map.put("fechasNacimiento",fechasNacimiento);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -1691,9 +1699,12 @@ public class RecepcionMxController {
                     map.put("sexo", tomaMx.getIdNotificacion().getPersona().getSexo().getValor());
                     if (edad > 12 && tomaMx.getIdNotificacion().getPersona().isSexoFemenino()) {
                         //map.put("embarazada", tomaMxService.estaEmbarazada(tomaMx.getIdNotificacion().getIdNotificacion()));
-                        if (tomaMx.getIdNotificacion().getEmbarazada()!=null)
-                        map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
-                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                        if (tomaMx.getIdNotificacion().getEmbarazada()!=null) {
+                            map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                                    messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                        }else{
+                            map.put("embarazada", "--");
+                        }
                     } else
                         map.put("embarazada", "--");
                 } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
@@ -2420,4 +2431,6 @@ public class RecepcionMxController {
             }
         }
     }
+
+
 }

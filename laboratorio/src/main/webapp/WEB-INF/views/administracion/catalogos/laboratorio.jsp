@@ -114,6 +114,7 @@
                                         <th><spring:message code="lbl.name" /></th>
                                         <th><spring:message code="lbl.desc.request" /></th>
                                         <th><spring:message code="lbl.enabled" /></th>
+                                        <th><spring:message code="lbl.popup.mx" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="lbl.silais" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.edit" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.override" /></th>
@@ -247,6 +248,19 @@
                                                 <div class="col col-4">
                                                     <label class="checkbox">
                                                         <input type="checkbox" name="checkbox-enable" id="checkbox-enable" checked>
+                                                        <i></i>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-6 col-lg-6">
+                                            <label class="text-left txt-color-blue font-md"><spring:message code="lbl.popup.mx.lorge"/></label>
+                                            <div class="row">
+                                                <div class="col col-4">
+                                                    <label class="checkbox">
+                                                        <input type="checkbox" name="chk_popup_mx" id="chk_popup_mx">
                                                         <i></i>
                                                     </label>
                                                 </div>
@@ -400,9 +414,9 @@
         Laboratorio.init(parametros);
         $("li.administracion").addClass("open");
         $("li.catalogos").addClass("active");
-        $("li.laboratorio").addClass("active");
+        $("li.admlaboratorio").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.laboratorio").parents("ul").slideDown(200);
+            $("li.admlaboratorio").parents("ul").slideDown(200);
         }
     });
 </script>

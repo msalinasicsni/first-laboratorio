@@ -3,10 +3,8 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
-import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.EntidadAdtvaLaboratorio;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
-import ni.gob.minsa.laboratorio.service.AreaService;
 import ni.gob.minsa.laboratorio.service.EntidadAdmonService;
 import ni.gob.minsa.laboratorio.service.LaboratoriosService;
 import ni.gob.minsa.laboratorio.service.SeguridadService;
@@ -105,6 +103,7 @@ public class LaboratoriosController {
         String telefono=null;
         String fax=null;
         String edicion="";
+        boolean popUpCodigoMx = false;
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
@@ -125,9 +124,11 @@ public class LaboratoriosController {
                 fax = jsonpObject.get("fax").getAsString();
             if (jsonpObject.get("habilitado") != null && !jsonpObject.get("habilitado").getAsString().isEmpty())
                 habilitado = jsonpObject.get("habilitado").getAsBoolean();
+            if (jsonpObject.get("popUpCodigoMx") != null && !jsonpObject.get("popUpCodigoMx").getAsString().isEmpty())
+                popUpCodigoMx = jsonpObject.get("popUpCodigoMx").getAsBoolean();
 
             Laboratorio laboratorio;
-            //existe dirección
+            //existe laboratorio
             if (edicion.equals("si")){
                 laboratorio = laboratoriosService.getLaboratorioByCodigo(codigo);
                 laboratorio.setNombre(nombre);
@@ -136,7 +137,8 @@ public class LaboratoriosController {
                 laboratorio.setTelefono(telefono);
                 laboratorio.setTelefax(fax);
                 laboratorio.setPasivo(!habilitado);
-            } else { //es nueva dirección
+                laboratorio.setPopUpCodigoMx(popUpCodigoMx);
+            } else { //es nuevo laboratorio
                 laboratorio = new Laboratorio();
                 laboratorio.setCodigo(codigo);
                 laboratorio.setNombre(nombre);
@@ -148,6 +150,7 @@ public class LaboratoriosController {
                 laboratorio.setPasivo(!habilitado);
                 laboratorio.setFechaRegistro(new Date());
                 laboratorio.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                laboratorio.setPopUpCodigoMx(popUpCodigoMx);
             }
             //se registra o actualiza dirección
             laboratoriosService.saveLaboratorio(laboratorio);
@@ -166,6 +169,7 @@ public class LaboratoriosController {
             map.put("telefono", telefono!=null?fax:"");
             map.put("fax", fax!=null?fax:"");
             map.put("habilitado",String.valueOf(habilitado));
+            map.put("popUpCodigoMx",String.valueOf(popUpCodigoMx));
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());

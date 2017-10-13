@@ -36,7 +36,7 @@ var Laboratorio = function () {
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true,
                 "columns": [
-                    null,null,null,null,
+                    null,null,null,null,null,
                     {
                         "className":      'listSILAIS',
                         "orderable":      false
@@ -182,6 +182,7 @@ var Laboratorio = function () {
                 valueObj['telefono'] = $('#telefono').val();
                 valueObj['fax'] = $('#fax').val();
                 valueObj['edicion'] = $("#edicion").val();
+                valueObj['popUpCodigoMx']= ($('#chk_popup_mx').is(':checked'));
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
@@ -239,9 +240,13 @@ var Laboratorio = function () {
                             btnOverride = ' <button type="button" title="Anular" disabled class="btn btn-default btn-xs btn-danger" data-id='+data[i].codigo+' ' +
                                 '> <i class="fa fa-times"></i>';
                         }
+                        var popMx = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
+                        if (data[i].popUpCodigoMx==false){
+                            popMx = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
+                        }
 
                         table1.fnAddData(
-                            [data[i].codigo, data[i].nombre, data[i].descripcion, pasivo, btnSILAIS, btnEditar, btnOverride ]);
+                            [data[i].codigo, data[i].nombre, data[i].descripcion, pasivo, popMx, btnSILAIS, btnEditar, btnOverride ]);
                     }
 
                 }).fail(function(jqXHR) {
@@ -264,6 +269,7 @@ var Laboratorio = function () {
                     $("#fax").val(data.telefax);
                     $("#codigo").prop('disabled',true);
                     $("#checkbox-enable").prop('checked',!data.pasivo);
+                    $("#chk_popup_mx").prop('checked',data.popUpCodigoMx);
                     showModalLaboratorio();
                 }).fail(function(jqXHR) {
                     desbloquearUI();

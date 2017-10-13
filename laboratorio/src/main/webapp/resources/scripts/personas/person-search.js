@@ -118,7 +118,6 @@ var SearchPerson = function () {
                                         '<a title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
 
                         }
-                        setTimeout($.unblockUI, 500);
                     }else {
                         $.smallBox({
                             title: $("#msg_no_results_found").val(),
@@ -128,6 +127,7 @@ var SearchPerson = function () {
                             timeout: 4000
                         });
                     }
+                    setTimeout($.unblockUI, 500);
                 })
                     .fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);

@@ -115,7 +115,7 @@ public class TomaMxController {
         String urlValidacion= "";
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         }catch (Exception e){
@@ -154,7 +154,7 @@ public class TomaMxController {
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
         DaNotificacion noti;
-        //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
+        //si es numero significa que es un id de persona, no de notificaciï¿½n por tanto hay que crear una notificaciï¿½n para esa persona
         noti = daNotificacionService.getNotifById(idNotificacion);
         if (noti != null) {
             //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");
@@ -176,6 +176,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -186,6 +187,7 @@ public class TomaMxController {
             mav.addObject("notificaciones",tiposNotificacion);
             mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",true);
+            mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {
@@ -207,7 +209,7 @@ public class TomaMxController {
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
         DaNotificacion noti;
-        //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
+        //si es numero significa que es un id de persona, no de notificaciï¿½n por tanto hay que crear una notificaciï¿½n para esa persona
         noti = daNotificacionService.getNotifById(idNotificacion);
         if (noti != null) {
             catTipoMx = tomaMxService.getTipoMxByTipoNoti(noti.getCodTipoNotificacion().getCodigo());
@@ -228,6 +230,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -238,6 +241,7 @@ public class TomaMxController {
             mav.addObject("notificaciones",tiposNotificacion);
             mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",false);
+            mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {
@@ -253,7 +257,7 @@ public class TomaMxController {
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
         DaNotificacion noti;
-        //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
+        //si es numero significa que es un id de persona, no de notificaciï¿½n por tanto hay que crear una notificaciï¿½n para esa persona
         noti = daNotificacionService.getNotifById(idNotificacion);
         if (noti != null) {
             noti.setPasivo(true);
@@ -277,7 +281,7 @@ public class TomaMxController {
     public
     @ResponseBody
     List<Dx_TipoMx_TipoNoti> getDxBySample(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
-        logger.info("Obteniendo los diagnósticos segun muestra y tipo de Notificacion en JSON");
+        logger.info("Obteniendo los diagnï¿½sticos segun muestra y tipo de Notificacion en JSON");
         //nombre usuario null, para que no valide autoridad
         return tomaMxService.getDx(codMx, tipoNoti,null);
     }
@@ -348,20 +352,20 @@ public class TomaMxController {
     }
 
     /**
-     * Método para generar un string alfanumérico de 8 caracteres, que se usará como código único de muestra
+     * Mï¿½todo para generar un string alfanumï¿½rico de 8 caracteres, que se usarï¿½ como cï¿½digo ï¿½nico de muestra
      * @return String codigoUnicoMx
      */
     private String generarCodigoUnicoMx(){
         DaTomaMx validaC;
-        //Se genera el código
+        //Se genera el cï¿½digo
         String codigoUnicoMx = StringUtil.getCadenaAlfanumAleatoria(8);
-        //Se consulta BD para ver si existe toma de Mx que tenga mismo código
+        //Se consulta BD para ver si existe toma de Mx que tenga mismo cï¿½digo
         validaC = tomaMxService.getTomaMxByCodUnicoMx(codigoUnicoMx);
-        //si existe, de manera recursiva se solicita un nuevo código
+        //si existe, de manera recursiva se solicita un nuevo cï¿½digo
         if (validaC!=null){
             codigoUnicoMx = generarCodigoUnicoMx();
         }
-        //si no existe se retorna el último código generado
+        //si no existe se retorna el ï¿½ltimo cï¿½digo generado
         return codigoUnicoMx;
     }
 
@@ -533,7 +537,7 @@ public class TomaMxController {
                 ex.printStackTrace();
                 throw ex;
             }
-            //se procede a registrar los diagnósticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
+            //se procede a registrar los diagnï¿½sticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
             if (saveDxRequest(tomaMx.getIdTomaMx(), dx, strRespuestas, cantRespuestas)) {
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(),labUsuario.getCodigo());
                 List<DaSolicitudEstudio> solicitudEstudioList=new ArrayList<DaSolicitudEstudio>();
@@ -545,7 +549,7 @@ public class TomaMxController {
                     if (solicitudEstudioList.size()> 0)
                         areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                 }
-                //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepción de la misma
+                //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepciï¿½n de la misma
                 RecepcionMx recepcionMx = new RecepcionMx();
                 recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
                 recepcionMx.setLabRecepcion(labUsuario);
@@ -718,7 +722,7 @@ public class TomaMxController {
     public
     @ResponseBody
     List<DaTomaMx> getTestBySample(@RequestParam(value = "idNotificacion", required = true) String idNotificacion) throws Exception {
-        logger.info("Realizando búsqueda de Toma de Mx.");
+        logger.info("Realizando bï¿½squeda de Toma de Mx.");
 
         return tomaMxService.getTomaMxByIdNoti(idNotificacion);
 
@@ -728,7 +732,7 @@ public class TomaMxController {
     public
     @ResponseBody
     List<TipoMx_TipoNotificacion> getTipoMxByTipoNoti(@RequestParam(value = "codigo", required = true) String codigo) throws Exception {
-        logger.info("Realizando búsqueda de tipos de muestras según el tipo de notificación");
+        logger.info("Realizando bï¿½squeda de tipos de muestras segï¿½n el tipo de notificaciï¿½n");
 
         return tomaMxService.getTipoMxByTipoNoti(codigo);
 
@@ -765,7 +769,7 @@ public class TomaMxController {
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
         DaNotificacion noti;
-        //si es numero significa que es un id de persona, no de notificación por tanto hay que crear una notificación para esa persona
+        //si es numero significa que es un id de persona, no de notificaciï¿½n por tanto hay que crear una notificaciï¿½n para esa persona
         noti = daNotificacionService.getNotifById(idNotificacion);
         if (noti != null) {
             //catTipoMx = tomaMxService.getTipoMxByTipoNoti("TPNOTI|CAESP");

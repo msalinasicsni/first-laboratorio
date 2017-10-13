@@ -35,6 +35,7 @@ public class User implements Serializable, Auditable {
     private String email;
     private Boolean enabled=true;
     private String usuario;
+    private Boolean nivelCentral=false;
 
     @Id
     @Column(name = "username", nullable = false, length =50)
@@ -91,6 +92,15 @@ public class User implements Serializable, Auditable {
     }
     public void setUsuario(String usuario) {
 	this.usuario = usuario;
+    }
+
+    @Column(name = "nivel_central", nullable = true)
+    public Boolean getNivelCentral() {
+        return (nivelCentral!=null?nivelCentral:false);
+    }
+
+    public void setNivelCentral(Boolean nivelCentral) {
+        this.nivelCentral = nivelCentral;
     }
 
     @Override

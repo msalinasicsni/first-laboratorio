@@ -36,6 +36,7 @@ public class FiltroMx {
     Date fechaFinProcesamiento;
     Date fechaInicioRechazo;
     Date fechaFinRechazo;
+    boolean nivelCentral;
 
 
     public String getNombreApellido() {
@@ -127,7 +128,7 @@ public class FiltroMx {
     }
 
     public void setCodigoUnicoMx(String codigoUnicoMx) {
-        this.codigoUnicoMx = codigoUnicoMx;
+        this.codigoUnicoMx = (codigoUnicoMx!=null?codigoUnicoMx.toUpperCase():codigoUnicoMx);
     }
 
     public String getCodTipoSolicitud() { return codTipoSolicitud; }
@@ -240,5 +241,13 @@ public class FiltroMx {
 
     public void setFechaFinRechazo(Date fechaFinRechazo) {
         this.fechaFinRechazo = fechaFinRechazo;
+    }
+
+    public boolean isNivelCentral() {
+        return nivelCentral;
+    }
+
+    public void setNivelCentral(boolean nivelCentral) {
+        this.nivelCentral = nivelCentral;
     }
 }

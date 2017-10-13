@@ -26,6 +26,8 @@ public class FiltrosReporte {
     String codZona;
     Integer idDx;
     boolean incluirMxInadecuadas;
+    String codLaboratio;
+    boolean nivelCentral;
 
     public String getCodArea() {
         return codArea;
@@ -161,5 +163,21 @@ public class FiltrosReporte {
 
     public void setIncluirMxInadecuadas(boolean incluirMxInadecuadas) {
         this.incluirMxInadecuadas = incluirMxInadecuadas;
+    }
+
+    public String getCodLaboratio() {
+        return codLaboratio;
+    }
+
+    public void setCodLaboratio(String codLaboratio) {
+        this.codLaboratio = codLaboratio;
+    }
+
+    public boolean isNivelCentral() {
+        return nivelCentral;
+    }
+
+    public void setNivelCentral(boolean nivelCentral) {
+        this.nivelCentral = nivelCentral;
     }
 }

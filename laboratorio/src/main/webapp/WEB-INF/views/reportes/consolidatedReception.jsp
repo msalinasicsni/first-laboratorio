@@ -106,6 +106,7 @@
                                                              class="select2">
                                                         <option value=""><spring:message code="lbl.select" />...</option>
                                                         <option value="<spring:message code="lbl.silais" />"><spring:message code="lbl.silais" /></option>
+                                                        <option value="<spring:message code="lbl.muni" />"><spring:message code="lbl.muni" /></option>
                                                         <option value="<spring:message code="lbl.dx" />"><spring:message code="lbl.dxs.large" /></option>
                                                     </select>
                                                 </div>
@@ -138,6 +139,23 @@
                                             </section>
 
                                         </div>
+                                            <div class="row">
+                                                <section class="col col-sm-12 col-md-5 col-lg-4" id="dvSilais">
+                                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm hidden-xs"></i>
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.silais" /> </label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                                        <select id="codSilais" name="codSilais"
+                                                                class="select2">
+                                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${entidades}" var="entidad">
+                                                                <option value="${entidad.entidadAdtvaId}">${entidad.nombre}</option>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </div>
+                                                </section>
+                                            </div>
                                         </fieldset>
                                         <footer>
                                             <!--<button type="button" id="all-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>-->
@@ -255,12 +273,14 @@
     <!-- END PAGE LEVEL SCRIPTS -->
 	<c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
     <c:url var="searchUrl" value="/reports/getResumenRecepcionMxSILAIS"/>
+    <c:url var="searchUrlMun" value="/reports/getResumenRecepcionMxMunSILAIS"/>
     <c:url var="searchUrlDx" value="/reports/getResumenRecepcionMxSolicitud"/>
 
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
 			var parametros = {searchUrl : "${searchUrl}",
+                searchUrlMun : "${searchUrlMun}",
                 searchUrlDx: "${searchUrlDx}",
                 blockMess: "${blockMess}"
             };
@@ -272,6 +292,7 @@
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.consolReceptionReport").parents("ul").slideDown(200);
 	    	}
+            $("#dvSilais").hide();
         });
 	</script>
 	<!-- END JAVASCRIPTS -->

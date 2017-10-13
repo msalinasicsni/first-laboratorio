@@ -80,6 +80,7 @@ var Users = function () {
                 valueObj['nombreCompleto'] = $('#completeName').val();
                 valueObj['email'] = $('#correoe').val();
                 valueObj['labAsignado'] = $('#laboratorio').find('option:selected').val();
+                valueObj['nivelCentral'] = ($('#checkbox-nc').is(':checked'));
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
@@ -255,6 +256,7 @@ var Users = function () {
                 valueObj['habilitado'] = ($('#checkbox-enable').is(':checked'));
                 valueObj['password'] = $('#password').val();
                 valueObj['labAsignado'] = $('#laboratorio').find('option:selected').val();
+                valueObj['nivelCentral'] = ($('#checkbox-nc').is(':checked'));
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {

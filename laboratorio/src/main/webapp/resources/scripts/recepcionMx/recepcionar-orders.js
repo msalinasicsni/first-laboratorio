@@ -476,6 +476,11 @@ var ReceiptOrders = function () {
             });
 
             $("#receipt-mxs").click(function () {
+/*
+                mostrarPopUpCodigos('abc-1-17*parasitosis,abc2-1-17*parasitosis2,abcccc-1-17*parasitosis3,abc4-1-17*parasitosis4,abc5-1-17*parasitosis5,abc6-1-17*parasitosis6,abc7-1-17*parasitosis7,abc8-1-17*parasitosis8,abc9-1-17*parasitosis9,abc10-1-17*parasitosis10,abc11-1-17*parasitosis11,abc12-1-17*parasitosis12,abc13-1-17*parasitosis13,abc14-1-17*parasitosis14,abc15-1-17*parasitosis15',
+                    'nombre nombre apellido apellido1,nombre nombre apellido apellido2,nombre nombre apellido apellido3,nombre nombre apellido apellido4,nombre nombre apellido apellido5,nombre nombre apellido apellido6,nombre nombre apellido apellido7,nombre nombre apellido apellido8,nombre nombre apellido apellido9,nombre nombre apellido apellido10,nombre nombre apellido apellido11,nombre nombre apellido apellido12,nombre nombre apellido apellido13,nombre nombre apellido apellido14,nombre nombre apellido apellido15'
+                ,' ,02/10/2017,03/10/2017,04/10/2017,05/10/2017,06/10/2017,07/10/2017, ,09/10/2017,10/10/2017,11/10/2017,12/10/2017,13/10/2017,14/10/2017, ');
+*/
                 var oTT = TableTools.fnGetInstance('orders_result');
                 var aSelectedTrs = oTT.fnGetSelected();
                 var len = aSelectedTrs.length;
@@ -533,7 +538,8 @@ var ReceiptOrders = function () {
                                             });
                                             //codUnicosFormat = reemplazar(data.codigosUnicosMx, ".", "*");
                                             codUnicosFormat = data.codigosUnicosMx;
-                                                getMxs(false);
+                                            mostrarPopUpCodigos(data.codigosUnicosMx, data.nombresCodigosLabMx, data.fechasNacimiento);
+                                            getMxs(false);
                                         }
                                         desbloquearUI();
                                     },
@@ -566,6 +572,27 @@ var ReceiptOrders = function () {
                 }
             });
 
+            function mostrarPopUpCodigos (codigos, nombres, fechasnac) {
+                if ($("#mostrarPopUpMx").val()==='true') {
+                    var wnd = window.open("about:blank", "", "top=200,left=300,width=600,height=450,_blank");
+                    var textoHtml = '<table style="width:100%;border: 1px solid black; border-collapse: collapse;">' +
+                        '<tr><th style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#lblPersona").val() + '</th>' +
+                        '<th style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#lblCodigo").val() + '</th>' +
+                        '<th style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#lblArea").val() + '</th></tr>';
+                    var lstCodigos = codigos.split(',');
+                    var lstNombres = nombres.split(',');
+                    var lstFechas = fechasnac.split(',');
+                    for(var row in lstCodigos){
+                        var partes = lstCodigos[row].split('*');
+                        textoHtml = textoHtml +'<tr><td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + lstNombres[row] + '</br>' + lstFechas[row]+ '</td>' +
+                            '<td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' +partes[0] + '</td>' +
+                            '<td style="border: 1px solid black;padding: 10px; border-collapse: collapse;">' + unicodeEscape(partes[1]) + '</td></tr>';
+                    }
+
+                    textoHtml = textoHtml + '</table>';
+                    wnd.document.write(textoHtml);
+                }
+            }
             $("#recep-orders-lab").click(function () {
                 var oTT = TableTools.fnGetInstance('orders_result');
                 var aSelectedTrs = oTT.fnGetSelected();

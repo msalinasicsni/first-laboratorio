@@ -121,6 +121,21 @@
                             </c:choose>
                         </tr>
                         <tr>
+                            <th><spring:message code="users.nc" /></th>
+                            <c:choose>
+                                <c:when test="${user.nivelCentral}">
+                                    <td>
+                                        <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
+                                    </td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td>
+                                        <span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>
+                                    </td>
+                                </c:otherwise>
+                            </c:choose>
+                        </tr>
+                        <tr>
                             <th><spring:message code="users.roles" /></th>
                             <td><c:out value="${rolesString}" /></td>
                         </tr>

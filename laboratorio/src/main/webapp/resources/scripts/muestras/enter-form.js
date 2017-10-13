@@ -161,6 +161,7 @@ var EnterFormTomaMx = function () {
                         if (mensaje.length<=0)
                         {
                             save();
+
                         }else{
                             var opcSi = $("#yes").val();
                             var opcNo = $("#no").val();
@@ -311,6 +312,17 @@ var EnterFormTomaMx = function () {
                                     iconSmall: "fa fa-check-circle",
                                     timeout: 4000
                                 });
+                                if ($("#mostrarPopUpMx").val()==='true') {
+                                    var wnd = window.open("about:blank", "", "top=200,left=300,width=600,height=450,_blank");
+                                    var textoHtml = '<table style="width:100%;border: 1px solid black; border-collapse: collapse;">' +
+                                        '<tr><th style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#lblPersona").val() + '</th>' +
+                                        '<th style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#lblCodigo").val() + '</th>' +
+                                        '<th style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#lblArea").val() + '</th></tr>' +
+                                        '<tr><td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + $("#primerNombre").val() + ' ' + $("#segundoNombre").val() + ' ' + $("#primerApellido").val() + ' ' + $("#segundoApellido").val() + '</br>' + $("#fechaNac").val() + '</td>' +
+                                        '<td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + data.codigoLab + '</td>' +
+                                        '<td style="border: 1px solid black;padding: 10px; border-collapse: collapse;">' + unicodeEscape(data.areaPrc) + '</td></tr></table>';
+                                    wnd.document.write(textoHtml);
+                                }
                                 setTimeout(function () {
                                     window.location.href = parametros.searchUrl;
                                 }, 4000);
