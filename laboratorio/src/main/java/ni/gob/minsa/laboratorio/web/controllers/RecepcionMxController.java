@@ -253,6 +253,7 @@ public class RecepcionMxController {
             mav.addObject("dxList",solicitudDxList);
             mav.addObject("estudiosList",solicitudEstudioList);
             mav.addObject("causasRechazo",causaRechazoMxList);
+            mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
             mav.setViewName("recepcionMx/recepcionarOrders");
         }else
             mav.setViewName(urlValidacion);

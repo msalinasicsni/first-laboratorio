@@ -723,7 +723,8 @@ var ReceiptOrders = function () {
                                 });
                                 //codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
                                 codUnicoFormat = data.codigoUnicoMx+"*"+data.area;
-                                    limpiarDatosRecepcion();
+                                mostrarPopUpCodigos(codUnicoFormat, $("#primerNombre").val() + ' ' + $("#segundoNombre").val() + ' ' + $("#primerApellido").val() + ' ' + $("#segundoApellido").val(), $("#fechaNac").val());
+                                limpiarDatosRecepcion();
                                 setTimeout(function () {
                                     window.location.href = parametros.sSearchReceiptUrl
                                 }, 4000);

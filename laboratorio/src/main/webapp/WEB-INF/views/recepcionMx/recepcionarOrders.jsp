@@ -81,6 +81,11 @@
                                 <!-- end widget edit box -->
                                 <!-- widget content -->
                                 <div class="widget-body no-padding">
+                                <input type="hidden" id="fechaNac" value="<fmt:formatDate value="${tomaMx.idNotificacion.persona.fechaNacimiento}" pattern="dd/MM/yyyy" />"/>
+                                <input id="mostrarPopUpMx" type="hidden" value="${mostrarPopUpMx}" />
+                                <input id="lblPersona" type="hidden" value="<spring:message code="lbl.person"/>"/>
+                                <input id="lblArea" type="hidden" value="<spring:message code="lbl.receipt.pcr.area"/>"/>
+                                <input id="lblCodigo" type="hidden" value="<spring:message code="lbl.unique.code.mx"/>"/>
                                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                     <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                     <input id="msg_receipt_added" type="hidden" value="<spring:message code="msg.receipt.successfully.added"/>"/>
