@@ -545,8 +545,8 @@ public class ReportesExcelController {
             validarPCRIgMDengue(registro, solicitudDx.getIdSolicitudDx());
 
             CalendarioEpi calendario = null;
-            if (sindFebril!=null)
-                calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null)
+                calendario = calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(),"dd/MM/yyyy"));
             if (calendario!=null) {
                 registro[18] = calendario.getNoSemana();
             }
@@ -711,8 +711,8 @@ public class ReportesExcelController {
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[18] = sexo.substring(sexo.length() - 1, sexo.length());
             CalendarioEpi calendario = null;
-            if (sindFebril!=null)
-                calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null)
+                calendario = calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(),"dd/MM/yyyy"));
             if (calendario!=null) {
                 registro[19] = calendario.getNoSemana();
             }
@@ -784,8 +784,8 @@ public class ReportesExcelController {
             registro[14] = solicitudDx.getIdTomaMx().getFechaHTomaMx();
             registro[15] = (solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getMunicipioResidencia().getDependenciaSilais().getNombre():"");
             CalendarioEpi calendario = null;
-            if (sindFebril!=null)
-                calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(sindFebril.getFechaFicha(),"dd/MM/yyyy"));
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas()!=null)
+                calendario = calendarioEpiService.getCalendarioEpiByFecha(DateUtil.DateToString(solicitudDx.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas(),"dd/MM/yyyy"));
             if (calendario!=null) {
                 registro[16] = calendario.getNoSemana();
             }
