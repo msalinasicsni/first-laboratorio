@@ -20,7 +20,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 })
 @Entity
 @Table(name="ocupaciones"
-    ,schema="alerta"
+    ,schema="general"
     , uniqueConstraints = @UniqueConstraint(columnNames="CODIGO") 
 )
 public class Ocupacion  implements java.io.Serializable {

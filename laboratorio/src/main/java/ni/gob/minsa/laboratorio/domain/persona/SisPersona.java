@@ -36,7 +36,7 @@ import ni.gob.minsa.laboratorio.domain.poblacion.Paises;
 })
 
 @Entity  @Indexed
-@Table(name="sis_personas",schema="alerta")
+@Table(name="sis_personas",schema="sis")
 
 public class SisPersona  implements java.io.Serializable {
 

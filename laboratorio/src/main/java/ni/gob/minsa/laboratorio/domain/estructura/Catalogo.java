@@ -10,7 +10,7 @@ import org.hibernate.annotations.DiscriminatorOptions;
 
 
 @Entity
-@Table(name="catalogos", schema="ALERTA")
+@Table(name="catalogos", schema="general")
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="DEPENDENCIA",discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorOptions(force = true)

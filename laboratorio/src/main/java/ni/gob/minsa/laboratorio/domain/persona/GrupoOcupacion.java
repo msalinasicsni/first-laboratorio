@@ -9,7 +9,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.RelacionGrupoOcupacion;
 
 @Entity
 @Table(name="grupos_ocupaciones"
-    ,schema="alerta"
+    ,schema="general"
     , uniqueConstraints = @UniqueConstraint(columnNames="CODIGO_CIUO") 
 )
 public class GrupoOcupacion  implements java.io.Serializable {

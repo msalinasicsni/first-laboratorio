@@ -15,7 +15,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
  * @author mdeltrus
  */
 @Entity
-@Table(name="sis_responsablepersonas",schema="alerta")
+@Table(name="sis_responsablepersonas",schema="sis")
 public class SisResponsablesPersona implements java.io.Serializable {
     
     private static final long serialVersionUID = 1L;

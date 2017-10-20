@@ -10,7 +10,7 @@ import java.util.Date;
  * Created by Herrold on 27/05/14 12:39
  */
 @Entity
-@Table(name = "usuarios", schema = "alerta")
+@Table(name = "usuarios", schema = "portal")
 @Lazy(value = false)
 public class Usuarios {
 

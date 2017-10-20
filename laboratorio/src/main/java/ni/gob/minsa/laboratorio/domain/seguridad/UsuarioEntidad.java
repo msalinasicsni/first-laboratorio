@@ -11,7 +11,7 @@ import ni.gob.minsa.laboratorio.domain.portal.Sistema;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 
 @Entity
-@Table(name="usuarios_entidades", schema="alerta")
+@Table(name="usuarios_entidades", schema="general")
 @NamedQueries({
 	@NamedQuery(
 			name="entidadesPorUsuario",

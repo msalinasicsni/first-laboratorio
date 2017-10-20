@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by FIRSTICT on 9/2/2014.
  */
 @Entity
-@Table(name = "calendario_epi", schema = "alerta",  uniqueConstraints = @UniqueConstraint(columnNames = {"ANIO","NO_SEMANA"}))
+@Table(name = "sive_calendario_epi", schema = "sive",  uniqueConstraints = @UniqueConstraint(columnNames = {"ANIO","NO_SEMANA"}))
 public class CalendarioEpi {
     private int anio;
     private int noSemana;

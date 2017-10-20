@@ -16,7 +16,7 @@ import javax.persistence.*;
  * @since jdk1.6.0_21
  */
 @Entity
-@Table(name="sistemas",schema = "alerta")
+@Table(name="sistemas",schema = "portal")
 public class Sistema implements Serializable {
 	private static final long serialVersionUID = 1L;
 
