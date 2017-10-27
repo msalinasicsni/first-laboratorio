@@ -503,6 +503,19 @@ public class VisualizarNotificacionController {
                     String mesFis = fechaFis != null ? fechaFis[1] : "--";
                     String diaFis = fechaFis != null ? fechaFis[2] : "--";
 
+                    List<DaTomaMx> muestras = tomaMxService.getTomaMxActivaByIdNoti(febril.getIdNotificacion().getIdNotificacion());
+                    String[] fechaTM =  null;
+                    String anioTM = "--";
+                    String mesTM =  "--";
+                    String diaTM =  "--";
+                    if (muestras.size()>0){
+                        String fechaTomaMx = muestras.get(0).getFechaHTomaMx() != null?DateUtil.DateToString(muestras.get(0).getFechaHTomaMx(), "yyyy/MM/dd"):null;
+                        if (fechaTomaMx!=null) fechaTM = fechaTomaMx.split("/");
+                        anioTM = fechaTM != null ? fechaTM[0]: "--";
+                        mesTM = fechaTM != null ? fechaTM[1]: "--";
+                        diaTM = fechaTM != null ? fechaTM[2]:"--";
+                    }
+
                     String dsa = febril.getSsDSA() != null ? febril.getSsDSA() : null;
 
                     boolean fiebre = false;
@@ -973,6 +986,13 @@ public class VisualizarNotificacionController {
                     GeneralUtils.drawTEXT(mesFis, y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
                     x1 = x + 150;
                     GeneralUtils.drawTEXT(anioFis, y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
+
+                    x1 = x + 300;
+                    GeneralUtils.drawTEXT(diaTM,y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
+                    x1 = x + 325;
+                    GeneralUtils.drawTEXT(mesTM,y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
+                    x1 = x + 345;
+                    GeneralUtils.drawTEXT(anioTM,y, x1, stream, 7, PDType1Font.TIMES_ROMAN);
 
                     y -= 22;
                     x1 = x + 25;
