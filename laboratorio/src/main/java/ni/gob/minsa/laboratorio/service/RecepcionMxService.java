@@ -422,7 +422,20 @@ public class RecepcionMxService {
         Query q = session.createQuery(query);
         q.setString("idRecepcion", idRecepcion);
         List<RecepcionMxLab> recepcionMxLabList = q.list();
-        if (recepcionMxLabList!=null & recepcionMxLabList.size()>0){
+        if (recepcionMxLabList!=null && recepcionMxLabList.size()>0){
+            resultado = recepcionMxLabList.get(0);
+        }
+        return  resultado;
+    }
+
+    public RecepcionMxLab getLastRecepcionMxLabByIdTomaMx(String idTomaMx){
+        RecepcionMxLab resultado = null;
+        String query = "select a from RecepcionMxLab as a inner join a.recepcionMx as t inner join t.tomaMx mx where mx.idTomaMx = :idTomaMx order by a.fechaHoraRecepcion desc";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("idTomaMx", idTomaMx);
+        List<RecepcionMxLab> recepcionMxLabList = q.list();
+        if (recepcionMxLabList!=null && recepcionMxLabList.size()>0){
             resultado = recepcionMxLabList.get(0);
         }
         return  resultado;

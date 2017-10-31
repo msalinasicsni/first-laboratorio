@@ -95,6 +95,9 @@ public class TrasladoMxController {
     @Resource(name = "examenesService")
     private ExamenesService examenesService;
 
+    @Resource(name = "recepcionMxService")
+    private RecepcionMxService recepcionMxService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -271,7 +274,7 @@ public class TrasladoMxController {
                 boolean crearSolicitud = true;
                 Timestamp fhRegistro = new Timestamp(new Date().getTime());
                 String idTomaMx = jObjectRecepciones.get(String.valueOf(i)).getAsString();
-                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(idTomaMx);
+                RecepcionMxLab lastRecepcionMxLab = recepcionMxService.getLastRecepcionMxLabByIdTomaMx(idTomaMx);
 
                 //se obtiene tomaMx a recepcionar
                 DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
@@ -292,7 +295,7 @@ public class TrasladoMxController {
                     if (trasladoActivo!=null) {
                         trasladoMx.setAreaOrigen(trasladoActivo.getAreaDestino());
                     }else{//si no tien traslados, tomar el area del dx con mayor prioridad
-                        trasladoMx.setAreaOrigen(solicitudDxList.get(0).getCodDx().getArea());
+                        trasladoMx.setAreaOrigen(lastRecepcionMxLab.getArea());
                     }
                     //si el traslado tiene el mismo area de origen y destino, no procesar (puede que tenga traslado activo hacia el mismo area)
                     if (trasladoMx.getAreaOrigen().getIdArea().equals(trasladoMx.getAreaDestino().getIdArea()))
@@ -531,7 +534,7 @@ public class TrasladoMxController {
         filtroMx.setCodTipoMx(codTipoMx);
         filtroMx.setCodTipoSolicitud(codTipoSolicitud);
         filtroMx.setNombreSolicitud(nombreSolicitud);
-        filtroMx.setCodEstado("ESTDMX|RCLAB"); // s�lo las enviadas
+        filtroMx.setCodEstado("ESTDMX|RCLAB"); // s�lo las recepcionadas en laboratorio
         filtroMx.setCodigoUnicoMx(codigoUnicoMx);
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         if (tipoTraslado.equals("cc")){ //para traslado al CNDR la solicitud tiene que estar aprobada
