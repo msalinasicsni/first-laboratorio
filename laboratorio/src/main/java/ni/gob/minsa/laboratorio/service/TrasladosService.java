@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
+import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import org.apache.commons.codec.language.Soundex;
@@ -209,6 +210,16 @@ public class TrasladosService {
                     .add(Restrictions.eq("pasivo",false)) //autoridad laboratorio activa
                     .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                     .setProjection(Property.forName("labautorizado.codigo"))));
+
+            crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(RecepcionMxLab.class)
+                    .createAlias("recepcionMx","rmx")
+                    .createAlias("area","area")
+                    .add(Subqueries.propertyIn("area.idArea", DetachedCriteria.forClass(AutoridadArea.class)
+                            .add(Restrictions.eq("pasivo", false)) //autoridad area activa
+                            .add(Restrictions.and(Restrictions.eq("user.username", filtro.getNombreUsuario()))) //usuario
+                            .setProjection(Property.forName("area.idArea"))))
+                    .createAlias("rmx.tomaMx", "tomarmx")
+                    .setProjection(Property.forName("tomarmx.idTomaMx"))));
         }
 
         //filtro para solicitudes aprobadas

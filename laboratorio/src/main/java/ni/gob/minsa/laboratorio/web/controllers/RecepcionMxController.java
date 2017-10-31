@@ -1134,10 +1134,11 @@ public class RecepcionMxController {
                 recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
                 recepcionMx.setTomaMx(tomaMx);
                 try {
-                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas
-                    if (!esEstudio)
+                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas, que no vengan por traslado externo
+                    if (!esEstudio && tomaMx.getCodigoLab()==null)
                         tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(),1));
                     idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+
                     //si tiene traslado activo marcarlo como recepcionado
                     TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
                     if (trasladoActivo!=null) {
