@@ -123,6 +123,7 @@
 												<th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.lastname1"/></th>
 												<th data-hide="phone,tablet"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.lastname2"/></th>
 												<th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.fecnac"/></th>
+                                                <th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.age2"/></th>
 												<th data-hide="phone,tablet"><i class="fa fa-fw fa-map-marker text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.mun.res"/></th>
 												<th></th>
                                                 <th></th>
@@ -137,6 +138,7 @@
                                                 <td>${persona.primerApellido}</td>
                                                 <td>${persona.segundoApellido}</td>
                                                 <td>${persona.fechaNacimiento}</td>
+                                                <td>${edad}</td>
                                                 <td>${persona.muniResiNombre}</td>
                                                 <td><a href="${sActionUrl}/${persona.personaId}" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></a></td>
                                                 <td><a href="${sActionNotiPacienteUrl}/${persona.personaId}" class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a></td>
@@ -203,6 +205,8 @@
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<spring:url value="/resources/scripts/personas/person-search.js" var="personSearch" />
 	<script src="${personSearch}"></script>
+    <spring:url value="/resources/scripts/utilidades/calcularEdad.js" var="edadJS" />
+    <script src="${edadJS}"></script>
 	<!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/persons" var="sPersonUrl"/>
     <spring:url value="/personas/create" var="sCreatePersonUrl"/>

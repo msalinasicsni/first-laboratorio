@@ -22,7 +22,7 @@ var SearchPerson = function () {
         //main function to initiate the module
         init: function (parametros) {
             var page=0;
-            var rowsPage=20;
+            var rowsPage=50;
             $("#prev").prop('disabled',true);
             $("#next").prop('disabled',true);
             var responsiveHelper_dt_basic = undefined;
@@ -111,9 +111,10 @@ var SearchPerson = function () {
                             }
                             var actionUrl = parametros.sActionUrl + '/' + data[i].personaId;
                             var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
-
+                            var fechaNacPartes = data[i].fechaNacimiento.split("-");
+                            var edad = getAge(fechaNacPartes[2]+"/"+fechaNacPartes[1]+"/"+fechaNacPartes[0]).split(",");
                             table1.fnAddData(
-                                [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, nombreMuniRes,
+                                [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, edad[0], nombreMuniRes,
                                         '<a title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
                                         '<a title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
 

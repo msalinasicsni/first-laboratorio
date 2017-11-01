@@ -90,7 +90,7 @@ public class PersonaController {
     public @ResponseBody List<SisPersona> fetchPersonasJson(@RequestParam(value = "strFilter", required = true) String filtro,
                                                             @RequestParam(value = "pPaginaActual", required = true) int pPaginaActual) {
         logger.info("Obteniendo las personas en JSON");
-        List<SisPersona> personas = personaService.getPersonas(pPaginaActual,20,filtro); //personaService.getPersonas(filtro);
+        List<SisPersona> personas = personaService.getPersonas(pPaginaActual,50,filtro); //personaService.getPersonas(filtro);
 
         if (personas == null){
         	logger.debug("Nulo");
@@ -109,6 +109,8 @@ public class PersonaController {
         Persona persona = personaService.buscarPorId(idPerson);
         mav.setViewName("personas/search");
         mav.addObject("persona",persona);
+        int edad = DateUtil.calcularEdadAnios(persona.getFechaNacimiento());
+        mav.addObject("edad", edad + " años");
         return mav;
     }
     @RequestMapping(value = "create", method = RequestMethod.GET)
