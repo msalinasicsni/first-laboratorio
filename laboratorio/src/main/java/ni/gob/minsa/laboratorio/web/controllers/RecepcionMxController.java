@@ -425,7 +425,7 @@ public class RecepcionMxController {
                     //List<OrdenExamen> ordenExamenListNew = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
                     //mav.addObject("examenesList",ordenExamenListNew);
                 }//else{
-                    //mav.addObject("examenesList",ordenExamenList);
+                //mav.addObject("examenesList",ordenExamenList);
                 //}
                 mav.addObject("esEstudio",esEstudio);
                 TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(recepcionMx.getTomaMx().getIdTomaMx());
@@ -598,7 +598,7 @@ public class RecepcionMxController {
                     areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
                 else {
                     if (esEstudio) {
-                            areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
+                        areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                     }
                 }
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
@@ -646,7 +646,7 @@ public class RecepcionMxController {
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
-               //se tiene que actualizar la tomaMx
+                //se tiene que actualizar la tomaMx
                 tomaMx.setEstadoMx(estadoMx);
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
@@ -751,7 +751,20 @@ public class RecepcionMxController {
                 //si no hay traslado, obtener area de dx con mayor prioridad
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
                 if (solicitudDxList.size() > 0) {
-                    recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
+                    int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
+                    for(DaSolicitudDx solicitudDx: solicitudDxList) {
+                        if (prioridad==solicitudDx.getCodDx().getPrioridad()) {
+                            if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
+                                recepcionMxLab.setArea(solicitudDx.getCodDx().getArea());
+                                break;
+                            }
+                        }else break;
+                        prioridad = solicitudDx.getCodDx().getPrioridad();
+                    }
+                    //deberia ser siempre distinto de null, pero para evitar null pointer
+                    if (recepcionMxLab.getArea()==null){
+                        recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
+                    }
 
                 }else{ //es estudio, se toma el area del estudio. Sólo se permite un estudio por muestra
                     if (solicitudEstudioList.size()>0){
@@ -923,7 +936,7 @@ public class RecepcionMxController {
                         logger.error("Error al anular orden de examen",ex);
                         resultado = messageSource.getMessage("msg.receipt.test.cancel.error2", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
-                   }
+                    }
                 }else{
                     throw new Exception(messageSource.getMessage("msg.receipt.test.order.notfound", null, null));
                 }
@@ -1276,9 +1289,23 @@ public class RecepcionMxController {
                     //se si no hay traslado, pero tiene mas de un dx validar si el usuario tiene acceso al de mayor prioridad
                     List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
                     if (solicitudDxList.size() > 0) {
-                        if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDxList.get(0).getCodDx().getArea().getIdArea())) {
+                        int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
+                        for(DaSolicitudDx solicitudDx: solicitudDxList) {
+                            if (prioridad==solicitudDx.getCodDx().getPrioridad()) {
+                                if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
+                                    recepcionMxLab.setArea(solicitudDx.getCodDx().getArea());
+                                    break;
+                                }
+                            }else break;
+                            prioridad = solicitudDx.getCodDx().getPrioridad();
+                        }
+                        //deberia ser siempre distinto de null, pero para evitar null pointer
+                        if (recepcionMxLab.getArea()==null){
                             recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
                         }
+                        /*if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDxList.get(0).getCodDx().getArea().getIdArea())) {
+                            recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
+                        }*/
                     }else{ //es estudio, se toma el area del estudio. Sólo se permite un estudio por muestra
                         List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
                         if (solicitudEstudioList.size()>0){
@@ -1749,6 +1776,7 @@ public class RecepcionMxController {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         for(RecepcionMx recepcion : recepcionMxList){
             boolean mostrar = true;
             String traslado = messageSource.getMessage("lbl.no",null,null);
@@ -1772,10 +1800,18 @@ public class RecepcionMxController {
                 }
             }else {
                 //se si no hay traslado, pero tiene mas de un dx validar si el usuario tiene acceso al de mayor prioridad. Si sólo hay uno siempre se muestra
-                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcion.getTomaMx().getIdTomaMx());
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(recepcion.getTomaMx().getIdTomaMx(), labUser.getCodigo());
+                //List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcion.getTomaMx().getIdTomaMx());
                 if (solicitudDxList.size() > 1) {
-                    if (!seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDxList.get(0).getCodDx().getArea().getIdArea())) {
-                        mostrar = false;
+                    int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
+                    for(DaSolicitudDx solicitudDx: solicitudDxList) {
+                        if (prioridad==solicitudDx.getCodDx().getPrioridad()) {
+                            if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
+                                mostrar = true;
+                                break;
+                            }else{mostrar = false;}
+                        }else break;
+                        prioridad = solicitudDx.getCodDx().getPrioridad();
                     }
                 }
             }
@@ -1862,8 +1898,8 @@ public class RecepcionMxController {
                     if(edad > 12 && recepcion.getTomaMx().getIdNotificacion().getPersona().isSexoFemenino()){
                         //map.put("embarazada", tomaMxService.estaEmbarazada(recepcion.getTomaMx().getIdNotificacion().getIdNotificacion()));
                         if (recepcion.getTomaMx().getIdNotificacion().getEmbarazada()!=null)
-                        map.put("embarazada",(recepcion.getTomaMx().getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S")?
-                                messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
+                            map.put("embarazada",(recepcion.getTomaMx().getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S")?
+                                    messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
                         else map.put("embarazada",messageSource.getMessage("lbl.no",null,null));
                     }else
                         map.put("embarazada","--");
@@ -1878,7 +1914,6 @@ public class RecepcionMxController {
                 map.put("origen",areaOrigen);
 
                 //se arma estructura de diagnósticos o estudios
-                Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx(), labUser.getCodigo());
                 DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
 

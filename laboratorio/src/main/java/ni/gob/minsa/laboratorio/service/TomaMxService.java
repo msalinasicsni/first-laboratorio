@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -970,6 +971,21 @@ public class TomaMxService {
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("idDiagnostico",idDiagnostico);
         return (DaSolicitudDx)q.uniqueResult();
+    }
+
+    /**
+     * Obtiene los dx iniciales solicitados en la toma de mx en una fecha de toma especifica
+     * @param id del estudio a buscar
+     * @return Catalogo_Estudio
+     */
+    public List<DaSolicitudDx> getSoliDxByIdMxFechaToma(String id, Date fechaToma){
+        String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
+                "where sdx.anulado = false and sdx.inicial = true and mx.idTomaMx  = :id and mx.fechaHTomaMx = :fechaToma ORDER BY sdx.idTomaMx.idTomaMx";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("id", id);
+        q.setParameter("fechaToma", fechaToma);
+        return q.list();
     }
 
 }

@@ -546,6 +546,8 @@
     <c:url var="datosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivosDx"/>
     <c:url var="todoDatosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivos"/>
     <c:url var="tipoMxUrl" value="/tomaMx/getTipoMxByTipoNoti"/>
+    <spring:url value="/tomaMx/validateTomaMx" var="validateUrl"/>
+
     <script type="text/javascript">
         $(document).ready(function() {
             pageSetUp();
@@ -561,7 +563,8 @@
                 municipiosUrl : "${municipiosUrl}",
                 unidadesUrl : "${unidadesUrl}",
                 tipoMxUrl : "${tipoMxUrl}",
-                language : "${pageContext.request.locale.language}"
+                language : "${pageContext.request.locale.language}",
+                validateUrl: "${validateUrl}"
             };
             EnterFormTomaMx.init(parametros);
             $('#embarazada').change();

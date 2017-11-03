@@ -373,6 +373,40 @@ public class TomaMxController {
     /******************** TOMA MUESTRAS PACIENTES Y OTRAS MX********************************/
     /***************************************************************************/
 
+    @RequestMapping(value = "validateTomaMx", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String validateTomaMx(@RequestParam(value = "idNotificacion", required = true) String idNotificacion,
+                          @RequestParam(value = "fechaHTomaMx", required = true) String fechaToma,
+                          @RequestParam(value = "dxs", required = true) String dxs) throws Exception {
+        logger.info("Realizando validacion de Toma de Mx.");
+        int totalEncontrados = 0;
+        String respuesta = "OK";
+        String[] dxArray = dxs.split(",");
+        Date fecha1 = DateUtil.StringToDate(fechaToma, "dd/MM/yyyy");
+        List<DaTomaMx> muestras = tomaMxService.getTomaMxActivaByIdNoti(idNotificacion);
+        for(DaTomaMx muestra : muestras){
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxByIdMxFechaToma(muestra.getIdTomaMx(), fecha1);
+            for(String dx : dxArray) {
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (solicitudDx.getCodDx().getIdDiagnostico().equals(Integer.valueOf(dx))) {
+                        totalEncontrados++;
+                        break;
+                    }
+                }
+            }
+            if (totalEncontrados == dxArray.length && totalEncontrados == solicitudDxList.size()) {
+                respuesta = messageSource.getMessage("msg.existe.toma", null, null);
+                break;
+            }
+            totalEncontrados = 0;
+        }
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("respuesta", respuesta);
+        String jsonResponse = new Gson().toJson(map);
+        return jsonResponse;
+    }
 
     @RequestMapping(value = "saveToma", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
     protected void saveTomaMxPacienteOtras(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -539,26 +573,27 @@ public class TomaMxController {
             }
             //se procede a registrar los diagn�sticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno)
             if (saveDxRequest(tomaMx.getIdTomaMx(), dx, strRespuestas, cantRespuestas)) {
-                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(),labUsuario.getCodigo());
-                List<DaSolicitudEstudio> solicitudEstudioList=new ArrayList<DaSolicitudEstudio>();
-                //area que procesa la solicitud con mayor prioridad
-                if (solicitudDxList.size()> 0)
-                    areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
-                else {
-                    solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
-                    if (solicitudEstudioList.size()> 0)
-                        areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
-                }
-                //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepci�n de la misma
-                RecepcionMx recepcionMx = new RecepcionMx();
-                recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                recepcionMx.setLabRecepcion(labUsuario);
-                recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-                recepcionMx.setTipoMxCk(true);
-                recepcionMx.setCantidadTubosCk(true);
-                recepcionMx.setTipoRecepcionMx(catalogoService.getTipoRecepcionMx("TPRECPMX|VRT"));
-                recepcionMx.setTomaMx(tomaMx);
                 try {
+                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxPrioridadByTomaAndLab(tomaMx.getIdTomaMx(), labUsuario.getCodigo());
+                    List<DaSolicitudEstudio> solicitudEstudioList = new ArrayList<DaSolicitudEstudio>();
+                    //area que procesa la solicitud con mayor prioridad
+                    if (solicitudDxList.size() > 0)
+                        areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
+                    else {
+                        solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
+                        if (solicitudEstudioList.size() > 0)
+                            areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
+                    }
+                    //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepci�n de la misma
+                    RecepcionMx recepcionMx = new RecepcionMx();
+                    recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                    recepcionMx.setLabRecepcion(labUsuario);
+                    recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                    recepcionMx.setTipoMxCk(true);
+                    recepcionMx.setCantidadTubosCk(true);
+                    recepcionMx.setTipoRecepcionMx(catalogoService.getTipoRecepcionMx("TPRECPMX|VRT"));
+                    recepcionMx.setTomaMx(tomaMx);
+
                     recepcionMxService.addRecepcionMx(recepcionMx);
                 } catch (Exception ex) { //rollback completo
                     ex.printStackTrace();
