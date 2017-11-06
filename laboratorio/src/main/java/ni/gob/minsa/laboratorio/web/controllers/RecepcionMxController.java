@@ -2026,6 +2026,7 @@ public class RecepcionMxController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         boolean agregarExamenDx = true;
+        List<Area> areasUsuario = autoridadesService.getAreasUsuario(seguridadService.obtenerNombreUsuario());
         for(DaSolicitudDx dx : dxList){
             Map<String, String> map = new HashMap<String, String>();
             map.put("idTomaMx", dx.getIdTomaMx().getIdTomaMx());
@@ -2038,6 +2039,10 @@ public class RecepcionMxController {
                 map.put("cc", messageSource.getMessage("lbl.yes", null, null));
             else
                 map.put("cc", messageSource.getMessage("lbl.no", null, null));
+            if (areasUsuario.contains(dx.getCodDx().getArea()))
+                map.put("permiso", "true");
+            else
+                map.put("permiso", "false");
 
             mapResponse.put(indice, map);
             indice ++;

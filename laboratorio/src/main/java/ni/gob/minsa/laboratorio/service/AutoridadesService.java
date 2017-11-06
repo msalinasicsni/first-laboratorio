@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.Departamento;
 import ni.gob.minsa.laboratorio.domain.examen.Direccion;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.*;
@@ -287,6 +288,14 @@ public class AutoridadesService {
                 "and dl.pasivo = false and dd.pasivo = false and d.pasivo = false and al.pasivo = false " +
                 "order by d.nombre ");
 
+        query.setParameter("userName",userName);
+        return query.list();
+    }
+
+    public List<Area> getAreasUsuario(String userName) {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery(" select distinct a.area FROM AutoridadArea as a where a.pasivo = false and a.user.username = :userName");
         query.setParameter("userName",userName);
         return query.list();
     }

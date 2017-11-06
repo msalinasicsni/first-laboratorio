@@ -404,7 +404,7 @@ public class TomaMxService {
                 "where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx " +
                 "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti and dx.diagnostico.pasivo = false";
         if (userName!=null) {
-          query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.user.username = :userName)";
+          query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.pasivo = false and aa.user.username = :userName)";
         }
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);

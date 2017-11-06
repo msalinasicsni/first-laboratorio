@@ -403,9 +403,12 @@ var ReceiptOrders = function () {
                             } else {
                                 idExamenes = idExamenes +','+response[i].idSolicitud;
                             }
+                            var btnAnular = '<a data-toggle="modal" title="Cancelar solicitud" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'><i class="fa fa-times"></i></a>';
+                            if (response[i].permiso==="false"){
+                                btnAnular = '<button type="button" title="Cancelar solicitud" disabled class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'><i class="fa fa-times"></i></button>';
+                            }
                             table3.fnAddData(
-                                [response[i].tipo,response[i].nombre, response[i].fechaSolicitud, response[i].nombreAreaPrc, response[i].cc,
-                                        '<a data-toggle="modal" title="Cancelar solicitud" class="btn btn-danger btn-xs anularSolicitud" data-id=' + response[i].idSolicitud +'><i class="fa fa-times"></i></a>']);
+                                [response[i].tipo,response[i].nombre, response[i].fechaSolicitud, response[i].nombreAreaPrc, response[i].cc, btnAnular]);
 
                         }
                         $(".anularSolicitud").on("click", function () {
