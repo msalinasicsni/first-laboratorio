@@ -121,7 +121,8 @@ public class PersonaService {
                 }
             }
         }catch(Exception e){
-            personaList = null;
+            e.printStackTrace();
+            throw e;
         }
 
         return personaList;
@@ -163,9 +164,8 @@ public class PersonaService {
             }
 
         }catch(Exception e){
-            personaList = null;
             this.rowCount = 0;
-            e.printStackTrace();
+            throw  e;
         }
 
         return personaList;
@@ -197,7 +197,7 @@ public class PersonaService {
 
         }catch(Exception e){
             this.rowCount = 0;
-            personaList = null;
+            throw e;
         }
 
         return personaList;
@@ -228,7 +228,7 @@ public class PersonaService {
             }
         }catch(Exception e){
             this.rowCount = 0;
-            personaList = null;
+            throw e;
         }
 
         return personaList;

@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.persona.*;
 import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
@@ -11,12 +12,16 @@ import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.ciportal.dto.InfoResultado;
 import ni.gob.minsa.ejbPersona.dto.Persona;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -87,20 +93,33 @@ public class PersonaController {
      * @return Un arreglo JSON de personas 
      */
     @RequestMapping(value = "persons", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody List<SisPersona> fetchPersonasJson(@RequestParam(value = "strFilter", required = true) String filtro,
+    public ResponseEntity<String> fetchPersonasJson(@RequestParam(value = "strFilter", required = true) String filtro,
                                                             @RequestParam(value = "pPaginaActual", required = true) int pPaginaActual) {
         logger.info("Obteniendo las personas en JSON");
-        List<SisPersona> personas = personaService.getPersonas(pPaginaActual,50,filtro); //personaService.getPersonas(filtro);
-
-        if (personas == null){
-        	logger.debug("Nulo");
+        List<SisPersona> personas = null;
+        try{
+            personas = personaService.getPersonas(pPaginaActual,50,filtro); //personaService.getPersonas(filtro);
+        }catch(HibernateException he){
+            logger.error("HibernateException", he);
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("mensaje", he.getMessage());
+            return createJsonResponse(map);
+        }catch (Exception e){
+            logger.error("Exception", e);
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("mensaje", e.getMessage());
+            return createJsonResponse(map);
         }
-        /*else{
-        	for (SisPersona persona : personas) {
-        		if(persona.getOcupacion()!=null) persona.getOcupacion().setRelacionGrupoOcupacion(null);
-        	}
-        }*/
-        return personas;
+        return createJsonResponse(personas);
+    }
+
+    private ResponseEntity<String> createJsonResponse( Object o )
+    {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
+        String json = gson.toJson( o );
+        return new ResponseEntity<String>( json, headers, HttpStatus.CREATED );
     }
 
     @RequestMapping(value = "search/{idPerson}", method = RequestMethod.GET)

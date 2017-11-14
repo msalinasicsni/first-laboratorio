@@ -96,41 +96,60 @@ var SearchPerson = function () {
                     pPaginaActual: pagina,
                     ajax: 'true'
                 }, function (data) {
-                    var len = data.length;
-                    if (len<rowsPage) {
-                        $("#next").prop('disabled', true);
-                    }else{
-                        $("#next").prop('disabled', false);
+                    var mensaje="";
+                    try{
+                        mensaje = data.mensaje;
+                    }catch (err){
+                        mensaje="";
                     }
-                    if (len > 0) {
-                        for (var i = 0; i < len; i++) {
-                            var nombreMuniRes = "";
-
-                            if (data[i].municipioResidencia != null) {
-                                nombreMuniRes = data[i].municipioResidencia.nombre;
-                            }
-                            var actionUrl = parametros.sActionUrl + '/' + data[i].personaId;
-                            var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
-                            var fechaNacPartes = data[i].fechaNacimiento.split("-");
-                            var edad = getAge(fechaNacPartes[2]+"/"+fechaNacPartes[1]+"/"+fechaNacPartes[0]).split(",");
-                            table1.fnAddData(
-                                [data[i].identificacion, data[i].primerNombre, data[i].segundoNombre, data[i].primerApellido, data[i].segundoApellido, data[i].fechaNacimiento, edad[0], nombreMuniRes,
-                                        '<a title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
-                                        '<a title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
-
-                        }
-                    }else {
+                    if (mensaje!=undefined && mensaje!="") {
+                        setTimeout($.unblockUI, 500);
                         $.smallBox({
-                            title: $("#msg_no_results_found").val(),
+                            title: mensaje,
                             content: $("#smallBox_content").val(),
-                            color: "#C79121",
+                            color: "#C46A69",
                             iconSmall: "fa fa-warning",
                             timeout: 4000
                         });
+                    } else {
+                        var len = 0;
+                        if (data != null)
+                            len = data.length;
+
+                        if (len < rowsPage) {
+                            $("#next").prop('disabled', true);
+                        } else {
+                            $("#next").prop('disabled', false);
+                        }
+                        if (len > 0) {
+                            for (var i = 0; i < len; i++) {
+                                var nombreMuniRes = "";
+
+                                if (data[i].municipioResidencia != null) {
+                                    nombreMuniRes = data[i].municipioResidencia.nombre;
+                                }
+                                var actionUrl = parametros.sActionUrl + '/' + data[i].personaId;
+                                var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
+                                var edad = getAge(data[i].fechaNacimiento).split(",");
+                                table1.fnAddData(
+                                    [data[i].identificacion, data[i].primerNombre, (data[i].segundoNombre != null ? data[i].segundoNombre : ""), data[i].primerApellido,
+                                        (data[i].segundoApellido != null ? data[i].segundoApellido : ""), data[i].fechaNacimiento, edad[0], nombreMuniRes,
+                                            '<a title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
+                                            '<a title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
+                            }
+                            setTimeout($.unblockUI, 500);
+                        } else {
+                            setTimeout($.unblockUI, 500);
+                            $.smallBox({
+                                title: $("#msg_no_results_found").val(),
+                                content: $("#smallBox_content").val(),
+                                color: "#C79121",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        }
                     }
-                    setTimeout($.unblockUI, 500);
-                })
-                    .fail(function (jqXHR) {
+                }).fail(function (jqXHR) {
                         setTimeout($.unblockUI, 10);
                         if (jqXHR.status=="200") {
                             $.smallBox({
