@@ -132,7 +132,7 @@ var SearchPerson = function () {
                                 var actionNotiPacienteUrl = parametros.sActionNotiPacienteUrl + '/' + data[i].personaId;
                                 var edad = getAge(data[i].fechaNacimiento).split(",");
                                 table1.fnAddData(
-                                    [data[i].identificacion, data[i].primerNombre, (data[i].segundoNombre != null ? data[i].segundoNombre : ""), data[i].primerApellido,
+                                    [(data[i].identificacion!=null?data[i].identificacion:""), data[i].primerNombre, (data[i].segundoNombre != null ? data[i].segundoNombre : ""), data[i].primerApellido,
                                         (data[i].segundoApellido != null ? data[i].segundoApellido : ""), data[i].fechaNacimiento, edad[0], nombreMuniRes,
                                             '<a title="Ver" href=' + actionUrl + ' class="btn btn-success btn-xs"><i class="fa fa-mail-forward"></i></a>',
                                             '<a title="Eventos Previos" href=' + actionNotiPacienteUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-list"></i></a>']);
