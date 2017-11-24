@@ -102,6 +102,9 @@ var resultReport = function () {
                     },
                     endDate:{
                         required:true
+                    },
+                    codigoLab: {
+                        required:true
                     }
                 },
                 // Do not change code below
@@ -162,6 +165,7 @@ var resultReport = function () {
                 filtro['porSilais'] = "true"; //$('input[name="rbNivelPais"]:checked', '#result_form').val();
                 //filtro['codZona'] = $('#codZona').find('option:selected').val();
                 filtro['idDx'] = $('#idDx').find('option:selected').val();
+                filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
 
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sActionUrl, {
@@ -183,7 +187,7 @@ var resultReport = function () {
                     }
                     else if ($('#codArea option:selected').val() == "AREAREP|SILAIS"){
                         //title = title + '</br>'+$('#codSilaisAtencion option:selected').text() + " " + "-" + " " + $('#municps').val() ;
-                        $('#firstTh').html( $('#silaisT').val() );
+                        $('#firstTh').html( $('#municT').val() );
 
                     }
                     else if ($('#codArea option:selected').val() == "AREAREP|DEPTO"){

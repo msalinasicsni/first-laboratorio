@@ -30,6 +30,9 @@
         <intercept-url pattern="/recepcionMx/anularSolicitud" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/receiptLaboratory" access="ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/recepcionMasivaLab" access="ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/printResults" access="ROLE_RECEPCION,ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/searchResults" access="ROLE_RECEPCION,ROLE_ANALISTA" />
+        <intercept-url pattern="/recepcionMx/resultsPDF" access="ROLE_RECEPCION,ROLE_ANALISTA" />
         <intercept-url pattern="/recepcionMx/**" access="ROLE_RECEPCION" />
         <intercept-url pattern="/generacionAlicuota/**" access="ROLE_ANALISTA" />
         <intercept-url pattern="/administracion/respuestas/getRespuestasActivasExamen" access="ROLE_ANALISTA" />

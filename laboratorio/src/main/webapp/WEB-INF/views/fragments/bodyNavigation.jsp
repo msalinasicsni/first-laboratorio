@@ -85,9 +85,6 @@
                     <li class="reprintLabCode">
                         <a href="<spring:url value="/reprint/init" htmlEscape="true "/>" title="<spring:message code="lbl.reprint.codelab" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="lbl.reprint.codelab" /></a>
                     </li>
-                    <li class="printresults">
-                        <a href="<spring:url value="/recepcionMx/printResults" htmlEscape="true "/>" title="<spring:message code="menu.print.result" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="menu.print.result" /></a>
-                    </li>
                 </ul>
             </li>
             <li class="laboratorio">
@@ -201,6 +198,9 @@
             <li class="reportes">
                 <a href="#" title="<spring:message code="menu.reports" />"><i class="fa fa-lg fa-fw fa-file-pdf-o"></i> <span class="menu-item-parent"><spring:message code="menu.reports" /></span></a>
                 <ul>
+                    <li class="printresults">
+                        <a href="<spring:url value="/recepcionMx/printResults" htmlEscape="true "/>" title="<spring:message code="menu.print.result" />"><i class="fa fa-lg fa-fw fa-print"></i> <spring:message code="menu.print.result" /></a>
+                    </li>
                     <li class="receptionReport">
                         <a href="<spring:url value="/reports/reception/init" htmlEscape="true "/>" title="<spring:message code="menu.reception.report" />"><i class="fa fa-lg fa-fw fa-list"></i> <spring:message code="menu.reception.report" /></a>
                     </li>

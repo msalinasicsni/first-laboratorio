@@ -142,7 +142,7 @@ public class PersonaService {
             queryString = "select {per.*} from sis.sis_personas {per} where catsearch(snd_nombre,";
             String codigoNombre = "";
             for(int i=0;i<partes.length;i++){
-                if (!partes[i].isEmpty()) {
+                if (!partes[i].isEmpty()) {//por si hay más de un espacio entre las partes del nombre
                     String codigo = ((String) session.createSQLQuery("select sis.PKG_SND.soundesp(sis.PKG_SND.remover_acentos(TRIM(REPLACE(REPLACE(REPLACE(REPLACE('" + partes[i].trim() + "','DE LOS ',''),'DE LA ',''),'LA ',''),'DE ','')))) from dual").list().get(0)).toString();
                     if (i == 0) {
                         codigoNombre = codigoNombre.concat(codigo);

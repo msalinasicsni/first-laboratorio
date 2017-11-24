@@ -3245,27 +3245,31 @@ public class ReportesController {
     public String initReportResultDx(Model model,HttpServletRequest request) throws Exception {
         logger.debug("Reporte por Resultado");
 
-        User usuActual = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         List<EntidadesAdtvas> entidades = new ArrayList<EntidadesAdtvas>();
         List<AreaRep> areas = new ArrayList<AreaRep>();
-        if (usuActual.getNivelCentral()!=null && usuActual.getNivelCentral()) {
-            areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
+        laboratorio = seguridadService.getLaboratorioUsuario(usuario.getUsername());
+        List<Laboratorio> laboratorios = null;
+        if (usuario.getNivelCentral()!=null && usuario.getNivelCentral()) {
+            laboratorios = laboratoriosService.getLaboratoriosRegionales();
+            //areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
             entidades = entidadAdmonService.getAllEntidadesAdtvas();
         }else{
-            Laboratorio labUser = seguridadService.getLaboratorioUsuario(usuActual.getUsername());
-            if (labUser!=null) {
-                entidades = entidadAdmonService.getEntidadesAdtvasByCodigoLab(labUser.getCodigo());
+            if (laboratorio!=null) {
+                entidades = entidadAdmonService.getEntidadesAdtvasByCodigoLab(laboratorio.getCodigo());
+                laboratorios = new ArrayList<Laboratorio>();
+                laboratorios.add(laboratorio);
             }
         }
+        areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
         areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
         areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
-        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
-        laboratorio = seguridadService.getLaboratorioUsuario(usuario.getUsername());
 
         List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
         model.addAttribute("areas", areas);
         model.addAttribute("entidades", entidades);
         model.addAttribute("dxs", catDx);
+        model.addAttribute("laboratorios", laboratorios);
         return "reportes/resultadoDx";
     }
 
@@ -3431,6 +3435,7 @@ public class ReportesController {
         boolean porSilais = true;//por defecto true
         String codZona = null;
         Integer idDx = null;
+        String codLabo = null;
 
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsLong();
@@ -3458,6 +3463,8 @@ public class ReportesController {
             codZona = jObjectFiltro.get("codZona").getAsString();
         if (jObjectFiltro.get("idDx") != null && !jObjectFiltro.get("idDx").getAsString().isEmpty())
             idDx = jObjectFiltro.get("idDx").getAsInt();
+        if (jObjectFiltro.get("codLabo") != null && !jObjectFiltro.get("codLabo").getAsString().isEmpty())
+            codLabo = jObjectFiltro.get("codLabo").getAsString();
 
         filtroRep.setSubunidades(subunidad);
         filtroRep.setCodSilais(codSilais);
@@ -3474,7 +3481,8 @@ public class ReportesController {
         filtroRep.setCodZona(codZona);
         filtroRep.setIdDx(idDx);
 
-        filtroRep.setCodLaboratio(laboratorio.getCodigo());
+        //filtroRep.setCodLaboratio(laboratorio.getCodigo());
+        filtroRep.setCodLaboratio(codLabo);
         filtroRep.setNivelCentral(usuario.getNivelCentral());
         return filtroRep;
     }

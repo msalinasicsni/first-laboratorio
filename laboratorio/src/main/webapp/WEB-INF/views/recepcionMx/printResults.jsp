@@ -234,7 +234,7 @@
         };
         PrintResults.init(parametros);
 
-        $("li.recepcion").addClass("open");
+        $("li.reportes").addClass("open");
         $("li.printresults").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.printresults").parents("ul").slideDown(200);
