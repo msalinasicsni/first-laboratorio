@@ -142,11 +142,13 @@ public class PersonaService {
             queryString = "select {per.*} from sis.sis_personas {per} where catsearch(snd_nombre,";
             String codigoNombre = "";
             for(int i=0;i<partes.length;i++){
-                String codigo = ((String)session.createSQLQuery("select sis.PKG_SND.soundesp(sis.PKG_SND.remover_acentos(TRIM(REPLACE(REPLACE(REPLACE(REPLACE('"+partes[i]+"','DE LOS ',''),'DE LA ',''),'LA ',''),'DE ','')))) from dual").list().get(0)).toString();
-                if(i == 0){
-                    codigoNombre  = codigoNombre.concat(codigo);
-                }else{
-                    codigoNombre  = codigoNombre.concat( " " +codigo);
+                if (!partes[i].isEmpty()) {
+                    String codigo = ((String) session.createSQLQuery("select sis.PKG_SND.soundesp(sis.PKG_SND.remover_acentos(TRIM(REPLACE(REPLACE(REPLACE(REPLACE('" + partes[i].trim() + "','DE LOS ',''),'DE LA ',''),'LA ',''),'DE ','')))) from dual").list().get(0)).toString();
+                    if (i == 0) {
+                        codigoNombre = codigoNombre.concat(codigo);
+                    } else {
+                        codigoNombre = codigoNombre.concat(" " + codigo);
+                    }
                 }
             }
             queryString = queryString.concat("'" + codigoNombre + "',null) > 0");

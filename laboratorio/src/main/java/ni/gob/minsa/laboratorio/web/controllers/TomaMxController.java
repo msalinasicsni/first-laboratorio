@@ -380,8 +380,19 @@ public class TomaMxController {
                           @RequestParam(value = "fechaHTomaMx", required = true) String fechaToma,
                           @RequestParam(value = "dxs", required = true) String dxs) throws Exception {
         logger.info("Realizando validacion de Toma de Mx.");
-        int totalEncontrados = 0;
         String respuesta = "OK";
+        if (existeTomaMx(idNotificacion, fechaToma, dxs)){
+            respuesta = messageSource.getMessage("msg.existe.toma", null, null);
+        }
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("respuesta", respuesta);
+        String jsonResponse = new Gson().toJson(map);
+        return jsonResponse;
+    }
+
+    private boolean existeTomaMx(String idNotificacion, String fechaToma, String dxs) throws Exception{
+        int totalEncontrados = 0;
+        boolean respuesta = false;
         String[] dxArray = dxs.split(",");
         Date fecha1 = DateUtil.StringToDate(fechaToma, "dd/MM/yyyy");
         List<DaTomaMx> muestras = tomaMxService.getTomaMxActivaByIdNoti(idNotificacion);
@@ -396,16 +407,12 @@ public class TomaMxController {
                 }
             }
             if (totalEncontrados == dxArray.length && totalEncontrados == solicitudDxList.size()) {
-                respuesta = messageSource.getMessage("msg.existe.toma", null, null);
+                respuesta = true;
                 break;
             }
             totalEncontrados = 0;
         }
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("respuesta", respuesta);
-        String jsonResponse = new Gson().toJson(map);
-        return jsonResponse;
+        return respuesta;
     }
 
     @RequestMapping(value = "saveToma", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
@@ -552,7 +559,11 @@ public class TomaMxController {
             codigoGenerado = tomaMx.getCodigoLab();
             tomaMx.setEnvio(envioOrden);
             try {
-                tomaMxService.addTomaMx(tomaMx);
+                if (existeTomaMx(idNotificacion, fechaHTomaMx, dx)) {
+                    throw new Exception(messageSource.getMessage("msg.existe.toma", null, null));
+                } else {
+                    tomaMxService.addTomaMx(tomaMx);
+                }
             }catch (Exception ex){
                 tomaMxService.deleteEnvioOrden(envioOrden);
                 resultado=resultado+". \n "+ex.getMessage();
