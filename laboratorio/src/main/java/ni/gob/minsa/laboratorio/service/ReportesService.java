@@ -178,7 +178,6 @@ public class ReportesService {
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
         }
-
         //se filtra por SILAIS
         if (filtro.getCodSilais()!=null){
             crit.createAlias("notif.codSilaisAtencion","silais");
@@ -220,15 +219,29 @@ public class ReportesService {
 
         crit.addOrder(Order.asc("fechaAprobacion"));
 
-        if (!filtro.isNivelCentral()) {//si no es nivel central, filtrar solo el laboratorio al que pertenece el usuario
+        if (!filtro.isNivelCentral()) {//si no es nivel central, filtrar solo el laboratorio al que pertenece el usuario o seleccionado en pantalla
             crit.createAlias("rutina.labProcesa", "labProcesa");
-            crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
-                    .createAlias("laboratorio", "labautorizado")
-                    .createAlias("user", "usuario")
-                    .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
-                    .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
-                    .setProjection(Property.forName("labautorizado.codigo"))));
+            if (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")) {
+                crit.add(Restrictions.and(
+                        Restrictions.eq("labProcesa.codigo", filtro.getCodLaboratio())));
+            }else {
+                crit.add(Subqueries.propertyIn("labProcesa.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
+                        .createAlias("laboratorio", "labautorizado")
+                        .createAlias("user", "usuario")
+                        .add(Restrictions.eq("pasivo", false)) //autoridad laboratorio activa
+                        .add(Restrictions.and(Restrictions.eq("usuario.username", filtro.getNombreUsuario()))) //usuario
+                        .setProjection(Property.forName("labautorizado.codigo"))));
+            }
+        }else {
+            //se filtra por laboratorio que procesa
+            if (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")) {
+                // and dx.labProcesa.codigo = :codigoLab
+                crit.createAlias("rutina.labProcesa", "labProcesa");
+                crit.add(Restrictions.and(
+                        Restrictions.eq("labProcesa.codigo", filtro.getCodLaboratio())));
+            }
         }
+
         //filtro x area
         if(filtro.getArea() != null){
             crit.createAlias("dx.area","area");
@@ -534,7 +547,7 @@ public class ReportesService {
         return resumenMxSolicitud;
     }
 
-    public List<DaSolicitudDx> getDiagnosticosAprobadosByFiltro(FiltrosReporte filtro, String codigoLab){
+    public List<DaSolicitudDx> getDiagnosticosAprobadosByFiltro(FiltrosReporte filtro){
         Session session = sessionFactory.getCurrentSession();
         Query queryNotiDx = null;
         if (filtro.getCodArea().equals("AREAREP|PAIS")) {
@@ -551,7 +564,8 @@ public class ReportesService {
             "  and noti.codUnidadAtencion.unidadId =:codUnidad ");
             queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
         }
-        queryNotiDx.setParameter("codigoLab", codigoLab);
+
+        queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
         queryNotiDx.setParameter("idDx", filtro.getIdDx());
         queryNotiDx.setParameter("fechaInicio", filtro.getFechaInicio());
         queryNotiDx.setParameter("fechaFin", filtro.getFechaFin());
@@ -601,8 +615,8 @@ public class ReportesService {
                         " and  noti.codSilaisAtencion.codigo = ent.codigo " +
                         " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                         " and mx.anulada = false),0) as sinresultado " +
-                        " from EntidadesAdtvas ent " +
-                        " where ent.pasivo = 0 " +
+                        " from EntidadesAdtvas ent " + (!filtro.isNivelCentral()?", EntidadAdtvaLaboratorio entlab ":"") +
+                        " where ent.pasivo = 0 " + (!filtro.isNivelCentral()?" and ent.codigo = entlab.entidadAdtva.codigo and entlab.laboratorio.codigo = :laboratorio ":"") +
                         " order by ent.codigo ");
 
                 queryIdNoti = session.createQuery(" select noti.codSilaisAtencion.codigo, dx.idSolicitudDx, r.valor " +
@@ -674,6 +688,9 @@ public class ReportesService {
                 queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
                 queryIdNoti.setParameter("codigoLab", filtro.getCodLaboratio());
             }
+            if (!filtro.isNivelCentral()){
+                queryNotiDx.setParameter("laboratorio", filtro.getCodLaboratio());
+            }
             resTemp2.addAll(queryIdNoti.list());
 
         } else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
@@ -705,7 +722,7 @@ public class ReportesService {
                     " and mx.anulada = false),0) as sinresultado " +
                     " from Divisionpolitica div, Unidades as uni " +
                     " where div.pasivo = '0' and uni.pasivo='0' " +
-                    " and uni.municipio.codigoNacional = div.codigoNacional and uni.entidadAdtva.entidadAdtvaId = :codSilais " +
+                    " and uni.municipio.codigoNacional = div.codigoNacional and uni.entidadAdtva.codigo = :codSilais " +
                     " order by div.divisionpoliticaId ");
 
             queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.municipio.divisionpoliticaId, dx.idSolicitudDx, r.valor " +
@@ -719,7 +736,7 @@ public class ReportesService {
                     " and noti.pasivo = false and dx.anulado = false " +
                     " and mx.anulada = false " +
                     " and dx.aprobada = true and dx.controlCalidad = false " +
-                    " and noti.codUnidadAtencion.entidadAdtva.entidadAdtvaId = :codSilais " +
+                    " and noti.codUnidadAtencion.entidadAdtva.codigo = :codSilais " +
                     " order by noti.codUnidadAtencion.municipio.divisionpoliticaId ");
 
             queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
@@ -728,6 +745,69 @@ public class ReportesService {
             queryIdNoti.setParameter("idDx", filtro.getIdDx());
             queryIdNoti.setParameter("fechaInicio", filtro.getFechaInicio());
             queryIdNoti.setParameter("fechaFin", filtro.getFechaFin());
+            queryIdNoti.setParameter("codSilais", filtro.getCodSilais());
+            if (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")) {
+                queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
+                queryIdNoti.setParameter("codigoLab", filtro.getCodLaboratio());
+            }
+            resTemp2.addAll(queryIdNoti.list());
+
+        } else if (filtro.getCodArea().equals("AREAREP|MUNI")) {
+            queryNotiDx = session.createQuery(" select uni.unidadId, uni.nombre, " +
+                    " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                    " where noti.idNotificacion = mx.idNotificacion.idNotificacion" +
+                    " and noti.codUnidadAtencion.codigo =  uni.codigo " +
+                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
+                    sqlRutina +sqlFechasProcRut + (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
+                    " group by  noti.codUnidadAtencion.unidadId) as dx, " +
+                    " coalesce( " +
+                    " (select sum(case dx.aprobada when true then 1 else 0 end) " +
+                    " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                    " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
+                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                    " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
+                    sqlRutina +sqlFechasProcRut + (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
+                    " and noti.pasivo = false and dx.anulado = false " +
+                    " and mx.anulada = false),0) as conresultado, " +
+                    " coalesce( " +
+                    " (select  sum(case dx.aprobada when false then 1 else 0 end) " +
+                    " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
+                    " where noti.idNotificacion = mx.idNotificacion.idNotificacion " +
+                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                    sqlRutina +sqlFechasProcRut + (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
+                    " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
+                    " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
+                    " and mx.anulada = false),0) as sinresultado " +
+                    "FROM Unidades uni " +
+                    "where uni.municipio.codigoNacional = :codMunicipio" +
+                    " and uni.entidadAdtva.codigo = :codSilais" +
+                    " and uni.tipoUnidad in ("+ HealthUnitType.UnidadesPrimHosp.getDiscriminator()+") " +
+                    " order by uni.unidadId ");
+
+
+            queryIdNoti = session.createQuery(" select noti.codUnidadAtencion.unidadId, dx.idSolicitudDx, r.valor " +
+                    ", coalesce((select rr.concepto.tipo.codigo from RespuestaSolicitud rr where rr.idRespuesta = r.respuesta.idRespuesta),'NULL')"+
+                    ", coalesce((select rr.concepto.tipo.codigo from RespuestaExamen rr where rr.idRespuesta = r.respuestaExamen.idRespuesta),'NULL') "+
+                    " from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, DetalleResultadoFinal r  " +
+                    " where noti.idNotificacion = mx.idNotificacion " +
+                    sqlRutina +sqlFechasProcRut + (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
+                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
+                    " and dx.idSolicitudDx = r.solicitudDx.idSolicitudDx and r.pasivo = false " +
+                    " and noti.pasivo = false and dx.anulado = false " +
+                    " and mx.anulada = false " +
+                    " and dx.aprobada = true and dx.controlCalidad = false " +
+                    " and noti.codUnidadAtencion.municipio.codigoNacional = :codMunicipio " +
+                    " and noti.codUnidadAtencion.entidadAdtva.codigo = :codSilais " +
+                    " order by noti.codUnidadAtencion.unidadId ");
+
+            queryNotiDx.setParameter("codMunicipio", String.valueOf(filtro.getCodMunicipio()));
+            queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
+
+            //rutinas
+            queryIdNoti.setParameter("idDx", filtro.getIdDx());
+            queryIdNoti.setParameter("fechaInicio", filtro.getFechaInicio());
+            queryIdNoti.setParameter("fechaFin", filtro.getFechaFin());
+            queryIdNoti.setParameter("codMunicipio", String.valueOf(filtro.getCodMunicipio()));
             queryIdNoti.setParameter("codSilais", filtro.getCodSilais());
             if (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")) {
                 queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
@@ -853,109 +933,109 @@ public class ReportesService {
             Object[] reg1 = new Object[8];
             reg1[0] = reg[1]; //Nombre Silais
             reg1[1] = reg[2]; //Cantidad Notificaciones (NO SE USA)
-            reg1[2] = (Long)reg[2]; //Cantidad Dx
+            reg1[2] = (Long) reg[2]; //Cantidad Dx
+            if (!filtro.getCodArea().equals("AREAREP|MUNI") || (filtro.getCodArea().equals("AREAREP|MUNI") && (Long) reg[2]>0)) {
+                int pos = 0;
+                int neg = 0;
+                int inadecuada = 0;
+                String idSolicitud = "";
+                for (Object[] sol : resTemp2) {
+                    //identidad
+                    if (sol[0].equals(reg[0]) && !sol[0].equals(idSolicitud)) {
 
-            int pos = 0;
-            int neg = 0;
-            int inadecuada = 0;
-            String idSolicitud = "";
-            for (Object[] sol : resTemp2) {
-                //identidad
-                if (sol[0].equals(reg[0]) && !sol[0].equals(idSolicitud)) {
+                        if (!sol[3].toString().equalsIgnoreCase("NULL")) {
+                            if (sol[3].toString().equalsIgnoreCase("TPDATO|LIST")) {
+                                Integer idLista = Integer.valueOf(sol[2].toString());
+                                Catalogo_Lista valor = null;
+                                try {
+                                    valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                if (valor != null) {
+                                    if (valor.getValor().trim().toLowerCase().contains("negativo")
+                                            || valor.getValor().trim().toLowerCase().contains("no reactor")
+                                            || valor.getValor().trim().toLowerCase().contains("no detectado")) {
+                                        neg++;
+                                        idSolicitud = sol[1].toString();
+                                    } else if (valor.getValor().trim().toLowerCase().contains("positivo")
+                                            || valor.getValor().trim().toLowerCase().contains("reactor")
+                                            || valor.getValor().trim().toLowerCase().contains("detectado")) {
+                                        pos++;
+                                        idSolicitud = sol[1].toString();
+                                    }
+                                }
 
-                    if (!sol[3].toString().equalsIgnoreCase("NULL")){
-                        if (sol[3].toString().equalsIgnoreCase("TPDATO|LIST")) {
-                            Integer idLista = Integer.valueOf(sol[2].toString());
-                            Catalogo_Lista valor = null;
-                            try {
-                                valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            if (valor != null) {
-                                if (valor.getValor().trim().toLowerCase().contains("negativo")
-                                        || valor.getValor().trim().toLowerCase().contains("no reactor")
-                                        || valor.getValor().trim().toLowerCase().contains("no detectado")) {
+                            } else if (sol[3].toString().equalsIgnoreCase("TPDATO|TXT")) {
+                                if (sol[2].toString().trim().toLowerCase().contains("negativo")
+                                        || sol[2].toString().trim().toLowerCase().contains("no reactor")
+                                        || sol[2].toString().trim().toLowerCase().contains("no detectado")) {
                                     neg++;
                                     idSolicitud = sol[1].toString();
-                                } else if (valor.getValor().trim().toLowerCase().contains("positivo")
-                                        || valor.getValor().trim().toLowerCase().contains("reactor")
-                                        || valor.getValor().trim().toLowerCase().contains("detectado")) {
+                                } else if (sol[2].toString().trim().toLowerCase().contains("positivo")
+                                        || sol[2].toString().trim().toLowerCase().contains("reactor")
+                                        || sol[2].toString().trim().toLowerCase().contains("detectado")) {
                                     pos++;
+                                    idSolicitud = sol[1].toString();
+                                } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")) {
+                                    inadecuada++;
                                     idSolicitud = sol[1].toString();
                                 }
                             }
+                        } else if (!sol[4].toString().equalsIgnoreCase("NULL")) {
+                            if (sol[4].toString().equalsIgnoreCase("TPDATO|LIST")) {
+                                Integer idLista = Integer.valueOf(sol[2].toString());
+                                Catalogo_Lista valor = null;
+                                try {
+                                    valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
 
-                        } else if (sol[3].toString().equalsIgnoreCase("TPDATO|TXT")) {
-                            if (sol[2].toString().trim().toLowerCase().contains("negativo")
-                                    || sol[2].toString().trim().toLowerCase().contains("no reactor")
-                                    || sol[2].toString().trim().toLowerCase().contains("no detectado")) {
-                                neg++;
-                                idSolicitud = sol[1].toString();
-                            }else if (sol[2].toString().trim().toLowerCase().contains("positivo")
-                                    || sol[2].toString().trim().toLowerCase().contains("reactor")
-                                    || sol[2].toString().trim().toLowerCase().contains("detectado")) {
-                                pos++;
-                                idSolicitud = sol[1].toString();
-                            } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")){
-                                inadecuada++;
-                                idSolicitud = sol[1].toString();
-                            }
-                        }
-                    } else if (!sol[4].toString().equalsIgnoreCase("NULL")){
-                        if (sol[4].toString().equalsIgnoreCase("TPDATO|LIST")) {
-                            Integer idLista = Integer.valueOf(sol[2].toString());
-                            Catalogo_Lista valor = null;
-                            try {
-                                valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                                if (valor != null) {
+                                    if (valor.getValor().trim().toLowerCase().contains("negativo")
+                                            || valor.getValor().trim().toLowerCase().contains("no reactor")
+                                            || valor.getValor().trim().toLowerCase().contains("no detectado")) {
+                                        neg++;
+                                        idSolicitud = sol[1].toString();
+                                    } else if (valor.getValor().trim().toLowerCase().contains("positivo")
+                                            || valor.getValor().trim().toLowerCase().contains("reactor")
+                                            || valor.getValor().trim().toLowerCase().contains("detectado")) {
+                                        pos++;
+                                        idSolicitud = sol[1].toString();
+                                    }
+                                }
 
-                            if (valor != null) {
-                                if (valor.getValor().trim().toLowerCase().contains("negativo")
-                                        || valor.getValor().trim().toLowerCase().contains("no reactor")
-                                        || valor.getValor().trim().toLowerCase().contains("no detectado")) {
+
+                            } else if (sol[4].toString().equalsIgnoreCase("TPDATO|TXT")) {
+                                if (sol[2].toString().trim().toLowerCase().contains("negativo")
+                                        || sol[2].toString().trim().toLowerCase().contains("no reactor")
+                                        || sol[2].toString().trim().toLowerCase().contains("no detectado")) {
                                     neg++;
                                     idSolicitud = sol[1].toString();
-                                } else if (valor.getValor().trim().toLowerCase().contains("positivo")
-                                        || valor.getValor().trim().toLowerCase().contains("reactor")
-                                        || valor.getValor().trim().toLowerCase().contains("detectado")) {
+                                } else if (sol[2].toString().trim().toLowerCase().contains("positivo")
+                                        || sol[2].toString().trim().toLowerCase().contains("reactor")
+                                        || sol[2].toString().trim().toLowerCase().contains("detectado")) {
                                     pos++;
                                     idSolicitud = sol[1].toString();
+                                } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")) {
+                                    inadecuada++;
+                                    idSolicitud = sol[1].toString();
                                 }
+
                             }
-
-
-                        } else if (sol[4].toString().equalsIgnoreCase("TPDATO|TXT")) {
-                            if (sol[2].toString().trim().toLowerCase().contains("negativo")
-                                    || sol[2].toString().trim().toLowerCase().contains("no reactor")
-                                    || sol[2].toString().trim().toLowerCase().contains("no detectado")) {
-                                neg++;
-                                idSolicitud = sol[1].toString();
-                            }else if (sol[2].toString().trim().toLowerCase().contains("positivo")
-                                    || sol[2].toString().trim().toLowerCase().contains("reactor")
-                                    || sol[2].toString().trim().toLowerCase().contains("detectado")) {
-                                pos++;
-                                idSolicitud = sol[1].toString();
-                            } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")){
-                                inadecuada++;
-                                idSolicitud = sol[1].toString();
-                            }
-
                         }
                     }
                 }
+
+                reg1[3] = pos; // Positivo
+                reg1[4] = neg; // Negativo
+                reg1[5] = (Long) reg[4]; // Sin Resultado dx
+                Long totalConySinResultado = (Long) reg1[2];
+                reg1[6] = (totalConySinResultado != 0 ? (double) Math.round(Integer.valueOf(reg1[3].toString()).doubleValue() / totalConySinResultado * 100 * 100) / 100 : 0);
+                reg1[7] = inadecuada; //muestras inadecuadas
+                resFinal.add(reg1);
             }
-
-            reg1[3] = pos; // Positivo
-            reg1[4] = neg; // Negativo
-            reg1[5] = (Long)reg[4]; // Sin Resultado dx
-            Long totalConySinResultado = (Long) reg1[2];
-            reg1[6] = (totalConySinResultado != 0 ? (double) Math.round(Integer.valueOf(reg1[3].toString()).doubleValue() / totalConySinResultado * 100 * 100) / 100 : 0);
-            reg1[7] = inadecuada; //muestras inadecuadas
-            resFinal.add(reg1);
-
         }
         return resFinal;
     }
