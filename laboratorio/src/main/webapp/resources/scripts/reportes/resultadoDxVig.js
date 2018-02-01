@@ -51,6 +51,9 @@ var resultReportDxVig = function () {
                     },
                     endDate:{
                         required:true
+                    },
+                    codigoLab: {
+                        required:true
                     }
                 },
                 // Do not change code below
@@ -160,7 +163,7 @@ var resultReportDxVig = function () {
                 //filtro['codZona'] = $('#codZona').find('option:selected').val();
                 filtro['idDx'] = $('#idDx').find('option:selected').val();
                 filtro['incluirMxInadecuadas']=($('#ckbmxinadecuada').is(':checked'));
-
+                filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sMailUrl, {
                     filtro: JSON.stringify(filtro),
@@ -200,6 +203,7 @@ var resultReportDxVig = function () {
                     //filtro['codZona'] = $('#codZona').find('option:selected').val();
                     filtro['idDx'] = $('#idDx').find('option:selected').val();
                     filtro['incluirMxInadecuadas']=($('#ckbmxinadecuada').is(':checked'));
+                    filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
                     $(this).attr("href",parametros.excelUrl+"?filtro="+JSON.stringify(filtro));
                     desbloquearUI();
                 }

@@ -447,4 +447,14 @@ public class SeguridadService {
         return laboratorioList.size() > 0;
     }
 
+    public boolean esUsuarioNivelCentral(String username){
+        String query = "from User as usu " +
+                "where usu.username = :username";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("username", username);
+        User usuario = (User)q.uniqueResult();
+        if (usuario!=null) return usuario.getNivelCentral();
+        else return  false;
+    }
+
 }

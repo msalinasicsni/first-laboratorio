@@ -338,7 +338,10 @@ var ReceptionReport = function () {
                     }},
                     fecFinAprob: {required: function () {
                         return $('#fecFinAprob').val().length > 0;
-                    }}
+                    }},
+                    codigoLab: {
+                        required:true
+                    }
                 },
                 // Do not change code below
                 errorPlacement: function (error, element) {
@@ -370,7 +373,7 @@ var ReceptionReport = function () {
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
                     mxFiltros['area'] = '';
-
+                    mxFiltros['laboratorio'] = 'ALL';
 
                 } else {
 
@@ -381,7 +384,7 @@ var ReceptionReport = function () {
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoli').val());
                     mxFiltros['area'] = $('#area').find('option:selected').val();
-
+                    mxFiltros['laboratorio'] = $('#codigoLab').find('option:selected').val();
                 }
                 blockUI();
                 $.getJSON(parametros.searchReqUrl, {
@@ -516,7 +519,10 @@ var ReceptionReport = function () {
                     }},
                     finAprob: {required: function () {
                         return $('#finAprob').val().length > 0;
-                    }}
+                    }},
+                    codigoLab: {
+                        required:true
+                    }
                 },
                 // Do not change code below
                 errorPlacement: function (error, element) {
@@ -549,7 +555,7 @@ var ReceptionReport = function () {
                     mxFiltros['nombreSolicitud'] = '';
                     mxFiltros['area'] = '';
                     mxFiltros['finalRes'] = '';
-
+                    mxFiltros['laboratorio'] = 'ALL';
                 } else {
 
                     mxFiltros['fechaInicioAprob'] = $('#inicioAprob').val();
@@ -560,7 +566,7 @@ var ReceptionReport = function () {
                     mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSol').val());
                     mxFiltros['area'] = $('#areaSol').find('option:selected').val();
                     mxFiltros['finalRes'] = $('#finalRes').find('option:selected').val();
-
+                    mxFiltros['laboratorio'] = $('#codigoLab').find('option:selected').val();
                 }
                 blockUI();
                 $.getJSON(parametros.searchPosNegReqUrl, {
@@ -699,7 +705,10 @@ var ReceptionReport = function () {
                     }},
                     fiAprob: {required: function () {
                         return $('#fiAprob').val().length > 0;
-                    }}
+                    }},
+                    codigoLab: {
+                        required:true
+                    }
                 },
                 // Do not change code below
                 errorPlacement: function (error, element) {
@@ -731,7 +740,7 @@ var ReceptionReport = function () {
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
                     mxFiltros['area'] = '';
-
+                    mxFiltros['laboratorio'] = 'ALL';
 
                 } else {
 
@@ -742,7 +751,7 @@ var ReceptionReport = function () {
                     mxFiltros['codTipoSolicitud'] = $('#tipoGR').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoliGR').val());
                     mxFiltros['area'] = $('#areaGR').find('option:selected').val();
-
+                    mxFiltros['laboratorio'] = $('#codigoLab').find('option:selected').val();
 
                 }
                 blockUI();

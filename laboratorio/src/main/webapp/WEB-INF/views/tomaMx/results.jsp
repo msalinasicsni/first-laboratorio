@@ -109,9 +109,9 @@
                                                         <spring:url value="/tomaMx/create/{idNotificacion}" var="editUrl">
                                                             <spring:param name="idNotificacion" value="${noti.idNotificacion}" />
                                                         </spring:url>
-												<spring:url value="/tomaMx/override/{idNotificacion}" var="deleteUrl">
+												<!--<spring:url value="/tomaMx/override/{idNotificacion}" var="deleteUrl">
 													<spring:param name="idNotificacion" value="${noti.idNotificacion}" />
-												</spring:url>
+												</spring:url>-->
 												<td><c:if test="${noti.pasivo==false}">
                                                         <a title="Tomar Mx" data-id= "${noti.idNotificacion}"  class="btn btn-primary btn-xs tomarmx"><i class="fa fa-eyedropper"></i></a>
                                                     </c:if>
@@ -119,8 +119,9 @@
                                                     <button type="button" title="Tomar Mx" disabled class="btn btn-xs btn-primary"> <i class="fa fa-eyedropper"></i></button>
                                                     </c:if>
                                                 </td>
-                                                <td><c:if test="${noti.pasivo==false}">
-                                                        <a title="Anular" href="${fn:escapeXml(deleteUrl)}" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></a>
+                                                <td>
+                                                    <c:if test="${noti.pasivo==false}">
+                                                        <a title="Anular" data-id= "${noti.idNotificacion}" class="btn btn-danger btn-xs overridenoti"><i class="fa fa-times"></i></a>
                                                     </c:if>
                                                     <c:if test="${noti.pasivo==true}">
                                                         <button type="button" title="Anular" disabled class="btn btn-danger btn-xs"> <i class="fa fa-times"></i></button>
@@ -142,6 +143,36 @@
 							</div>
 						</div>
 						<!-- end widget -->
+                        <div class="modal fade" id="d_confirmacion"  role="dialog" tabindex="-1" data-aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header alert-warning">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                            &times;
+                                        </button>
+                                        <h4 class="modal-title fa fa-warning"> <spring:message code="msg.confirm.title" /></h4>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <form method="{method}">
+                                            <input type=hidden id="idOverride"/>
+                                            <div id="cuerpo">
+                                                <label id="questionOverride"><spring:message code="msg.confirm.override.all" /></label>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="act.cancel" /></button>
+                                        <button id="btnOverride" type="button" class="btn btn-info" ><spring:message code="act.ok" /></button>
+                                    </div>
+
+                                </div>
+
+                                <!-- /.modal-content -->
+                            </div>
+                            <!-- /.modal-dialog -->
+                        </div>
 					</article>
 					<!-- WIDGET END -->
 				</div>
@@ -180,6 +211,7 @@
     <c:url var="createUrl" value="/tomaMx/createInicial/"/>
     <c:url var="addNotificationUrl" value="/tomaMx/createnoti"/>
     <c:url var="addMxUrl" value="/tomaMx/create/"/>
+    <c:url var="overrideUrl" value="/tomaMx/override/"/>
     <spring:url value="/tomaMx/tomaMxByIdNoti" var="tomaMxUrl"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -188,7 +220,8 @@
                 createUrl: "${createUrl}",
                 addNotificationUrl: "${addNotificationUrl}",
                 tomaMxUrl: "${tomaMxUrl}",
-                addMxUrl: "${addMxUrl}"
+                addMxUrl: "${addMxUrl}",
+                overrideUrl: "${overrideUrl}"
             };
             ResultsNotices.init(parametros);
 	    	$("li.recepcion").addClass("open");

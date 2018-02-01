@@ -94,6 +94,19 @@ var ResultsNotices = function () {
                     });
             }
 
+            //Mostrar mensaje de confirmación para anular notificación
+            $(".overridenoti").click(function(){
+                var id = $(this).data('id');
+                if (id != null) {
+                    $('#idOverride').val(id);
+                    $('#d_confirmacion').modal('show');
+                }
+            });
+
+            $('#btnOverride').click(function () {
+                window.location.href = parametros.overrideUrl + $('#idOverride').val();
+            });
+
             /*******************************************************************************/
             /***************************** OTRAS MUESTRAS **********************************/
             /*******************************************************************************/

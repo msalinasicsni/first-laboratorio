@@ -90,10 +90,12 @@
                                     <input id="msg_select_receipt" type="hidden" value="<spring:message code="msg.select.receipt"/>"/>
                                     <input id="msg_reception_cancel" type="hidden" value="<spring:message code="msg.reception.lab.massive.canceled"/>"/>
                                     <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
-                                    <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.reception.lab.confirm.content"/>"/>
+                                    <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.confirm.override.all"/>"/>
                                     <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                     <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
-                                    <input id="msg_reception_lab_success" type="hidden" value="<spring:message code="msg.reception.lab.successfully"/>"/>
+                                    <input id="msg_override_success" type="hidden" value="<spring:message code="msg.tomamx.successfully.cancel"/>"/>
+                                    <input id="titleCancel" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
+                                    <input id="nivelCentral" type="hidden" value="${nivelCentral}"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
@@ -256,6 +258,7 @@
                                             <th data-hide="phone"><i class="fa fa-exclamation-triangle fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.urgent"/></th>
                                             <th><spring:message code="lbl.request.large"/></th>
                                             <th></th>
+                                            <th></th>
                                         </tr>
                                         </thead>
                                     </table>
@@ -279,6 +282,57 @@
 				<!-- end row -->
 			</section>
 			<!-- end widget grid -->
+            <!-- Modal -->
+            <div class="modal fade" id="modalOverride" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-times"></i>
+                                    <spring:message code="lbl.override" /> <spring:message code="lbl.sample" />
+                                    <label class="text-left txt-color-blue font-md" id="lblCodigoMx"></label>
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="modal-body"> <!--  no-padding -->
+                            <form id="override-mx-form" class="smart-form" novalidate="novalidate">
+                                <input id="codigoMx" type="hidden" value=""/>
+                                <fieldset>
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-12 col-lg-12">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.annulment.cause" /> </label>
+                                            <div class="">
+                                                <label class="textarea">
+                                                    <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                    <textarea class="form-control" rows="3" name="causaAnulacion" id="causaAnulacion"
+                                                              placeholder="<spring:message code="lbl.annulment.cause" />"></textarea>
+                                                    <b class="tooltip tooltip-bottom-right"> <i
+                                                            class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.annulment.cause"/>
+                                                    </b>
+                                                </label>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-save"></i> <spring:message code="act.ok" />
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.cancel" />
+                                    </button>
+                                </footer>
+                            </form>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div>
+            <!-- /.modal -->
 		</div>
 		<!-- END MAIN CONTENT -->
 	</div>
@@ -338,6 +392,7 @@
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sEditUrl" value="/editarMx/editLab/"/>
+    <c:url var="sOverrideUrl" value="/editarMx/override"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -346,6 +401,7 @@
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
                 sActionUrl : "${sEditUrl}",
+                sOverrideUrl : "${sOverrideUrl}",
                 sTableToolsPath : "${tabletools}"
             };
 

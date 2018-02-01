@@ -40,6 +40,13 @@ var EditarMxLab = function () {
                     "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true,
+                "columns": [
+                    null, null, null, null, null, null, null, null, null, null, null, null,
+                    {
+                        "className": 'override',
+                        "orderable": false
+                    }
+                ],
                 "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -59,6 +66,11 @@ var EditarMxLab = function () {
                         {"sExtends": "select_all", "sButtonText": text_selected_all},
                         {"sExtends": "select_none", "sButtonText": text_selected_none}
                     ]
+                },
+                fnDrawCallback: function () {
+                    $('.override')
+                        .off("click", overrideHandler)
+                        .on("click", overrideHandler);
                 }
             });
 
@@ -84,6 +96,30 @@ var EditarMxLab = function () {
                 }
             });
 
+            <!-- formulario para anular examen -->
+            $('#override-mx-form').validate({
+                // Rules for form validation
+                rules: {
+                    causaAnulacion: {required: true}
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    anularMuestra($("#codigoMx").val());
+                }
+            });
+
+            function overrideHandler() {
+                var id = $(this.innerHTML).data('id');
+                if (id != null) {
+                    $("#codigoMx").val(id);
+                    $("#lblCodigoMx").text(id);
+                    showModalOverride();
+                }
+            }
+
             function getMxs(showAll) {
                 var mxFiltros = {};
                 if (showAll) {
@@ -106,7 +142,7 @@ var EditarMxLab = function () {
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
                 }
-                bloquearUI();
+                bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sOrdersUrl, {
                     strFilter: JSON.stringify(mxFiltros),
                     ajax: 'true'
@@ -116,11 +152,16 @@ var EditarMxLab = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var actionUrl = parametros.sActionUrl;
-                            var idLoad;
-                            idLoad = dataToLoad[i].idTomaMx;
+                            var idLoad = dataToLoad[i].idTomaMx;
+                            var btnOverride = '<button title="Anular" type="button" class="btn btn-danger btn-xs" data-id="' + dataToLoad[i].codigoUnicoMx + '" > <i class="fa fa-times"></i></button>';
+                            if ($('#nivelCentral').val()=='false'){
+                                btnOverride = '<button title="Anular" type="button" disabled class="btn btn-danger btn-xs"> <i class="fa fa-times"></i></button>';
+                            }
                             actionUrl = actionUrl + idLoad;
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes,
+                                        '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>',
+                                        btnOverride]);
                         }
                     } else {
                         $.smallBox({
@@ -139,9 +180,64 @@ var EditarMxLab = function () {
                     });
             }
 
+            function showModalOverride() {
+                $("#causaAnulacion").val('');
+                $("#modalOverride").modal({
+                    show: true
+                });
+            }
+
+            function hideModalOverride() {
+                $('#modalOverride').modal('hide');
+            }
+
+            function anularMuestra(codigoMx) {
+                var anulacionObj = {};
+                anulacionObj['codigoMx'] = codigoMx;
+                anulacionObj['causaAnulacion'] = $("#causaAnulacion").val();
+                anulacionObj['mensaje'] = '';
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.sOverrideUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(anulacionObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0) {
+                                $.smallBox({
+                                    title: data.mensaje,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            } else {
+                                table1.fnClearTable();
+                                hideModalOverride();
+                                var msg = $("#msg_override_success").val();
+                                $.smallBox({
+                                    title: msg,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            desbloquearUI();
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
+                    });
+            }
+
             <!-- al seleccionar SILAIS -->
             $('#codSilais').change(function () {
-                blockUI();
+                bloquearUI(parametros.blockMess);
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sUnidadesUrl, {
                         codSilais: $(this).val(),
@@ -167,7 +263,7 @@ var EditarMxLab = function () {
                     $('#codUnidadSalud').html(html);
                 }
                 $('#codUnidadSalud').val('').change();
-                unBlockUI();
+                desbloquearUI();
             });
         }
     };

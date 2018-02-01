@@ -555,7 +555,7 @@ public class RecepcionMxController {
             tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
             if(fechaRecibido != null && !fechaRecibido.isEmpty()){
-                recepcionMx.setFechaRecibido(DateUtil.StringToDate(fechaRecibido,"dd/MM/yyyyy" ));
+                recepcionMx.setFechaRecibido(DateUtil.StringToDate(fechaRecibido,"dd/MM/yyyy" ));
             }
             recepcionMx.setHoraRecibido(horaRecibido);
             recepcionMx.setUsuarioRecepcion(usuario);
@@ -2465,8 +2465,8 @@ public class RecepcionMxController {
         if(labProcesa != null){
 
             if(labProcesa.getDescripcion()!= null){
-                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
-                GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getNombre());
+                GeneralUtils.drawTEXT(labProcesa.getNombre(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
 
@@ -2479,11 +2479,11 @@ public class RecepcionMxController {
             if(labProcesa.getTelefono() != null){
 
                 if(labProcesa.getTelefax() != null){
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono() + " " + labProcesa.getTelefax());
-                    GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono() + " ," + messageSource.getMessage("person.fax", null, null)+": "+ labProcesa.getTelefax());
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono() + ", " + messageSource.getMessage("person.fax", null, null)+": "+ labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }else{
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono());
-                    GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono());
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }
             }
         }

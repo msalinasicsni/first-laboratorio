@@ -700,11 +700,25 @@ public class ReportesController {
     @RequestMapping(value = "/positiveResults/init", method = RequestMethod.GET)
     public ModelAndView initForm(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte de Resultados Positivos");
-
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         ModelAndView mav = new ModelAndView();
-        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        List<EntidadesAdtvas> entidadesAdtvases = new ArrayList<EntidadesAdtvas>();
         List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
         List<Area> areas = areaService.getAreas();
+        List<Laboratorio> laboratorios = null;
+        if (usuario.getNivelCentral()!=null && usuario.getNivelCentral()) {
+            laboratorios = laboratoriosService.getLaboratoriosRegionales();
+            //areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
+            entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        }else{
+            laboratorio = seguridadService.getLaboratorioUsuario(usuario.getUsername());
+            if (laboratorio!=null) {
+                entidadesAdtvases = entidadAdmonService.getEntidadesAdtvasByCodigoLab(laboratorio.getCodigo());
+                laboratorios = new ArrayList<Laboratorio>();
+                laboratorios.add(laboratorio);
+            }
+        }
+        mav.addObject("laboratorios", laboratorios);
         mav.addObject("entidades", entidadesAdtvases);
         mav.addObject("areas", areas);
         mav.setViewName("reportes/positiveResultsReport");
@@ -1234,11 +1248,25 @@ public class ReportesController {
     @RequestMapping(value = "/posNegResults/init", method = RequestMethod.GET)
     public ModelAndView initReportForm(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte de Resultados Positivos y Negativos");
-
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         ModelAndView mav = new ModelAndView();
-        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        List<EntidadesAdtvas> entidadesAdtvases = new ArrayList<EntidadesAdtvas>();
         //List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
         List<Area> areas = areaService.getAreas();
+        List<Laboratorio> laboratorios = null;
+        if (usuario.getNivelCentral()!=null && usuario.getNivelCentral()) {
+            laboratorios = laboratoriosService.getLaboratoriosRegionales();
+            //areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
+            entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        }else{
+            laboratorio = seguridadService.getLaboratorioUsuario(usuario.getUsername());
+            if (laboratorio!=null) {
+                entidadesAdtvases = entidadAdmonService.getEntidadesAdtvasByCodigoLab(laboratorio.getCodigo());
+                laboratorios = new ArrayList<Laboratorio>();
+                laboratorios.add(laboratorio);
+            }
+        }
+        mav.addObject("laboratorios", laboratorios);
         mav.addObject("entidades", entidadesAdtvases);
         mav.addObject("areas", areas);
         mav.setViewName("reportes/positiveNegativeResults");
@@ -2576,11 +2604,25 @@ public class ReportesController {
     @RequestMapping(value = "/general/init", method = RequestMethod.GET)
     public ModelAndView init(HttpServletRequest request) throws Exception {
         logger.debug("Iniciando Reporte General de Resultados");
-
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         ModelAndView mav = new ModelAndView();
-        List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        List<EntidadesAdtvas> entidadesAdtvases = new ArrayList<EntidadesAdtvas>();
         List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
         List<Area> areas = areaService.getAreas();
+        List<Laboratorio> laboratorios = null;
+        if (usuario.getNivelCentral()!=null && usuario.getNivelCentral()) {
+            laboratorios = laboratoriosService.getLaboratoriosRegionales();
+            //areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
+            entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
+        }else{
+            laboratorio = seguridadService.getLaboratorioUsuario(usuario.getUsername());
+            if (laboratorio!=null) {
+                entidadesAdtvases = entidadAdmonService.getEntidadesAdtvasByCodigoLab(laboratorio.getCodigo());
+                laboratorios = new ArrayList<Laboratorio>();
+                laboratorios.add(laboratorio);
+            }
+        }
+        mav.addObject("laboratorios", laboratorios);
         mav.addObject("areas", areas);
         mav.addObject("entidades", entidadesAdtvases);
         mav.addObject("tipoMuestra", tipoMxList);
@@ -3263,6 +3305,7 @@ public class ReportesController {
         }
         areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
         areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
+        areas.add(catalogosService.getAreaRep("AREAREP|MUNI"));
         areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
 
         List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();

@@ -18,13 +18,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -96,6 +103,7 @@ public class EditarSolicitudesMxController {
         if (urlValidacion.isEmpty()) {
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
+            mav.addObject("nivelCentral", true);//q todos puedan editar //seguridadService.esUsuarioNivelCentral(seguridadService.obtenerNombreUsuario()));
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("tipoMuestra", tipoMxList);
             mav.setViewName("laboratorio/editarMx/searchMxLab");
@@ -120,6 +128,47 @@ public class EditarSolicitudesMxController {
         return RecepcionMxToJson(recepcionMxList);
     }
 
+    @RequestMapping(value = "override", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void anularMuestra(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String codigoMx=null;
+        String causaAnulacion = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            codigoMx = jsonpObject.get("codigoMx").getAsString();
+            causaAnulacion = jsonpObject.get("causaAnulacion").getAsString();
+            DaTomaMx tomaMx = tomaMxService.getTomaMxByCodLab(codigoMx);
+            if (tomaMx!=null) {
+                tomaMx.setAnulada(true);
+                tomaMx.setFechaAnulacion(new Timestamp(new Date().getTime()));
+                tomaMxService.updateTomaMx(tomaMx);
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(tomaMx.getIdTomaMx());
+                for(DaSolicitudDx solicitudDx:solicitudDxList){
+                    tomaMxService.bajaSolicitudDx(seguridadService.obtenerNombreUsuario(), solicitudDx.getIdSolicitudDx(), causaAnulacion);
+                }
+
+            }else{
+                throw new Exception(messageSource.getMessage("msg.tomamx.notfound",null,null));
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.override.tomamx.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("codigoMx",String.valueOf(codigoMx));
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
     /**
      * Método para convertir estructura Json que se recibe desde el cliente a FiltroMx para realizar búsqueda de Mx(Vigilancia) y Recepción Mx(Laboratorio)
      * @param strJson String con la información de los filtros

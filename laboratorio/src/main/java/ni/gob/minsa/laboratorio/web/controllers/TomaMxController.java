@@ -135,7 +135,6 @@ public class TomaMxController {
     public ModelAndView showNoticesRutPerson(@PathVariable("idPerson") long idPerson) throws Exception {
         ModelAndView mav = new ModelAndView();
         List<DaNotificacion> results = daNotificacionService.getNoticesByPerson(idPerson);
-        //List<DaNotificacion> results = daNotificacionService.getNoticesByPerson(idPerson,"TPNOTI|PCNT");
         mav.addObject("notificaciones", results);
         mav.addObject("personaId",idPerson);
         mav.setViewName("tomaMx/results");
@@ -522,7 +521,7 @@ public class TomaMxController {
                 notificacion.setCodTipoNotificacion(catalogoService.getTipoNotificacion(codTipoNoti));
             }
             if (!fechaInicioSintomas.isEmpty()){
-                notificacion.setFechaInicioSintomas(DateUtil.StringToDate(fechaInicioSintomas,"dd/MM/yyyyy"));
+                notificacion.setFechaInicioSintomas(DateUtil.StringToDate(fechaInicioSintomas,"dd/MM/yyyy"));
             }
             if (!urgente.isEmpty()) {
                 notificacion.setUrgente(catalogoService.getRespuesta(urgente));

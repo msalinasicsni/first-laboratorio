@@ -205,8 +205,22 @@
                                     <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.silais" />" name="codSilais" id="codSilais" class="select2">
                                         <option value=""></option>
                                         <c:forEach items="${entidades}" var="entidad">
-                                            <option value="${entidad.entidadAdtvaId}">${entidad.nombre}</option>
+                                            <option value="${entidad.codigo}">${entidad.nombre}</option>
                                         </c:forEach>
+                                    </select>
+                                </div>
+                            </section>
+                        </div>
+                        <!-- END ROW -->
+                        <!-- START ROW -->
+                        <div class="row">
+                            <section class="col col-sm-12 col-md-12 col-lg-12" id="municipio" hidden="hidden">
+                                <label class="text-left txt-color-blue font-md">
+                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.muni" /> </label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                    <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.muni" />" name="codMunicipio" id="codMunicipio" class="select2">
+                                        <option value=""></option>
                                     </select>
                                 </div>
                             </section>
@@ -410,7 +424,8 @@
 <c:set var="msgTitle"><spring:message code="lbl.alert" /></c:set>
 <c:set var="msgNoData"><spring:message code="lbl.no.data.found" /></c:set>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
-<c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
+<c:url var="unidadesURL" value="/api/v1/unidadesPrimHosp"/>
+<c:url var="municipiosURL" value="/api/v1/municipiosbysilais"/>
 <c:url var="sMailUrl" value="/reports/dataReportResultDxMail"/>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -418,6 +433,7 @@
         var parametros = {sActionUrl: "${sActionUrl}",
             blockMess:"${blockMess}",
             sUnidadesUrl: "${unidadesURL}",
+            sMunicipiosUrl:"${municipiosURL}",
             msgNoData: "${msgNoData}",
             msgTitle: "${msgTitle}",
             sMailUrl: "${sMailUrl}"

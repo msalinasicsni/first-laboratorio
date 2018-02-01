@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.audit.AuditTrail;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
@@ -8,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
+import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
@@ -981,6 +983,21 @@ public class TomaMxService {
     public List<DaSolicitudDx> getSoliDxByIdMxFechaToma(String id, Date fechaToma){
         String query = "select sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
                 "where sdx.anulado = false and sdx.inicial = true and mx.idTomaMx  = :id and mx.fechaHTomaMx = :fechaToma ORDER BY sdx.idTomaMx.idTomaMx";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("id", id);
+        q.setParameter("fechaToma", fechaToma);
+        return q.list();
+    }
+
+    /**
+     * Obtiene las mx tomadas para una notificación en fecha de toma especifica
+     * @param id del estudio a buscar
+     * @return Catalogo_Estudio
+     */
+    public List<DaTomaMx> getTomaMxByIdNotiAndFechaToma(String id, Date fechaToma){
+        String query = "select mx from DaTomaMx mx " +
+                "where mx.idNotificacion.idNotificacion  = :id and mx.fechaHTomaMx = :fechaToma";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setString("id", id);
