@@ -178,7 +178,7 @@ public class OrdenExamenMxService {
         );
         crit.add(Restrictions.eq("solicitudDx.anulado",false));
         //y las ordenes en estado según filtro
-        if (filtro.getCodEstado()!=null) {
+        /*if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
                         Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()).
@@ -188,7 +188,7 @@ public class OrdenExamenMxService {
                 crit.add(Restrictions.and(
                         Restrictions.eq("estado.codigo", filtro.getCodEstado()).ignoreCase()));
             }
-        }
+        }*/
         // se filtra por nombre y apellido persona
         if (filtro.getNombreApellido()!=null) {
             //crit.createAlias("notifi.persona", "person");

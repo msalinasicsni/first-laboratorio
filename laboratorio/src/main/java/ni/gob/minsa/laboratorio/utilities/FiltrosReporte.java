@@ -12,8 +12,8 @@ public class FiltrosReporte {
     Long codDepartamento;
     Long codMunicipio;
     Long codUnidad;
-    String semInicial;
-    String semFinal;
+    Integer semInicial;
+    Integer semFinal;
     String anioInicial;
     String anioFinal;
     String tipoNotificacion;
@@ -28,6 +28,7 @@ public class FiltrosReporte {
     boolean incluirMxInadecuadas;
     String codLaboratio;
     boolean nivelCentral;
+    String diagnosticos;
 
     public String getCodArea() {
         return codArea;
@@ -69,19 +70,19 @@ public class FiltrosReporte {
         this.codUnidad = codUnidad;
     }
 
-    public String getSemInicial() {
+    public Integer getSemInicial() {
         return semInicial;
     }
 
-    public void setSemInicial(String semInicial) {
+    public void setSemInicial(Integer semInicial) {
         this.semInicial = semInicial;
     }
 
-    public String getSemFinal() {
+    public Integer getSemFinal() {
         return semFinal;
     }
 
-    public void setSemFinal(String semFinal) {
+    public void setSemFinal(Integer semFinal) {
         this.semFinal = semFinal;
     }
 
@@ -179,5 +180,13 @@ public class FiltrosReporte {
 
     public void setNivelCentral(boolean nivelCentral) {
         this.nivelCentral = nivelCentral;
+    }
+
+    public String getDiagnosticos() {
+        return diagnosticos;
+    }
+
+    public void setDiagnosticos(String diagnosticos) {
+        this.diagnosticos = diagnosticos;
     }
 }

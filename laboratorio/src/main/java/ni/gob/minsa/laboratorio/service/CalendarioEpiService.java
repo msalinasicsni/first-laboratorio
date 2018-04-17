@@ -49,6 +49,15 @@ public class CalendarioEpiService {
         return  aux;
     }
 
+    public List<CalendarioEpi> getCalendarioRangoSemanas(int semI, int semF, int anio){
+        Session session = sessionFactory.getCurrentSession();
+        String query = "from CalendarioEpi as a where a.anio = :anio and a.noSemana between :semI and :semF order by a.noSemana";
+        Query q = session.createQuery(query);
+        q.setParameter("semI", semI);
+        q.setParameter("semF", semF);
+        q.setParameter("anio", anio);
+        return q.list();
+    }
     private Date StringToDate(String strFecha) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.parse(strFecha);

@@ -51,6 +51,8 @@
         <intercept-url pattern="/reports/reportResultDx/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/reportResultDxVig/**" access="ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/downloadExcel/**" access="ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/consolidatedexams/**" access="ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/consolidadoTecnica/**" access="ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/searchMx/*" access="ROLE_RECEPCION" />
         <intercept-url pattern="/administracion/request/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/solicitante/**" access="ROLE_ADMIN,ROLE_RECEPCION" />
@@ -73,6 +75,7 @@
         <intercept-url pattern="/usuarios/**" access="ROLE_ADMIN" />
         <intercept-url pattern="/print/**" access="ROLE_ADMIN,ROLE_RECEPCION,ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/editarMx/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/gestion/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
 
         <!--<intercept-url pattern="/**" access="ROLE_ADMIN,ROLE_USER" />-->
         <!--<intercept-url pattern="/.*" access="ROLE_ADMIN,ROLE_USER" />-->

@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
@@ -37,7 +38,7 @@ public class RecepcionMxService {
     public RecepcionMxService(){}
 
     /**
-     * Agrega una Registro de Recepción de muestra
+     * Agrega una Registro de Recepciï¿½n de muestra
      *
      * @param dto Objeto a agregar
      * @throws Exception
@@ -50,16 +51,16 @@ public class RecepcionMxService {
                 idMaestro = (String)session.save(dto);
             }
             else
-                throw new Exception("Objeto Recepción Muestra es NULL");
+                throw new Exception("Objeto Recepciï¿½n Muestra es NULL");
         }catch (Exception ex){
-            logger.error("Error al agregar recepción de muestra",ex);
+            logger.error("Error al agregar recepciï¿½n de muestra",ex);
             throw ex;
         }
         return idMaestro;
     }
 
     /**
-     * Agrega una Registro de Recepción de muestra en laboratorio
+     * Agrega una Registro de Recepciï¿½n de muestra en laboratorio
      *
      * @param dto Objeto a agregar
      * @throws Exception
@@ -71,15 +72,15 @@ public class RecepcionMxService {
                 session.save(dto);
             }
             else
-                throw new Exception("Objeto Recepción Muestra Lab es NULL");
+                throw new Exception("Objeto Recepciï¿½n Muestra Lab es NULL");
         }catch (Exception ex){
-            logger.error("Error al agregar recepción de muestra Lab",ex);
+            logger.error("Error al agregar recepciï¿½n de muestra Lab",ex);
             throw ex;
         }
     }
 
     /**
-     * Actualiza una Registro de Recepción de muestra
+     * Actualiza una Registro de Recepciï¿½n de muestra
      *
      * @param dto Objeto a actualizar
      * @throws Exception
@@ -91,9 +92,9 @@ public class RecepcionMxService {
                 session.update(dto);
             }
             else
-                throw new Exception("Objeto Recepción Muestra es NULL");
+                throw new Exception("Objeto Recepciï¿½n Muestra es NULL");
         }catch (Exception ex){
-            logger.error("Error al actualizar recepción de muestra",ex);
+            logger.error("Error al actualizar recepciï¿½n de muestra",ex);
             throw ex;
         }
     }
@@ -144,7 +145,7 @@ public class RecepcionMxService {
         //siempre se tomam las muestras que no estan anuladas
         crit.add( Restrictions.and(
                         Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado según filtro
+        );//y las ordenes en estado segï¿½n filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
@@ -206,7 +207,7 @@ public class RecepcionMxService {
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
-        //Se filtra por rango de fecha de recepción
+        //Se filtra por rango de fecha de recepciï¿½n
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add( Restrictions.and(
                             Restrictions.between("recepcion.fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
@@ -313,8 +314,8 @@ public class RecepcionMxService {
 
         }*/
             if(filtro.getCodEstado() != null){
-                if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepción en laboratorio
-                    //Se filtra que el área a la que pertenece la solicitud este asociada al usuario autenticado
+                if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|EPLAB")){ //significa que es recepciï¿½n en laboratorio
+                    //Se filtra que el ï¿½rea a la que pertenece la solicitud este asociada al usuario autenticado
                     Junction conditGroup = Restrictions.disjunction();
 
                     conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
@@ -340,6 +341,14 @@ public class RecepcionMxService {
 
                     crit.add(conditGroup);
                 }
+                //sÃ³lo la Ãºltima recepciÃ³n de cada muestra, cuando es para envio al area que procesa
+                if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|RCP")) {
+                    DetachedCriteria maxDateQuery = DetachedCriteria.forClass(RecepcionMx.class);
+                    maxDateQuery.createAlias("tomaMx", "mx");
+                    maxDateQuery.add(Restrictions.eqProperty("mx.idTomaMx", "tomaMx.idTomaMx"));
+                    maxDateQuery.setProjection(Projections.max("fechaHoraRecepcion"));
+                    crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));
+                }
             }
 
 
@@ -352,7 +361,7 @@ public class RecepcionMxService {
                         .add(Restrictions.and(Restrictions.eq("usuario.username",filtro.getNombreUsuario()))) //usuario
                         .setProjection(Property.forName("labautorizado.codigo"))));
 
-        //sólo la última recepción de cada muestra
+        //sï¿½lo la ï¿½ltima recepciï¿½n de cada muestra
 /*
         DetachedCriteria maxDateQuery = DetachedCriteria.forClass(RecepcionMx.class);
         maxDateQuery.createAlias("tomaMx","mx");
@@ -360,9 +369,9 @@ public class RecepcionMxService {
         maxDateQuery.setProjection(Projections.max("fechaHoraRecepcion"));
         crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));*/
 
-        //filtro sólo control calidad en el laboratio del usuario
+        //filtro sï¿½lo control calidad en el laboratio del usuario
         if (filtro.getControlCalidad()!=null) {
-            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", sólo incluir rutinas
+            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", sï¿½lo incluir rutinas
                 crit.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
                         .createAlias("idTomaMx", "toma")
@@ -393,7 +402,7 @@ public class RecepcionMxService {
                 crit.add(conditGroup);
             }
         }
-        //filtro para sólo solicitudes aprobadas
+        //filtro para sï¿½lo solicitudes aprobadas
         if (filtro.getSolicitudAprobada() != null) {
             Junction conditGroup = Restrictions.disjunction();
             conditGroup.add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
@@ -403,7 +412,7 @@ public class RecepcionMxService {
                     .setProjection(Property.forName("toma.idTomaMx"))))
                     .add(Subqueries.propertyIn("tomaMx.idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                             .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
-                            //.add(Restrictions.eq("controlCalidad",false)) ¿¿¿¿¿¿¿¿¿?????????????
+                            //.add(Restrictions.eq("controlCalidad",false)) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?????????????
                             .createAlias("idTomaMx", "toma")
                             .setProjection(Property.forName("toma.idTomaMx"))));
 
@@ -441,8 +450,21 @@ public class RecepcionMxService {
         return  resultado;
     }
 
+    public Boolean validarMuestraRecepcionadaAreaLab(String idTomaMx, String codigoLab, Integer idArea){
+        RecepcionMxLab resultado = null;
+        String query = "select ar from RecepcionMxLab as a inner join a.recepcionMx as t inner join t.tomaMx mx inner join a.area as ar where mx.idTomaMx = :idTomaMx" +
+                " and t.labRecepcion.codigo = :codigoLab and ar.idArea = :idArea order by a.fechaHoraRecepcion desc";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("idTomaMx", idTomaMx);
+        q.setString("codigoLab", codigoLab);
+        q.setParameter("idArea",idArea);
+        return q.list().size()>0;
+    }
+
+
     /**
-     * Método que genera
+     * Mï¿½todo que genera
      * @param codigoLaboratorio codigo del laboratorio que recepciona la muestra
      * @param intento cantidad numeros a sumar al siguiente codigo a obtener. Intentos por que si falla la llamada, intenta obtener el siguiente mediante llamada recursiva
      * @return String

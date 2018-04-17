@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
+import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
@@ -52,8 +53,8 @@ public class ResultadosController {
     private SeguridadService seguridadService;
 
     @Autowired
-    @Qualifier(value = "usuarioService")
-    private UsuarioService usuarioService;
+    @Qualifier(value = "recepcionMxService")
+    private RecepcionMxService recepcionMxService;
 
     @Autowired
     @Qualifier(value = "catalogosService")
@@ -66,10 +67,6 @@ public class ResultadosController {
     @Autowired
     @Qualifier(value = "tomaMxService")
     private TomaMxService tomaMxService;
-
-    @Autowired
-    @Qualifier(value = "alicuotaService")
-    private AlicuotaService alicuotaService;
 
     @Autowired
     @Qualifier(value = "ordenExamenMxService")
@@ -266,55 +263,62 @@ public class ResultadosController {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         for(OrdenExamen orden : ordenesExamen){
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", orden.getIdOrdenExamen());
             map.put("examen", orden.getCodExamen().getNombre());
             map.put("fechaHoraOrden", DateUtil.DateToString(orden.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
-
+            boolean agregar = false;
             if (orden.getSolicitudDx()!=null) {
-                map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
-                map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoLab());
-                map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
-                map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy")+
-                        (orden.getSolicitudDx().getIdTomaMx().getHoraTomaMx()!=null?" "+orden.getSolicitudDx().getIdTomaMx().getHoraTomaMx():""));
-                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
-                    map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                }
-                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
-                    map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-                }else {
-                    map.put("codUnidadSalud","");
-                }
-                map.put("tipoMuestra", orden.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
-                //Si hay fecha de inicio de sintomas se muestra
-                Date fechaInicioSintomas = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
-                if (fechaInicioSintomas != null)
-                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
-                else
-                    map.put("fechaInicioSintomas", " ");
-                //Si hay persona
-                if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                    /// se obtiene el nombre de la persona asociada a la ficha
-                    String nombreCompleto = "";
-                    nombreCompleto = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                    nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                    map.put("persona", nombreCompleto);
-                } else if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
-                    map.put("persona", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-                }else {
-                    map.put("persona", " ");
-                }
+                if (recepcionMxService.validarMuestraRecepcionadaAreaLab(
+                        orden.getSolicitudDx().getIdTomaMx().getIdTomaMx(),
+                        labUser.getCodigo(),
+                        orden.getCodExamen().getArea().getIdArea())) {
+                    agregar = true;
+                    map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
+                    map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoLab());
+                    map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
+                    map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy") +
+                            (orden.getSolicitudDx().getIdTomaMx().getHoraTomaMx() != null ? " " + orden.getSolicitudDx().getIdTomaMx().getHoraTomaMx() : ""));
+                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                        map.put("codSilais", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                    }
+                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                        map.put("codUnidadSalud", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                    } else {
+                        map.put("codUnidadSalud", "");
+                    }
+                    map.put("tipoMuestra", orden.getSolicitudDx().getIdTomaMx().getCodTipoMx().getNombre());
+                    //Si hay fecha de inicio de sintomas se muestra
+                    Date fechaInicioSintomas = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
+                    if (fechaInicioSintomas != null)
+                        map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                    else
+                        map.put("fechaInicioSintomas", " ");
+                    //Si hay persona
+                    if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                        /// se obtiene el nombre de la persona asociada a la ficha
+                        String nombreCompleto = "";
+                        nombreCompleto = orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                        if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                        if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            nombreCompleto = nombreCompleto + " " + orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                        map.put("persona", nombreCompleto);
+                    } else if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                        map.put("persona", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                    } else {
+                        map.put("persona", " ");
+                    }
 
-                if(!resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen()).isEmpty()){
-                    map.put("resultadoExamen", "Si");
-                }else{
-                    map.put("resultadoExamen", "No");
+                    if (!resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen()).isEmpty()) {
+                        map.put("resultadoExamen", "Si");
+                    } else {
+                        map.put("resultadoExamen", "No");
+                    }
                 }
             }
             else{
@@ -353,8 +357,10 @@ public class ResultadosController {
                     map.put("resultadoExamen", "No");
                 }
             }
-            mapResponse.put(indice, map);
-            indice ++;
+            if (agregar) {
+                mapResponse.put(indice, map);
+                indice++;
+            }
         }
         jsonResponse = new Gson().toJson(mapResponse);
         //escapar caracteres especiales, escape de los caracteres con valor numérico mayor a 127

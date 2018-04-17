@@ -37,7 +37,10 @@ public class FiltroMx {
     Date fechaInicioRechazo;
     Date fechaFinRechazo;
     boolean nivelCentral;
-
+    Date fechaInicioNotificacion;
+    Date fechaFinNotificacion;
+    String tipoNotificacion;
+    Boolean incluirAnuladas = false;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -249,5 +252,37 @@ public class FiltroMx {
 
     public void setNivelCentral(boolean nivelCentral) {
         this.nivelCentral = nivelCentral;
+    }
+
+    public Date getFechaInicioNotificacion() {
+        return fechaInicioNotificacion;
+    }
+
+    public void setFechaInicioNotificacion(Date fechaInicioNotificacion) {
+        this.fechaInicioNotificacion = fechaInicioNotificacion;
+    }
+
+    public Date getFechaFinNotificacion() {
+        return fechaFinNotificacion;
+    }
+
+    public void setFechaFinNotificacion(Date fechaFinNotificacion) {
+        this.fechaFinNotificacion = fechaFinNotificacion;
+    }
+
+    public String getTipoNotificacion() {
+        return tipoNotificacion;
+    }
+
+    public void setTipoNotificacion(String tipoNotificacion) {
+        this.tipoNotificacion = tipoNotificacion;
+    }
+
+    public Boolean getIncluirAnuladas() {
+        return incluirAnuladas;
+    }
+
+    public void setIncluirAnuladas(Boolean incluirAnuladas) {
+        this.incluirAnuladas = incluirAnuladas;
     }
 }
