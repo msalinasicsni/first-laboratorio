@@ -341,6 +341,7 @@ public class TrasladoMxController {
                             //se recupera la solicitud de dx existente para la muestra y el dx seleccionado por el usuario
                             DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, dxTraslado.getIdDiagnostico());
                             if (solicitudDx != null) {
+                                solicitudDx.setLabProcesa(labDestino);
                                 // control de calidad //crear envio y solicitud dx
                                 if (tipoTraslado.equals("cc")) {
                                     DaSolicitudDx solicitudDxCC = new DaSolicitudDx();
@@ -387,8 +388,10 @@ public class TrasladoMxController {
                                         }
                                     }
                                     //si ning�n examen es v�lido para el traslado, no procesar traslado
-                                    if (contExamenesValidos <= 0)
+                                    if (contExamenesValidos <= 0) {
+                                        tomaMxService.updateSolicitudDx(solicitudDx);//actualizar laboratorio que procesa solicitud dx
                                         procesarTraslado = false;
+                                    }
                                 }
                             } else {//si no se encontr� la solicitud, no se permite el traslado
                                 procesarTraslado = false;
