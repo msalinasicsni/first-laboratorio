@@ -255,10 +255,10 @@ public class DaTomaMx implements Serializable, Auditable {
 
     @Override
     public boolean isFieldAuditable(String fieldname) {
-        if (fieldname.matches("estadoMx") || fieldname.matches("anulada") || fieldname.matches("envio") || fieldname.matches("codigoLab"))
+        //if (fieldname.matches("estadoMx") || fieldname.matches("anulada") || fieldname.matches("envio") || fieldname.matches("codigoLab"))
             return true;
-        else
-            return false;
+        //else
+            //return false;
     }
 
     @Override

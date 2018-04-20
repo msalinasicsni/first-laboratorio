@@ -362,7 +362,7 @@ var SendOrdersReceipt = function () {
                 unBlockUI();
             });
             <!-- para buscar código de barra -->
-            var timer;
+            /*var timer;
             var iniciado = false;
             var contador;
             //var codigo;
@@ -377,18 +377,18 @@ var SendOrdersReceipt = function () {
                     getOrders(false);
 
                 }
-            }
+            }*/
 
             $('#txtCodUnicoMx').keypress(function (event) {
-                if (!iniciado) {
+/*                if (!iniciado) {
                     timer = setInterval(tiempo(), 100);
                     iniciado = true;
                 }
                 contador = 0;
-
+*/
                 if (event.keyCode == '13') {
-                    clearInterval(timer);
-                    iniciado = false;
+                    //clearInterval(timer);
+                    //iniciado = false;
                     event.preventDefault();
                     //codigo = $.trim($(this).val());
                     getOrders(false);

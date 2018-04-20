@@ -139,6 +139,17 @@
                     </li>
                 </ul>
             </li>
+            <li class="gestion">
+                <a href="#" title="<spring:message code="menu.management" />"><i class="fa fa-lg fa-fw fa-gear"></i> <span class="menu-item-parent"><spring:message code="menu.management" /></span></a>
+                <ul>
+                    <li class="gestion_sample">
+                        <a href="<spring:url value="/gestion/initsample" htmlEscape="true "/>" title="<spring:message code="menu.management.samples" />"><i class="fa fa-lg fa-fw fa-tint"></i> <spring:message code="menu.management.samples" /></a>
+                    </li>
+                    <li class="gestion_noti">
+                        <a href="<spring:url value="/gestion/initnoti" htmlEscape="true "/>" title="<spring:message code="menu.management.notifications" />"><i class="fa fa-lg fa-fw fa-book"></i> <spring:message code="menu.management.notifications" /></a>
+                    </li>
+                </ul>
+            </li>
             <li class="administracion">
                 <a href="#" title="<spring:message code="menu.administration" />"><i class="fa fa-lg fa-fw fa-cogs"></i> <span class="menu-item-parent"><spring:message code="menu.administration" /></span></a>
                 <ul>
@@ -149,7 +160,7 @@
                                 <a href="<spring:url value="/administracion/laboratorio/list" htmlEscape="true "/>" title="<spring:message code="menu.catalog.lab" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.catalog.lab" /></a>
                             </li>
                             <li class="direccion">
-                                <a href="<spring:url value="/administracion/direccion/list" htmlEscape="true "/>" title="<spring:message code="menu.management" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.management" /></a>
+                                <a href="<spring:url value="/administracion/direccion/list" htmlEscape="true "/>" title="<spring:message code="menu.catalog.management" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.catalog.management" /></a>
                             </li>
                             <li class="departamento">
                                 <a href="<spring:url value="/administracion/departamento/list" htmlEscape="true "/>" title="<spring:message code="menu.department" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.department" /></a>
@@ -227,6 +238,9 @@
                     </li>
                     <li class="resultDxVig">
                         <a href="<spring:url value="/reports/reportResultDxVig/init" htmlEscape="true "/>" title="<spring:message code="menu.report.result.dx.vig" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.report.result.dx.vig" /></a>
+                    </li>
+                    <li class="consolidatedexams">
+                        <a href="<spring:url value="/reports/consolidatedexams/init" htmlEscape="true "/>" title="<spring:message code="menu.report.consol.exams" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.report.consol.exams" /></a>
                     </li>
                 </ul>
             </li>

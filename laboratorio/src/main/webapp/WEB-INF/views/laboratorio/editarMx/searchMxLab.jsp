@@ -93,7 +93,7 @@
                                     <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.confirm.override.all"/>"/>
                                     <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                     <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
-                                    <input id="msg_override_success" type="hidden" value="<spring:message code="msg.tomamx.successfully.cancel"/>"/>
+                                    <input id="msg_override_success" type="hidden" value="<spring:message code="msg.tomamx.successfully.override"/>"/>
                                     <input id="titleCancel" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
                                     <input id="nivelCentral" type="hidden" value="${nivelCentral}"/>
                                     <form id="searchOrders-form" class="smart-form" autocomplete="off">

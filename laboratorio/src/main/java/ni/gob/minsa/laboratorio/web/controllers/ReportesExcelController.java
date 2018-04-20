@@ -1,12 +1,15 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
+import com.google.common.base.Predicate;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.catalogos.AreaRep;
+import ni.gob.minsa.laboratorio.domain.catalogos.Semanas;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
+import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.examen.Departamento;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
@@ -21,10 +24,13 @@ import ni.gob.minsa.laboratorio.utilities.Email.EmailUtil;
 import ni.gob.minsa.laboratorio.utilities.Email.SessionData;
 import ni.gob.minsa.laboratorio.utilities.FiltrosReporte;
 import ni.gob.minsa.laboratorio.utilities.excelUtils.ExcelBuilder;
+import ni.gob.minsa.laboratorio.utilities.reportes.ConsolidadoExamen;
+import ni.gob.minsa.laboratorio.utilities.reportes.FilterLists;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -78,6 +84,9 @@ public class ReportesExcelController {
     @Resource(name = "reportesService")
     private ReportesService reportesService;
 
+    @Resource(name = "reporteConsolExamenService")
+    private ReporteConsolExamenService reporteConsolExamenService;
+
     @Resource(name = "resultadoFinalService")
     private ResultadoFinalService resultadoFinalService;
 
@@ -98,6 +107,10 @@ public class ReportesExcelController {
 
     @Resource(name = "laboratoriosService")
     private LaboratoriosService laboratoriosService;
+
+    @Resource(name = "examenesService")
+    private ExamenesService examenesService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -148,6 +161,19 @@ public class ReportesExcelController {
         }
     }
 
+    /*******************************************************************/
+    /***** REPORTE POSITIVIDAD CONSILIDADO POR TÉCNICA, DX Y SEMANA ****/
+    /*******************************************************************/
+
+    @RequestMapping(value = "consolidatedexams/init", method = RequestMethod.GET)
+    public String initReportConsolidatedByExams(Model model,HttpServletRequest request) throws Exception {
+        logger.debug("Reporte por examenes(técnica)");
+        List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+        List<Semanas> semanas = catalogosService.getSemanas();
+        model.addAttribute("semanas", semanas);
+        model.addAttribute("dxs", catDx);
+        return "reportes/consolidatedByExams";
+    }
     /**
      * Método para obtener data para Reporte por Resultado dx
      * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
@@ -303,7 +329,157 @@ public class ReportesExcelController {
         return sessionData;
     }
 
-    @RequestMapping(value = "/downloadExcel", method = RequestMethod.GET)
+    @RequestMapping(value = "/consolidadoTecnica", method = RequestMethod.GET)
+    public ModelAndView downloadExcelConsolidatedExam(@RequestParam(value = "filtro", required = true) String filtro) throws Exception {
+        ModelAndView excelView = new ModelAndView("excelView");
+        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+        List<Catalogo_Dx> catalogoDxList = tomaMxService.getDxs(filtroRep.getDiagnosticos());
+
+        List<String> semanas = new ArrayList<String>();
+        String anio = DateUtil.DateToString(new Date(), "YYYY");
+        List<String> meses = new ArrayList<String>();
+        List<CalendarioEpi> semanasEpi = calendarioEpiService.getCalendarioRangoSemanas(filtroRep.getSemInicial(), filtroRep.getSemFinal(), 2017); //Integer.valueOf(anio));
+        Integer mesActual = null;
+        Integer semanasMes = 0;
+        int contadorSemana = 1;
+        //se determina la cantidad de semanas de cada mes
+        for (CalendarioEpi semana : semanasEpi) {
+            //primera iteración
+            if (mesActual == null) {
+                mesActual = semana.getNoMes();
+            }
+            //primer semana de siguiente mes
+            if (semana.getNoMes() != mesActual) {
+                //agregar el mes que se ha completado el conteo de semanas
+                meses.add(mesActual.toString() + "," + semanasMes.toString());
+                semanasMes = 1;
+                mesActual = semana.getNoMes();
+            } else {
+                semanasMes++;
+            }
+            //es último registro, agregar el mes correspondiente
+            if (contadorSemana == semanasEpi.size()) {
+                meses.add(mesActual.toString() + "," + semanasMes.toString());
+            }
+            contadorSemana++;
+        }
+        //sacar todas las semanas contenidas dentro del rango indicado por el usuario
+        for (int i = filtroRep.getSemInicial(); i <= filtroRep.getSemFinal(); i++) {
+            semanas.add(String.valueOf(i));
+        }
+        //trae todos los registros que coinciden con el filtro de búsqueda
+        List<ConsolidadoExamen> registros = reporteConsolExamenService.getDataDxResultReport(filtroRep);
+        //por entidades es que se cuentan los datos
+        List<EntidadesAdtvas> entidades = entidadAdmonService.getAllEntidadesAdtvas();
+        //la cantidad de entidades es la que indica cuanto registros debería tener cada tabla
+        int registrosPorTabla = entidades.size();
+        List<List<Object[]>> datos = new ArrayList<List<Object[]>>();
+        List<List<Object[]>> consolidados = new ArrayList<List<Object[]>>();
+        List<String> dxsList = new ArrayList<String>();
+        for (final Catalogo_Dx dx : catalogoDxList) {
+            dxsList.add(dx.getNombre());
+            List<Object[]> consolidadoList = new ArrayList<Object[]>();
+            List<Object[]> datosList = new ArrayList<Object[]>();
+            //sacar todos los examenes(técnica) activos por cada dx
+            List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdDx(dx.getIdDiagnostico());
+            for(final CatalogoExamenes examen : examenesList) {
+                Object[] salto = new Object[1];
+                salto[0] = examen.getNombre();
+                datosList.add(salto);
+                consolidadoList.add(salto);
+                //Patron para filtras registros por dx y examen
+                Predicate<ConsolidadoExamen> byDxAndExam = new Predicate<ConsolidadoExamen>() {
+                    @Override
+                    public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                        return consolidadoExamen.getIdDiagnostico().equals(dx.getIdDiagnostico()) && consolidadoExamen.getIdExamen().equals(examen.getIdExamen());
+                    }
+                };
+                //aplicar filtro por dx y examen
+                Collection<ConsolidadoExamen> registrosdx = FilterLists.filter(registros, byDxAndExam);
+                for (final EntidadesAdtvas SILAIS : entidades) {
+                    //representa una fila para la tabla de datos. El tamaño es: (semanas.size() * 2), porque cada semana de datos lleva total y positivos; y (+ 1), por que se agrega el nombre del SILAIS al inicio
+                    Object[] registro = new Object[(semanas.size() * 2) + 1];
+                    //representa una fila para la tabla de consolidados
+                    Object[] registroMes = new Object[(meses.size() * 2) + 1];
+                    registro[0] = SILAIS.getNombre().replaceAll("SILAIS","").trim();
+                    registroMes[0] = SILAIS.getNombre().replaceAll("SILAIS","").trim();
+                    int indice = 1;
+                    int indiceMes = 1;
+                    //se arma estructura para hoja de datos
+                    for (final String semana : semanas) {
+                        //Del subconjunto por dx y examen, se filtran todos los registros por semana y SILAIS
+                        Predicate<ConsolidadoExamen> totalBySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                            @Override
+                            public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                return consolidadoExamen.getCodigoSilais() == SILAIS.getCodigo() && consolidadoExamen.getNoSemana().equals(Integer.valueOf(semana));
+                            }
+                        };
+                        //aplicar filtro por semana y SILAIS
+                        Collection<ConsolidadoExamen> examenes = FilterLists.filter(registrosdx, totalBySilaisSemana);
+                        //el total es el tamaño del subconjunto resultado del filtro
+                        registro[indice] = examenes.size();
+
+                        //total positivos
+                        //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado positivo
+                        Predicate<ConsolidadoExamen> posBySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                            @Override
+                            public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                return consolidadoExamen.getResultado().equalsIgnoreCase("positivo");
+                            }
+                        };
+                        //se aplica filtro de registros con resultado positivo
+                        Collection<ConsolidadoExamen> positivos = FilterLists.filter(examenes, posBySilaisSemana);
+                        //el total de positivos es el tamaño del subconjunto resultado del filtro
+                        registro[indice + 1] = positivos.size();
+
+                        indice += 2;
+                    }
+
+                    //se arma estructura para hoja de consolidado
+                    for (final String mes : meses) {
+                        //Del subconjunto por dx y examen, se filtran todos los registros por mes y SILAIS
+                        Predicate<ConsolidadoExamen> totalBySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                            @Override
+                            public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                return consolidadoExamen.getCodigoSilais() == SILAIS.getCodigo() && consolidadoExamen.getNoMes().equals(Integer.valueOf(mes.substring(0,mes.indexOf(","))));
+                            }
+                        };
+                        //se aplica filtro por mes y SILAIS
+                        Collection<ConsolidadoExamen> examenes = FilterLists.filter(registrosdx, totalBySilaisSemana);
+                        registroMes[indiceMes] = examenes.size();
+
+                        //total positivos
+                        //Del subconjunto por dx, examen, mes y SILAIS, se filtran todos los registros con resultado positivo
+                        Predicate<ConsolidadoExamen> posBySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                            @Override
+                            public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                return consolidadoExamen.getResultado().equalsIgnoreCase("positivo");
+                            }
+                        };
+                        Collection<ConsolidadoExamen> positivos = FilterLists.filter(examenes, posBySilaisSemana);
+                        registroMes[indiceMes + 1] = positivos.size();
+
+                        indiceMes += 2;
+                    }
+                    datosList.add(registro);
+                    consolidadoList.add(registroMes);
+                }
+            }
+            datos.add(datosList);
+            consolidados.add(consolidadoList);
+        }
+        excelView.addObject("consol",consolidados);
+        excelView.addObject("datos", datos);
+        excelView.addObject("columnas", semanas);
+        excelView.addObject("meses", meses);
+        excelView.addObject("dxs", dxsList);
+        excelView.addObject("anio", Integer.valueOf(anio));
+        excelView.addObject("registrosPorTabla", registrosPorTabla);
+        excelView.addObject("reporte","DXEXAMS");
+        return excelView;
+    }
+
+        @RequestMapping(value = "/downloadExcel", method = RequestMethod.GET)
     public ModelAndView downloadExcel(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
         // create some sample data
         logger.info("Obteniendo los datos para Reporte por Resultado dx vigilancia ");
@@ -361,6 +537,7 @@ public class ReportesExcelController {
 
         excelView.addObject("columnas", columnas);
         excelView.addObject("tipoReporte", tipoReporte);
+            excelView.addObject("reporte", "DXVIG");
 
         excelView.addObject("listaDxPos", registrosPos);
         excelView.addObject("listaDxNeg", registrosNeg);
@@ -1095,6 +1272,9 @@ public class ReportesExcelController {
         Integer idDx = null;
         boolean mxInadecuadas = true;
         String codLabo = null;
+        String diagnosticos = null;
+        Integer semInicial = null;
+        Integer semFinal = null;
 
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsLong();
@@ -1126,6 +1306,12 @@ public class ReportesExcelController {
             mxInadecuadas = jObjectFiltro.get("incluirMxInadecuadas").getAsBoolean();
         if (jObjectFiltro.get("codLabo") != null && !jObjectFiltro.get("codLabo").getAsString().isEmpty())
             codLabo = jObjectFiltro.get("codLabo").getAsString();
+        if (jObjectFiltro.get("diagnosticos") != null && !jObjectFiltro.get("diagnosticos").getAsString().isEmpty())
+            diagnosticos = jObjectFiltro.get("diagnosticos").getAsString();
+        if (jObjectFiltro.get("semInicial") != null && !jObjectFiltro.get("semInicial").getAsString().isEmpty())
+            semInicial = jObjectFiltro.get("semInicial").getAsInt();
+        if (jObjectFiltro.get("semFinal") != null && !jObjectFiltro.get("semFinal").getAsString().isEmpty())
+            semFinal = jObjectFiltro.get("semFinal").getAsInt();
 
         filtroRep.setSubunidades(subunidad);
         filtroRep.setCodSilais(codSilais);
@@ -1143,6 +1329,9 @@ public class ReportesExcelController {
         filtroRep.setIdDx(idDx);
         filtroRep.setIncluirMxInadecuadas(mxInadecuadas);
         filtroRep.setCodLaboratio(codLabo);
+        filtroRep.setDiagnosticos(diagnosticos);
+        filtroRep.setSemInicial(semInicial);
+        filtroRep.setSemFinal(semFinal);
 
         return filtroRep;
     }

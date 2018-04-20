@@ -41,7 +41,7 @@
 			</span>
         <!-- breadcrumb -->
         <ol class="breadcrumb">
-            <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <spring:message code="menu.catalogs" /> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/direccion/list" htmlEscape="true "/>"><spring:message code="menu.management" /></a></li>
+            <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i> <spring:message code="menu.catalogs" /> <i class="fa fa-angle-right"></i> <a href="<spring:url value="/administracion/direccion/list" htmlEscape="true "/>"><spring:message code="menu.catalog.management" /></a></li>
         </ol>
         <!-- end breadcrumb -->
         <jsp:include page="../../fragments/layoutOptions.jsp" />

@@ -97,10 +97,13 @@ public class TomaMxService {
         Criteria crit = session.createCriteria(DaTomaMx.class, "tomaMx");
         crit.createAlias("tomaMx.estadoMx","estado");
         crit.createAlias("tomaMx.idNotificacion", "notifi");
-        //siempre se tomam las muestras que no estan anuladas
-        crit.add( Restrictions.and(
-                        Restrictions.eq("tomaMx.anulada", false))
-        );//y las ordenes en estado según filtro
+        if (!filtro.getIncluirAnuladas()) {
+            //siempre se tomam las muestras que no estan anuladas
+            crit.add(Restrictions.and(
+                            Restrictions.eq("tomaMx.anulada", false))
+            );
+        }
+        //y las ordenes en estado según filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
@@ -170,6 +173,18 @@ public class TomaMxService {
         if (filtro.getFechaInicioTomaMx()!=null && filtro.getFechaFinTomaMx()!=null){
             crit.add( Restrictions.and(
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
+            );
+        }
+        //Se filtra por rango de fecha de notificación
+        if (filtro.getFechaInicioNotificacion()!=null && filtro.getFechaFinNotificacion()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.between("notifi.fechaRegistro", filtro.getFechaInicioNotificacion(),filtro.getFechaFinNotificacion()))
+            );
+        }
+        if (filtro.getTipoNotificacion()!=null){
+            crit.createAlias("notifi.codTipoNotificacion","tipoNoti");
+            crit.add( Restrictions.and(
+                            Restrictions.eq("tipoNoti.codigo", filtro.getTipoNotificacion()))
             );
         }
         // se filtra por tipo de muestra
@@ -1005,4 +1020,39 @@ public class TomaMxService {
         return q.list();
     }
 
+    public List<DaSolicitudDx> getSolicitudesDxByIdNoti(String idNotificacion, String codigoLab, boolean nivelCentral){
+        String query = "select distinct sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
+                "where sdx.anulado = false and mx.idNotificacion.idNotificacion = :idNotificacion ";
+        if (!nivelCentral)
+            query += "and (sdx.labProcesa.codigo = :codigoLab" +
+                    " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
+                    "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) ";
+        query +=  "ORDER BY sdx.fechaHSolicitud ";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idNotificacion", idNotificacion);
+        if (!nivelCentral)
+            q.setParameter("codigoLab",codigoLab);
+        return q.list();
+    }
+
+    public List<DaSolicitudEstudio> getSolicitudesEstudioByIdNoti(String idNotificacion){
+        String query = "select distinct sde from DaSolicitudEstudio sde inner join sde.idTomaMx mx " +
+                "where sde.anulado = false and mx.idNotificacion.idNotificacion = :idNotificacion ORDER BY sde.fechaHSolicitud ";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idNotificacion", idNotificacion);
+        return q.list();
+    }
+
+    /**
+     * Retorna rutina
+     * @param idDiagnosticos
+     */
+    public List<Catalogo_Dx> getDxs(String idDiagnosticos){
+        String query = "from Catalogo_Dx where idDiagnostico in ("+idDiagnosticos+")";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        return q.list();
+    }
 }
