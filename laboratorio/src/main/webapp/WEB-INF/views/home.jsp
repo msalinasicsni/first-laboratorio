@@ -114,19 +114,19 @@
                                     <table id="orders_result" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
                                         <tr>
+                                            <th><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.lab.code.mx"/></th>
+                                            <th><spring:message code="lbl.cc"/></th>
+                                            <th><spring:message code="lbl.transfer.origin.lab"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
-                                            <!--<th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.order.dateTime"/></th>
-                                            --><th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
+                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
-                                            <%--<th data-hide="phone"><spring:message code="lbl.sample.separation"/></th>--%>
-                                            <%--<th data-hide="phone"><spring:message code="lbl.sample.number.tubes"/></th>--%>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
                                             <th data-hide="phone"><i class="fa fa-child fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.pregnant.short"/></th>
                                             <th data-hide="phone"><i class="fa fa-hospital-o fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.hosp"/></th>
                                             <th data-hide="phone"><i class="fa fa-exclamation-triangle fa-fw text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.urgent"/></th>
                                             <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
+
                                             <th></th>
                                         </tr>
                                         </thead>
@@ -305,7 +305,7 @@
                             }
                             var actionUrl = "${sCreateReceiptUrl}"+idLoad;
                             table1.fnAddData(
-                                    [dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, dataToLoad[i].persona, '<a target="_blank" title="Ver" href='+ actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+                                    [dataToLoad[i].codigoUnicoMx,dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].tipoMuestra,dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, dataToLoad[i].persona, '<a target="_blank" title="Ver" href='+ actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
 
                         }
 

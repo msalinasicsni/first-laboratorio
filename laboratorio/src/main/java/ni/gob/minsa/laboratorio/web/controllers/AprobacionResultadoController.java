@@ -647,6 +647,7 @@ public class AprobacionResultadoController {
     String fetchAprovedResultsJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo las solicitudes con resultados aprobados");
         FiltroMx filtroMx= jsonToFiltroDx(filtro);
+        filtroMx.setCodEstado(null);
         List<DaSolicitudDx> solicitudDxList = resultadoFinalService.getDxByFiltro(filtroMx);
         List<DaSolicitudEstudio> solicitudEstudioList = resultadoFinalService.getEstudioByFiltro(filtroMx);
         return solicitudDx_Est_ToJson(solicitudDxList, solicitudEstudioList, true);
@@ -771,6 +772,7 @@ public class AprobacionResultadoController {
     String fetchRejectResultsJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo los solicutdes con resultados rechazados");
         FiltroMx filtroMx= jsonToFiltroDx(filtro);
+        filtroMx.setCodEstado(null);
         List<RechazoResultadoFinalSolicitud> rechazosList = resultadoFinalService.getResultadosRechazadosByFiltro(filtroMx);
         return rechazosToJson(rechazosList);
     }

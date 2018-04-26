@@ -515,8 +515,6 @@
     <script src="${jqueryInputMask}"></script>
     <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
     <script src="${handleInputMask}"></script>
-    <spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
-    <script src="${handleDatePickers}"></script>
     <spring:url value="/resources/scripts/utilidades/unicodeEscaper.js" var="unicodeEsc" />
     <script src="${unicodeEsc}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
@@ -525,7 +523,14 @@
     <c:url var="ordersUrl" value="/recepcionMx/searchOrders"/>
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sAddReceiptUrl" value="/recepcionMx/agregarRecepcion"/>
-    <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
+    <c:choose>
+        <c:when test="${trasladoCC}">
+            <c:url var="sSearchReceiptUrl" value="/recepcionMx/init"/>
+        </c:when>
+        <c:otherwise>
+            <c:url var="sSearchReceiptUrl" value="/recepcionMx/initCC"/>
+        </c:otherwise>
+    </c:choose>
     <spring:url var="sPrintUrl" value="/print/barcode"/>
     <script type="text/javascript">
 		$(document).ready(function() {
@@ -543,10 +548,19 @@
             handleDatePickers("${pageContext.request.locale.language}");
 	    	$("li.recepcion").addClass("open");
             $("li.check-in").addClass("open");
-            $("li.receipt").addClass("active");
-	    	if("top"!=localStorage.getItem("sm-setmenu")){
-	    		$("li.receipt").parents("ul").slideDown(200);
-	    	}
+            if (${trasladoCC}){
+                $("li.receiptCC").addClass("active");
+                if("top"!=localStorage.getItem("sm-setmenu")){
+                    $("li.receiptCC").parents("ul").slideDown(200);
+                }
+            }else
+            {
+                $("li.receipt").addClass("active");
+                if("top"!=localStorage.getItem("sm-setmenu")){
+                    $("li.receipt").parents("ul").slideDown(200);
+                }
+            }
+
             $('#dvCausa').hide();
             $('#horaRec').datetimepicker({
                 format: 'LT'

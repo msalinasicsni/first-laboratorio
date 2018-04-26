@@ -200,7 +200,7 @@ public class TrasladoMxController {
     @RequestMapping(value = "searchMxExt", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody
     String fetchMxExternoJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
-        logger.info("Obteniendo las mxs para cc seg�n filtros en JSON");
+        logger.info("Obteniendo las mxs para traslado externo seg�n filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = trasladosService.getTomaMxCCByFiltro(filtroMx);
         return tomaMxToJson(tomaMxList);
@@ -261,7 +261,7 @@ public class TrasladoMxController {
                 //codLabDestino viene cuando es traslado externo, cuando no viene es porque es control de calidad y por defecto se toma el CNDR
                 labDestino = laboratoriosService.getLaboratorioByCodigo(!codLabDestino.isEmpty()?codLabDestino:"CNDR");
                 if (labDestino==null){
-                    throw new Exception("No se logr� recuperar laboratio destino");
+                    throw new Exception(messageSource.getMessage("msg.transfer.lab.dest",null,null));
                 }
                 labOrigen = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             }
@@ -352,6 +352,26 @@ public class TrasladoMxController {
                                     solicitudDxCC.setUsarioRegistro(usurioRegistro);
                                     solicitudDxCC.setLabProcesa(labDestino);
                                     tomaMxService.addSolicitudDx(solicitudDxCC);
+
+                                    //se mandan a realizar los mismo examenes que el dx original
+                                    DaSolicitudDx solicitudNoCC = tomaMxService.getSolicitudDxByMxDxNoCC(tomaMx.getIdTomaMx(),dxTraslado.getIdDiagnostico());
+                                    List<OrdenExamen> examenesDxNoCC = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudNoCC.getIdSolicitudDx());
+                                    for (OrdenExamen examenDxNoCC : examenesDxNoCC){
+                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                        ordenExamen.setSolicitudDx(solicitudDxCC);
+                                        ordenExamen.setCodExamen(examenDxNoCC.getCodExamen());
+                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                        ordenExamen.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                                        ordenExamen.setLabProcesa(labDestino);
+                                        try {
+                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                            procesarTraslado = true;
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            logger.error("Error al agregar orden de examen", ex);
+                                        }
+                                    }
+
                                 } else {
                                     //externo, validar si el dx tiene el examanen y el ex�men sin resultado
                                     //si ya tiene registrado ex�menes con resultado, no se va a trasladar
@@ -539,9 +559,9 @@ public class TrasladoMxController {
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         if (tipoTraslado.equals("cc")){ //para traslado al CNDR la solicitud tiene que estar aprobada
             filtroMx.setSolicitudAprobada(true);
-        }else if(tipoTraslado.equals("externo")){ //para traslado externo la solicitud no tiene que estar aprobada
+        }/*else if(tipoTraslado.equals("externo")){ //para traslado externo la solicitud puedo estar o no aprobada
             filtroMx.setSolicitudAprobada(false);
-        }
+        }*/
         return filtroMx;
     }
 

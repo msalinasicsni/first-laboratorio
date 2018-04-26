@@ -18,8 +18,9 @@
     <spring:url value="/resources/img/plus.png" var="plus"/>
     <spring:url value="/resources/img/minus.png" var="minus"/>
     <style>
-
-
+        .modal .modal-dialog {
+            width: 60%;
+        }
         td.details-control {
             background: url("${plus}") no-repeat center center;
             cursor: pointer;
@@ -108,6 +109,7 @@
                     <input id="msg_no_results_found" type="hidden"  value="<spring:message code="msg.no.results.found"/>"/>
                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                     <input id="msg_override_success" type="hidden" value="<spring:message code="msg.noti.successfully.override"/>"/>
+                    <input id="msg_update_success" type="hidden" value="<spring:message code="msg.noti.successfully.updated"/>"/>
                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                         <fieldset>
                             <div class="row">
@@ -261,6 +263,7 @@
                             <th data-hide="phone"><spring:message code="lbl.notification.date"/></th>
                             <th data-hide="phone"><spring:message code="lbl.fis.short"/></th>
                             <th style="width: 5%" valign="center"><spring:message code="lbl.request.large"/></th>
+                            <th style="width: 5%" valign="center"><spring:message code="act.redefine"/></th>
                             <th style="width: 5%" valign="center"><spring:message code="lbl.override"/></th>
                         </tr>
                         </thead>
@@ -312,6 +315,111 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
+        <!-- end modal -->
+
+        <!-- end widget -->
+        <div class="modal fade" id="d_redefine"  role="dialog" tabindex="-1" data-aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-info">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title"> <spring:message code="act.redefine" /> <spring:message code="lbl.notification" /> <spring:message code="lbl.patient" /></h4>
+                        <h4 class="modal-title"><label class="text-left txt-color-blue font-md" id="lblPersona"></label></h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="redefine-noti-form" class="smart-form" novalidate="novalidate">
+                            <input type=hidden id="idRedefine"/>
+                            <input type=hidden id="codMunicipioNoti"/>
+                            <input type=hidden id="codUnidadNoti"/>
+                            <div id="cuerpo2">
+                                <div class="row">
+                                    <section class="col col-sm-12 col-md-12 col-lg-12">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.notification.type" /> </label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                            <select id="codTipoNotiRedef" name="codTipoNotiRedef"
+                                                    class="select2">
+                                                <option value=""><spring:message code="lbl.select" />...</option>
+                                                <c:forEach items="${notificaciones}" var="tipoNoti">
+                                                    <c:if test="${tipoNoti.codigo ne 'TPNOTI|PCNT'}">
+                                                        <option value="${tipoNoti.codigo}">${tipoNoti.valor}</option>
+                                                    </c:if>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </section>
+                                    <section class="col col-sm-12 col-md-6 col-lg-6">
+                                        <label  class="text-left txt-color-blue font-md">
+                                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.symptoms.start.date.full" />
+                                        </label>
+                                        <div class="">
+                                            <label class="input">
+                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
+                                                <input name="fechaInicioSintomas" id="fechaInicioSintomas" type='text'
+                                                       class="form-control date-picker" data-date-end-date="+0d"
+                                                       placeholder="<spring:message code="lbl.receipt.symptoms.start.date.full" />"/>
+                                            </label>
+                                        </div>
+                                    </section>
+                                </div>
+                                <!-- START ROW -->
+                                <div class="row">
+                                    <section class="col col-6">
+                                        <label class="text-left txt-color-blue font-md hidden-xs">
+                                            <spring:message code="lbl.silais" />
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                            <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.silais" />" name="codSilaisAtencion" id="codSilaisAtencion" class="select2">
+                                                <option value=""><spring:message code="lbl.select"/> ...</option>
+                                                <c:forEach items="${entidades}" var="entidad">
+                                                            <option value="${entidad.codigo}">${entidad.nombre}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </section>
+                                    <section class="col col-6">
+                                        <label class="text-left txt-color-blue font-md hidden-xs">
+                                            <spring:message code="lbl.muni" />
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                            <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.muni" />" name="codMunicipio" id="codMunicipio" class="select2">
+                                            </select>
+                                        </div>
+                                    </section>
+                                </div>
+                                <div class="row">
+                                    <section class="col col-12">
+                                        <label class="text-left txt-color-blue font-md hidden-xs">
+                                            <spring:message code="lbl.health.unit" />
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"> <i class="fa fa-location-arrow"></i></span>
+                                            <select data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.health.unit" />" name="codUnidadAtencion" id="codUnidadAtencion" class="select2">
+                                            </select>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                            <footer>
+                                <button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code="act.cancel" /></button>
+                                <button type="submit" class="btn btn-info" ><spring:message code="act.ok" /></button>
+                            </footer>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- end modal -->
+
     </article>
     <!-- WIDGET END -->
 </div>
@@ -381,8 +489,11 @@
 <c:set var="blockMess"><spring:message code="blockUI.message"/></c:set>
 <c:url var="ordersUrl" value="/gestion/searchMx"/>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
+<spring:url var="municipiosUrl" value="/api/v1/municipiosbysilais"/>
+<spring:url var="unidadesUrl"   value="/api/v1/unidadesPrimHosp"  />
 <c:url var="notificacionesUrl" value="/gestion/getNotifications"/>
 <c:url var="overrideUrl" value="/gestion/overridenoti"/>
+<c:url var="updateUrl" value="/tomaMx/updatenoti"/>
 <script type="text/javascript">
     $(document).ready(function () {
         pageSetUp();
@@ -390,7 +501,10 @@
             sUnidadesUrl: "${unidadesURL}",
             blockMess: "${blockMess}",
             notificacionesUrl: "${notificacionesUrl}",
-            sOverrideUrl: "${overrideUrl}"
+            sOverrideUrl: "${overrideUrl}",
+            municipiosUrl : "${municipiosUrl}",
+            unidadesUrl : "${unidadesUrl}",
+            updateUrl : "${updateUrl}"
         };
         BuscarNotificacion.init(parametros);
 

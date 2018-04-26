@@ -168,6 +168,7 @@ public class ExamenesSolicitudController {
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("id", dx.getIdExamen_Dx().toString());
                 map.put("nombreExamen", dx.getExamen().getNombre());
+                map.put("porDefecto", String.valueOf(dx.isPorDefecto()));
                 mapResponse.put(indice, map);
                 indice++;
             }
@@ -178,6 +179,7 @@ public class ExamenesSolicitudController {
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("id", estudio.getIdExamen_Estudio().toString());
                 map.put("nombreExamen", estudio.getExamen().getNombre());
+                map.put("porDefecto", String.valueOf(estudio.isPorDefecto()));
                 mapResponse.put(indice, map);
                 indice++;
             }
@@ -207,6 +209,7 @@ public class ExamenesSolicitudController {
         Integer idExamen = 0;
         Integer idSolicitud = 0;
         String pasivo = "";
+        String porDefecto = "";
         String tipo ="";
 
         try {
@@ -235,6 +238,10 @@ public class ExamenesSolicitudController {
                 pasivo = jsonpObject.get("pasivo").getAsString();
             }
 
+            if (jsonpObject.get("porDefecto") != null && !jsonpObject.get("porDefecto").getAsString().isEmpty()) {
+                porDefecto = jsonpObject.get("porDefecto").getAsString();
+            }
+
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
 
@@ -251,6 +258,7 @@ public class ExamenesSolicitudController {
                             exa.setDiagnostico(associationSR.getDx(idSolicitud));
                             exa.setExamen(examenesService.getExamenById(idExamen));
                             exa.setPasivo(false);
+                            exa.setPorDefecto(Boolean.valueOf(porDefecto));
                             testsRequestService.addOrUpdateTest(exa);
                         } else {
                             resultado = messageSource.getMessage("msg.existing.record.error", null, null);
@@ -269,6 +277,7 @@ public class ExamenesSolicitudController {
                             exa.setEstudio(associationSR.getEstudio(idSolicitud));
                             exa.setExamen(examenesService.getExamenById(idExamen));
                             exa.setPasivo(false);
+                            exa.setPorDefecto(Boolean.valueOf(porDefecto));
                             testsRequestService.addOrUpdateTestE(exa);
                         } else {
                             resultado = messageSource.getMessage("msg.existing.record.error", null, null);
@@ -282,13 +291,25 @@ public class ExamenesSolicitudController {
                     if (tipo.equals("Rutina")) {
                         Examen_Dx rec = testsRequestService.getRoutineTestById(idRecord);
                         if (rec != null) {
-                            rec.setPasivo(true);
+                            if (!pasivo.isEmpty()) {
+                                rec.setPasivo(Boolean.valueOf(pasivo));
+                            }
+                            //cuando es por defecto, trae el valor actual, entonces se pone el valor inverso
+                            if (!porDefecto.isEmpty()) {
+                                rec.setPorDefecto(!Boolean.valueOf(porDefecto));
+                            }
                             testsRequestService.addOrUpdateTest(rec);
                         }
                     } else if (tipo.equals("Estudio")) {
                         Examen_Estudio rec1 = testsRequestService.getStudyTestById(idRecord);
                         if (rec1 != null) {
-                            rec1.setPasivo(true);
+                            if (!pasivo.isEmpty()) {
+                                rec1.setPasivo(Boolean.valueOf(pasivo));
+                            }
+                            //cuando es por defecto, trae el valor actual, entonces se pone el valor inverso
+                            if (!porDefecto.isEmpty()) {
+                                rec1.setPorDefecto(!Boolean.valueOf(porDefecto));
+                            }
                             testsRequestService.addOrUpdateTestE(rec1);
                         }
                     }

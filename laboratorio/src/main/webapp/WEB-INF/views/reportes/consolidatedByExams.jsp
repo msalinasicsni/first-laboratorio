@@ -72,7 +72,7 @@
 <!-- row -->
 <div class="row">
 <!-- NEW WIDGET START -->
-<article class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+<article class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
     <!-- Widget ID (each widget will need unique ID)-->
     <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
         <!-- widget options:
@@ -123,7 +123,21 @@
                         <!-- END ROW -->
                         <!-- START ROW -->
                         <div class="row">
-                            <section class="col col-6">
+                            <section class="col col-sm-12 col-md-4 col-lg-4">
+                                <label class="text-left txt-color-blue font-md">
+                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="sp.year" />
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"></span>
+                                    <select name="anio" id="anio" data-placeholder="<spring:message code="act.select" /> <spring:message code="sp.year" />" class="select2">
+                                        <option value=""></option>
+                                        <c:forEach items="${anios}" var="anio">
+                                            <option value="${anio.valor}">${anio.valor}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </section>
+                            <section class="col col-4">
                                 <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="week1" />
                                 </label>
@@ -137,7 +151,7 @@
                                     </select>
                                 </div>
                             </section>
-                            <section class="col col-6">
+                            <section class="col col-4">
                                 <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="week2" />
                                 </label>
@@ -152,6 +166,7 @@
                                 </div>
                             </section>
                         </div>
+
                         <!-- END ROW -->
                         <footer>
                             <a id="exportExcel" class="btn btn-success btn-lg pull-right header-btn" href="#"><i class="fa fa-file-excel-o"></i> <spring:message code="lbl.export.excel" /></a>

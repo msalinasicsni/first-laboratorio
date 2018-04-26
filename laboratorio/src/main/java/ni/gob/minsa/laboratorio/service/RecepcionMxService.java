@@ -340,6 +340,8 @@ public class RecepcionMxService {
                                     .setProjection(Property.forName("toma.idTomaMx"))));
 
                     crit.add(conditGroup);
+                }else if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|RCP")){
+                    crit.add(Restrictions.isNull("calidadMx.codigo"));//si no tiene calidad significa que no ha sido procesada. esto es por los traslados CC
                 }
                 //sólo la última recepción de cada muestra, cuando es para envio al area que procesa
                 if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|RCP")) {
@@ -473,7 +475,8 @@ public class RecepcionMxService {
         String codigoLab=null;
         String anioActual = DateUtil.DateToString(new Date(), "yyyy");
         String query = "select concat(to_char((count(a.idRecepcion)+"+String.valueOf(intento)+")),concat('-',to_char(current_date,'YY'))) " +
-                "from RecepcionMx as a where a.labRecepcion.codigo = :codLab and a.tipoRecepcionMx.codigo = 'TPRECPMX|VRT' and to_char(a.fechaHoraRecepcion,'YYYY') =:anio";
+                "from RecepcionMx as a where a.labRecepcion.codigo = :codLab and a.tipoRecepcionMx.codigo = 'TPRECPMX|VRT' and to_char(a.fechaHoraRecepcion,'YYYY') =:anio "+
+                "and a.tomaMx.codigoLab like '"+codigoLaboratorio+"-%'";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("codLab", codigoLaboratorio);

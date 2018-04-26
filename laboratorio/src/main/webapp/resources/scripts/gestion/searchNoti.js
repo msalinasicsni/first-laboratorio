@@ -28,6 +28,10 @@ var BuscarNotificacion = function () {
                         "defaultContent": ''
                     },
                     {
+                        "className": 'redefine',
+                        "orderable": false
+                    },
+                    {
                         "className": 'override',
                         "orderable": false
                     }
@@ -46,6 +50,9 @@ var BuscarNotificacion = function () {
                 },
 
                 fnDrawCallback: function () {
+                    $('.redefine')
+                        .off("click", redefineHandler)
+                        .on("click", redefineHandler);
                     $('.override')
                         .off("click", overrideHandler)
                         .on("click", overrideHandler);
@@ -62,6 +69,40 @@ var BuscarNotificacion = function () {
 
             function hideModalOverride() {
                 $('#d_confirmacion').modal('hide');
+            }
+
+            function redefineHandler() {
+                $('#idRedefine').val('');
+                $('#codTipoNotiRedef').val('').change();
+                $('#codMunicipioNoti').val('');
+                $('#codUnidadNoti').val('');
+                $('#fechaInicioSintomas').val('').change();
+                $('#codSilaisAtencion').val('').change();
+                $('#codMunicipio').val('').change();
+                $('#codUnidadAtencion').val('').change();
+                var id = $(this.innerHTML).data('id');
+                if (id != null) {
+                    var codigos = id.split(",");
+                    $('#idRedefine').val(codigos[0]);
+                    if (codigos[1]!= 'ND'){
+                        $('#codSilaisAtencion').val(codigos[1]).change();
+                    }
+                    if (codigos[2]!= 'ND'){
+                        $('#codMunicipioNoti').val(codigos[2]);
+                    }
+                    if (codigos[3]!= 'ND'){
+                        $('#codUnidadNoti').val(codigos[3]);
+                    }
+                    if (codigos[4]!= '') {
+                        $('#fechaInicioSintomas').val(codigos[4]).change();
+                    }
+                    $('#lblPersona').text(codigos[5]);
+                    $('#d_redefine').modal('show');
+                }
+            }
+
+            function hideModalRedefine() {
+                $('#d_redefine').modal('hide');
             }
 
             <!-- formulario para anular muestra -->
@@ -100,6 +141,22 @@ var BuscarNotificacion = function () {
                 }
             });
 
+            <!-- formulario para anular muestra -->
+            $('#redefine-noti-form').validate({
+                // Rules for form validation
+                rules: {
+                    codTipoNotiRedef: {required: true},
+                    fechaInicioSintomas: {required: true}
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                   guardarNotificacion();
+                }
+            });
+
             function blockUI() {
                 var loc = window.location;
                 var pathName = loc.pathname.substring(0, loc.pathname.indexOf('/', 1) + 1);
@@ -121,60 +178,6 @@ var BuscarNotificacion = function () {
 
             function unBlockUI() {
                 setTimeout($.unblockUI, 500);
-            }
-
-            function getMxs(showAll) {
-                var filtros = {};
-                if (showAll) {
-                    filtros['nombreApellido'] = '';
-                    filtros['fechaInicioNoti'] = '';
-                    filtros['fechaFinNoti'] = '';
-                    filtros['codSilais'] = '';
-                    filtros['codUnidadSalud'] = '';
-                    filtros['tipoNotificacion'] = '';
-
-                } else {
-                    filtros['nombreApellido'] = $('#txtfiltroNombre').val();
-                    filtros['fechaInicioNoti'] = $('#fechaInicioNoti').val();
-                    filtros['fechaFinNoti'] = $('#fechaFinNoti').val();
-                    filtros['codSilais'] = $('#codSilais option:selected').val();
-                    filtros['codUnidadSalud'] = $('#codUnidadSalud option:selected').val();
-                    filtros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
-                    filtros['tipoNotificacion'] = $('#tiponoti option:selected').val();
-
-                }
-                blockUI();
-                $.getJSON(parametros.sOrdersUrl, {
-                    strFilter: JSON.stringify(filtros),
-                    ajax: 'true'
-                }, function (dataToLoad) {
-                    table1.fnClearTable();
-                    var len = Object.keys(dataToLoad).length;
-                    if (len > 0) {
-                        for (var i = 0; i < len; i++) {
-                            var json = JSON.parse(dataToLoad[i].diagnosticos);
-                            var btnOverride = '<button title="Anular" type="button" class="btn btn-danger btn-xs" data-id="' + dataToLoad[i].idNotificacion + '" > <i class="fa fa-times"></i>';
-
-                            table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + json[1].idSolicitud + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].tipoNoti, dataToLoad[i].fechaNotificacion,
-                                    dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].fechaInicioSintomas, " <input type='hidden' value='" + dataToLoad[i].diagnosticos + "'/>", btnOverride]);
-
-                        }
-                    } else {
-                        $.smallBox({
-                            title: $("#msg_no_results_found").val(),
-                            content: $("#smallBox_content").val(),
-                            color: "#C79121",
-                            iconSmall: "fa fa-warning",
-                            timeout: 4000
-                        });
-                    }
-                    unBlockUI();
-                })
-                    .fail(function (jqXHR) {
-                        setTimeout($.unblockUI, 10);
-                        validateLogin(jqXHR);
-                    });
             }
 
             function getNotifications(showAll) {
@@ -205,9 +208,15 @@ var BuscarNotificacion = function () {
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
+                            var btnRedefine = '<button title="Mover" type="button" class="btn btn-primary btn-xs" disabled> <i class="fa fa-repeat"></i></button>';
+                            if (dataToLoad[i].tipoNoti==='PACIENTE'){
+                                btnRedefine = '<button title="Mover" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion+ "," + dataToLoad[i].codSilais+ "," +
+                                    dataToLoad[i].codMunicipio+ "," + dataToLoad[i].codUnidad+ "," + dataToLoad[i].fechaInicioSintomas+"," + dataToLoad[i].persona+'"> <i class="fa fa-repeat"></i></button>';
+                            }
                             table1.fnAddData(
                                 [dataToLoad[i].persona, dataToLoad[i].edad, dataToLoad[i].sexo,dataToLoad[i].silais, dataToLoad[i].unidad,dataToLoad[i].tipoNoti,
                                     dataToLoad[i].fechaRegistro, dataToLoad[i].fechaInicioSintomas, " <input type='hidden' value='" + dataToLoad[i].solicitudes + "'/>",
+                                    btnRedefine,
                                         '<button title="Anular" type="button" class="btn btn-danger btn-xs" data-id="' + dataToLoad[i].idNotificacion + '"> <i class="fa fa-times fa-fw"></i></button>']);
                         }
                     }else{
@@ -289,7 +298,7 @@ var BuscarNotificacion = function () {
             $('#codSilais').change(function () {
                 blockUI();
                 if ($(this).val().length > 0) {
-                    $.getJSON(parametros.sUnidadesUrl, {
+                    $.getJSON(parametros.sUnidadesSILAISUrl, {
                         codSilais: $(this).val(),
                         ajax: 'true'
                     }, function (data) {
@@ -315,40 +324,62 @@ var BuscarNotificacion = function () {
                 unBlockUI();
             });
 
-            <!-- para buscar código de barra -->
-            var timer;
-            var iniciado = false;
-            var contador;
-            //var codigo;
-            function tiempo() {
-                console.log('tiempo');
-                contador++;
-                if (contador >= 10) {
-                    clearInterval(timer);
-                    iniciado = false;
-                    //codigo = $.trim($('#codigo').val());
-                    console.log('consulta con tiempo');
-                    getNotifications(false);
+            $('#codSilaisAtencion').change(
+                function() {
+                    blockUI();
+                    if ($(this).val().length > 0) {
+                        $.getJSON(parametros.municipiosUrl, {
+                            idSilais : $('#codSilaisAtencion').val(),
+                            ajax : 'true'
+                        }, function(data) {
+                            $("#codMunicipio").select2('data',null);
+                            $("#codUnidadAtencion").select2('data',null);
+                            $("#codMunicipio").empty();
+                            $("#codUnidadAtencion").empty();
+                            var html='<option value="">' + $("#text_opt_select").val() + '...</option>';
+                            var len = data.length;
+                            for ( var i = 0; i < len; i++) {
+                                html += '<option value="' + data[i].codigoNacional + '">'
+                                    + data[i].nombre + '</option>';
+                            }
+                            html += '</option>';
+                            $('#codMunicipio').html(html);
+                            $('#codMunicipio').val($("#codMunicipioNoti").val()).change();
+                        });
+                    } else {
+                        var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        $('#codMunicipio').html(html);
+                    }
+                    unBlockUI();
+                });
 
-                }
-            }
-
-            $('#txtCodUnicoMx').keypress(function (event) {
-                if (!iniciado) {
-                    timer = setInterval(tiempo(), 100);
-                    iniciado = true;
-                }
-                contador = 0;
-
-                if (event.keyCode == '13') {
-                    clearInterval(timer);
-                    iniciado = false;
-                    event.preventDefault();
-                    //codigo = $.trim($(this).val());
-                    getNotifications(false);
-                    $('#txtCodUnicoMx').val('');
-                }
-            });
+            $('#codMunicipio').change(
+                function() {
+                    blockUI();
+                    if ($(this).val().length > 0) {
+                        $.getJSON(parametros.unidadesUrl, {
+                            codMunicipio : $('#codMunicipio').val(),
+                            codSilais: $('#codSilaisAtencion').val(),
+                            ajax : 'true'
+                        }, function(data) {
+                            $("#codUnidadAtencion").select2('data',null);
+                            $("#codUnidadAtencion").empty();
+                            var html='<option value="">' + $("#text_opt_select").val() + '...</option>';
+                            var len = data.length;
+                            for ( var i = 0; i < len; i++) {
+                                html += '<option value="' + data[i].codigo + '">'
+                                    + data[i].nombre + '</option>';
+                            }
+                            html += '</option>';
+                            $('#codUnidadAtencion').html(html);
+                            $("#codUnidadAtencion").val($("#codUnidadNoti").val()).change();
+                        });
+                    } else {
+                        var html = '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        $('#codUnidadAtencion').html(html);
+                    }
+                    unBlockUI();
+                });
 
             function anularNotificacion(idNotificacion) {
                 var anulacionObj = {};
@@ -394,7 +425,53 @@ var BuscarNotificacion = function () {
                     });
             }
 
+            function guardarNotificacion() {
+                blockUI();
+                var objetoNoti = {};
+                objetoNoti['mensaje'] = '';
+                objetoNoti['idNotificacion'] = $("#idRedefine").val();
+                objetoNoti['codSilais'] = $('#codSilaisAtencion').find('option:selected').val();
+                objetoNoti['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
+                objetoNoti['codTipoNoti'] = $('#codTipoNotiRedef').find('option:selected').val();
+                objetoNoti['fechaInicioSintomas'] = $("#fechaInicioSintomas").val();
+                $.ajax({
+                    url: parametros.updateUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: JSON.stringify(objetoNoti),
+                    contentType: 'application/json',
+                    mimeType: 'application/json',
+                    success: function (data) {
+                        unBlockUI();
+                        if (data.mensaje.length > 0) {
+                            $.smallBox({
+                                title: data.mensaje,
+                                content: $("#smallBox_content").val(),
+                                color: "#C46A69",
+                                iconSmall: "fa fa-warning",
+                                timeout: 4000
+                            });
+                        } else {
+                            hideModalRedefine();
+                            var msg = $("#msg_update_success").val();
+                            $.smallBox({
+                                title: msg,
+                                content: $("#smallBox_content").val(),
+                                color: "#739E73",
+                                iconSmall: "fa fa-success",
+                                timeout: 4000
+                            });
+                            getNotifications(false);
+                        }
 
+                    },
+                    error: function (jqXHR) {
+                        unBlockUI();
+                        validateLogin(jqXHR);
+                    }
+
+                });
+            }
         }
     };
 

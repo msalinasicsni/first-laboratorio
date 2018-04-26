@@ -151,7 +151,7 @@ public class ResultadoFinalService {
             if (filtro.getFechaInicioProcesamiento()!=null && filtro.getFechaFinProcesamiento()!=null){
                 crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
                         .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado", false)).add(Restrictions.eq("pasivo", false))
-                        .add(Restrictions.between("fechahRegistro",filtro.getFechaInicioProcesamiento(), filtro.getFechaFinProcesamiento()))
+                        .add(Restrictions.between("fechahProcesa",filtro.getFechaInicioProcesamiento(), filtro.getFechaFinProcesamiento()))
                         .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
             }else {
                 crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultado.class)
@@ -623,7 +623,7 @@ public class ResultadoFinalService {
     }
 
     public List<DetalleResultado> getResultDetailExaByIdOrden(String idOrdenExa){
-        String query = "from DetalleResultado where examen.idOrdenExamen = :idOrdenExa and pasivo=false ORDER BY fechahRegistro ";
+        String query = "from DetalleResultado where examen.idOrdenExamen = :idOrdenExa and pasivo=false ORDER BY fechahProcesa ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idOrdenExa",idOrdenExa);
         return q.list();

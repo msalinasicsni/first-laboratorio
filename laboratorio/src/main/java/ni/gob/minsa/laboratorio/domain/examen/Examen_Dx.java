@@ -22,6 +22,7 @@ public class Examen_Dx implements Auditable {
     private boolean pasivo;
     Date fechaRegistro;
     User usuarioRegistro;
+    private boolean porDefecto;
 
     @Id
     @GeneratedValue(strategy= GenerationType.TABLE)
@@ -85,6 +86,16 @@ public class Examen_Dx implements Auditable {
 
     public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
+    }
+
+    @Basic
+    @Column(name = "PORDEFECTO", nullable = false, insertable = true, updatable = true)
+    public boolean isPorDefecto() {
+        return porDefecto;
+    }
+
+    public void setPorDefecto(boolean porDefecto) {
+        this.porDefecto = porDefecto;
     }
 
     @Override

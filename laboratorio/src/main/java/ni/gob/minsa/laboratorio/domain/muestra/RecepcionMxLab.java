@@ -24,6 +24,7 @@ public class RecepcionMxLab {
     Timestamp fechaHoraRecepcion;
     User usuarioRecepcion;
     Area area;
+    Timestamp fechaHoraRegistro;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -78,6 +79,16 @@ public class RecepcionMxLab {
 
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    @Basic
+    @Column(name = "FECHAHORA_REGISTRO", nullable = true, insertable = true, updatable = false)
+    public Timestamp getFechaHoraRegistro() {
+        return fechaHoraRegistro;
+    }
+
+    public void setFechaHoraRegistro(Timestamp fechaHoraRegistro) {
+        this.fechaHoraRegistro = fechaHoraRegistro;
     }
 
     @Override

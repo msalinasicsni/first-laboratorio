@@ -416,6 +416,11 @@ public class ResultadosController {
         Integer cantRespuestas=0;
         boolean examenAgregado= false;
         String esResFinal="";
+        String fechaProc ="";
+        String horaProc = "";
+        Date fechaRegistro = new Date();
+        Date fechaHoraPrc = fechaRegistro;
+
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -425,6 +430,17 @@ public class ResultadosController {
             idOrdenExamen = jsonpObject.get("idOrdenExamen").getAsString();
             cantRespuestas = jsonpObject.get("cantRespuestas").getAsInt();
             esResFinal = jsonpObject.get("esResFinal").getAsString();
+            if (jsonpObject.get("fechaProc") != null && !jsonpObject.get("fechaProc").getAsString().isEmpty())
+                fechaProc = jsonpObject.get("fechaProc").getAsString();
+            if (jsonpObject.get("horaProc") != null && !jsonpObject.get("horaProc").getAsString().isEmpty())
+                horaProc = jsonpObject.get("horaProc").getAsString();
+
+            if (!fechaProc.isEmpty()){
+                if (horaProc.isEmpty())
+                    fechaHoraPrc = DateUtil.StringToDate(fechaProc, "dd/MM/yyyy");
+                else
+                    fechaHoraPrc = DateUtil.StringToDate(fechaProc+ " "+horaProc, "dd/MM/yyyy hh:mm a");
+            }
 
             OrdenExamen ordenExamen = ordenExamenMxService.getOrdenExamenById(idOrdenExamen);
             long idUsuario = seguridadService.obtenerIdUsuario(request);
@@ -440,7 +456,8 @@ public class ResultadosController {
                 RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaById(idRespuesta);
                 String valor = jsRespuestaObject.get("valor").getAsString();
                 DetalleResultado detalleResultado = new DetalleResultado();
-                detalleResultado.setFechahRegistro(new Timestamp(new Date().getTime()));
+                detalleResultado.setFechahProcesa(new Timestamp(fechaHoraPrc.getTime()));
+                detalleResultado.setFechahoraRegistro(new Timestamp(fechaRegistro.getTime()));
                 detalleResultado.setValor(valor);
                 detalleResultado.setRespuesta(conceptoTmp);
                 detalleResultado.setExamen(ordenExamen);

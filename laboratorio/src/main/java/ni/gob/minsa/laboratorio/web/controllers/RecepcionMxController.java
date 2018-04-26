@@ -12,7 +12,6 @@ import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
-import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
@@ -190,7 +189,7 @@ public class RecepcionMxController {
     }
 
     /***
-     * Método que se llama para crear una Recepción Mx Vigilancia. Setea los datos de la Muestra e inicializa listas y demas controles
+     * Método que se llama para crear una Recepción Mx Vigilancia. Setea los datos de la Muestra e inicializa listas y resto de controles
      * @param request para obtener información de la petición del cliente
      * @param strIdOrden Id de la toma de Muestra a recepcionar
      * @return ModelAndView
@@ -211,6 +210,7 @@ public class RecepcionMxController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
+            boolean trasladoCC = false;
             DaTomaMx tomaMx = tomaMxService.getTomaMxById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
@@ -223,6 +223,7 @@ public class RecepcionMxController {
                 if (trasladoMxActivo.isTrasladoExterno()){
                     solicitudDxList = tomaMxService.getSolicitudesDxTrasladoExtByIdToma(tomaMx.getIdTomaMx(),labUser.getCodigo());
                 }
+                trasladoCC = trasladoMxActivo.isControlCalidad();
             }
             List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx());
             Date fechaInicioSintomas = null;
@@ -255,6 +256,7 @@ public class RecepcionMxController {
             mav.addObject("estudiosList",solicitudEstudioList);
             mav.addObject("causasRechazo",causaRechazoMxList);
             mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
+            mav.addObject("trasladoCC",trasladoCC);
             mav.setViewName("recepcionMx/recepcionarOrders");
         }else
             mav.setViewName(urlValidacion);
@@ -348,13 +350,9 @@ public class RecepcionMxController {
                                 //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
                                 Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
                                 if (pTipoNoti != null) {
-                                    //se obtienen los id de los examenes por defecto
-                                    Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
                                     for(DaSolicitudDx solicitudDx : solicitudDxList) {
-                                        if (pExamenesDefecto != null) {
-                                            //se recuperan los examenes por defecto que puede agregar el usuario (autoridad examen)
-                                            examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor(), usuario.getUsername());
-                                        }
+                                        //se obtienen los id de los examenes por defecto
+                                        examenesList = examenesService.getExamenesDefectoByIdDx(solicitudDx.getCodDx().getIdDiagnostico(),usuario.getUsername());
                                         if (examenesList != null) {
                                             //se registran los examenes por defecto
                                             for (Examen_Dx examenTmp : examenesList) {
@@ -426,7 +424,7 @@ public class RecepcionMxController {
                     //List<OrdenExamen> ordenExamenListNew = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
                     //mav.addObject("examenesList",ordenExamenListNew);
                 }//else{
-                //mav.addObject("examenesList",ordenExamenList);
+                    //mav.addObject("examenesList",ordenExamenList);
                 //}
                 mav.addObject("esEstudio",esEstudio);
                 TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(recepcionMx.getTomaMx().getIdTomaMx());
@@ -486,7 +484,7 @@ public class RecepcionMxController {
         logger.info("Obteniendo las ordenes de examen pendientes según filtros en JSON");
         FiltroMx filtroMx = jsonToFiltroMx(filtro);
         List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
-        return tomaMxToJson(tomaMxList);
+        return tomaMxToJson(tomaMxList, (filtroMx.getControlCalidad()!=null && filtroMx.getControlCalidad()));
     }
 
     /**
@@ -524,6 +522,7 @@ public class RecepcionMxController {
         String horaRecibido = "";
         String fechaRecibido ="";
         boolean mxInadecuada = false;
+        boolean esControlCalidad = false;
         String areaEntrega = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -576,12 +575,15 @@ public class RecepcionMxController {
             recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
             recepcionMx.setTomaMx(tomaMx);
             try {
-                //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas, que no vengan por traslado externo
-                if (!esEstudio && tomaMx.getCodigoLab()==null)
-                    tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(),1));
-                idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
                 //si tiene traslado activo marcarlo como recepcionado
                 TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
+                if (trasladoActivo!=null) esControlCalidad = trasladoActivo.isControlCalidad();
+                //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas, que no vengan por traslado externo o control de calidad
+                if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
+                    tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
+                }
+                idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+
                 if (trasladoActivo!=null) {
                     if (trasladoActivo.isTrasladoExterno() || trasladoActivo.isControlCalidad()){ //control de calidad, por tanto llega a recepción general
                         if (trasladoActivo.getLaboratorioDestino().getCodigo().equals(recepcionMx.getLabRecepcion().getCodigo())){
@@ -599,7 +601,7 @@ public class RecepcionMxController {
                     areaEntrega = solicitudDxList.get(0).getCodDx().getArea().getNombre();
                 else {
                     if (esEstudio) {
-                        areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
+                            areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                     }
                 }
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
@@ -647,7 +649,7 @@ public class RecepcionMxController {
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
-                //se tiene que actualizar la tomaMx
+               //se tiene que actualizar la tomaMx
                 tomaMx.setEstadoMx(estadoMx);
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
@@ -696,6 +698,8 @@ public class RecepcionMxController {
         String codCalidadMx = "";
         String codCondicionMx = "";
         boolean mxInadecuada = false;
+        String horaRecibido = "";
+        String fechaRecibido ="";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -707,6 +711,12 @@ public class RecepcionMxController {
 
             if (jsonpObject.get("causaRechazo")!=null && !jsonpObject.get("causaRechazo").getAsString().isEmpty())
                 causaRechazo = jsonpObject.get("causaRechazo").getAsString();
+
+            if (jsonpObject.get("horaRecibido") != null && !jsonpObject.get("horaRecibido").getAsString().isEmpty())
+                horaRecibido = jsonpObject.get("horaRecibido").getAsString();
+
+            if (jsonpObject.get("fechaRecibido") != null && !jsonpObject.get("fechaRecibido").getAsString().isEmpty())
+                fechaRecibido = jsonpObject.get("fechaRecibido").getAsString();
 
             User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
             Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -734,7 +744,16 @@ public class RecepcionMxController {
             RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
             recepcionMxLab.setRecepcionMx(recepcionMx);
             recepcionMxLab.setUsuarioRecepcion(usuario);
-            recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+            if(fechaRecibido != null && !fechaRecibido.isEmpty()){
+                if (horaRecibido !=null && !horaRecibido.isEmpty()){
+                    recepcionMxLab.setFechaHoraRecepcion(new Timestamp(DateUtil.StringToDate(fechaRecibido +" "+ horaRecibido, "dd/MM/yyyy HH:mm").getTime()));
+                }else {
+                    recepcionMxLab.setFechaHoraRecepcion(new Timestamp(DateUtil.StringToDate(fechaRecibido, "dd/MM/yyyy").getTime()));
+                }
+            }else {
+                recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+            }
+            recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
             boolean actualizarTraslado = false;
             if (trasladoMxActivo!=null) {
@@ -1113,6 +1132,7 @@ public class RecepcionMxController {
         String fechasNacimiento="";
         Integer cantMuestras = 0;
         Integer cantMxProc = 0;
+        boolean esControlCalidad = false;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -1148,13 +1168,15 @@ public class RecepcionMxController {
                 recepcionMx.setTipoRecepcionMx(tipoRecepcionMx);
                 recepcionMx.setTomaMx(tomaMx);
                 try {
-                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas, que no vengan por traslado externo
-                    if (!esEstudio && tomaMx.getCodigoLab()==null)
-                        tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(),1));
-                    idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
-
                     //si tiene traslado activo marcarlo como recepcionado
                     TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
+                    if (trasladoActivo!=null) esControlCalidad = trasladoActivo.isControlCalidad();
+                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. Sólo para rutinas, que no vengan por traslado externo o control de calidad
+                    if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
+                        tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
+                    }
+                    idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+                    //si tiene traslado activo marcarlo como recepcionado
                     if (trasladoActivo!=null) {
                         if (trasladoActivo.isTrasladoExterno()){ //control de calidad, por tanto llega a recepción general
                             if (trasladoActivo.getLaboratorioDestino().getCodigo().equals(recepcionMx.getLabRecepcion().getCodigo())){
@@ -1273,6 +1295,7 @@ public class RecepcionMxController {
                 recepcionMxLab.setRecepcionMx(recepcionMx);
                 recepcionMxLab.setUsuarioRecepcion(user);
                 recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
                 TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
                 boolean actualizarTraslado = false;
                 if (trasladoMxActivo!=null) {
@@ -1321,8 +1344,8 @@ public class RecepcionMxController {
                     //boolean tieneOrdenesAnuladas = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
                     //Se valida en cada área que tenga asociada el usuario si se puede agregar el examen por defecto configurado
                     for(AutoridadArea area : areasAutorizadas) {
-                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), recepcionMxLab.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
-                        //List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), area.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                        //List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), recepcionMxLab.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), area.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
                         if (solicitudDxList != null && solicitudDxList.size() > 0) {
                             //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
                             Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
@@ -1330,10 +1353,7 @@ public class RecepcionMxController {
                                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                                     List<Examen_Dx> examenesList = null;
                                     //se obtienen los id de los examenes por defecto
-                                    Parametro pExamenesDefecto = parametrosService.getParametroByName(pTipoNoti.getValor());
-                                    if (pExamenesDefecto != null)
-                                        //se recuperan los examenes por defecto que puede agregar el usuario (autoridad examen)
-                                        examenesList = examenesService.getExamenesByIdDxAndIdsEx(solicitudDx.getCodDx().getIdDiagnostico(), pExamenesDefecto.getValor(), user.getUsername());
+                                    examenesList = examenesService.getExamenesDefectoByIdDx(solicitudDx.getCodDx().getIdDiagnostico(),user.getUsername());
                                     if (examenesList != null) {
                                         //se registran los examenes por defecto
                                         for (Examen_Dx examenTmp : examenesList) {
@@ -1643,7 +1663,7 @@ public class RecepcionMxController {
      * @param tomaMxList lista con las tomaMx a convertir
      * @return String
      */
-    private String tomaMxToJson(List<DaTomaMx> tomaMxList){
+    private String tomaMxToJson(List<DaTomaMx> tomaMxList, boolean incluirSolic){
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -1663,7 +1683,7 @@ public class RecepcionMxController {
                 Map<String, String> map = new HashMap<String, String>();
                 //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
                 map.put("idTomaMx", tomaMx.getIdTomaMx());
-                map.put("codigoUnicoMx", esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab());
+                map.put("codigoUnicoMx", esEstudio ? tomaMx.getCodigoUnicoMx() : (tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():""));
                 //map.put("fechaHoraOrden",DateUtil.DateToString(tomaMx.getFechaHOrden(), "dd/MM/yyyy hh:mm:ss a"));
                 map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy") +
                         (tomaMx.getHoraTomaMx() != null ? " " + tomaMx.getHoraTomaMx() : ""));
@@ -1760,6 +1780,34 @@ public class RecepcionMxController {
                 if (labOrigen == null || (!labOrigen.getCodigo().equals(labUser.getCodigo()))) {
                     mapResponse.put(indice, map);
                     indice++;
+                }
+                if (incluirSolic){
+                    //se arma estructura de diagnósticos o estudios
+                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
+                    if (!solicitudDxList.isEmpty()) {
+                        int cont = 0;
+                        String dxs = "";
+                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                            if (solicitudDx.getControlCalidad()) {
+                                cont++;
+                                if (cont == solicitudDxList.size()) {
+                                    dxs += solicitudDx.getCodDx().getNombre();
+                                } else {
+                                    dxs += solicitudDx.getCodDx().getNombre() + ", ";
+                                }
+                            }
+
+                        }
+                        map.put("solicitudes", dxs);
+                    } else {
+                        DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
+                        if(solicitudE != null && solicitudE.getAprobada()){
+                            map.put("solicitudes", solicitudE.getTipoEstudio().getNombre());
+                        }else{
+                            map.put("solicitudes", "");
+                        }
+
+                    }
                 }
             }
         }
@@ -2415,7 +2463,7 @@ public class RecepcionMxController {
                                             } else {
                                                 detalleResultado = resultado.getValor();
                                             }
-                                            fechaProcesamiento = DateUtil.DateToString(resultado.getFechahRegistro(), "dd/MM/yyyy");
+                                            fechaProcesamiento = DateUtil.DateToString(resultado.getFechahProcesa(), "dd/MM/yyyy");
                                             GeneralUtils.drawTEXT(resultado.getRespuesta().getNombre() + ": " + detalleResultado, y, 150, stream, 12, PDType1Font.HELVETICA_BOLD);
                                             y = y - 15;
                                         }
@@ -2489,5 +2537,26 @@ public class RecepcionMxController {
         }
     }
 
+    /**
+     * Método que se llama al entrar a la opción de menu "Recepción Mx CC". Se encarga de inicializar las listas para realizar la búsqueda de muestras para CC
+     * @return ModelAndView
+     * @throws Exception
+     */
+    @RequestMapping(value = "initCC", method = RequestMethod.GET)
+    public ModelAndView initSearchFormCC() throws Exception {
+        logger.debug("buscar ordenes para ordenExamen");
 
+        ModelAndView mav = new ModelAndView();
+        List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
+        List<Laboratorio> laboratorioList = laboratoriosService.getAllLaboratories();
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        String nose = recepcionMxService.obtenerCodigoLab(labUser.getCodigo(),1);
+        mav.addObject("entidades",entidadesAdtvases);
+        mav.addObject("laboratorios", laboratorioList);
+        nose = "nose";
+        mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
+        mav.setViewName("recepcionMx/searchOrdersCC");
+
+        return mav;
+    }
 }

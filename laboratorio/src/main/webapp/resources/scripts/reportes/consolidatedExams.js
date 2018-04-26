@@ -42,6 +42,9 @@ var consolidatedExams = function () {
                     },
                     semF:{
                         required:true
+                    },
+                    anio:{
+                        required:true
                     }
                 },
                 // Do not change code below
@@ -71,6 +74,7 @@ var consolidatedExams = function () {
                 } else {
                     bloquearUI('');
                     var filtro = {};
+                    filtro['anio'] = $('#anio').find('option:selected').val();
                     filtro['semFinal'] = $('#semF').find('option:selected').val();
                     filtro['semInicial'] = $('#semI').find('option:selected').val();
                     var valores = $('#idDx').val();

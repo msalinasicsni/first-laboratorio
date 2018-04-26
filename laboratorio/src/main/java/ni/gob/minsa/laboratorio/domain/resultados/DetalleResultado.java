@@ -1,7 +1,7 @@
 package ni.gob.minsa.laboratorio.domain.resultados;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
@@ -17,18 +17,19 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "detalle_resultado", schema = "laboratorio")
-public class DetalleResultado implements Serializable {
+public class DetalleResultado implements Serializable, Auditable {
 
     String idDetalle;
     String valor;
     OrdenExamen examen;
     RespuestaExamen respuesta;
     User usuarioRegistro;
-    Timestamp fechahRegistro;
+    Timestamp fechahProcesa;
     boolean pasivo;
     String razonAnulacion;
     User usuarioAnulacion;
     Timestamp fechahAnulacion;
+    Timestamp fechahoraRegistro;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -63,13 +64,13 @@ public class DetalleResultado implements Serializable {
     }
 
     @Basic
-    @Column(name = "FECHAH_REGISTRO", nullable = false, insertable = true, updatable = false)
-    public Timestamp getFechahRegistro() {
-        return fechahRegistro;
+    @Column(name = "FECHAH_REGISTRO", nullable = false, insertable = true, updatable = true)
+    public Timestamp getFechahProcesa() {
+        return fechahProcesa;
     }
 
-    public void setFechahRegistro(Timestamp fechahRegistro) {
-        this.fechahRegistro = fechahRegistro;
+    public void setFechahProcesa(Timestamp fechahRegistro) {
+        this.fechahProcesa = fechahRegistro;
     }
 
     @Basic
@@ -136,5 +137,42 @@ public class DetalleResultado implements Serializable {
 
     public void setUsuarioAnulacion(User usuarioAnulacion) {
         this.usuarioAnulacion = usuarioAnulacion;
+    }
+
+    @Basic
+    @Column(name = "FECHA_REG_SISTEMA", nullable = true, insertable = true, updatable = false)
+    public Timestamp getFechahoraRegistro() {
+        return fechahoraRegistro;
+    }
+
+    public void setFechahoraRegistro(Timestamp fechahoraRegistro) {
+        this.fechahoraRegistro = fechahoraRegistro;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "DetalleResultado{" + idDetalle + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DetalleResultado)) return false;
+
+        DetalleResultado that = (DetalleResultado) o;
+
+        if (!idDetalle.equals(that.idDetalle)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idDetalle.hashCode();
     }
 }

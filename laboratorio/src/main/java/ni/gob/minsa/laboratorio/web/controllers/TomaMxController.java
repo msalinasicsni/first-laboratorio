@@ -655,7 +655,7 @@ public class TomaMxController {
                 DaSindFebril sindFebril = sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion());
                 if (sindFebril==null) {
                     sindFebril = new DaSindFebril();
-                    sindFebril.setFechaFicha(new Date());
+                    sindFebril.setFechaFicha(notificacion.getFechaRegistro());
                 }
                 sindFebril.setIdNotificacion(notificacion);
                 if (notificacion.getSemanasEmbarazo()!=null) {
@@ -673,7 +673,7 @@ public class TomaMxController {
                 DaIrag irag = daIragService.getFormById(notificacion.getIdNotificacion());
                 if (irag==null) {
                     irag = new DaIrag();
-                    irag.setFechaRegistro(new Timestamp(new Date().getTime()));
+                    irag.setFechaRegistro(notificacion.getFechaRegistro());
                     irag.setUsuario(notificacion.getUsuarioRegistro());
                 }
                 irag.setIdNotificacion(notificacion);
@@ -781,6 +781,73 @@ public class TomaMxController {
 
         return tomaMxService.getTipoMxByTipoNoti(codigo);
 
+    }
+
+    @RequestMapping(value = "updatenoti", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
+    protected void modificarNotificacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json = "";
+        String resultado = "";
+        String idNotificacion = "";
+        Integer codSilais=null;
+        Integer codUnidadSalud=null;
+        String codTipoNoti="";
+        String fechaInicioSintomas="";
+        try {
+            logger.debug("actualizando datos de la notificacion");
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idNotificacion = jsonpObject.get("idNotificacion").getAsString();
+            DaNotificacion notificacion = daNotificacionService.getNotifById(idNotificacion);
+            if (notificacion!=null) {
+                if (jsonpObject.get("codSilais") != null && !jsonpObject.get("codSilais").getAsString().isEmpty())
+                    codSilais = jsonpObject.get("codSilais").getAsInt();
+
+                if (jsonpObject.get("codUnidadSalud") != null && !jsonpObject.get("codUnidadSalud").getAsString().isEmpty())
+                    codUnidadSalud = jsonpObject.get("codUnidadSalud").getAsInt();
+
+                if (jsonpObject.get("codTipoNoti") != null && !jsonpObject.get("codTipoNoti").getAsString().isEmpty())
+                    codTipoNoti = jsonpObject.get("codTipoNoti").getAsString();
+
+                if (jsonpObject.get("fechaInicioSintomas") != null && !jsonpObject.get("fechaInicioSintomas").getAsString().isEmpty())
+                    fechaInicioSintomas = jsonpObject.get("fechaInicioSintomas").getAsString();
+
+                if (codSilais != null) {
+                    notificacion.setCodSilaisAtencion(entidadAdmonService.getSilaisByCodigo(codSilais));
+                }
+                if (codUnidadSalud != null) {
+                    notificacion.setCodUnidadAtencion(unidadesService.getUnidadByCodigo(codUnidadSalud));
+                }
+                if (!codTipoNoti.isEmpty()) {
+                    notificacion.setCodTipoNotificacion(catalogoService.getTipoNotificacion(codTipoNoti));
+                }
+                if (!fechaInicioSintomas.isEmpty()) {
+                    notificacion.setFechaInicioSintomas(DateUtil.StringToDate(fechaInicioSintomas, "dd/MM/yyyy"));
+                }
+                //en este caso sólo sería actualizar
+                crearFicha(notificacion);
+            }else{
+                resultado =  messageSource.getMessage("msg.notification.notfound",null,null);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.update.notification.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idNotificacion",idNotificacion);
+            map.put("mensaje",resultado);
+            map.put("codSilais",String.valueOf(codSilais));
+            map.put("codUnidadSalud",String.valueOf(codUnidadSalud));
+            map.put("codTipoNoti", codTipoNoti);
+            map.put("fechaInicioSintomas",fechaInicioSintomas);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
     }
     /*******************************************************************************/
     /***************************** OTRAS MUESTRAS **********************************/

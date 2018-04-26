@@ -325,15 +325,22 @@ var ReceiptOrders = function () {
                     mxFiltros['esLab'] = $('#txtEsLaboratorio').val();
                     mxFiltros['codTipoSolicitud'] = '';
                     mxFiltros['nombreSolicitud'] = '';
-                    mxFiltros['controlCalidad'] = '';
+                    if ($('#esCC').val()!=undefined){
+                        mxFiltros['controlCalidad'] = $('#esCC').val()=='true';
+                    }else{
+                        mxFiltros['controlCalidad'] = '';
+                    }
+
                 } else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
                     if ($('#txtEsLaboratorio').val() == 'true') {
                         mxFiltros['fechaInicioRecep'] = $('#fecInicioTomaMx').val();
                         mxFiltros['fechaFinRecepcion'] = $('#fecFinTomaMx').val();
+                        mxFiltros['controlCalidad'] = $('#quality').find('option:selected').val();
                     }else {
                         mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
                         mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+                        mxFiltros['controlCalidad'] = $('#esCC').val()=='true';
                     }
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
@@ -342,7 +349,7 @@ var ReceiptOrders = function () {
                     mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
-                    mxFiltros['controlCalidad'] = $('#quality').find('option:selected').val();
+
                 }
                 blockUI();
                 $.getJSON(parametros.sOrdersUrl, {
@@ -361,7 +368,13 @@ var ReceiptOrders = function () {
                                 table1.fnAddData(
                                     [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].dias, dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen,dataToLoad[i].embarazada, dataToLoad[i].urgente, dataToLoad[i].solicitudes, '<a target="_blank" title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
                                 //[dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].traslado, dataToLoad[i].origen, dataToLoad[i].embarazada, dataToLoad[i].hospitalizado, dataToLoad[i].urgente, '<a href=' + actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>']);
-                            } else {
+                            }else if ($('#esCC').val() == 'true') {
+                                idLoad = dataToLoad[i].idTomaMx;
+                                actionUrl = actionUrl + idLoad;
+                                table1.fnAddData(
+                                    [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + idLoad + "'/>", dataToLoad[i].origen, dataToLoad[i].tipoMuestra, dataToLoad[i].fechaTomaMx, dataToLoad[i].fechaInicioSintomas, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitudes, '<a title="Ver Detalle" href=' + actionUrl + ' class="btn btn-primary btn-xs"><i class="fa fa-mail-forward"></i></a>']);
+
+                            }else {
                                 idLoad = dataToLoad[i].idTomaMx;
                                 actionUrl = actionUrl + idLoad;
                                 table1.fnAddData(
@@ -587,7 +600,7 @@ var ReceiptOrders = function () {
                     var lstFechas = fechasnac.split(',');
                     for(var row in lstCodigos){
                         var partes = lstCodigos[row].split('*');
-                        textoHtml = textoHtml +'<tr><td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + lstNombres[row] + '</br>' + lstFechas[row]+ '</td>' +
+                        textoHtml = textoHtml +'<tr><td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' + unicodeEscape(lstNombres[row]) + '</br>' + lstFechas[row]+ '</td>' +
                             '<td style="border: 1px solid black;padding: 10px;border-collapse: collapse;">' +partes[0] + '</td>' +
                             '<td style="border: 1px solid black;padding: 10px; border-collapse: collapse;">' + unicodeEscape(partes[1]) + '</td></tr>';
                     }
@@ -806,6 +819,8 @@ var ReceiptOrders = function () {
                 recepcionObj['calidadMx'] = $('#codCalidadMx option:selected').val();
                 recepcionObj['condicionMx'] = $('#condicionMx option:selected').val();
                 recepcionObj['causaRechazo'] = $('#causaRechazo').val();
+                recepcionObj['fechaRecibido']= $('#fechaRec').val() ;
+                recepcionObj['horaRecibido']= $('#horaRec').val() ;
                 $.ajax(
                     {
                         url: parametros.sAddReceiptUrl,

@@ -109,16 +109,20 @@
                     <input id="msg_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                     <input id="msg_conf" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
                     <input id="msg_overrideT_confirm_c" type="hidden" value="<spring:message code="msg.overrideT.confirm.content"/>"/>
+                    <input id="msg_activate_confirm_c" type="hidden" value="<spring:message code="msg.set.default.confirm.content"/>"/>
+                    <input id="msg_deactivate_confirm_c" type="hidden" value="<spring:message code="msg.not.set.default.confirm.content"/>"/>
                     <input id="msg_succOverrideT" type="hidden" value="<spring:message code="msg.successfully.overrideT"/>"/>
                     <input id="msg_overrideT_cancel" type="hidden" value="<spring:message code="msg.override.test.cancel"/>"/>
+                    <input id="msg_action_canceled" type="hidden" value="<spring:message code="msg.action.canceled"/>"/>
+                    <input id="msg_action_successfull" type="hidden" value="<spring:message code="msg.test.request.successfully.edited"/>"/>
 
-                    <table id="records" class="table table-striped table-bordered table-hover" width="75%">
+                    <table id="records" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
                         <tr>
-                            <th data-class="expand" width="15%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
-                            <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
-                            <th data-hide="phone"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.area"/></th>
-                            <th><spring:message code="lbl.tests"/></th>
+                            <th data-class="expand" width="40%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
+                            <th data-hide="phone" width="20%"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.solic.type"/></th>
+                            <th data-hide="phone" width="25%"><i class="fa fa-fw fa-sort-alpha-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.area"/></th>
+                            <th width="15%"><spring:message code="lbl.tests"/></th>
 
                         </tr>
                         </thead>
@@ -153,9 +157,9 @@
                     <table id="tests" class="table table-striped table-bordered table-hover" width="75%">
                         <thead>
                         <tr>
-                            <th data-class="expand" width="35%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
-                            <th><spring:message code="lbl.override"/></th>
-
+                            <th data-class="expand" width="70%"><i class="fa fa-fw fa-sort-numeric-asc text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.test"/></th>
+                            <th  width="15%"><spring:message code="smart.default"/></th>
+                            <th  width="15%"><spring:message code="lbl.override"/></th>
                         </tr>
                         </thead>
                     </table>
@@ -228,7 +232,16 @@
                                         </select>
                                     </div>
                                 </section>
-
+                                <section class="col col-sm-6 col-md-4 col-lg-4">
+                                    <label class="text-left txt-color-blue font-md"><spring:message code="smart.default"/></label>
+                                    <div class="row">
+                                        <div class="col col-4">
+                                            <label class="checkbox">
+                                                <input type="checkbox" name="chk_defecto" id="chk_defecto">
+                                                <i></i></label>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
 
                         </form>

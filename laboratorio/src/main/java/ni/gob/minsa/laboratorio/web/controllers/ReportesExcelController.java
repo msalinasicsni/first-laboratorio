@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 import com.google.common.base.Predicate;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.catalogos.Anios;
 import ni.gob.minsa.laboratorio.domain.catalogos.AreaRep;
 import ni.gob.minsa.laboratorio.domain.catalogos.Semanas;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
@@ -170,7 +171,9 @@ public class ReportesExcelController {
         logger.debug("Reporte por examenes(técnica)");
         List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
         List<Semanas> semanas = catalogosService.getSemanas();
+        List<Anios> anios = catalogosService.getAnios();
         model.addAttribute("semanas", semanas);
+        model.addAttribute("anios", anios);
         model.addAttribute("dxs", catDx);
         return "reportes/consolidatedByExams";
     }
@@ -336,9 +339,8 @@ public class ReportesExcelController {
         List<Catalogo_Dx> catalogoDxList = tomaMxService.getDxs(filtroRep.getDiagnosticos());
 
         List<String> semanas = new ArrayList<String>();
-        String anio = DateUtil.DateToString(new Date(), "YYYY");
         List<String> meses = new ArrayList<String>();
-        List<CalendarioEpi> semanasEpi = calendarioEpiService.getCalendarioRangoSemanas(filtroRep.getSemInicial(), filtroRep.getSemFinal(), 2017); //Integer.valueOf(anio));
+        List<CalendarioEpi> semanasEpi = calendarioEpiService.getCalendarioRangoSemanas(filtroRep.getSemInicial(), filtroRep.getSemFinal(), Integer.valueOf(filtroRep.getAnioInicial()));
         Integer mesActual = null;
         Integer semanasMes = 0;
         int contadorSemana = 1;
@@ -473,7 +475,7 @@ public class ReportesExcelController {
         excelView.addObject("columnas", semanas);
         excelView.addObject("meses", meses);
         excelView.addObject("dxs", dxsList);
-        excelView.addObject("anio", Integer.valueOf(anio));
+        excelView.addObject("anio", Integer.valueOf(filtroRep.getAnioInicial()));
         excelView.addObject("registrosPorTabla", registrosPorTabla);
         excelView.addObject("reporte","DXEXAMS");
         return excelView;
@@ -1083,7 +1085,7 @@ public class ReportesExcelController {
                             detalleResultado = resultado.getValor();
                         }*/
                     }
-                    fechaProcesamiento = resultado.getFechahRegistro();
+                    fechaProcesamiento = resultado.getFechahProcesa();
                 }
                 if (resultados.size() > 0) {
                     dato[15] = detalleResultado;
@@ -1104,7 +1106,7 @@ public class ReportesExcelController {
                     } /*else {
                         detalleResultado = resultado.getValor();
                     }*/
-                    fechaProcesamiento = resultado.getFechahRegistro();
+                    fechaProcesamiento = resultado.getFechahProcesa();
                 }
                 if (resultados.size() > 0) {
                     dato[19] = detalleResultado;
@@ -1275,6 +1277,7 @@ public class ReportesExcelController {
         String diagnosticos = null;
         Integer semInicial = null;
         Integer semFinal = null;
+        String anio = null;
 
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsLong();
@@ -1312,6 +1315,8 @@ public class ReportesExcelController {
             semInicial = jObjectFiltro.get("semInicial").getAsInt();
         if (jObjectFiltro.get("semFinal") != null && !jObjectFiltro.get("semFinal").getAsString().isEmpty())
             semFinal = jObjectFiltro.get("semFinal").getAsInt();
+        if (jObjectFiltro.get("anio") != null && !jObjectFiltro.get("anio").getAsString().isEmpty())
+            anio = jObjectFiltro.get("anio").getAsString();
 
         filtroRep.setSubunidades(subunidad);
         filtroRep.setCodSilais(codSilais);
@@ -1332,7 +1337,7 @@ public class ReportesExcelController {
         filtroRep.setDiagnosticos(diagnosticos);
         filtroRep.setSemInicial(semInicial);
         filtroRep.setSemFinal(semFinal);
-
+        filtroRep.setAnioInicial(anio);
         return filtroRep;
     }
 }

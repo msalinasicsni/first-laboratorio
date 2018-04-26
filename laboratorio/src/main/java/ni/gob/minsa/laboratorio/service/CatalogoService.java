@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.service;
 
+import ni.gob.minsa.laboratorio.domain.catalogos.Anios;
 import ni.gob.minsa.laboratorio.domain.catalogos.AreaRep;
 import ni.gob.minsa.laboratorio.domain.catalogos.Semanas;
 import ni.gob.minsa.laboratorio.domain.estructura.Catalogo;
@@ -1037,6 +1038,16 @@ public class CatalogoService {
         Session session = sessionFactory.getCurrentSession();
         //Create a hibernate query (HQL)
         Query query = session.createQuery("FROM Semanas where pasivo = false order by orden");
+        //retrieve all
+        return query.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Anios> getAnios(){
+        //Retrieve session Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        //Create a hibernate query (HQL)
+        Query query = session.createQuery("FROM Anios where pasivo = false order by orden");
         //retrieve all
         return query.list();
     }

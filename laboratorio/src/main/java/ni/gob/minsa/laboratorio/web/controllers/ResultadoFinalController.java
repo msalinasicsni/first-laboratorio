@@ -474,7 +474,7 @@ public class ResultadoFinalController {
                             mapRes.put("valor", res.getValor());
                         }
                         mapRes.put("respuesta", res.getRespuesta().getNombre());
-                        mapRes.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                        mapRes.put("fechaResultado", DateUtil.DateToString(res.getFechahProcesa(), "dd/MM/yyyy hh:mm:ss a"));
                         subIndice++;
                         mapResList.put(subIndice, mapRes);
                         mapRes = new HashMap<String, String>();

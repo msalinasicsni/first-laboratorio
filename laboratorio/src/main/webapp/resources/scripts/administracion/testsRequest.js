@@ -117,6 +117,10 @@ var TestsRequest  = function () {
                 "columns": [
                     null,
                     {
+                        "className":      'defaultHandler',
+                        "orderable":      false
+                    },
+                    {
                         "className":      'overrideT',
                         "orderable":      false
                     }
@@ -135,9 +139,10 @@ var TestsRequest  = function () {
                 "drawCallback" : function(oSettings) {
                     responsiveHelper_dt_basic.respond();
                 },
-
-
                 fnDrawCallback : function() {
+                    $('.defaultHandler')
+                        .off("click", activateDeactivateT)
+                        .on("click", activateDeactivateT);
                     $('.overrideT')
                         .off("click", overrideTe)
                         .on("click", overrideTe);
@@ -145,9 +150,6 @@ var TestsRequest  = function () {
                 }
 
             });
-
-
-
 
 
             function getTestsRequest() {
@@ -183,9 +185,18 @@ var TestsRequest  = function () {
                     for (var i = 0; i < len; i++) {
                         var btnOverride = '<button type="button" title="Anular" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id +
                             '" > <i class="fa fa-times"></i>' ;
+                        var btnDefault = '<button type="button" title="Activar" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id +"^"+dataToLoad[i].porDefecto+
+                            '" > '+$("#msg_no").val();
+                        if ($('#tipo').val() === 'Estudio'){
+                            btnDefault = "No Aplica";
+                        }else if (dataToLoad[i].porDefecto == 'true'){
+                            btnDefault = '<button type="button" title="Desactivar" class="btn btn-success btn-xs" data-id="'+dataToLoad[i].id +"^"+dataToLoad[i].porDefecto+
+                                '" > '+$("#msg_yes").val();
+                        }
+
 
                        testsTable.fnAddData(
-                            [dataToLoad[i].nombreExamen, btnOverride]);
+                            [dataToLoad[i].nombreExamen, btnDefault, btnOverride]);
                     }
                 }).fail(function(jqXHR) {
                     unBlockUI();
@@ -254,7 +265,13 @@ var TestsRequest  = function () {
                 }
             }
 
-
+            function activateDeactivateT(){
+                var data =  $(this.innerHTML).data('id');
+                if (data != null) {
+                    var detalle = data.split("^");
+                    activateDeactivateTest(detalle[0], detalle[1]);
+                }
+            }
 
             function addTest() {
                 var obj = {};
@@ -262,6 +279,7 @@ var TestsRequest  = function () {
                 obj['idSolicitud'] = $('#idSolicitud').val();
                 obj['idExamen'] = $('#examen').val();
                 obj['pasivo'] = '';
+                obj['porDefecto'] = ($('#chk_defecto').is(':checked'));
                 obj['idRecord'] = '';
                 obj['tipo'] = $('#tipo').val();
 
@@ -310,7 +328,7 @@ var TestsRequest  = function () {
                 obj['mensaje'] = '';
                 obj['idSolicitud'] = $('#idSolicitud').val();
                 obj['idExamen'] = '';
-                obj['pasivo'] = '';
+                obj['pasivo'] = 'true';
                 obj['idRecord'] = idRecord;
                 obj['tipo'] = $('#tipo').val();
 
@@ -374,6 +392,77 @@ var TestsRequest  = function () {
                 });
             }
 
+            function activateDeactivateTest(idRecord, porDefecto) {
+                var obj = {};
+                obj['mensaje'] = '';
+                obj['porDefecto'] = porDefecto;
+                obj['idRecord'] = idRecord;
+                obj['tipo'] = $('#tipo').val();
+
+                var opcSi = $("#msg_yes").val();
+                var opcNo = $("#msg_no").val();
+                var msgConfirm = $("#msg_activate_confirm_c").val();
+                if (porDefecto == 'true'){
+                    msgConfirm = $("#msg_deactivate_confirm_c").val();
+                }
+
+
+                $.SmartMessageBox({
+                    title: $("#msg_conf").val(),
+                    content: msgConfirm,
+                    buttons: '['+opcSi+']['+opcNo+']'
+                }, function (ButtonPressed) {
+                    if (ButtonPressed === opcSi) {
+
+                        blockUI(parametros.blockMess);
+                        $.ajax(
+                            {
+                                url: parametros.saveTestUrl,
+                                type: 'POST',
+                                dataType: 'json',
+                                data: JSON.stringify(obj),
+                                contentType: 'application/json',
+                                mimeType: 'application/json',
+                                success: function (data) {
+                                    if (data.mensaje.length > 0){
+                                        $.smallBox({
+                                            title: data.mensaje ,
+                                            content: $("#disappear").val(),
+                                            color: "#C46A69",
+                                            iconSmall: "fa fa-warning",
+                                            timeout: 4000
+                                        });
+                                    }else{
+                                        getExams($('#idSolicitud').val(), $('#tipo').val());
+                                        var msg = $("#msg_action_successfull").val();
+                                        $.smallBox({
+                                            title: msg ,
+                                            content: $("#disappear").val(),
+                                            color: "#739E73",
+                                            iconSmall: "fa fa-success",
+                                            timeout: 4000
+                                        });
+                                    }
+                                    unBlockUI();
+                                },
+                                error: function (jqXHR) {
+                                    unBlockUI();
+                                    validateLogin(jqXHR);
+                                }
+                            });
+
+                    }
+                    if (ButtonPressed === opcNo) {
+                        $.smallBox({
+                            title: $("#msg_action_canceled").val(),
+                            content: "<i class='fa fa-clock-o'></i> <i>"+$("#disappear").val()+"</i>",
+                            color: "#C46A69",
+                            iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                            timeout: 4000
+                        });
+                    }
+                });
+            }
 
         }
 

@@ -245,7 +245,7 @@ public class EditarSolicitudesMxController {
                         traslado = messageSource.getMessage("lbl.yes",null,null);
                         areaOrigen = trasladoMxActivo.getAreaOrigen().getNombre();
                     }
-                }else {
+                }else if (trasladoMxActivo.isTrasladoInterno()) {
                     /*if (!seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
                         mostrar = false;
                     }else{*/

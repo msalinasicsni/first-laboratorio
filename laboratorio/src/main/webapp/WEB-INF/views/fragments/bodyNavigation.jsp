@@ -71,6 +71,9 @@
                             <li class="receipt">
                                 <a href="<spring:url value="/recepcionMx/init" htmlEscape="true "/>" title="<spring:message code="lbl.check-in.samples.from.alerta" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="lbl.check-in.samples.from.alerta" /></a>
                             </li>
+                            <li class="receiptCC">
+                                <a href="<spring:url value="/recepcionMx/initCC" htmlEscape="true "/>" title="<spring:message code="lbl.check-in.samples.from.cc" />"><i class="fa fa-lg fa-fw fa-cc"></i> <spring:message code="lbl.check-in.samples.from.cc" /></a>
+                            </li>
                             <li class="otherSamples">
                                 <a href="<spring:url value="/tomaMx/searchOMx" htmlEscape="true "/>" title="<spring:message code="menu.receipt.other.samples" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.other.samples" /></a>
                             </li>
@@ -156,7 +159,7 @@
                     <li class="catalogos">
                         <a href="#" title="<spring:message code="menu.catalogs" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <span class="menu-item-parent"><spring:message code="menu.catalogs" /></span></a>
                         <ul>
-                            <li class="laboratorio">
+                            <li class="admlaboratorio">
                                 <a href="<spring:url value="/administracion/laboratorio/list" htmlEscape="true "/>" title="<spring:message code="menu.catalog.lab" />"><i class="fa fa-lg fa-fw fa-sitemap"></i> <spring:message code="menu.catalog.lab" /></a>
                             </li>
                             <li class="direccion">

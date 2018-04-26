@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -1512,7 +1511,7 @@ public class VisualizarNotificacionController {
                                             contt++;
                                             //first record
                                             if (contt == 1) {
-                                                    fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahRegistro(), "dd/MM/yyyy HH:mm:ss");
+                                                    fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahProcesa(), "dd/MM/yyyy HH:mm:ss");
                                                     if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                         Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
                                                         rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
@@ -1647,7 +1646,7 @@ public class VisualizarNotificacionController {
                                             cont2++;
                                             //first record
                                             if (cont2 == 1) {
-                                                    fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahRegistro(), "dd/MM/yyyy HH:mm:ss");
+                                                    fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahProcesa(), "dd/MM/yyyy HH:mm:ss");
                                                     if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                         Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
                                                         rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
@@ -2871,7 +2870,7 @@ public class VisualizarNotificacionController {
                                         cont1++;
                                         //first record
                                         if (cont1 == 1) {
-                                                fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahRegistro(), "dd/MM/yyyy HH:mm:ss");
+                                                fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahProcesa(), "dd/MM/yyyy HH:mm:ss");
                                                 if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
                                                     rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();

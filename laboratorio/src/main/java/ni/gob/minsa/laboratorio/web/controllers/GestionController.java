@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
+import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -183,6 +185,7 @@ public class GestionController {
         if (urlValidacion.isEmpty()) {
             List<EntidadesAdtvas> entidadesAdtvases = entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoNotificacion> tiposNotificacion = new ArrayList<TipoNotificacion>();
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
 
@@ -662,7 +665,10 @@ public class GestionController {
             map.put("tipoNoti", notificacion.getCodTipoNotificacion().getValor());
             map.put("fechaRegistro", DateUtil.DateToString(notificacion.getFechaRegistro(), "dd/MM/yyyy"));
             map.put("silais", (notificacion.getCodSilaisAtencion() != null ? notificacion.getCodSilaisAtencion().getNombre() : ""));
+            map.put("codSilais", (notificacion.getCodSilaisAtencion() != null ? String.valueOf(notificacion.getCodSilaisAtencion().getCodigo()) : "ND"));
             map.put("unidad", (notificacion.getCodUnidadAtencion() != null ? notificacion.getCodUnidadAtencion().getNombre() : ""));
+            map.put("codUnidad", (notificacion.getCodUnidadAtencion() != null ? String.valueOf(notificacion.getCodUnidadAtencion().getCodigo()) : "ND"));
+            map.put("codMunicipio", (notificacion.getCodUnidadAtencion() != null ? String.valueOf(notificacion.getCodUnidadAtencion().getMunicipio().getCodigoNacional()) : "ND"));
             //Si hay persona
             if (notificacion.getPersona() != null) {
                 /// se obtiene el nombre de la persona asociada a la ficha

@@ -46,8 +46,7 @@
 			<!-- end breadcrumb -->
 			<jsp:include page="../../fragments/layoutOptions.jsp" />
 		</div>
-		<!-- END RIBBON -->
-		<!-- MAIN CONTENT -->
+		<!-- END RIBBON --><!-- MAIN CONTENT -->
 		<div id="content">
 			<!-- row -->
 			<div class="row">

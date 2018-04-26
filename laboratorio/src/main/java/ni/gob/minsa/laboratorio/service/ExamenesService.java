@@ -82,6 +82,15 @@ public class ExamenesService {
         return q.list();
     }
 
+    public List<Examen_Dx> getExamenesDefectoByIdDx(int idDx, String username){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select edx from Examen_Dx as edx inner join edx.examen as ex inner join edx.diagnostico as dx, AutoridadExamen as ae " +
+                "where ae.examen.idExamen = ex.idExamen and ae.pasivo = false and ae.autoridadArea.pasivo = false and ae.autoridadArea.user.username = :username and dx.idDiagnostico = :idDx "+
+                " and edx.porDefecto = true and edx.pasivo = false and ex.pasivo = false ");
+        q.setParameter("idDx",idDx);
+        q.setParameter("username", username);
+        return q.list();
+    }
     /**
      * Obtiene una lista de examenes según ids de examenes enviados
      * @param idExamenes id de los examenes a filtrar, separados por coma Ejm: 1,2,3

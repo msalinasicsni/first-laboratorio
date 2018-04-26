@@ -60,7 +60,7 @@ public class ControllerELISA {
                 return "Fail. Id Respuesta enviada no se reconoce como respues válida!";
 
             DetalleResultado detalleResultado = new DetalleResultado();
-            detalleResultado.setFechahRegistro(new Timestamp(new Date().getTime()));
+            detalleResultado.setFechahProcesa(new Timestamp(new Date().getTime()));
             detalleResultado.setValor(resultado.getValor());
             detalleResultado.setRespuesta(respuestaExamen);
             detalleResultado.setExamen(ordenExamen);

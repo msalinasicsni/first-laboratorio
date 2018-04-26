@@ -200,6 +200,8 @@ var IncomeResult = function () {
                             cantRespuestas++;
                         }
                         objResultado["idOrdenExamen"] = $("#idOrdenExamen").val();
+                        objResultado["fechaProc"] = $("#fechaProc").val();
+                        objResultado["horaProc"] = $("#horaProc").val();
                         objResultado["strRespuestas"] = objDetalle;
                         objResultado["mensaje"] = '';
                         objResultado["cantRespuestas"] = cantRespuestas;

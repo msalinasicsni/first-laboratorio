@@ -22,7 +22,7 @@ public class Examen_Estudio implements Auditable {
     private boolean pasivo;
     Date fechaRegistro;
     User usuarioRegistro;
-
+    private boolean porDefecto;
 
     @Id
     @GeneratedValue(strategy= GenerationType.TABLE)
@@ -84,6 +84,15 @@ public class Examen_Estudio implements Auditable {
         this.usuarioRegistro = usuarioRegistro;
     }
 
+    @Basic
+    @Column(name = "PORDEFECTO", nullable = false, insertable = true, updatable = true)
+    public boolean isPorDefecto() {
+        return porDefecto;
+    }
+
+    public void setPorDefecto(boolean porDefecto) {
+        this.porDefecto = porDefecto;
+    }
     @Override
     public boolean isFieldAuditable(String fieldname) {
         if (fieldname.matches("fechaRegistro") || fieldname.matches("usuarioRegistro")) return false;

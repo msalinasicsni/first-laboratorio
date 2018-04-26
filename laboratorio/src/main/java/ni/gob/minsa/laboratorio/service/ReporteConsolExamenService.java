@@ -55,7 +55,8 @@ public class ReporteConsolExamenService {
                 "where noti.idNotificacion = mx.idNotificacion and mx.idTomaMx = dx.idTomaMx and dx.idSolicitudDx = oe.solicitudDx " +
                 "and noti.pasivo = false and mx.anulada = false  and dx.anulado = false and dx.aprobada = true " +
                 "and dx.controlCalidad = false and oe.anulado = false " +
-                "and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where dr.fechahRegistro between cal.fechaInicial and cal.fechaFinal) " +
+                "and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal " +
+                //"and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal) " +
                 "and cal.anio = :anio and dx.codDx.idDiagnostico in ("+filtro.getDiagnosticos()+") " +
                 "and cal.noSemana between :semI and :semF " +
                 //" and noti.codSilaisAtencion.nombre = 'SILAIS RAAS' "+
@@ -70,7 +71,8 @@ public class ReporteConsolExamenService {
                 "and oe.idOrdenExamen = dr.examen and re.idRespuesta = dr.respuesta.idRespuesta and c.idConcepto = re.concepto.idConcepto and c.tipo.catalogoId = tp.catalogoId " +
                 "and noti.pasivo = false and mx.anulada = false  and dx.anulado = false and dx.aprobada = true " +
                 "and dx.controlCalidad = false and oe.anulado = false and dr.pasivo = false " +
-                "and dr.fechahRegistro between cal.fechaInicial and cal.fechaFinal " +
+                "and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal " +
+                //"and dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal " +
                 //" and noti.codSilaisAtencion.nombre = 'SILAIS RAAS' "+
                 "and cal.anio = :anio and dx.codDx.idDiagnostico in ("+filtro.getDiagnosticos()+") " +
                 "and cal.noSemana between :semI and :semF ");
