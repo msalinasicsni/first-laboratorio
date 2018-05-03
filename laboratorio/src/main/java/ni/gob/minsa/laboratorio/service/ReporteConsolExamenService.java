@@ -79,11 +79,11 @@ public class ReporteConsolExamenService {
 
         queryExamenes.setParameter("semI", filtro.getSemInicial());
         queryExamenes.setParameter("semF", filtro.getSemFinal());
-        queryExamenes.setParameter("anio", 2017);
+        queryExamenes.setParameter("anio", Integer.valueOf(filtro.getAnioInicial()));
 
         queryRespuestaExamenes.setParameter("semI", filtro.getSemInicial());
         queryRespuestaExamenes.setParameter("semF", filtro.getSemFinal());
-        queryRespuestaExamenes.setParameter("anio", 2017);
+        queryRespuestaExamenes.setParameter("anio", Integer.valueOf(filtro.getAnioInicial()));
 
         respuestas.addAll(queryRespuestaExamenes.list());
         examenes.addAll(queryExamenes.list());
