@@ -1209,14 +1209,23 @@ public class RecepcionMxController {
                             if (solicitudEstudioList.size()> 0)
                                 areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                         }
-                        String nombreCompleto;
-                        nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                        if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
-                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                        if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                        String fechaNac = (tomaMx.getIdNotificacion().getPersona().getFechaNacimiento()!=null?DateUtil.DateToString(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(),"dd/MM/yyyy"):" ");
+                        String nombreCompleto="";
+                        if(tomaMx.getIdNotificacion().getPersona()!=null) {
+	                        nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+	                        if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+	                            nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+	                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+	                        if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+	                            nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+	                        }
+	                        else if(tomaMx.getIdNotificacion().getCodigoPacienteVIH()!=null) {
+	                        	nombreCompleto = tomaMx.getIdNotificacion().getCodigoPacienteVIH();
+                        }
+                        
+                        String fechaNac = "";
+                        if(tomaMx.getIdNotificacion().getPersona()!=null) {
+                        	fechaNac = (tomaMx.getIdNotificacion().getPersona().getFechaNacimiento()!=null?DateUtil.DateToString(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(),"dd/MM/yyyy"):" ");
+                        }
                         if(cantMxProc==1) {
                             codigosLabMx = (esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab()) + "*" + areaEntrega;
                             nombresCodigosLabMx = nombreCompleto;
@@ -1760,7 +1769,15 @@ public class RecepcionMxController {
                 } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
                     map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
                     map.put("embarazada", "--");
-                } else {
+                } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                	map.put("persona", tomaMx.getIdNotificacion().getCodigoPacienteVIH());
+                	if (tomaMx.getIdNotificacion().getEmbarazada()!=null) {
+                        map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                    }else{
+                        map.put("embarazada", "--");
+                    }
+                }else {
                     map.put("persona", " ");
                     map.put("embarazada", "--");
                 }
@@ -1955,6 +1972,14 @@ public class RecepcionMxController {
                 } else if (recepcion.getTomaMx().getIdNotificacion().getSolicitante() != null) {
                     map.put("persona", recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
                     map.put("embarazada","--");
+                }else if (recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                	map.put("persona", recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                	if (recepcion.getTomaMx().getIdNotificacion().getEmbarazada()!=null) {
+                        map.put("embarazada", (recepcion.getTomaMx().getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                    }else{
+                        map.put("embarazada", "--");
+                    }
                 }else {
                     map.put("persona", " ");
                     map.put("embarazada","--");
@@ -2138,6 +2163,7 @@ public class RecepcionMxController {
         String codTipoSolicitud = null;
         String nombreSolicitud = null;
         Boolean controlCalidad = null;
+        String codigoVIH = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -2165,6 +2191,8 @@ public class RecepcionMxController {
             nombreSolicitud = jObjectFiltro.get("nombreSolicitud").getAsString();
         if (jObjectFiltro.get("controlCalidad") != null && !jObjectFiltro.get("controlCalidad").getAsString().isEmpty())
             controlCalidad = jObjectFiltro.get("controlCalidad").getAsBoolean();
+        if (jObjectFiltro.get("codigoVIH") != null && !jObjectFiltro.get("codigoVIH").getAsString().isEmpty())
+        	codigoVIH = jObjectFiltro.get("codigoVIH").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -2187,6 +2215,7 @@ public class RecepcionMxController {
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         filtroMx.setIncluirTraslados(true);
         filtroMx.setControlCalidad(controlCalidad);
+        filtroMx.setCodigoVIH(codigoVIH);
 
         return filtroMx;
     }
@@ -2330,7 +2359,15 @@ public class RecepcionMxController {
                     map.put("persona", nombreCompleto);
                 } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
                     map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
-                } else {
+                } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                	map.put("persona", tomaMx.getIdNotificacion().getCodigoPacienteVIH());
+                	if (tomaMx.getIdNotificacion().getEmbarazada()!=null) {
+                        map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                    }else{
+                        map.put("embarazada", "--");
+                    }
+                }else {
                     map.put("persona", " ");
                 }
 
@@ -2371,6 +2408,8 @@ public class RecepcionMxController {
                         apellidos = tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
                         if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
                             apellidos = apellidos + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                    } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                    	nombres = tomaMx.getIdNotificacion().getCodigoPacienteVIH();
                     } else {
                         nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
                     }

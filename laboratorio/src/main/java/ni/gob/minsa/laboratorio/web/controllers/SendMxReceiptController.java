@@ -261,6 +261,8 @@ public class SendMxReceiptController {
                 map.put("persona", nombreCompleto);
             } else if (recepcion.getTomaMx().getIdNotificacion().getSolicitante() != null) {
                 map.put("persona", recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
+            }else if (recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+            	map.put("persona", recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH());
             }else{
                 map.put("persona", " ");
             }

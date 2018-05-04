@@ -310,6 +310,8 @@ public class ResultadosController {
                         map.put("persona", nombreCompleto);
                     } else if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
                         map.put("persona", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                    } else if (orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                        map.put("persona", orden.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
                     } else {
                         map.put("persona", " ");
                     }
@@ -347,7 +349,10 @@ public class ResultadosController {
                     if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                         nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                     map.put("persona", nombreCompleto);
-                } else {
+                } else if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                	map.put("persona", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                }
+                else {
                     map.put("persona", " ");
                 }
 

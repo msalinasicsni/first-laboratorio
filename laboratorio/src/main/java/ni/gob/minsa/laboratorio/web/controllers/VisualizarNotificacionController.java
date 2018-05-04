@@ -11,6 +11,7 @@ import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
+import ni.gob.minsa.laboratorio.domain.vih.DaDatosVIH;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -43,6 +44,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -105,6 +107,10 @@ public class VisualizarNotificacionController {
     @Autowired
     @Qualifier(value = "daIragService")
     public DaIragService daIragService;
+    
+    @Autowired
+    @Qualifier(value = "daDatosVIHService")
+    public DaDatosVIHService daDatosVIHService;
 
     @Autowired
     MessageSource messageSource;
@@ -204,7 +210,9 @@ public class VisualizarNotificacionController {
                 map.put("persona", nombreCompleto);
             } else if (recepcion.getTomaMx().getIdNotificacion().getSolicitante() != null) {
                 map.put("persona", recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
-            } else {
+            } else if (recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+            	map.put("persona", recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+            }else {
                 map.put("persona", " ");
             }
 
@@ -3070,6 +3078,123 @@ public class VisualizarNotificacionController {
 
 
             }
+            else if (not.getCodTipoNotificacion().getCodigo().equals("TPNOTI|VIH")) {
+            	DaDatosVIH dVih = daDatosVIHService.getDaDatosVIH(idNotificacion);
+            	
+            	if (dVih != null) {
+            		
+            		String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(new Date());
+                    Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+                    
+                    String nombres = "";
+                    String apellidos = "";
+                    String edad = "";
+                    if (dVih.getIdNotificacion().getPersona() != null) {
+                        nombres = dVih.getIdNotificacion().getPersona().getPrimerNombre();
+                        if (dVih.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombres = nombres + " " + dVih.getIdNotificacion().getPersona().getSegundoNombre();
+
+                        apellidos = dVih.getIdNotificacion().getPersona().getPrimerApellido();
+                        if (dVih.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            apellidos = apellidos + " " + dVih.getIdNotificacion().getPersona().getSegundoApellido();
+                    } else if (dVih.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                    	nombres = dVih.getIdNotificacion().getCodigoPacienteVIH();
+                    }else {
+                        nombres = dVih.getIdNotificacion().getSolicitante().getNombre();
+                    }
+                    if (dVih.getIdNotificacion().getPersona() != null) {
+                        String[] arrEdad = DateUtil.calcularEdad(dVih.getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
+                        if (arrEdad[0] != null) edad = arrEdad[0] + " A";
+                        if (arrEdad[1] != null) edad = edad + " " + arrEdad[1] + " M";
+                    }
+
+            		
+            		PDPage page = GeneralUtils.addNewPage(doc);
+                    PDPageContentStream stream = new PDPageContentStream(doc, page);
+                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
+                    
+                    String pageNumber= String.valueOf(doc.getNumberOfPages());
+                    GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
+                    
+                    drawInfoLab(stream,page, labProcesa);
+                    
+                    float xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 12, messageSource.getMessage("lbl.work.sheet", null, null));
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.add.notification", null, null)+  " VIH", 630, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
+
+                    float y = 610;
+                    
+                    //datos personales
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getIdNotificacion().getCodigoPacienteVIH(), y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(nombres, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lastnames", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(apellidos, y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 185, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getIdNotificacion().getCodSilaisAtencion() != null ? dVih.getIdNotificacion().getCodSilaisAtencion().getNombre() : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getIdNotificacion().getCodUnidadAtencion() != null ? dVih.getIdNotificacion().getCodUnidadAtencion().getMunicipio().getNombre() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getIdNotificacion().getCodUnidadAtencion() != null ? dVih.getIdNotificacion().getCodUnidadAtencion().getNombre() : "", y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 30;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.dx.date", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(DateUtil.DateToString(dVih.getFechaDxVIH(), "dd/MM/yyyy"), y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.res.a1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getResA1() != null ? dVih.getResA1() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.res.a2", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getResA2() != null ? dVih.getResA2() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.emb.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getEmbarazo() != null ? dVih.getEmbarazo() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.status.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getEstadoPx() != null ? dVih.getEstadoPx() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.infop.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getInfOport() != null ? dVih.getInfOport() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.tar.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getEstaTx() != null ? dVih.getEstaTx() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.tardate.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getFechaTAR() != null ? DateUtil.DateToString(dVih.getFechaTAR(), "dd/MM/yyyy") : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.expperi.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getExposicionPeri() != null ? dVih.getExposicionPeri() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    y = y - 15;
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.ces.vih", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                    GeneralUtils.drawTEXT(dVih.getCesarea() != null ? dVih.getCesarea() : "", y, 250, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
+                    GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
+                    stream.close();
+                    doc.save(output);
+                    doc.close();
+                    // generate the file
+                    res = Base64.encodeBase64String(output.toByteArray());
+            	}
+            	
+            	
+            }
+        
         }
 
         return res;
@@ -3354,5 +3479,42 @@ public class VisualizarNotificacionController {
         return height;
     }
 
+    
+    private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
+        float xCenter;
+
+        float inY = 720;
+        float m = 20;
+
+        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
+        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+        inY -= m;
+
+        if(labProcesa != null){
+
+            if(labProcesa.getDescripcion()!= null){
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
+                GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                inY -= m;
+            }
+
+            if(labProcesa.getDireccion() != null){
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getDireccion());
+                GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                inY -= m;
+            }
+
+            if(labProcesa.getTelefono() != null){
+
+                if(labProcesa.getTelefax() != null){
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono() + " - " + labProcesa.getTelefax());
+                    GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                }else{
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono());
+                    GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                }
+            }
+        }
+    }
 
 }

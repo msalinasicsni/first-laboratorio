@@ -353,7 +353,15 @@ public class SearchMxController {
                 map.put("persona", nombreCompleto);
             } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
                 map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
-            } else {
+            } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+            	map.put("persona", tomaMx.getIdNotificacion().getCodigoPacienteVIH());
+            	if (tomaMx.getIdNotificacion().getEmbarazada()!=null) {
+                    map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                            messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                }else{
+                    map.put("embarazada", "--");
+                }
+            }else {
                 map.put("persona", " ");
             }
 
@@ -911,6 +919,8 @@ public class SearchMxController {
                     if (soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null) {
                         nombrePersona = nombrePersona + " " + soliDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                     }
+                }else if (soliDx.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                	nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH();
                 }else{
                     nombrePersona = soliDx.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
                 }

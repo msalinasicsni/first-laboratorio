@@ -400,6 +400,8 @@ public class GestionController {
                 map.put("persona", nombreCompleto);
             } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
                 map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
+            } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                map.put("persona", tomaMx.getIdNotificacion().getCodigoPacienteVIH());
             } else {
                 map.put("persona", " ");
             }

@@ -139,7 +139,7 @@ var ReceiptOrders = function () {
                 getRequest();
                 getOrdersReview();
             }
-            <!-- formulario de búsqueda de ordenes -->
+            <!-- formulario de bï¿½squeda de ordenes -->
             $('#searchOrders-form').validate({
                 // Rules for form validation
                 rules: {
@@ -161,7 +161,7 @@ var ReceiptOrders = function () {
                 }
             });
 
-            <!-- formulario de recepción general -->
+            <!-- formulario de recepciï¿½n general -->
             $('#receiptOrders-form').validate({
                 // Rules for form validation
                 rules: {
@@ -187,7 +187,7 @@ var ReceiptOrders = function () {
                 }
             });
 
-            <!-- formulario de recepción en laboratorio -->
+            <!-- formulario de recepciï¿½n en laboratorio -->
             $('#receiptOrdersLab-form').validate({
                 // Rules for form validation
                 rules: {
@@ -330,6 +330,7 @@ var ReceiptOrders = function () {
                     }else{
                         mxFiltros['controlCalidad'] = '';
                     }
+                    mxFiltros['codigoVIH'] = '';
 
                 } else {
                     mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
@@ -349,7 +350,7 @@ var ReceiptOrders = function () {
                     mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
                     mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
-
+                    mxFiltros['codigoVIH'] = $('#codigoVIH').val();
                 }
                 blockUI();
                 $.getJSON(parametros.sOrdersUrl, {
@@ -429,7 +430,7 @@ var ReceiptOrders = function () {
                             showModalOverrideRequest();
                         });
 
-                        //al paginar se define nuevamente la función de cargar el detalle
+                        //al paginar se define nuevamente la funciï¿½n de cargar el detalle
                         $(".dataTables_paginate").on('click', function () {
                             $(".anularSolicitud").on('click', function () {
                                 $("#idSolicitud").val($(this).data('id'));
@@ -470,7 +471,7 @@ var ReceiptOrders = function () {
                             showModalOverrideTest();
                         });
 
-                        //al paginar se define nuevamente la función de cargar el detalle
+                        //al paginar se define nuevamente la funciï¿½n de cargar el detalle
                         $(".dataTables_paginate").on('click', function () {
                             $(".anularExamen").on('click', function () {
                                 //anularExamen($(this).data('id'));
@@ -695,7 +696,7 @@ var ReceiptOrders = function () {
             });
 
 
-            <!-- para guardar recepción general -->
+            <!-- para guardar recepciï¿½n general -->
             function guardarRecepcion() {
                 bloquearUI(parametros.blockMess);
                 var codUnicoFormat = '';
@@ -810,7 +811,7 @@ var ReceiptOrders = function () {
                 });
             }
 
-            <!-- para guardar recepción en laboratorio -->
+            <!-- para guardar recepciï¿½n en laboratorio -->
             function guardarRecepcionLab() {
                 bloquearUI(parametros.blockMess);
                 var recepcionObj = {};
@@ -1093,7 +1094,7 @@ var ReceiptOrders = function () {
                 unBlockUI();
             });
 
-            //En recepción general Se valida que si selecciona "Si" en Mx Inadecuada se solicite causa de rechazo
+            //En recepciï¿½n general Se valida que si selecciona "Si" en Mx Inadecuada se solicite causa de rechazo
             $("input[name$='rdMxInadequate']").click(function () {
                 var valor = $(this).val();
                 $('#causaRechazo').val('');
@@ -1174,7 +1175,7 @@ var ReceiptOrders = function () {
                     });
             }
 
-            <!-- Al seleccionar diagnóstico-->
+            <!-- Al seleccionar diagnï¿½stico-->
             $('#codDX').change(function () {
                 if ($(this).val().length > 0) {
                     $.getJSON(parametros.sExamenesURL, {
@@ -1230,7 +1231,7 @@ var ReceiptOrders = function () {
                 $('#codExamen').val('').change();
             });
 
-            <!-- para buscar código de barra -->
+            <!-- para buscar cï¿½digo de barra -->
             var timer;
             var iniciado = false;
             var contador;

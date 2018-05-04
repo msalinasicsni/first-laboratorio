@@ -164,8 +164,10 @@ public class ResultadoFinalController {
                     if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
                         nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
 
-                }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                } else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
                     nombreCompleto = diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre();
+                } else if (diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                    nombreCompleto = diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH();
                 }
                 map.put("persona",nombreCompleto);
                 map.put("diagnostico", diagnostico.getCodDx().getNombre());
@@ -220,6 +222,9 @@ public class ResultadoFinalController {
                       nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
                       if (estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                           nombreCompleto = nombreCompleto + " " + estudio.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                  }
+                  else if (estudio.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                	  nombreCompleto = estudio.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH();
                   }
                   map.put("persona", nombreCompleto);
 
@@ -423,6 +428,8 @@ public class ResultadoFinalController {
                             map.put("persona", nombreCompleto);
                         } else if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
                             map.put("persona", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                        } else if (examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                            map.put("persona", examen.getSolicitudDx().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
                         } else {
                             map.put("persona", " ");
                         }
@@ -449,7 +456,10 @@ public class ResultadoFinalController {
                             if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                                 nombreCompleto = nombreCompleto + " " + examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                             map.put("persona", nombreCompleto);
-                        } else {
+                        } else if (examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                        	map.put("persona", examen.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                        }
+                        else {
                             map.put("persona", " ");
                         }
 

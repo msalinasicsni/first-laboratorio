@@ -204,6 +204,16 @@
                                                         <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
                                                     </label>
                                                 </section>
+                                                
+                                                <section class="col col-sm-12 col-md-6 col-lg-3">
+                                                    <label class="text-left txt-color-blue font-md">
+                                                        <spring:message code="lbl.unique.code.mx" />
+                                                    </label>
+                                                    <label class="input"><i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-sort-alpha-asc"></i>
+                                                        <input type="text" id="codigoVIH" name="codigoVIH" placeholder="<spring:message code="lbl.unique.code.mx"/>">
+                                                        <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="lbl.unique.code.mx"/></b>
+                                                    </label>
+                                                </section>
 
                                                 <!--<section class="col col-sm-12 col-md-6 col-lg-2">
                                                     <label class="text-left txt-color-blue font-md">

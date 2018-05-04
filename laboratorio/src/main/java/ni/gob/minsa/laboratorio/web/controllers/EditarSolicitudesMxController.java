@@ -323,6 +323,12 @@ public class EditarSolicitudesMxController {
                 } else if (recepcion.getTomaMx().getIdNotificacion().getSolicitante() != null) {
                     map.put("persona", recepcion.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
                     map.put("embarazada","--");
+                }else if (recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                    map.put("persona", recepcion.getTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                    if (recepcion.getTomaMx().getIdNotificacion().getEmbarazada()!=null)
+                        map.put("embarazada",(recepcion.getTomaMx().getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S")?
+                                messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
+                    else map.put("embarazada",messageSource.getMessage("lbl.no",null,null));
                 }else {
                     map.put("persona", " ");
                     map.put("embarazada","--");

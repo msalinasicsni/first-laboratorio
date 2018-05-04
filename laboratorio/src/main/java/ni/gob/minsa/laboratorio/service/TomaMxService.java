@@ -193,6 +193,13 @@ public class TomaMxService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
+        
+        // se filtra por codigo VIH
+        if (filtro.getCodigoVIH()!=null){
+            crit.add( Restrictions.and(
+                            Restrictions.eq("notifi.codigoPacienteVIH", filtro.getCodigoVIH()))
+            );
+        }
 
         //Se filtra por rango de fecha de recepción
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){

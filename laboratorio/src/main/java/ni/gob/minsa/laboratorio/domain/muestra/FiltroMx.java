@@ -41,6 +41,7 @@ public class FiltroMx {
     Date fechaFinNotificacion;
     String tipoNotificacion;
     Boolean incluirAnuladas = false;
+    String codigoVIH;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -285,4 +286,14 @@ public class FiltroMx {
     public void setIncluirAnuladas(Boolean incluirAnuladas) {
         this.incluirAnuladas = incluirAnuladas;
     }
+
+	public String getCodigoVIH() {
+		return codigoVIH;
+	}
+
+	public void setCodigoVIH(String codigoVIH) {
+		this.codigoVIH = codigoVIH;
+	}
+    
+    
 }

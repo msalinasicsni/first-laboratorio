@@ -6,7 +6,6 @@ import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.irag.Respuesta;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
-import ni.gob.minsa.laboratorio.domain.poblacion.Comunidades;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
@@ -44,6 +43,7 @@ public class DaNotificacion implements Serializable, Auditable {
     private Solicitante solicitante;
     private Respuesta embarazada;
     private Integer semanasEmbarazo;
+    private String codigoPacienteVIH;
     private boolean completa;
 
     @Id
@@ -208,8 +208,19 @@ public class DaNotificacion implements Serializable, Auditable {
     public void setSemanasEmbarazo(Integer semanasEmbarazo) {
         this.semanasEmbarazo = semanasEmbarazo;
     }
-
+    
+    
     @Basic
+    @Column(name = "CODIGO_VIH", length=100)
+    public String getCodigoPacienteVIH() {
+		return codigoPacienteVIH;
+	}
+
+	public void setCodigoPacienteVIH(String codigoPacienteVIH) {
+		this.codigoPacienteVIH = codigoPacienteVIH;
+	}
+
+	@Basic
     @Column(name = "COMPLETA", nullable = true, insertable = true, updatable = true)
     public boolean isCompleta() { return completa; }
 

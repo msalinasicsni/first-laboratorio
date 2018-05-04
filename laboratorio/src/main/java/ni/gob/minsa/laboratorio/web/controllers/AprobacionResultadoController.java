@@ -240,6 +240,8 @@ public class AprobacionResultadoController {
                 map.put("persona",nombreCompleto);
             }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
                 map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+            }else if (diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
             }else{
                 map.put("persona"," ");
             }
