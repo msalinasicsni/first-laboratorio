@@ -82,7 +82,6 @@
                                 <!-- widget content -->
                                 <div class="widget-body no-padding">
                                     <input id="mostrarPopUpMx" type="hidden" value="${mostrarPopUpMx}" />
-                                    <input id="esCC" type="hidden" value="false" />
                                     <input id="lblPersona" type="hidden" value="<spring:message code="lbl.person"/>"/>
                                     <input id="lblArea" type="hidden" value="<spring:message code="lbl.receipt.pcr.area"/>"/>
                                     <input id="lblCodigo" type="hidden" value="<spring:message code="lbl.unique.code.mx"/>"/>

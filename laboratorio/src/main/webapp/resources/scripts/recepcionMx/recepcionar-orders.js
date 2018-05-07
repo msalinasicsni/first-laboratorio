@@ -341,7 +341,11 @@ var ReceiptOrders = function () {
                     }else {
                         mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
                         mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
-                        mxFiltros['controlCalidad'] = $('#esCC').val()=='true';
+                        if ($('#esCC').val()!=undefined){
+                            mxFiltros['controlCalidad'] = $('#esCC').val()=='true';
+                        }else{
+                            mxFiltros['controlCalidad'] = '';
+                        }
                     }
                     mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
