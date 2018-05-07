@@ -345,30 +345,35 @@ public class RecepcionMxController {
                             }
                         }
                         if (procesar) {
-                            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), areaDestino.getIdArea(),seguridadService.obtenerNombreUsuario());
-                            if (solicitudDxList!=null && solicitudDxList.size()> 0) {
-                                //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
-                                Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
-                                if (pTipoNoti != null) {
-                                    for(DaSolicitudDx solicitudDx : solicitudDxList) {
-                                        //se obtienen los id de los examenes por defecto
-                                        examenesList = examenesService.getExamenesDefectoByIdDx(solicitudDx.getCodDx().getIdDiagnostico(),usuario.getUsername());
-                                        if (examenesList != null) {
-                                            //se registran los examenes por defecto
-                                            for (Examen_Dx examenTmp : examenesList) {
-                                                //si el área actual que debe procesa la mx es la misma area del exámen entonces se registra la orden
-                                                if (areaDestino != null && areaDestino.getIdArea().equals(examenTmp.getExamen().getArea().getIdArea())) {
-                                                    OrdenExamen ordenExamen = new OrdenExamen();
-                                                    ordenExamen.setSolicitudDx(solicitudDx);
-                                                    ordenExamen.setCodExamen(examenTmp.getExamen());
-                                                    ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                                    ordenExamen.setUsuarioRegistro(usuario);
-                                                    ordenExamen.setLabProcesa(labUsuario);
-                                                    try {
-                                                        ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                                    } catch (Exception ex) {
-                                                        ex.printStackTrace();
-                                                        logger.error("Error al agregar orden de examen", ex);
+                            //SI el usuario tiene autoridad sobre mas de un dx en distintas areas, agregar exmaen por defecto
+                            //Areas sobre las que tiene autoridad el usuario
+                            List<AutoridadArea> areasAutorizadas = autoridadesService.getAutoridadesArea(usuario.getUsername());
+                            for(AutoridadArea area : areasAutorizadas) {
+                                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), area.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                                if (solicitudDxList != null && solicitudDxList.size() > 0) {
+                                    //se obtiene la lista de examenes por defecto para dx según el tipo de notificación configurado en tabla de parámetros. Se pasa como paràmetro el codigo del tipo de notificación
+                                    Parametro pTipoNoti = parametrosService.getParametroByName(recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                                    if (pTipoNoti != null) {
+                                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                            //se obtienen los id de los examenes por defecto
+                                            examenesList = examenesService.getExamenesDefectoByIdDx(solicitudDx.getCodDx().getIdDiagnostico(), usuario.getUsername());
+                                            if (examenesList != null) {
+                                                //se registran los examenes por defecto
+                                                for (Examen_Dx examenTmp : examenesList) {
+                                                    //si el área actual que debe procesa la mx es la misma area del exámen entonces se registra la orden
+                                                    if (areaDestino != null && areaDestino.getIdArea().equals(examenTmp.getExamen().getArea().getIdArea())) {
+                                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                                        ordenExamen.setSolicitudDx(solicitudDx);
+                                                        ordenExamen.setCodExamen(examenTmp.getExamen());
+                                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                        ordenExamen.setUsuarioRegistro(usuario);
+                                                        ordenExamen.setLabProcesa(labUsuario);
+                                                        try {
+                                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                        } catch (Exception ex) {
+                                                            ex.printStackTrace();
+                                                            logger.error("Error al agregar orden de examen", ex);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -795,7 +800,21 @@ public class RecepcionMxController {
 
             try {
                 recepcionMxService.updateRecepcionMx(recepcionMx);
-                recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                //Si el usuario tiene autoridad sobre mas de un area según los dx solicitados en la muestra, agregar recepcion en lab para cada area
+                List<AutoridadArea> autoridadesArea = autoridadesService.getAutoridadesArea(usuario.getUsername());
+                List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), usuario.getUsername());
+                if (autoridadesArea.size() > 1){
+                    for (AutoridadArea autoridadArea : autoridadesArea){
+                        for (Area area : areasDx){
+                            if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())){
+                                recepcionMxLab.setArea(autoridadArea.getArea());
+                                recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                            }
+                        }
+                    }
+                }else{
+                    recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                }
                 if (actualizarTraslado)
                     trasladosService.saveTrasladoMx(trasladoMxActivo);
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
@@ -1461,7 +1480,20 @@ public class RecepcionMxController {
                     }
 
                     if (procesarRecepcion) {
-                        recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                        //Si el usuario tiene autoridad sobre mas de un area según los dx solicitados en la muestra, agregar recepcion en lab para cada area
+                        List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), user.getUsername());
+                        if (areasAutorizadas.size() > 1){
+                            for (AutoridadArea autoridadArea : areasAutorizadas){
+                                for (Area area : areasDx){
+                                    if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())){
+                                        recepcionMxLab.setArea(autoridadArea.getArea());
+                                        recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                                    }
+                                }
+                            }
+                        }else{
+                            recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                        }
                         recepcionMxService.updateRecepcionMx(recepcionMx);
                         if (actualizarTraslado)
                             trasladosService.saveTrasladoMx(trasladoMxActivo);

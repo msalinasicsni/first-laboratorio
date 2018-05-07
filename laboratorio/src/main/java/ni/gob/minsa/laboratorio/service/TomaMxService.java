@@ -745,6 +745,24 @@ public class TomaMxService {
         return q.list();
     }
 
+    /**
+     * Obtiene las areas a las que pertenecen los dx solicitidos en una muetra, según la autoridad del usuario indicado
+     * @param idToma toma a obtener areas de dx
+     * @param userName usuario que tiene la autoridad
+     * @return
+     */
+    public List<Area> getAreaSolicitudDxByTomaAndUser(String idToma, String userName){
+        String query = "select a from Area as a where a.idArea in (select sdx.codDx.area.idArea from DaSolicitudDx as sdx, AutoridadLaboratorio as al " +
+                "where al.pasivo = false and sdx.anulado = false and " +
+                "(sdx.labProcesa.codigo = al.laboratorio.codigo or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo))" +
+                " and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = false " +
+                "group by sdx.codDx.area.idArea)";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("userName",userName);
+        return q.list();
+    }
+
     public DaSolicitudDx getSolicitudDxByIdSolicitudUser(String idSolicitud, String userName){
         String query = " select sdx from DaSolicitudDx sdx, AutoridadLaboratorio al " +
                 "where al.pasivo = false and sdx.anulado = false and sdx.labProcesa.codigo = al.laboratorio.codigo and al.user.username =:userName and sdx.idSolicitudDx = :idSolicitud ORDER BY sdx.fechaHSolicitud";

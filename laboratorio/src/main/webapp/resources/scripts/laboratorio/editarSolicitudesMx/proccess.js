@@ -254,7 +254,6 @@ var EditarMxLab = function () {
                 if (parametros.sGetSolicitudesUrl!=null) {
                     $.getJSON(parametros.sGetSolicitudesUrl, {
                         idTomaMx: $("#idTomaMx").val(),
-                        contentType: "charset=ISO-8859-1",
                         ajax: 'true'
                     }, function (response) {
                         table3.fnClearTable();
@@ -326,7 +325,6 @@ var EditarMxLab = function () {
             function getRulesTest(idExamenes) {
                 $.getJSON(parametros.sReglasExamenesURL, {
                     idExamenes: idExamenes,
-                    contentType: "charset=ISO-8859-1",
                     ajax: 'true'
                 }, function (response) {
                     var len = Object.keys(response).length;
@@ -361,7 +359,6 @@ var EditarMxLab = function () {
                 if (parametros.sgetOrdenesExamenUrl!=null) {
                     $.getJSON(parametros.sgetOrdenesExamenUrl, {
                         idTomaMx: $("#idTomaMx").val(),
-                        contentType: "charset=ISO-8859-1",
                         ajax: 'true'
                     }, function (response) {
                         table2.fnClearTable();
