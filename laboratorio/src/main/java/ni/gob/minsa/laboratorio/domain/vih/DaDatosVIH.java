@@ -8,7 +8,7 @@ import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 
 @Entity
-@Table(name = "DA_DATOS_VIH", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = {"ID_NOTIFICACION"}))
+@Table(name = "da_datos_vih", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = {"ID_NOTIFICACION"}))
 public class DaDatosVIH implements Serializable, Auditable {
 
     /**
