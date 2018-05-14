@@ -269,7 +269,7 @@
                                     <div class="row">
                                         <section class="col col-3">
                                             <label  class="text-left txt-color-blue font-md">
-                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.symptoms.start.date.full" />
+                                                <spring:message code="lbl.receipt.symptoms.start.date.full" />
                                             </label>
                                             <div class="">
                                                 <label class="input">

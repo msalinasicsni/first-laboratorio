@@ -95,8 +95,12 @@ var EnterFormTomaMx = function () {
                 function(value, element, params) {
                     var fecha1 = value.split("/");
                     if (!/Invalid|NaN/.test(new Date(fecha1[2], fecha1[1]-1, fecha1[0]))) {
-                        var fecha2 = $(params).val().split("/");
-                        return new Date(fecha1[2], fecha1[1]-1, fecha1[0]) >= new Date(fecha2[2], fecha2[1]-1, fecha2[0]);
+                        if ($(params).val().length > 0) {
+                            var fecha2 = $(params).val().split("/");
+                            return new Date(fecha1[2], fecha1[1] - 1, fecha1[0]) >= new Date(fecha2[2], fecha2[1] - 1, fecha2[0]);
+                        }else { //si el otro campo de fecha esta vacío y no es requerido
+                            return true;
+                        }
                     }
 
                     return isNaN(value) && isNaN($(params).val())
