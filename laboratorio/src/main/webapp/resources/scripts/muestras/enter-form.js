@@ -123,9 +123,9 @@ var EnterFormTomaMx = function () {
 
             var $validator2 = $("#datos-noti").validate({
                 rules: {
-                    fechaInicioSintomas:{
-                        required: true
-                    },
+                    fechaInicioSintomas:{required: function () {
+                        return $('#codTipoNoti').find('option:selected').val() === 'TPNOTI|SINFEB' || $('#codTipoNoti').find('option:selected').val() === 'TPNOTI|IRAG' ;
+                    }},
                     embarazada:{
                         required: true
                     },
