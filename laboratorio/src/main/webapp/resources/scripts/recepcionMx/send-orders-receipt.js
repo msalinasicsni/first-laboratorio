@@ -262,6 +262,8 @@ var SendOrdersReceipt = function () {
                             ordenesObj['strOrdenes'] = idOrdenes;
                             ordenesObj['mensaje'] = '';
                             ordenesObj['cantRecepciones'] = len;
+                            ordenesObj['fechaEnvio'] = $('#fechaEnvio').val();
+                            ordenesObj["horaEnvio"] = $("#horaEnvio").val();
                             ordenesObj['cantRecepProc'] = '';
                             ordenesObj['numeroHoja'] = '';
                             $.ajax(

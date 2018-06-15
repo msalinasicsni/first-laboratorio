@@ -131,6 +131,9 @@ public class SendMxReceiptController {
         String numeroHoja="";
         Integer cantRecepciones = 0;
         Integer cantRecepProc = 0;
+        Date fechaHoraEnvio = new Date();
+        String fechaEnvio = "";
+        String horaEnvio = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -138,6 +141,17 @@ public class SendMxReceiptController {
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             strOrdenes = jsonpObject.get("strOrdenes").toString();
             cantRecepciones = jsonpObject.get("cantRecepciones").getAsInt();
+            if (jsonpObject.get("fechaEnvio") != null && !jsonpObject.get("fechaEnvio").getAsString().isEmpty())
+                fechaEnvio = jsonpObject.get("fechaEnvio").getAsString();
+            if (jsonpObject.get("horaEnvio") != null && !jsonpObject.get("horaEnvio").getAsString().isEmpty())
+                horaEnvio = jsonpObject.get("horaEnvio").getAsString();
+
+            if (!fechaEnvio.isEmpty()){
+                if (horaEnvio.isEmpty())
+                    fechaHoraEnvio = DateUtil.StringToDate(fechaEnvio, "dd/MM/yyyy");
+                else
+                    fechaHoraEnvio = DateUtil.StringToDate(fechaEnvio+ " "+horaEnvio, "dd/MM/yyyy hh:mm a");
+            }
 
             //Se obtiene estado enviado a procesar en laboratorio
             EstadoMx estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
@@ -148,7 +162,7 @@ public class SendMxReceiptController {
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             hojaTrabajo.setNumero(hojaTrabajoService.obtenerNumeroHoja(labUser.getCodigo()));
             hojaTrabajo.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-            hojaTrabajo.setFechaRegistro(new Date());
+            hojaTrabajo.setFechaRegistro(fechaHoraEnvio);
             hojaTrabajo.setLaboratorio(labUser);
             //se crea hoja de trabajo
             try {

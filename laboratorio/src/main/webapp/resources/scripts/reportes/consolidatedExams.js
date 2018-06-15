@@ -77,6 +77,7 @@ var consolidatedExams = function () {
                     filtro['anio'] = $('#anio').find('option:selected').val();
                     filtro['semFinal'] = $('#semF').find('option:selected').val();
                     filtro['semInicial'] = $('#semI').find('option:selected').val();
+                    filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
                     var valores = $('#idDx').val();
                     var strValores = '';
                    for (var i = 0; i < valores.length; i++) {

@@ -158,6 +158,15 @@ public class ResultadoFinalService {
                         .createAlias("examen", "examen").add(Restrictions.eq("examen.anulado", false)).add(Restrictions.eq("pasivo", false))
                         .setProjection(Property.forName("examen.solicitudDx.idSolicitudDx"))));
             }
+        }else {
+            //filtro por fecha de procesamiento de dx
+            if (filtro.getFechaInicioProcesamiento()!=null && filtro.getFechaFinProcesamiento()!=null){
+                crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
+                        .createAlias("solicitudDx", "dx").add(Restrictions.eq("pasivo",false))
+                        .add(Restrictions.between("fechahRegistro", filtro.getFechaInicioProcesamiento(),filtro.getFechaFinProcesamiento()))
+                        .setProjection(Property.forName("dx.idSolicitudDx"))));
+
+            }
         }
 
         //se filtra por tipo de solicitud
@@ -219,14 +228,6 @@ public class ResultadoFinalService {
                         .createAlias("solicitudDx", "dx").add(Restrictions.eq("pasivo",false))
                         .setProjection(Property.forName("dx.idSolicitudDx"))));
             }
-        }
-        //filtro por fecha de procesamiento
-        if (filtro.getFechaInicioProcesamiento()!=null && filtro.getFechaFinProcesamiento()!=null){
-            crit.add(Subqueries.propertyIn("idSolicitudDx", DetachedCriteria.forClass(DetalleResultadoFinal.class)
-                    .createAlias("solicitudDx", "dx").add(Restrictions.eq("pasivo",false))
-                    .add(Restrictions.between("fechahRegistro", filtro.getFechaInicioProcesamiento(),filtro.getFechaFinProcesamiento()))
-                    .setProjection(Property.forName("dx.idSolicitudDx"))));
-
         }
 
         //se filtra que la solicitud este aprobada. (SOLO CUANDO ES CONSULTA DE RESULTADOS APROBADOS)

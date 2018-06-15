@@ -108,6 +108,26 @@
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12">
                                 <label class="text-left txt-color-blue font-md">
+                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.lab" /> </label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"> <i class="fa fa-list"></i></span>
+                                    <select  name="codigoLab" id="codigoLab" data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.lab" />" class="select2">
+                                        <option value=""></option>
+                                        <c:forEach items="${laboratorios}" var="lab">
+                                            <option value="${lab.codigo}">${lab.nombre}</option>
+                                        </c:forEach>
+                                        <c:if test="${fn:length(laboratorios) gt 1}">
+                                            <option value="ALL"><spring:message code="act.show.all" /></option>
+                                        </c:if>
+                                    </select>
+                                </div>
+                            </section>
+                        </div>
+                        <!-- END ROW -->
+                        <!-- START ROW -->
+                        <div class="row">
+                            <section class="col col-sm-12 col-md-12 col-lg-12">
+                                <label class="text-left txt-color-blue font-md">
                                     <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dxs.large" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"> <i class="fa fa-list"></i></span>

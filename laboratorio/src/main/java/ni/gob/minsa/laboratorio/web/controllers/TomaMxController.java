@@ -439,6 +439,7 @@ public class TomaMxController {
         String embarazada = "";
         Integer semanasEmbarazo=null;
         String areaEntrega = "";
+        String codExpediente = "";
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -484,6 +485,8 @@ public class TomaMxController {
                 embarazada = jsonpObject.get("embarazada").getAsString();
             if (jsonpObject.get("semanasEmbarazo")!=null && !jsonpObject.get("semanasEmbarazo").getAsString().isEmpty())
                 semanasEmbarazo = jsonpObject.get("semanasEmbarazo").getAsInt();
+            if (jsonpObject.get("codExpediente")!=null && !jsonpObject.get("codExpediente").getAsString().isEmpty())
+                codExpediente = jsonpObject.get("codExpediente").getAsString();
 
             Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
             Usuarios usuarioRegistro = new Usuarios();
@@ -533,6 +536,9 @@ public class TomaMxController {
             }
             if (semanasEmbarazo!=null) {
                 notificacion.setSemanasEmbarazo(semanasEmbarazo);
+            }
+            if (!codExpediente.isEmpty()) {
+                notificacion.setCodExpediente(codExpediente);
             }
             tomaMx.setIdNotificacion(notificacion);
             if(fechaHTomaMx != null){
@@ -645,6 +651,7 @@ public class TomaMxController {
             map.put("fechaInicioSintomas",fechaInicioSintomas);
             map.put("codigoLab", codigoGenerado);
             map.put("areaPrc",escaper.translate(areaEntrega));
+            map.put("codExpediente", codExpediente);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
@@ -668,6 +675,9 @@ public class TomaMxController {
                 if (notificacion.getEmbarazada()!=null){
                     sindFebril.setEmbarazo(notificacion.getEmbarazada());
                 }
+                if (notificacion.getCodExpediente()!=null){
+                    sindFebril.setCodExpediente(notificacion.getCodExpediente());
+                }
                 sindFebrilService.saveSindFebril(sindFebril);
                 break;
             }
@@ -688,6 +698,9 @@ public class TomaMxController {
                 }
                 if (notificacion.getSemanasEmbarazo()!=null) {
                     irag.setSemanasEmbarazo(notificacion.getSemanasEmbarazo());
+                }
+                if (notificacion.getCodExpediente()!=null){
+                    irag.setCodExpediente(notificacion.getCodExpediente());
                 }
                 daIragService.saveOrUpdateIrag(irag);
                 break;

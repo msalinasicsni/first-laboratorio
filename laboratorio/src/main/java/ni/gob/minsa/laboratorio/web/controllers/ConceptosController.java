@@ -188,6 +188,7 @@ public class ConceptosController {
         String json = "";
         String resultado = "";
         String valor = "";
+        String etiqueta = "";
         String pasivo = "";
         Integer idConcepto = null;
         Integer idCatalogoLista = null;
@@ -199,7 +200,7 @@ public class ConceptosController {
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
 
             valor = jsonpObject.get("valor").getAsString();
-
+            etiqueta = jsonpObject.get("etiqueta").getAsString();
 
             if(!jsonpObject.get("pasivo").getAsString().isEmpty()){
                 pasivo = jsonpObject.get("pasivo").getAsString();
@@ -240,6 +241,9 @@ public class ConceptosController {
             if(!valor.isEmpty()){
                 value.setValor(valor);
             }
+            if(!etiqueta.isEmpty()){
+                value.setEtiqueta(etiqueta);
+            }
 
 
             conceptoService.addOrUpdateValue(value);
@@ -253,6 +257,7 @@ public class ConceptosController {
         } finally {
             Map<String, String> map = new HashMap<String, String>();
             map.put("valor", valor);
+            map.put("etiqueta", etiqueta);
             map.put("mensaje", resultado);
             map.put("idCatalogoLista", "");
             map.put("pasivo", pasivo);

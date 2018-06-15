@@ -1461,7 +1461,7 @@ public class VisualizarNotificacionController {
                                             if (det.getRespuesta() != null) {
                                                 if (det.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal = det.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal = det.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal = det.getRespuesta().getNombre() + ":" + " " + det.getValor();
@@ -1469,7 +1469,7 @@ public class VisualizarNotificacionController {
                                             } else {
                                                 if (det.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + det.getValor();
@@ -1481,7 +1481,7 @@ public class VisualizarNotificacionController {
                                             if (det.getRespuesta() != null) {
                                                 if (det.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal += "," + " "+ det.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal += "," + " "+ det.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal += "," + " "+ det.getRespuesta().getNombre() + ":" + " " + det.getValor();
@@ -1489,7 +1489,7 @@ public class VisualizarNotificacionController {
                                             } else {
                                                 if (det.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal += "," + " "+ det.getRespuestaExamen().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal += "," + " "+ det.getRespuestaExamen().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal += "," + " "+ det.getRespuestaExamen().getNombre() + ":" + " " + det.getValor();
@@ -1522,7 +1522,7 @@ public class VisualizarNotificacionController {
                                                     fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahProcesa(), "dd/MM/yyyy HH:mm:ss");
                                                     if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                         Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
-                                                        rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                        rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                     } else {
                                                         rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + resExamen.getValor();
@@ -1532,7 +1532,7 @@ public class VisualizarNotificacionController {
                                             } else {
                                                     if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                         Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
-                                                        rExamen += " " + resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                        rExamen += " " + resExamen.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                     } else {
                                                         rExamen += " " + resExamen.getRespuesta().getNombre() + ":" + " " + resExamen.getValor();
@@ -1597,7 +1597,7 @@ public class VisualizarNotificacionController {
                                             if (det.getRespuesta() != null) {
                                                 if (det.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal = det.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal = det.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal = det.getRespuesta().getNombre() + ":" + " " + det.getValor();
@@ -1605,7 +1605,7 @@ public class VisualizarNotificacionController {
                                             } else {
                                                 if (det.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + det.getValor();
@@ -1617,7 +1617,7 @@ public class VisualizarNotificacionController {
                                             if (det.getRespuesta() != null) {
                                                 if (det.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal += "," + " "+ det.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal += "," + " "+ det.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal += "," + " "+ det.getRespuesta().getNombre() + ":" + " " + det.getValor();
@@ -1625,7 +1625,7 @@ public class VisualizarNotificacionController {
                                             } else {
                                                 if (det.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                    rFinal += "," + " "+ det.getRespuestaExamen().getNombre() + ":" + " " + valor.getValor();
+                                                    rFinal += "," + " "+ det.getRespuestaExamen().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rFinal += "," + " "+ det.getRespuestaExamen().getNombre() + ":" + " " + det.getValor();
@@ -1657,7 +1657,7 @@ public class VisualizarNotificacionController {
                                                     fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahProcesa(), "dd/MM/yyyy HH:mm:ss");
                                                     if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                         Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
-                                                        rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                        rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                     } else {
                                                         rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + resExamen.getValor();
@@ -1667,7 +1667,7 @@ public class VisualizarNotificacionController {
                                             } else {
                                                     if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                         Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
-                                                        rExamen +=  ","+ " " + resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                        rExamen +=  ","+ " " + resExamen.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                     } else {
                                                         rExamen += ","+ " " + resExamen.getRespuesta().getNombre() + ":" + " " + resExamen.getValor();
@@ -2819,7 +2819,7 @@ public class VisualizarNotificacionController {
                                         if (det.getRespuesta() != null) {
                                             if (det.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                rFinal = det.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                rFinal = det.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                             } else {
                                                 rFinal = det.getRespuesta().getNombre() + ":" + " " + det.getValor();
@@ -2827,7 +2827,7 @@ public class VisualizarNotificacionController {
                                         } else {
                                             if (det.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + valor.getValor();
+                                                rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                             } else {
                                                 rFinal = det.getRespuestaExamen().getNombre() + ":" + " " + det.getValor();
@@ -2839,7 +2839,7 @@ public class VisualizarNotificacionController {
                                         if (det.getRespuesta() != null) {
                                             if (det.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                rFinal += ","+ " " +det.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                rFinal += ","+ " " +det.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                             } else {
                                                 rFinal += ","+ " " + det.getRespuesta().getNombre() + ":" + " " + det.getValor();
@@ -2847,7 +2847,7 @@ public class VisualizarNotificacionController {
                                         } else {
                                             if (det.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                 Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(det.getValor()));
-                                                rFinal += ","+ " " + det.getRespuestaExamen().getNombre() + ":" + " " + valor.getValor();
+                                                rFinal += ","+ " " + det.getRespuestaExamen().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                             } else {
                                                 rFinal += ","+ " " + det.getRespuestaExamen().getNombre() + ":" + " " + det.getValor();
@@ -2881,7 +2881,7 @@ public class VisualizarNotificacionController {
                                                 fechaProcesamiento = DateUtil.DateToString(resExamen.getFechahProcesa(), "dd/MM/yyyy HH:mm:ss");
                                                 if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
-                                                    rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                    rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rExamen = resExamen.getRespuesta().getNombre() + ":" + " " + resExamen.getValor();
@@ -2890,7 +2890,7 @@ public class VisualizarNotificacionController {
                                         } else {
                                                 if (resExamen.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(Integer.valueOf(resExamen.getValor()));
-                                                    rExamen += "," + " " + resExamen.getRespuesta().getNombre() + ":" + " " + valor.getValor();
+                                                    rExamen += "," + " " + resExamen.getRespuesta().getNombre() + ":" + " " + valor.getEtiqueta();
 
                                                 } else {
                                                     rExamen += "," + " " + resExamen.getRespuesta().getNombre() + ":" + " " + resExamen.getValor();

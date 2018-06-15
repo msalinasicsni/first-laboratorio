@@ -288,6 +288,36 @@
                                         </thead>
                                     </table>
                                    <form id="sendOrders-form" class="smart-form" autocomplete="off">
+                                       <fieldset>
+                                           <div class="row">
+                                               <section class="col col-3">
+                                                   <label  class="text-left txt-color-blue font-md">
+                                                       <spring:message code="lbl.shipping.date" />
+                                                   </label>
+                                                   <div class="">
+                                                       <label class="input">
+                                                           <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
+                                                           <input name="fechaEnvio" id="fechaEnvio" type='text'
+                                                                  class="form-control date-picker" data-date-end-date="+0d"
+                                                                  placeholder="<spring:message code="lbl.shipping.date" />"/>
+                                                       </label>
+                                                   </div>
+                                               </section>
+                                               <section class="col col-3">
+                                                   <label class="text-left txt-color-blue font-md">
+                                                       <spring:message code="lbl.shipping.time" />
+                                                   </label>
+                                                   <div class=''>
+                                                       <label class="input">
+                                                           <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-clock-o fa-fw"></i>
+                                                           <input id="horaEnvio" name="horaEnvio" type='text'
+                                                                  class="form-control styleTime"
+                                                                  placeholder="<spring:message code="lbl.shipping.time" />"/>
+                                                       </label>
+                                                   </div>
+                                               </section>
+                                           </div>
+                                       </fieldset>
                                        <footer>
                                            <button type="submit" id="send-orders-lab" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-send"></i> <spring:message code="act.send.selected" /></button>
                                        </footer>
@@ -343,7 +373,13 @@
     <spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
         <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
     <script src="${datePickerLoc}"></script>
-	<!-- JQUERY VALIDATE -->
+    <!-- bootstrap datetimepicker -->
+    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/moment-with-locales.js" var="moment" />
+    <script src="${moment}"></script>
+    <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/bootstrap-datetimepicker.js" var="datetimepicker" />
+    <script src="${datetimepicker}"></script>
+
+    <!-- JQUERY VALIDATE -->
 	<spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 	<script src="${jqueryValidate}"></script>
 	<spring:url value="/resources/js/plugin/jquery-validate/messages_{language}.js" var="jQValidationLoc">
@@ -393,6 +429,10 @@
 	    	if("top"!=localStorage.getItem("sm-setmenu")){
 	    		$("li.sendReceipt").parents("ul").slideDown(200);
 	    	}
+            $('#horaEnvio').datetimepicker({
+                format: 'LT'
+
+            });
         });
 	</script>
 	<!-- END JAVASCRIPTS -->

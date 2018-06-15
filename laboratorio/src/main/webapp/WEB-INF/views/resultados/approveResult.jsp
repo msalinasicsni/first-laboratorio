@@ -408,7 +408,6 @@
                         <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
                         <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
                         <input id="msg_select_exam" type="hidden" value="<spring:message code="msg.select.exam"/>"/>
-
                         <table id="solicitudesList" class="table table-striped table-bordered table-hover" width="100%">
                             <thead>
                             <tr>
@@ -430,6 +429,36 @@
                                     <input id="idSolicitud" type="hidden" value="0"/>
                                 </c:otherwise>
                             </c:choose>
+                            <fieldset>
+                                <div class="row">
+                                <section class="col col-3">
+                                    <label  class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.approve.date" />
+                                    </label>
+                                    <div class="">
+                                        <label class="input">
+                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
+                                            <input name="fechaAprobacion" id="fechaAprobacion" type='text'
+                                                   class="form-control date-picker" data-date-end-date="+0d"
+                                                   placeholder="<spring:message code="lbl.approve.date" />"/>
+                                        </label>
+                                    </div>
+                                </section>
+                                <section class="col col-3">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.approve.time" />
+                                    </label>
+                                    <div class=''>
+                                        <label class="input">
+                                            <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-clock-o fa-fw"></i>
+                                            <input id="horaAprobacion" name="horaAprobacion" type='text'
+                                                   class="form-control styleTime"
+                                                   placeholder="<spring:message code="lbl.approve.time" />"/>
+                                        </label>
+                                    </div>
+                                </section>
+                            </div>
+                            </fieldset>
                             <footer>
                                 <input id="val_yes" type="hidden" value="<spring:message code="lbl.yes"/>"/>
                                 <input id="val_no" type="hidden" value="<spring:message code="lbl.no"/>"/>
@@ -555,6 +584,11 @@
 <spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
     <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
 <script src="${datePickerLoc}"></script>
+<!-- bootstrap datetimepicker -->
+<spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/moment-with-locales.js" var="moment" />
+<script src="${moment}"></script>
+<spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/bootstrap-datetimepicker.js" var="datetimepicker" />
+<script src="${datetimepicker}"></script>
 <!-- JQUERY VALIDATE -->
 <spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 <script src="${jqueryValidate}"></script>
@@ -607,6 +641,10 @@
         if("top"!=localStorage.getItem("sm-setmenu")){
             $("li.approveResult").parents("ul").slideDown(200);
         }
+        $('#horaAprobacion').datetimepicker({
+            format: 'LT'
+
+        });
     });
 </script>
 <!-- END JAVASCRIPTS -->

@@ -246,9 +246,9 @@
                                         <h4 id="concName" ></h4>
                                     </div>
 
-                                    <section class="col col-sm-12 col-md-6 col-lg-6">
+                                    <section class="col col-sm-12 col-md-12 col-lg-12">
                                         <label class="text-left txt-color-blue font-md">
-                                            <spring:message code="lbl.value"/>
+                                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.value"/>
                                         </label>
                                         <div class="">
                                             <label class="input">
@@ -260,24 +260,34 @@
                                             </label>
                                         </div>
                                     </section>
-
-                                    <section style="padding-top: 10px" class="col col-sm-6 col-md-3 col-lg-3">
-
-                                        <button type="button" id="btnAddValue" class="btn btn-success styleButton"><i class="fa fa-save"></i></button>
-
+                                    <section class="col col-sm-12 col-md-12 col-lg-12">
+                                        <label class="text-left txt-color-blue font-md">
+                                            <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.label"/>
+                                        </label>
+                                        <div class="">
+                                            <label class="input">
+                                                <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>
+                                                <input class="form-control" type="text" name="etiqueta" id="etiqueta" placeholder=" <spring:message code="lbl.label" />" />
+                                                <b class="tooltip tooltip-bottom-right"> <i
+                                                        class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.enter.label"/>
+                                                </b>
+                                            </label>
+                                        </div>
                                     </section>
                                 </div>
-
-
-
+                                <footer>
+                                        <button type="button" id="btnAddValue" class="btn btn-success styleButton"><i class="fa fa-save"></i></button>
+                                </footer>
                             </form>
+                            <hr>
                             <div class="widget-body no-padding">
                                 <table id="values-records" class="table table-striped table-bordered table-hover" width="100%">
                                     <thead>
                                     <tr>
-                                        <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.value"/></th>
-                                        <th><spring:message code="act.edit"/></th>
-                                        <th><spring:message code="lbl.override"/></th>
+                                        <th style="width: 35%"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.value"/></th>
+                                        <th style="width: 45%"><i class="fa fa-fw fa-tag text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.label"/></th>
+                                        <th style="width: 10%"><spring:message code="act.edit"/></th>
+                                        <th style="width: 10%"><spring:message code="lbl.override"/></th>
                                     </tr>
                                     </thead>
                                 </table>

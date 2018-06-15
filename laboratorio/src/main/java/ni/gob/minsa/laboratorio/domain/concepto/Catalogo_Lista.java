@@ -15,15 +15,16 @@ import java.sql.Timestamp;
  * Created by souyen-ics.
  */
 @Entity
-@Table(name = "catalogo_lista", schema = "laboratorio")
+@Table(name = "catalogo_lista", schema = "laboratorio", uniqueConstraints = @UniqueConstraint(columnNames = {"VALOR","ID_CONCEPTO"},name = "CATLISTA_VALOR_IDCONCEPTO_UQ"))
 public class Catalogo_Lista implements Serializable, Auditable {
 
-   Integer idCatalogoLista;
-   String valor;
-   Concepto idConcepto;
-   boolean pasivo;
-   User usarioRegistro;
-   Timestamp fechaHRegistro;
+    Integer idCatalogoLista;
+    String valor;
+    String etiqueta;
+    Concepto idConcepto;
+    boolean pasivo;
+    User usarioRegistro;
+    Timestamp fechaHRegistro;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
@@ -44,6 +45,16 @@ public class Catalogo_Lista implements Serializable, Auditable {
 
     public void setValor(String valor) {
         this.valor = valor;
+    }
+
+    @Basic
+    @Column(name= "ETIQUETA", nullable = true, insertable = true, updatable = true, length = 150)
+    public String getEtiqueta() {
+        return etiqueta;
+    }
+
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
     }
 
     @LazyCollection(LazyCollectionOption.FALSE)

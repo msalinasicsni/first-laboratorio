@@ -32,6 +32,7 @@ public class ReporteConsolExamenService {
     @Resource(name = "respuestasExamenService")
     private RespuestasExamenService respuestasExamenService;
 
+    private static final String sqlLab = " and dx.labProcesa.codigo = :codigoLab ";
     /**
      * M?todo que retornar la informaci?n para generar reporte y gr?fico de notificaciones por tipo de resultado (positivo, negativo, sin resultado y % positividad)
      * @param filtro indicando el nivel (pais, silais, departamento, municipio, unidad salud), tipo notificaci?n, rango de fechas, factor tasas de poblaci?n
@@ -53,7 +54,9 @@ public class ReporteConsolExamenService {
                 "cal.noMes, oe.idOrdenExamen " +
                 "from DaNotificacion  noti, DaTomaMx mx, DaSolicitudDx  dx, OrdenExamen oe, CalendarioEpi cal "+
                 "where noti.idNotificacion = mx.idNotificacion and mx.idTomaMx = dx.idTomaMx and dx.idSolicitudDx = oe.solicitudDx " +
-                "and noti.pasivo = false and mx.anulada = false  and dx.anulado = false and dx.aprobada = true " +
+                "and noti.pasivo = false and mx.anulada = false " +
+                (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
+                "and dx.anulado = false and dx.aprobada = true " +
                 "and dx.controlCalidad = false and oe.anulado = false " +
                 "and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal " +
                 //"and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal) " +
@@ -69,7 +72,9 @@ public class ReporteConsolExamenService {
                 "from DaNotificacion  noti, DaTomaMx mx, DaSolicitudDx  dx, OrdenExamen oe , DetalleResultado dr, RespuestaExamen re, Concepto c, TipoDatoCatalogo tp, CalendarioEpi cal "+
                 "where noti.idNotificacion = mx.idNotificacion and mx.idTomaMx = dx.idTomaMx and dx.idSolicitudDx = oe.solicitudDx " +
                 "and oe.idOrdenExamen = dr.examen and re.idRespuesta = dr.respuesta.idRespuesta and c.idConcepto = re.concepto.idConcepto and c.tipo.catalogoId = tp.catalogoId " +
-                "and noti.pasivo = false and mx.anulada = false  and dx.anulado = false and dx.aprobada = true " +
+                "and noti.pasivo = false and mx.anulada = false " +
+                (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
+                "and dx.anulado = false and dx.aprobada = true " +
                 "and dx.controlCalidad = false and oe.anulado = false and dr.pasivo = false " +
                 "and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal " +
                 //"and dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal " +
@@ -84,6 +89,11 @@ public class ReporteConsolExamenService {
         queryRespuestaExamenes.setParameter("semI", filtro.getSemInicial());
         queryRespuestaExamenes.setParameter("semF", filtro.getSemFinal());
         queryRespuestaExamenes.setParameter("anio", Integer.valueOf(filtro.getAnioInicial()));
+
+        if (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")) {
+            queryExamenes.setParameter("codigoLab", filtro.getCodLaboratio());
+            queryRespuestaExamenes.setParameter("codigoLab", filtro.getCodLaboratio());
+        }
 
         respuestas.addAll(queryRespuestaExamenes.list());
         examenes.addAll(queryExamenes.list());

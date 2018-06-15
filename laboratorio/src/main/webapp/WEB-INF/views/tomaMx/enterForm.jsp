@@ -281,6 +281,18 @@
                                             </div>
                                         </section>
                                         <section class="col col-3">
+                                            <label  class="text-left txt-color-blue font-md">
+                                                <spring:message code="lbl.file.number" />
+                                            </label>
+                                            <div class="">
+                                                <label class="input">
+                                                    <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
+                                                    <input name="codExpediente" id="codExpediente" value="${noti.codExpediente}" type='text'
+                                                           class="form-control" placeholder="<spring:message code="lbl.file.number" />"/>
+                                                </label>
+                                            </div>
+                                        </section>
+                                        <section class="col col-3">
                                             <label class="text-left txt-color-blue font-md hidden-xs">
                                                 <spring:message code="lbl.urgent" />
                                             </label>
@@ -301,6 +313,8 @@
                                                 </select>
                                             </div>
                                         </section>
+                                        </div>
+                                    <div class="row">
                                         <c:if test="${noti.persona.sexo.codigo eq 'SEXO|F'}">
                                         <div id="datoEmbarazo" class="col col-3">
                                             <i class="fa fa-fw fa-asterisk txt-color-red font-sm hidden-xs"></i>

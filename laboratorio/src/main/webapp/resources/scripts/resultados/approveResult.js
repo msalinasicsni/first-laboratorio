@@ -203,12 +203,10 @@ var ApproveResult = function () {
                     idSolicitud: idSolicitud,
                     ajax: 'true'
                 }, function (dataToLoad) {
-                    console.log(dataToLoad);
                     table1.fnClearTable();
                     var len = Object.keys(dataToLoad).length;
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
-                            console.log(dataToLoad[i].resultado);
                             table1.fnAddData(
                                 [dataToLoad[i].respuesta, dataToLoad[i].valor, dataToLoad[i].fechaResultado]);
                         }
@@ -233,6 +231,8 @@ var ApproveResult = function () {
                 bloquearUI(parametros.blockMess);
                 var objResultado = {};
                 objResultado["idSolicitud"] = $("#idSolicitud").val();
+                objResultado['fechaAprobacion'] = $('#fechaAprobacion').val();
+                objResultado["horaAprobacion"] = $("#horaAprobacion").val();
                 objResultado["mensaje"] = '';
                 $.ajax(
                     {

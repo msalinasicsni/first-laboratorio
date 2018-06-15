@@ -516,12 +516,27 @@ public class AprobacionResultadoController {
         String json;
         String resultado = "";
         String idSolicitud="";
+        Date fechaHoraAprobacion = new Date();
+        String fechaAprobacion = "";
+        String horaAprobacion = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             idSolicitud = jsonpObject.get("idSolicitud").getAsString();
+            if (jsonpObject.get("fechaAprobacion") != null && !jsonpObject.get("fechaAprobacion").getAsString().isEmpty())
+                fechaAprobacion = jsonpObject.get("fechaAprobacion").getAsString();
+            if (jsonpObject.get("horaAprobacion") != null && !jsonpObject.get("horaAprobacion").getAsString().isEmpty())
+                horaAprobacion = jsonpObject.get("horaAprobacion").getAsString();
+
+            if (!fechaAprobacion.isEmpty()){
+                if (horaAprobacion.isEmpty())
+                    fechaHoraAprobacion = DateUtil.StringToDate(fechaAprobacion, "dd/MM/yyyy");
+                else
+                    fechaHoraAprobacion = DateUtil.StringToDate(fechaAprobacion+ " "+horaAprobacion, "dd/MM/yyyy hh:mm a");
+            }
+
             DaSolicitudDx solicitudDx = tomaMxService.getSolicitudDxByIdSolicitud(idSolicitud);
             DaSolicitudEstudio solicitudEstudio = tomaMxService.getSolicitudEstByIdSolicitud(idSolicitud);
             if (solicitudEstudio == null && solicitudDx == null){
@@ -530,13 +545,13 @@ public class AprobacionResultadoController {
                 User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
                 if (solicitudDx!=null){
                     solicitudDx.setAprobada(true);
-                    solicitudDx.setFechaAprobacion(new Date());
+                    solicitudDx.setFechaAprobacion(fechaHoraAprobacion);
                     solicitudDx.setUsuarioAprobacion(usuario);
                     tomaMxService.updateSolicitudDx(solicitudDx);
                 }
                 if (solicitudEstudio!=null){
                     solicitudEstudio.setAprobada(true);
-                    solicitudEstudio.setFechaAprobacion(new Date());
+                    solicitudEstudio.setFechaAprobacion(fechaHoraAprobacion);
                     solicitudEstudio.setUsuarioAprobacion(usuario);
                     tomaMxService.updateSolicitudEstudio(solicitudEstudio);
                 }

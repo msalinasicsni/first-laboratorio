@@ -135,7 +135,16 @@ var EnterFormTomaMx = function () {
                     },
                     semanasEmbarazo:{
                         required: true
-                    }
+                    },
+                    codExpediente:{required: function () {
+                        var requerido = false;
+                        if ($('#codExpediente').val().length <=0){
+                            if ($("#dx option:selected" ).text().toLowerCase().indexOf("tuberculos") !== -1){
+                                requerido = true;
+                            }
+                        }
+                        return requerido;
+                    }}
                 },
                 errorPlacement: function (error, element) {
                     error.insertAfter(element.parent());
@@ -162,6 +171,7 @@ var EnterFormTomaMx = function () {
                             ($('#codUnidadAtencion').find('option:selected').val()===undefined || $('#codUnidadAtencion').find('option:selected').val().length<=0)){
                             mensaje = $("#msg_sin_US").val();
                         }
+
                         if (mensaje.length<=0)
                         {
                             validateFechaToma();
@@ -250,6 +260,11 @@ var EnterFormTomaMx = function () {
                     objetoTomaMx['semanasEmbarazo'] = $('#semanasEmbarazo').val();
                 }else{
                     objetoTomaMx['semanasEmbarazo'] = '';
+                }
+                if (document.getElementById('codExpediente')){
+                    objetoTomaMx['codExpediente'] = $('#codExpediente').val();
+                }else{
+                    objetoTomaMx['codExpediente'] = '';
                 }
 
                 objetoTomaMx['fechaHTomaMx'] = $("#fechaHTomaMx").val();

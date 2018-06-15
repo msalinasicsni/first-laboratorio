@@ -167,7 +167,7 @@ var PrintResults = function () {
 
                             } else {
                                 $.smallBox({
-                                    title: $("#msjPdf").val(),
+                                    title: $("#msg_no_results_found").val(),
                                     content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
                                     color: "#C79121",
                                     iconSmall: "fa fa-warning",

@@ -99,7 +99,7 @@ var Concepts  = function () {
 
                 "pageLength": 4,
                 "columns": [
-                    null,
+                    null,null,
                     {
                         "className":      'editValue',
                         "orderable":      false
@@ -150,6 +150,7 @@ var Concepts  = function () {
                 $('#idCatalogoLista').val(detalle[0]);
                 $('#idC').val(detalle[1]);
                 $('#valor').val(detalle[2]);
+                $('#etiqueta').val(detalle[3]);
 
             }
 
@@ -194,6 +195,7 @@ var Concepts  = function () {
                         $('#concName').html(name);
                         $('#idC').val(codigo);
                         $('#valor').val('');
+                        $('#etiqueta').val('');
                         getValues(codigo);
                         showModalValues();
                     }
@@ -328,7 +330,8 @@ var Concepts  = function () {
             var $validator1 = $("#values-form").validate({
                 // Rules for form validation
                 rules: {
-                    valor: {required : true}
+                    valor: {required : true},
+                    etiqueta: {required : true}
 
                 },
                 // Do not change code below
@@ -356,15 +359,15 @@ var Concepts  = function () {
                     valuesTable.fnClearTable();
                     var len = data.length;
                     for (var i = 0; i < len; i++) {
-                        var btnEdit = '<button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto +"," +data[i].valor+'' +
-                                    '" > <i class="fa fa-edit"></i>' ;
+                        var btnEdit = '<button type="button" title="Editar" class="btn btn-default btn-xs btn-primary" data-id="'+data[i].idCatalogoLista+ ","+ data[i].idConcepto.idConcepto
+                            +"," +data[i].valor+"," +data[i].etiqueta +'" > <i class="fa fa-edit"></i>' ;
 
                         var btnOverride = '<button type="button" title="Anular" class="btn btn-default btn-xs btn-danger" data-id="'+data[i].idCatalogoLista+ '' +
                             '" > <i class="fa fa-times"></i>' ;
 
                           valuesTable.fnAddData(
 
-                                [data[i].valor, btnEdit, btnOverride ]);
+                                [data[i].valor, data[i].etiqueta, btnEdit, btnOverride ]);
                     }
 
                 }).fail(function(jqXHR) {
@@ -380,6 +383,7 @@ var Concepts  = function () {
                 valueObj['mensaje'] = '';
                 valueObj['pasivo']='';
                 valueObj['valor'] = $('#valor').val();
+                valueObj['etiqueta'] = $('#etiqueta').val();
                 valueObj['idConcepto'] = $('#idC').val();
                 valueObj['idCatalogoLista'] = $('#idCatalogoLista').val();
                 $.ajax(
@@ -410,8 +414,9 @@ var Concepts  = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
-                                valueObj['valor'] = $('#valor').val('');
-                                valueObj['idCatalogoLista'] = $('#idCatalogoLista').val('');
+                                $('#valor').val('');
+                                $('#etiqueta').val('');
+                                $('#idCatalogoLista').val('');
                             }
                             unBlockUI();
                         },
@@ -428,6 +433,7 @@ var Concepts  = function () {
                 valueObj['mensaje'] = '';
                 valueObj['pasivo']= 'true';
                 valueObj['valor'] = '';
+                valueObj['etiqueta'] = '';
                 valueObj['idConcepto'] = $('#idC').val();
                 valueObj['idCatalogoLista'] = idCatalogoLista;
                 blockUI(parametros.blockMess);
