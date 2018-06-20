@@ -62,7 +62,7 @@ public class ExamenesController {
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public String obtenerUsuarios(Model model) throws ParseException {
         logger.debug("Mostrando examenes en JSP");
-        List<Area> areaList = areaService.getAreas();
+        List<Area> areaList = areaService.getAreasActivas();
         model.addAttribute("areas",areaList);
         return "administracion/catalogos/tests";
     }

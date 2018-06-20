@@ -44,6 +44,8 @@ public class ExcelBuilder extends AbstractExcelView {
 
         List<String> columnas = (List<String>) model.get("columnas");
         boolean incluirMxInadecuadas = (boolean)model.get("incluirMxInadecuadas");
+        boolean mostrarTabla1 = (boolean)model.get("mostrarTabla1");
+        boolean mostrarTabla2 = (boolean)model.get("mostrarTabla2");
         String tipoReporte =  model.get("tipoReporte").toString();
         // create a new Excel sheet
         HSSFSheet sheet = workbook.createSheet(tipoReporte);
@@ -89,40 +91,44 @@ public class ExcelBuilder extends AbstractExcelView {
         CellStyle noDataCellStyle = workbook.createCellStyle();
         noDataCellStyle.setAlignment(HorizontalAlignment.CENTER);
         noDataCellStyle.setFont(font);
-
-        //tabla con dx positivos
-        // create header row
-        HSSFRow header = sheet.createRow(3);
-        setHeaderTable(header, headerStyle, columnas);
         // create data rows
         int rowCount = 4;
         int filaInicioNeg = 0;
 
-        for (Object[] registro : listaDxPos) {
-            HSSFRow aRow = sheet.createRow(rowCount++);
-            setRowData(aRow, registro, contentCellStyle, dateCellStyle);
-        }
-        if (listaDxPos.size()<=0){
-            HSSFRow aRow = sheet.createRow(rowCount++);
-            sheet.addMergedRegion(new CellRangeAddress(aRow.getRowNum(), aRow.getRowNum(), 0, columnas.size() - 1));
-            aRow.createCell(0).setCellValue(model.get("sinDatos").toString());
-            aRow.getCell(0).setCellStyle(noDataCellStyle);
+        if (mostrarTabla1) {
+            //tabla con dx positivos
+            // create header row
+            HSSFRow header = sheet.createRow(3);
+            setHeaderTable(header, headerStyle, columnas);
+
+            for (Object[] registro : listaDxPos) {
+                HSSFRow aRow = sheet.createRow(rowCount++);
+                setRowData(aRow, registro, contentCellStyle, dateCellStyle);
+            }
+            if (listaDxPos.size() <= 0) {
+                HSSFRow aRow = sheet.createRow(rowCount++);
+                sheet.addMergedRegion(new CellRangeAddress(aRow.getRowNum(), aRow.getRowNum(), 0, columnas.size() - 1));
+                aRow.createCell(0).setCellValue(model.get("sinDatos").toString());
+                aRow.getCell(0).setCellStyle(noDataCellStyle);
+            }
         }
 
-        //tabla con dx negativos
-        rowCount+=2; // PARA DEJAR UNA FILA EN BLANCO ENTRE AMBAS TABLAS
-        filaInicioNeg = rowCount++;
-        HSSFRow headerPos = sheet.createRow(rowCount++);
-        setHeaderTable(headerPos, headerStyle, columnas);
-        for (Object[] registro : listaDxNeg) {
-            HSSFRow aRow = sheet.createRow(rowCount++);
-            setRowData(aRow, registro, contentCellStyle, dateCellStyle);
-        }
-        if (listaDxNeg.size()<=0){
-            HSSFRow aRow = sheet.createRow(rowCount);
-            sheet.addMergedRegion(new CellRangeAddress(aRow.getRowNum(), aRow.getRowNum(),0,columnas.size()-1));
-            aRow.createCell(0).setCellValue(model.get("sinDatos").toString());
-            aRow.getCell(0).setCellStyle(noDataCellStyle);
+        if (mostrarTabla2) {
+            //tabla con dx negativos
+            rowCount += 2; // PARA DEJAR UNA FILA EN BLANCO ENTRE AMBAS TABLAS
+            filaInicioNeg = rowCount++;
+            HSSFRow headerPos = sheet.createRow(rowCount++);
+            setHeaderTable(headerPos, headerStyle, columnas);
+            for (Object[] registro : listaDxNeg) {
+                HSSFRow aRow = sheet.createRow(rowCount++);
+                setRowData(aRow, registro, contentCellStyle, dateCellStyle);
+            }
+            if (listaDxNeg.size() <= 0) {
+                HSSFRow aRow = sheet.createRow(rowCount);
+                sheet.addMergedRegion(new CellRangeAddress(aRow.getRowNum(), aRow.getRowNum(), 0, columnas.size() - 1));
+                aRow.createCell(0).setCellValue(model.get("sinDatos").toString());
+                aRow.getCell(0).setCellStyle(noDataCellStyle);
+            }
         }
         for(int i =0;i<columnas.size();i++){
             sheet.autoSizeColumn(i);
@@ -154,13 +160,17 @@ public class ExcelBuilder extends AbstractExcelView {
         subtitulo.createCell(1).setCellValue(model.get("subtitulo").toString());
         subtitulo.getCell(1).setCellStyle(titleStyle);
 
-        HSSFRow filtros = sheet.createRow(2);
-        filtros.createCell(1).setCellValue(model.get("tablaPos").toString());
-        filtros.getCell(1).setCellStyle(filterStyle);
+        if (mostrarTabla1) {
+            HSSFRow filtros = sheet.createRow(2);
+            filtros.createCell(1).setCellValue(model.get("tablaPos").toString());
+            filtros.getCell(1).setCellStyle(filterStyle);
+        }
 
-        HSSFRow filtrosNeg = sheet.createRow(filaInicioNeg);
-        filtrosNeg.createCell(1).setCellValue(model.get("tablaNeg").toString());
-        filtrosNeg.getCell(1).setCellStyle(filterStyle);
+        if (mostrarTabla2) {
+            HSSFRow filtrosNeg = sheet.createRow(filaInicioNeg);
+            filtrosNeg.createCell(1).setCellValue(model.get("tablaNeg").toString());
+            filtrosNeg.getCell(1).setCellStyle(filterStyle);
+        }
 
         if (incluirMxInadecuadas ){
             // create a new Excel sheet

@@ -212,7 +212,7 @@ public class ReportesExcelController {
             List<Object[]> registrosMxInadec = new ArrayList<Object[]>();
             List<String> columnas = new ArrayList<String>();
             Catalogo_Dx dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
-
+            boolean mostrarTabla1 = true, mostrarTabla2 = true;
 
             String tipoReporte = "";
             if (dx.getNombre().toLowerCase().contains("dengue")){
@@ -270,6 +270,8 @@ public class ReportesExcelController {
             model.put("listaDxNeg", registrosNeg);
             model.put("listaDxInadec", registrosMxInadec);
             model.put("incluirMxInadecuadas", filtroRep.isIncluirMxInadecuadas());
+            model.put("mostrarTabla1", mostrarTabla1);
+            model.put("mostrarTabla2", mostrarTabla2);
             model.put("sinDatos", messageSource.getMessage("lbl.nothing.to.show", null, null));
             /***********/
             /*GENERAR EXCEL*/
@@ -501,84 +503,128 @@ public class ReportesExcelController {
     }
 
         @RequestMapping(value = "/downloadExcel", method = RequestMethod.GET)
-    public ModelAndView downloadExcel(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
-        // create some sample data
-        logger.info("Obteniendo los datos para Reporte por Resultado dx vigilancia ");
-        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
-        Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());//seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-        List<DaSolicitudDx> dxList = reportesService.getDiagnosticosAprobadosByFiltro(filtroRep);
-        List<Object[]> registrosPos = new ArrayList<Object[]>();
-        List<Object[]> registrosNeg = new ArrayList<Object[]>();
-        List<Object[]> registrosMxInadec = new ArrayList<Object[]>();
-        List<String> columnas = new ArrayList<String>();
-        Catalogo_Dx dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
+    public ModelAndView downloadExcel(@RequestParam(value = "filtro", required = true) String filtro) throws Exception {
+            // create some sample data
+            logger.info("Obteniendo los datos para Reporte por Resultado dx vigilancia ");
+            FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+            Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());//seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            List<DaSolicitudDx> dxList = reportesService.getDiagnosticosAprobadosByFiltro(filtroRep);
+            List<Object[]> registrosPos = new ArrayList<Object[]>();
+            List<Object[]> registrosNeg = new ArrayList<Object[]>();
+            List<Object[]> registrosMxInadec = new ArrayList<Object[]>();
+            List<String> columnas = new ArrayList<String>();
+            Catalogo_Dx dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
+            boolean mostrarTabla1 = true, mostrarTabla2 = true;
 
+            ModelAndView excelView = new ModelAndView("excelView");
+            String tipoReporte = "";
+            if (dx.getNombre().toLowerCase().contains("dengue")) {
+                tipoReporte = "DENGUE";
+                setNombreColumnasDengue(columnas);
+                setDatosDengue(dxList, registrosPos, registrosNeg, labUser.getCodigo(), filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            } else if (dx.getNombre().toLowerCase().contains("chikun")) {
+                tipoReporte = "CHIK";
+                setNombreColumnasChik(columnas);
+                setDatosChikungunya(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, labUser.getCodigo(), columnas.size());
+            } else if (dx.getNombre().toLowerCase().contains("zika")) {
+                tipoReporte = "ZIKA";
+                setNombreColumnasZika(columnas);
+                setDatosZika(dxList, registrosPos, registrosNeg, labUser.getCodigo(), filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            } else if (dx.getNombre().toLowerCase().contains("leptospi")) {
+                tipoReporte = "LEPTO";
+                setNombreColumnasLepto(columnas);
+                setDatosLepto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            } else if (dx.getNombre().toLowerCase().contains("molecular") && dx.getNombre().toLowerCase().contains("vih")) {
+                tipoReporte = "ADN_VIH";
+                filtroRep.setIncluirMxInadecuadas(false);
+                setNombreColumnasVIHMolecular(columnas);
+                setDatosVIHMolecular(dxList, registrosPos, columnas.size(), labUser.getCodigo());
+            } else if (dx.getNombre().toLowerCase().contains("seguimiento") && dx.getNombre().toLowerCase().contains("vih")) {
+                tipoReporte = "CV-CD4_VIH";
+                filtroRep.setIncluirMxInadecuadas(false);
+                setNombreColumnasVIHSeguimiento(columnas);
+            } else if (dx.getNombre().toLowerCase().contains("serolog") && dx.getNombre().toLowerCase().contains("vih")) {
+                tipoReporte = "SEROLOGIA_VIH";
+                filtroRep.setIncluirMxInadecuadas(false);
+                setNombreColumnasVIHSerologia(columnas);
+            } //Mycobacterium Tuberculosis
+            else if (dx.getNombre().toLowerCase().contains("mycobacterium") && (dx.getNombre().toLowerCase().contains("tuberculosis") || dx.getNombre().toLowerCase().contains("tb"))) {
+                tipoReporte = "XPERT_TB";
+                mostrarTabla2 = false;
+                setNombreColumnasMycobacTB(columnas);
+                setDatosXpertTB(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            }//Cultivo TB
+            else if (dx.getNombre().toLowerCase().contains("cultivo") && (dx.getNombre().toLowerCase().contains("tuberculosis") || dx.getNombre().toLowerCase().contains("tb"))) {
+                tipoReporte = "CULTIVO_TB";
+                mostrarTabla2 = false;
+                filtroRep.setIncluirMxInadecuadas(false);
+                setNombreColumnasCultivoTB(columnas);
+                setDatosCultivoTB(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            } else {
+                tipoReporte = dx.getNombre().replace(" ", "_");
+                setNombreColumnasDefecto(columnas);
+                setDatosDefecto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec);
+            }
 
-        ModelAndView excelView = new ModelAndView("excelView");
-        String tipoReporte = "";
-        if (dx.getNombre().toLowerCase().contains("dengue")){
-            tipoReporte = "DENGUE";
-            setNombreColumnasDengue(columnas);
-            setDatosDengue(dxList, registrosPos, registrosNeg, labUser.getCodigo(), filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
-        }else if (dx.getNombre().toLowerCase().contains("chikun")){
-            tipoReporte = "CHIK";
-            setNombreColumnasChik(columnas);
-            setDatosChikungunya(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, labUser.getCodigo(), columnas.size());
-        }else if (dx.getNombre().toLowerCase().contains("zika")){
-            tipoReporte = "ZIKA";
-            setNombreColumnasZika(columnas);
-            setDatosZika(dxList, registrosPos, registrosNeg, labUser.getCodigo(), filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
-        }else if (dx.getNombre().toLowerCase().contains("leptospi")){
-            tipoReporte = "LEPTO";
-            setNombreColumnasLepto(columnas);
-            setDatosLepto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
-        }else if (dx.getNombre().toLowerCase().contains("molecular") && dx.getNombre().toLowerCase().contains("vih")){
-            tipoReporte = "ADN_VIH";
-            filtroRep.setIncluirMxInadecuadas(false);
-            setNombreColumnasVIHMolecular(columnas);
-            setDatosVIHMolecular(dxList, registrosPos, columnas.size(), labUser.getCodigo());
-        }else if (dx.getNombre().toLowerCase().contains("seguimiento") && dx.getNombre().toLowerCase().contains("vih")){
-            tipoReporte = "CV-CD4_VIH";
-            filtroRep.setIncluirMxInadecuadas(false);
-            setNombreColumnasVIHSeguimiento(columnas);
-        }else if (dx.getNombre().toLowerCase().contains("serolog") && dx.getNombre().toLowerCase().contains("vih")){
-            tipoReporte = "SEROLOGIA_VIH";
-            filtroRep.setIncluirMxInadecuadas(false);
-            setNombreColumnasVIHSerologia(columnas);
-        }else{
-            tipoReporte = dx.getNombre().replace(" ","_");
-            setNombreColumnasDefecto(columnas);
-            setDatosDefecto(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec);
-        }
+            Departamento departamento = organizationChartService.getDepartamentoAreaByLab(labUser.getCodigo(), dx.getArea().getIdArea());
+            excelView.addObject("titulo", messageSource.getMessage("lbl.minsa", null, null) + " - " + labUser.getNombre());
+            excelView.addObject("subtitulo", (departamento != null ? departamento.getNombre().toUpperCase() : "") + "/" + dx.getNombre().toUpperCase());
+            excelView.addObject("tablaPos", getSubtituloTabla1(tipoReporte, filtroRep));
+            excelView.addObject("tablaNeg", getSubtituloTabla2(tipoReporte, filtroRep));
+            excelView.addObject("tablaMxInadec", String.format(messageSource.getMessage("lbl.excel.filter.mx.inadec", null, null),
+                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
 
-        Departamento departamento = organizationChartService.getDepartamentoAreaByLab(labUser.getCodigo(), dx.getArea().getIdArea());
-        excelView.addObject("titulo", messageSource.getMessage("lbl.minsa", null, null)+ " - "+labUser.getNombre());
-        excelView.addObject("subtitulo", (departamento!=null?departamento.getNombre().toUpperCase():"")+"/"+dx.getNombre().toUpperCase());
-
-        excelView.addObject("tablaPos", String.format(messageSource.getMessage("lbl.excel.filter", null, null),
-                messageSource.getMessage((tipoReporte.equalsIgnoreCase("LEPTO")?"lbl.reactor":"lbl.positives"), null, null),
-                DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
-                DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
-
-        excelView.addObject("tablaNeg", String.format(messageSource.getMessage("lbl.excel.filter", null, null),
-                messageSource.getMessage((tipoReporte.equalsIgnoreCase("LEPTO")?"lbl.no.reactor":"lbl.negatives"), null, null),
-                DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
-                DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
-
-        excelView.addObject("tablaMxInadec", String.format(messageSource.getMessage("lbl.excel.filter.mx.inadec", null, null),
-                DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
-                DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
-
-        excelView.addObject("columnas", columnas);
-        excelView.addObject("tipoReporte", tipoReporte);
+            excelView.addObject("columnas", columnas);
+            excelView.addObject("tipoReporte", tipoReporte);
             excelView.addObject("reporte", "DXVIG");
 
-        excelView.addObject("listaDxPos", registrosPos);
-        excelView.addObject("listaDxNeg", registrosNeg);
-        excelView.addObject("listaDxInadec", registrosMxInadec);
-        excelView.addObject("incluirMxInadecuadas", filtroRep.isIncluirMxInadecuadas());
-        excelView.addObject("sinDatos", messageSource.getMessage("lbl.nothing.to.show",null,null));
-        return excelView;
+            excelView.addObject("listaDxPos", registrosPos);
+            excelView.addObject("listaDxNeg", registrosNeg);
+            excelView.addObject("listaDxInadec", registrosMxInadec);
+            excelView.addObject("incluirMxInadecuadas", filtroRep.isIncluirMxInadecuadas());
+            excelView.addObject("mostrarTabla1", mostrarTabla1);
+            excelView.addObject("mostrarTabla2", mostrarTabla2);
+            excelView.addObject("sinDatos", messageSource.getMessage("lbl.nothing.to.show", null, null));
+            return excelView;
+        }
+
+    private String getSubtituloTabla1(String tipoReporte, FiltrosReporte filtroRep){
+        String subTituloPos = "";
+        if (tipoReporte.equalsIgnoreCase("LEPTO")){
+            subTituloPos = String.format(messageSource.getMessage("lbl.excel.filter", null, null),
+                    messageSource.getMessage("lbl.reactor", null, null),
+                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy"));
+        }else if (tipoReporte.equalsIgnoreCase("XPERT_TB") || tipoReporte.equalsIgnoreCase("CULTIVO_TB")){
+            subTituloPos = String.format(messageSource.getMessage("lbl.excel.filter", null, null), "",
+                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy"));
+        }else{
+            subTituloPos = String.format(messageSource.getMessage("lbl.excel.filter", null, null),
+                    messageSource.getMessage("lbl.positives", null, null),
+                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy"));
+        }
+        return subTituloPos;
+    }
+
+    private String getSubtituloTabla2(String tipoReporte, FiltrosReporte filtroRep){
+        String subTituloPos = "";
+        if (tipoReporte.equalsIgnoreCase("LEPTO")){
+            subTituloPos = String.format(messageSource.getMessage("lbl.excel.filter", null, null),
+                    messageSource.getMessage("lbl.no.reactor", null, null),
+                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy"));
+        }else if (tipoReporte.equalsIgnoreCase("XPERT_TB") || tipoReporte.equalsIgnoreCase("CULTIVO_TB")){
+            subTituloPos = null;
+        }else{
+            subTituloPos = String.format(messageSource.getMessage("lbl.excel.filter", null, null),
+                    messageSource.getMessage("lbl.negatives", null, null),
+                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy"));
+        }
+        return subTituloPos;
     }
 
     private void setNombreColumnasDengue(List<String> columnas){
@@ -694,6 +740,52 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.date.admission", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.deceased", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.date.deceased", null, null).toUpperCase());
+    }
+
+    private void setNombreColumnasMycobacTB(List<String> columnas){
+        columnas.add(messageSource.getMessage("lbl.num", null, null));
+        columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.receipt.person.name", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.age", null, null).toUpperCase().replace(":", ""));
+        columnas.add(messageSource.getMessage("lbl.age.um", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.health.unit", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.population.risk", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.category.patient", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.comorbidities", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.location.infection", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.sample.type1", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.bacilloscopy", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.date.xpert.tb", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.fr.expert.tb", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.observations", null, null).toUpperCase());
+    }
+
+    private void setNombreColumnasCultivoTB(List<String> columnas){
+        columnas.add(messageSource.getMessage("lbl.num", null, null));
+        columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.receipt.person.name", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.age", null, null).toUpperCase().replace(":", ""));
+        columnas.add(messageSource.getMessage("lbl.age.um", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.health.unit", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.population.risk", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.category.patient", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.comorbidities", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.location.infection", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.sample.type1", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.bacilloscopy", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.date.xpert.tb", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.fr.expert.tb", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.planting.date", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.num.tubes", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.num.tubes.con", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.res.planting", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.date.res.planting", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lote.lj", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.observations", null, null).toUpperCase());
     }
 
     private void setNombreColumnasVIHMolecular(List<String> columnas){
@@ -1141,6 +1233,116 @@ public class ReportesExcelController {
         }
     }
 
+    private void setDatosXpertTB(List<DaSolicitudDx> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec, int numColumnas) throws Exception{
+// create data rows
+        int rowCountPos = 1;
+        int rowCountNeg = 1;
+        int rowCountInadec = 1;
+        for (DaSolicitudDx solicitudDx : dxList) {
+            String nombres = "";
+            String apellidos = "";
+
+            Object[] registro = new Object[numColumnas];
+            registro[1] = solicitudDx.getIdTomaMx().getCodigoLab();
+            nombres = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                nombres += " "+solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+
+            apellidos = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                apellidos += " "+solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+            registro[2] = nombres + " " + apellidos;
+            String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
+            registro[3] = sexo.substring(sexo.length() - 1, sexo.length());
+            Integer edad = null;
+            String medidaEdad = "";
+            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
+            if (arrEdad[0] != null) {
+                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
+            }else if (arrEdad[1] != null) {
+                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
+            }else if (arrEdad[2] != null) {
+                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
+            }
+            registro[4] = edad;
+            registro[5] = medidaEdad;
+            registro[6] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre(): //silais en la notificacion
+                    (solicitudDx.getIdTomaMx().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getCodSilaisAtencion().getNombre():"")); //silais en la toma mx
+            registro[7] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre()://unidad en la notif
+                    (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():""));//unidad en la toma mx
+            registro[12] = solicitudDx.getIdTomaMx().getCodTipoMx().getNombre();
+
+            validarPCRTB(registro, solicitudDx.getIdSolicitudDx(), 15, 14);
+
+             if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuada")){
+                registro[0]= rowCountInadec++;
+                registrosMxInadec.add(registro);
+            }else {
+                 //la posición que contiene el resultado final
+                 registro[0]= rowCountPos++;
+                 registrosPos.add(registro);
+             }
+        }
+    }
+
+    private void setDatosCultivoTB(List<DaSolicitudDx> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec, int numColumnas) throws Exception{
+// create data rows
+        int rowCountPos = 1;
+        int rowCountInadec = 1;
+        for (DaSolicitudDx solicitudDx : dxList) {
+            String nombres = "";
+            String apellidos = "";
+
+            Object[] registro = new Object[numColumnas];
+            registro[1] = solicitudDx.getIdTomaMx().getCodigoLab();
+            nombres = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
+                nombres += " "+solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+
+            apellidos = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+            if (solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
+                apellidos += " "+solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+            registro[2] = nombres + " " + apellidos;
+            String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
+            registro[3] = sexo.substring(sexo.length() - 1, sexo.length());
+            Integer edad = null;
+            String medidaEdad = "";
+            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
+            if (arrEdad[0] != null) {
+                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
+            }else if (arrEdad[1] != null) {
+                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
+            }else if (arrEdad[2] != null) {
+                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
+            }
+            registro[4] = edad;
+            registro[5] = medidaEdad;
+            registro[6] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre(): //silais en la notificacion
+                    (solicitudDx.getIdTomaMx().getCodSilaisAtencion()!=null?solicitudDx.getIdTomaMx().getCodSilaisAtencion().getNombre():"")); //silais en la toma mx
+            registro[7] = (solicitudDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre()://unidad en la notif
+                    (solicitudDx.getIdTomaMx().getCodUnidadAtencion()!=null?solicitudDx.getIdTomaMx().getCodUnidadAtencion().getNombre():""));//unidad en la toma mx
+            registro[12] = solicitudDx.getIdTomaMx().getCodTipoMx().getNombre();
+
+            validarCultivoTB(registro, solicitudDx.getIdSolicitudDx());
+
+            if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuada")){
+                registro[0]= rowCountInadec++;
+                registrosMxInadec.add(registro);
+            }else {
+                //la posición que contiene el resultado final
+                registro[0]= rowCountPos++;
+                registrosPos.add(registro);
+            }
+
+            List<DaSolicitudDx> buscarCultivoTb = tomaMxService.getSoliDxAprobByIdToma(solicitudDx.getIdTomaMx().getIdTomaMx());
+            for(DaSolicitudDx cultivoDx : buscarCultivoTb){
+                if (cultivoDx.getCodDx().getNombre().toLowerCase().contains("mycobacterium") && (cultivoDx.getCodDx().getNombre().toLowerCase().contains("tuberculosis") || cultivoDx.getCodDx().getNombre().toLowerCase().contains("tb"))){
+                    validarPCRTB(registro, cultivoDx.getIdSolicitudDx(), 15, 14);
+                }
+            }
+        }
+    }
+
     private void setDatosVIHMolecular(List<DaSolicitudDx> dxList, List<Object[]> registros, int numColumnas, String codigoLab) throws Exception{
 // create data rows
         int rowCountPos = 1;
@@ -1373,6 +1575,65 @@ public class ReportesExcelController {
             }
         }
     }
+
+    private void validarPCRTB(Object[] dato, String idSolicitudDx, int indiceRes, int indiceFR){
+
+        List<OrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitud(idSolicitudDx);
+        for (OrdenExamen examen : examenes) {
+            if (examen.getCodExamen().getNombre().toUpperCase().contains("XPERT")){
+                List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
+
+                Date fechaProcesamiento = null;
+                String detalleResultado = "";
+                for (DetalleResultado resultado : resultados) {
+
+                    if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                        detalleResultado = cat_lista.getEtiqueta();
+                    } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                    }/* else {
+                            detalleResultado = resultado.getValor();
+                        }*/
+                    fechaProcesamiento = resultado.getFechahProcesa();
+                }
+                if (resultados.size() > 0) {
+                    dato[indiceRes] = detalleResultado;
+                    dato[indiceFR] = DateUtil.DateToString(fechaProcesamiento,"dd/MM/yyyy");
+                }
+            }
+        }
+    }
+
+    private void validarCultivoTB(Object[] dato, String idSolicitudDx){
+
+        List<OrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitud(idSolicitudDx);
+        for (OrdenExamen examen : examenes) {
+            if (examen.getCodExamen().getNombre().toLowerCase().contains("cultivo")){
+                List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
+
+                Date fechaProcesamiento = null;
+                String detalleResultado = "";
+                for (DetalleResultado resultado : resultados) {
+
+                    if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                        detalleResultado = cat_lista.getEtiqueta();
+                    } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                    }/* else {
+                            detalleResultado = resultado.getValor();
+                        }*/
+                    fechaProcesamiento = resultado.getFechahProcesa();
+                }
+                if (resultados.size() > 0) {
+                    dato[19] = detalleResultado;
+                    dato[20] = DateUtil.DateToString(fechaProcesamiento,"dd/MM/yyyy");
+                }
+            }
+        }
+    }
+
 
     private void validarPCRIgMDefecto(Object[] dato, String idSolicitudDx){
 

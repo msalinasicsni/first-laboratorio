@@ -74,7 +74,7 @@ public class AdmonSolicitudesController {
         }
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
-              List<Area> areaList =  areaService.getAreas();
+              List<Area> areaList =  areaService.getAreasActivas();
               mav.addObject("areaList",areaList);
             mav.setViewName("administracion/catalogos/request");
         }else

@@ -36,6 +36,13 @@ public class AreaService {
         return  q.list();
     }
 
+    public List<Area> getAreasActivas(){
+        String query = "from Area where pasivo = false order by nombre";
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        return  q.list();
+    }
+
     public Area getArea(Integer idArea){
         String query = "from Area as a where idArea= :idArea";
 
