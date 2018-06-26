@@ -655,7 +655,7 @@ var EnterFormTomaMx = function () {
 
                                 }
                             }
-                            handleDatePickers("${pageContext.request.locale.language}");
+                            handleDatePickers(parametros.language);
                             desbloquearUI();
                         } else {
                             desbloquearUI();

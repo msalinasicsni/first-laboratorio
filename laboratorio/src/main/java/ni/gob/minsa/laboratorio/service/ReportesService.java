@@ -955,12 +955,14 @@ public class ReportesService {
                                 if (valor != null) {
                                     if (valor.getValor().trim().toLowerCase().contains("negativo")
                                             || valor.getValor().trim().toLowerCase().contains("no reactor")
-                                            || valor.getValor().trim().toLowerCase().contains("no detectado")) {
+                                            || valor.getValor().trim().toLowerCase().contains("no detectado")
+                                            || valor.getValor().trim().toUpperCase().contains("MTB-ND")) {
                                         neg++;
                                         idSolicitud = sol[1].toString();
                                     } else if (valor.getValor().trim().toLowerCase().contains("positivo")
                                             || valor.getValor().trim().toLowerCase().contains("reactor")
-                                            || valor.getValor().trim().toLowerCase().contains("detectado")) {
+                                            || valor.getValor().trim().toLowerCase().contains("detectado")
+                                            || valor.getValor().trim().toUpperCase().contains("MTB-DET")) {
                                         pos++;
                                         idSolicitud = sol[1].toString();
                                     }
@@ -969,12 +971,14 @@ public class ReportesService {
                             } else if (sol[3].toString().equalsIgnoreCase("TPDATO|TXT")) {
                                 if (sol[2].toString().trim().toLowerCase().contains("negativo")
                                         || sol[2].toString().trim().toLowerCase().contains("no reactor")
-                                        || sol[2].toString().trim().toLowerCase().contains("no detectado")) {
+                                        || sol[2].toString().trim().toLowerCase().contains("no detectado")
+                                        ) {
                                     neg++;
                                     idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("positivo")
                                         || sol[2].toString().trim().toLowerCase().contains("reactor")
-                                        || sol[2].toString().trim().toLowerCase().contains("detectado")) {
+                                        || sol[2].toString().trim().toLowerCase().contains("detectado")
+                                        || sol[2].toString().trim().toUpperCase().contains("MTB-DET")) {
                                     pos++;
                                     idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")) {
@@ -995,12 +999,14 @@ public class ReportesService {
                                 if (valor != null) {
                                     if (valor.getValor().trim().toLowerCase().contains("negativo")
                                             || valor.getValor().trim().toLowerCase().contains("no reactor")
-                                            || valor.getValor().trim().toLowerCase().contains("no detectado")) {
+                                            || valor.getValor().trim().toLowerCase().contains("no detectado")
+                                            || valor.getValor().trim().toUpperCase().contains("MTB-ND")) {
                                         neg++;
                                         idSolicitud = sol[1].toString();
                                     } else if (valor.getValor().trim().toLowerCase().contains("positivo")
                                             || valor.getValor().trim().toLowerCase().contains("reactor")
-                                            || valor.getValor().trim().toLowerCase().contains("detectado")) {
+                                            || valor.getValor().trim().toLowerCase().contains("detectado")
+                                            || valor.getValor().trim().toUpperCase().contains("MTB-DET")) {
                                         pos++;
                                         idSolicitud = sol[1].toString();
                                     }
@@ -1010,12 +1016,14 @@ public class ReportesService {
                             } else if (sol[4].toString().equalsIgnoreCase("TPDATO|TXT")) {
                                 if (sol[2].toString().trim().toLowerCase().contains("negativo")
                                         || sol[2].toString().trim().toLowerCase().contains("no reactor")
-                                        || sol[2].toString().trim().toLowerCase().contains("no detectado")) {
+                                        || sol[2].toString().trim().toLowerCase().contains("no detectado")
+                                        || sol[2].toString().trim().toUpperCase().contains("MTB-ND")) {
                                     neg++;
                                     idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("positivo")
                                         || sol[2].toString().trim().toLowerCase().contains("reactor")
-                                        || sol[2].toString().trim().toLowerCase().contains("detectado")) {
+                                        || sol[2].toString().trim().toLowerCase().contains("detectado")
+                                        || sol[2].toString().trim().toUpperCase().contains("MTB-DET")) {
                                     pos++;
                                     idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")) {

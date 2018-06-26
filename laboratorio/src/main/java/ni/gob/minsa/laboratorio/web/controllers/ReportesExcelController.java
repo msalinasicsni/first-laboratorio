@@ -238,6 +238,19 @@ public class ReportesExcelController {
                 tipoReporte = "SG_VIH";
             }else if (dx.getNombre().toLowerCase().contains("serolog") && dx.getNombre().toLowerCase().contains("vih")){
                 tipoReporte = "SR_VIH";
+            } //Mycobacterium Tuberculosis
+            else if (dx.getNombre().toLowerCase().contains("mycobacterium") && (dx.getNombre().toLowerCase().contains("tuberculosis") || dx.getNombre().toLowerCase().contains("tb"))) {
+                tipoReporte = "XPERT_TB";
+                mostrarTabla2 = false;
+                setNombreColumnasMycobacTB(columnas);
+                setDatosXpertTB(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            }//Cultivo TB
+            else if (dx.getNombre().toLowerCase().contains("cultivo") && (dx.getNombre().toLowerCase().contains("tuberculosis") || dx.getNombre().toLowerCase().contains("tb"))) {
+                tipoReporte = "CULTIVO_TB";
+                mostrarTabla2 = false;
+                filtroRep.setIncluirMxInadecuadas(false);
+                setNombreColumnasCultivoTB(columnas);
+                setDatosCultivoTB(dxList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
             }
             else{
                 tipoReporte = dx.getNombre().replace(" ","_");
@@ -249,15 +262,8 @@ public class ReportesExcelController {
             model.put("titulo", messageSource.getMessage("lbl.minsa", null, null) + " - " + labUser.getNombre());
             model.put("subtitulo", departamento.getNombre().toUpperCase() + "/" + dx.getNombre().toUpperCase());
 
-            model.put("tablaPos", String.format(messageSource.getMessage("lbl.excel.filter", null, null),
-                    messageSource.getMessage("lbl.positives", null, null),
-                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
-                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
-
-            model.put("tablaNeg", String.format(messageSource.getMessage("lbl.excel.filter", null, null),
-                    messageSource.getMessage("lbl.negatives", null, null),
-                    DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
-                    DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
+            model.put("tablaPos", getSubtituloTabla1(tipoReporte, filtroRep));
+            model.put("tablaNeg", getSubtituloTabla2(tipoReporte, filtroRep));
 
             model.put("tablaMxInadec", String.format(messageSource.getMessage("lbl.excel.filter.mx.inadec", null, null),
                     DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
@@ -1325,7 +1331,7 @@ public class ReportesExcelController {
 
             validarCultivoTB(registro, solicitudDx.getIdSolicitudDx());
 
-            if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuada")){
+            if (incluirMxInadecuadas && registro[19].toString().toLowerCase().contains("inadecuada")){
                 registro[0]= rowCountInadec++;
                 registrosMxInadec.add(registro);
             }else {
@@ -1589,9 +1595,10 @@ public class ReportesExcelController {
 
                     if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                         Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
-                        detalleResultado = cat_lista.getEtiqueta();
+                        detalleResultado = (detalleResultado.isEmpty()?cat_lista.getEtiqueta():detalleResultado+"/"+cat_lista.getEtiqueta());
                     } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                        String valorSN = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                        detalleResultado = (detalleResultado.isEmpty()?valorSN:detalleResultado+"/"+valorSN);
                     }/* else {
                             detalleResultado = resultado.getValor();
                         }*/
@@ -1605,7 +1612,7 @@ public class ReportesExcelController {
         }
     }
 
-    private void validarCultivoTB(Object[] dato, String idSolicitudDx){
+    private void validarCultivoTB(Object[] dato, String idSolicitudDx) throws Exception{
 
         List<OrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitud(idSolicitudDx);
         for (OrdenExamen examen : examenes) {
@@ -1613,20 +1620,27 @@ public class ReportesExcelController {
                 List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
 
                 Date fechaProcesamiento = null;
+                String fechaSiembra = null;
                 String detalleResultado = "";
                 for (DetalleResultado resultado : resultados) {
+                    if (resultado.getRespuesta().getNombre().toLowerCase().contains("fecha") && resultado.getRespuesta().getNombre().toLowerCase().contains("siembra"))
+                    {
+                       fechaSiembra = resultado.getValor();
+                    }else {
 
-                    if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
-                        detalleResultado = cat_lista.getEtiqueta();
-                    } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
-                    }/* else {
+                        if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                            detalleResultado = cat_lista.getEtiqueta();
+                        } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                        }/* else {
                             detalleResultado = resultado.getValor();
                         }*/
+                    }
                     fechaProcesamiento = resultado.getFechahProcesa();
                 }
                 if (resultados.size() > 0) {
+                    dato[16] = fechaSiembra;
                     dato[19] = detalleResultado;
                     dato[20] = DateUtil.DateToString(fechaProcesamiento,"dd/MM/yyyy");
                 }

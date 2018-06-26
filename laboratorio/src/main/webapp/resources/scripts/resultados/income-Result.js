@@ -189,6 +189,10 @@ var IncomeResult = function () {
                                     idControlRespuesta = dataToLoad[i].idRespuesta;
                                     valorControlRespuesta = $('#' + idControlRespuesta).val();
                                     break;
+                                case 'TPDATO|FCH':
+                                    idControlRespuesta = dataToLoad[i].idRespuesta;
+                                    valorControlRespuesta = $('#' + idControlRespuesta).val();
+                                    break;
                                 default:
                                     console.log('respuesta sin concepto');
                                     break;
@@ -532,12 +536,34 @@ var IncomeResult = function () {
                                                 digits: 2
                                             });
                                             break;
+                                        case 'TPDATO|FCH':
+                                            idControlRespuesta = dataToLoad[i].idRespuesta;
+                                            contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                            if (dataToLoad[i].requerido) {
+                                                contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                            }
+                                            contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
+                                                '<div class="">' +
+                                                '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>';
+                                            if (dataToLoad[i].requerido) {
+                                                contenidoControl = contenidoControl + '<input class="form-control date-picker requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
+                                            } else {
+                                                contenidoControl = contenidoControl + '<input class="form-control date-picker" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad[i].nombre + '" >';
+                                            }
+
+                                            contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad[i].nombre + '</b></label>' +
+                                                '</div></section>' +
+                                                seccionDescripcion +
+                                                '</div>';
+                                            divResultado.append(contenidoControl);
+                                            break;
                                         default:
                                             console.log('respuesta sin concepto');
                                             break;
 
                                     }
                                 }
+                                handleDatePickers(parametros.language);
                                 desbloquearUI();
                             } else {
                                 desbloquearUI();

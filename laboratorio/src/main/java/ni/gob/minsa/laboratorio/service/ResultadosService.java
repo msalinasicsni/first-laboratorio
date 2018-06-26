@@ -107,7 +107,7 @@ public class ResultadosService {
     }
 
     public List<DetalleResultado> getDetallesResultadoActivosByExamen(String idOrdenExamen){
-        String query = "select a from DetalleResultado as a inner join a.examen as r where a.pasivo = false and r.idOrdenExamen = :idOrdenExamen ";
+        String query = "select a from DetalleResultado as a inner join a.examen as r where a.pasivo = false and r.idOrdenExamen = :idOrdenExamen order by a.respuesta.orden asc";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);

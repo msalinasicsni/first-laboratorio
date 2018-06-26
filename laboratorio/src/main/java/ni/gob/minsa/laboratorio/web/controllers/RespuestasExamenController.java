@@ -90,7 +90,7 @@ public class RespuestasExamenController {
         ModelAndView mav = new ModelAndView();
         if (urlValidacion.isEmpty()) {
             List<TipoNotificacion> notificacionList = catalogoService.getTipoNotificacion();
-            List<Concepto> conceptsList = conceptoService.getConceptsList(true);
+            List<Concepto> conceptsList = conceptoService.getConceptsList(false);
             Parametro parametro = parametrosService.getParametroByName("DATO_NUM_CONCEPTO");
 
             mav.addObject("codigoDatoNumerico",parametro.getValor());
