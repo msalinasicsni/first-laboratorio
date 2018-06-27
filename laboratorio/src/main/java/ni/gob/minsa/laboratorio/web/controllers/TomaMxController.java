@@ -187,7 +187,7 @@ public class TomaMxController {
             mav.addObject("notificaciones",tiposNotificacion);
             mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",true);
-            mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
+            mav.addObject("mostrarPopUpMx",(labUser!=null?labUser.getPopUpCodigoMx():false));
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {
