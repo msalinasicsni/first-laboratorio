@@ -126,8 +126,8 @@ public class ExamenesService {
         Session session = sessionFactory.getCurrentSession();
         nombreExamen = URLDecoder.decode(nombreExamen, "utf-8");
         StringBuilder sQuery = new StringBuilder("select ex " +
-                "from CatalogoExamenes as ex");
-        if (!nombreExamen.isEmpty()) sQuery.append(" where lower(ex.nombre) like '%").append(nombreExamen.toLowerCase()).append("%'");
+                "from CatalogoExamenes as ex where pasivo = false ");
+        if (!nombreExamen.isEmpty()) sQuery.append(" and lower(ex.nombre) like '%").append(nombreExamen.toLowerCase()).append("%'");
 
         Query q = session.createQuery(sQuery.toString());
 

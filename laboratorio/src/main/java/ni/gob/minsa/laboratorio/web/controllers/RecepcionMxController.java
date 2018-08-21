@@ -14,6 +14,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.Authority;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
@@ -130,6 +131,9 @@ public class RecepcionMxController {
 
     @Resource(name = "autoridadesService")
     private AutoridadesService autoridadesService;
+
+    @Resource(name = "respuestasExamenService")
+    private RespuestasExamenService respuestasExamenService;
 
     @Autowired
     MessageSource messageSource;
@@ -691,7 +695,7 @@ public class RecepcionMxController {
      * @throws IOException
      */
     @RequestMapping(value = "receiptLaboratory", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    protected void recepcionLaboratorio(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void recepcionLaboratorio(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String json;
         String resultado = "";
         String idRecepcion = "";
@@ -755,6 +759,7 @@ public class RecepcionMxController {
                 recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
             }
             recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
             TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
             boolean actualizarTraslado = false;
             if (trasladoMxActivo!=null) {
@@ -770,7 +775,6 @@ public class RecepcionMxController {
                 }
             }else{
                 //si no hay traslado, obtener area de dx con mayor prioridad
-                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
                 if (solicitudDxList.size() > 0) {
                     int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
                     for(DaSolicitudDx solicitudDx: solicitudDxList) {
@@ -817,8 +821,8 @@ public class RecepcionMxController {
                 if (mxInadecuada){
                     User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
                     if (!esEstudio) {
-                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
-                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                        List<DaSolicitudDx> solicitudDxListInd = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
+                        for (DaSolicitudDx solicitudDx : solicitudDxListInd) {
                             RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
                             DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
                             resultadoFinal.setPasivo(false);
@@ -852,7 +856,32 @@ public class RecepcionMxController {
                             tomaMxService.updateSolicitudEstudio(solicitudEst);
                         }
                     }
+                }else {
+                    //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
+                    Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
+                    Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
+                    if (conceptoIFINegativo != null && valorIFINegativo != null)
+                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                            if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
+                                List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                                for (OrdenExamen examen : ordenesExamen) {
+                                    RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
+                                    if (conceptoTmp != null) {
+                                        DetalleResultado detalleResultado = new DetalleResultado();
+                                        detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                        detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                        detalleResultado.setValor(valorIFINegativo.getValor());
+                                        detalleResultado.setRespuesta(conceptoTmp);
+                                        detalleResultado.setExamen(examen);
+                                        detalleResultado.setUsuarioRegistro(usuario);
+                                        if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                            resultadosService.addDetalleResultado(detalleResultado);
+                                    }
+                                }
+                            }
+                        }
                 }
+
             }catch (Exception ex){
                 resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
@@ -1489,6 +1518,31 @@ public class RecepcionMxController {
                         recepcionMxService.updateRecepcionMx(recepcionMx);
                         if (actualizarTraslado)
                             trasladosService.saveTrasladoMx(trasladoMxActivo);
+                        //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
+                        Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
+                        Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
+                        if (conceptoIFINegativo!=null && valorIFINegativo!=null) {
+                            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
+                            for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
+                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                                    for (OrdenExamen examen : ordenesExamen) {
+                                        RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
+                                        if (conceptoTmp != null) {
+                                            DetalleResultado detalleResultado = new DetalleResultado();
+                                            detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                            detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                            detalleResultado.setValor(valorIFINegativo.getValor());
+                                            detalleResultado.setRespuesta(conceptoTmp);
+                                            detalleResultado.setExamen(examen);
+                                            detalleResultado.setUsuarioRegistro(user);
+                                            if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                resultadosService.addDetalleResultado(detalleResultado);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }catch (Exception ex){
                     resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
@@ -2421,28 +2475,6 @@ public class RecepcionMxController {
                 //Prepare the document.
                 if (tomaMx != null) {
 
-                    String nombres = "";
-                    String apellidos = "";
-                    String edad = "";
-                    if (tomaMx.getIdNotificacion().getPersona() != null) {
-                        nombres = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                        if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombres = nombres + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
-
-                        apellidos = tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                        if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            apellidos = apellidos + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                    } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
-                    	nombres = tomaMx.getIdNotificacion().getCodigoPacienteVIH();
-                    } else {
-                        nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
-                    }
-                    if (tomaMx.getIdNotificacion().getPersona() != null) {
-                        String[] arrEdad = DateUtil.calcularEdad(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
-                        if (arrEdad[0] != null) edad = arrEdad[0] + " A";
-                        if (arrEdad[1] != null) edad = edad + " " + arrEdad[1] + " M";
-                    }
-
                     List<Area> areaDxList = tomaMxService.getAreaSoliDxAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                     Authority esRecepcionista = usuarioService.getAuthority(userName, "ROLE_RECEPCION");
                     int count = 1;
@@ -2463,7 +2495,6 @@ public class RecepcionMxController {
                             drawInfoLab(stream, page, labProcesa);
 
                             float y = 640;
-
                             //nombre del reporte
                             float xCenter;
                             xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
@@ -2476,6 +2507,27 @@ public class RecepcionMxController {
                             GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                             y = y - 30;
 
+                            String nombres = "";
+                            String apellidos = "";
+                            String edad = "";
+                            if (tomaMx.getIdNotificacion().getPersona() != null) {
+                                nombres = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                    nombres = nombres + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+
+                                apellidos = tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                    apellidos = apellidos + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                            } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                                nombres = tomaMx.getIdNotificacion().getCodigoPacienteVIH();
+                            } else {
+                                nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
+                            }
+                            if (tomaMx.getIdNotificacion().getPersona() != null) {
+                                String[] arrEdad = DateUtil.calcularEdad(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
+                                if (arrEdad[0] != null) edad = arrEdad[0] + " A";
+                                if (arrEdad[1] != null) edad = edad + " " + arrEdad[1] + " M";
+                            }
                             //datos personales
                             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
                             GeneralUtils.drawTEXT(code, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
@@ -2500,6 +2552,7 @@ public class RecepcionMxController {
                             GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getNombre() : "", y, 150, stream, 10, PDType1Font.HELVETICA_BOLD);
                             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 400, stream, 11, PDType1Font.HELVETICA);
                             GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy"), y, 490, stream, 11, PDType1Font.HELVETICA_BOLD);
+
                             //resultados
                             List<DaSolicitudDx> listDx = tomaMxService.getSoliDxAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
                             y = y - 10;
@@ -2515,11 +2568,35 @@ public class RecepcionMxController {
                                     y = y - 20;
                                     List<OrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitud(dx.getIdSolicitudDx());
                                     for (OrdenExamen examen : examenes) {
+                                        //salto de página
+                                        if ((y - 15) < 180){
+                                            stream.close();
+                                            page = GeneralUtils.addNewPage(doc);
+                                            stream = new PDPageContentStream(doc, page);
+                                            //dibujar encabezado y pie de pagina
+                                            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
+                                            pageNumber = String.valueOf(doc.getNumberOfPages());
+                                            GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                            drawInfoLab(stream, page, labProcesa);
+                                            y = 640;
+                                            //nombre del reporte
+                                            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
+                                            GeneralUtils.drawTEXT(nombreDireccion, y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                            y = y - 15;
+                                            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, messageSource.getMessage("lbl.lab.result", null, null).toUpperCase());
+                                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lab.result", null, null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                            y = y - 15;
+                                            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
+                                            GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                            y = y-30;
+
+                                        }
                                         List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
                                         if (resultados.size() > 0) {
                                             GeneralUtils.drawTEXT(examen.getCodExamen().getNombre(), y, 100, stream, 10, PDType1Font.HELVETICA);
                                             y = y - 15;
                                         }
+
                                         String fechaProcesamiento = "";
                                         for (DetalleResultado resultado : resultados) {
                                             String detalleResultado = "";

@@ -278,7 +278,7 @@ public class AutoridadesService {
     public List<Departamento> getDepartDisponiblesUsuario(String userName) {
         // Retrieve session from Hibernate
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select d from Departamento d, AutoridadLaboratorio al, DireccionLaboratorio dl, DepartamentoDireccion dd " +
+        Query query = session.createQuery("select distinct d from Departamento d, AutoridadLaboratorio al, DireccionLaboratorio dl, DepartamentoDireccion dd " +
                 "where d.idDepartamento not in " +
                 "(select a.departamento.idDepartamento FROM AutoridadDepartamento as a where a.pasivo = false and a.user.username = :userName) " +
                 "and dl.laboratorio.codigo = al.laboratorio.codigo " +
