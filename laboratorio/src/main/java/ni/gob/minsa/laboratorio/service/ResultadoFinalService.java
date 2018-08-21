@@ -624,7 +624,7 @@ public class ResultadoFinalService {
     }
 
     public List<DetalleResultado> getResultDetailExaByIdOrden(String idOrdenExa){
-        String query = "from DetalleResultado where examen.idOrdenExamen = :idOrdenExa and pasivo=false ORDER BY fechahProcesa ";
+        String query = "from DetalleResultado where examen.idOrdenExamen = :idOrdenExa and pasivo=false ORDER BY respuesta.orden asc";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idOrdenExa",idOrdenExa);
         return q.list();

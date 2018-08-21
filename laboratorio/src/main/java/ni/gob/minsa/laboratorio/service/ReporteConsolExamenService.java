@@ -122,7 +122,11 @@ public class ReporteConsolExamenService {
                 Predicate<ConsolidadoExamenRespuesta> byIdOrdenExamen = new Predicate<ConsolidadoExamenRespuesta>() {
                     @Override
                     public boolean apply(ConsolidadoExamenRespuesta examenRespuesta) {
-                        return examenRespuesta.getIdOrdenExamen().equalsIgnoreCase(dat.getIdOrdenExamen()) && examenRespuesta.getValor().toLowerCase().contains("positivo");
+                        return examenRespuesta.getIdOrdenExamen().equalsIgnoreCase(dat.getIdOrdenExamen()) &&
+                                (examenRespuesta.getValor().toLowerCase().contains("positivo")
+                                        || examenRespuesta.getValor().toUpperCase().contains("MTB-DET")
+                                        || (examenRespuesta.getValor().trim().toLowerCase().contains("reactor") && !examenRespuesta.getValor().trim().toLowerCase().contains("no reactor"))
+                                );
                     }
                 };
                 //si hay mas de un elemento como resultado del filtro, significa que el examen es positivo

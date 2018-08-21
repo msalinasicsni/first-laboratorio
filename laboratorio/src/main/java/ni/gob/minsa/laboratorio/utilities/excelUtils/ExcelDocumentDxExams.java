@@ -96,7 +96,13 @@ public class ExcelDocumentDxExams{
 
         for(int indicedx = 0; indicedx < dxs.size(); indicedx++){
             // create a new Excel sheet
-            HSSFSheet sheet = workbook.createSheet(dxs.get(indicedx)+ " Consolidado");
+            String nombreHoja = dxs.get(indicedx).replaceAll(" ","");
+            if (nombreHoja.length()>24) {
+                nombreHoja = nombreHoja.substring(0, 24) + " Consol";
+            }else{
+                nombreHoja = nombreHoja+ " Consolidado";
+            }
+            HSSFSheet sheet = workbook.createSheet(nombreHoja);
             int rowCount = 1;
             List<Object[]> consolidado = consolidados.get(indicedx);
             for (Object[] registro : consolidado) {
@@ -120,7 +126,9 @@ public class ExcelDocumentDxExams{
                 }
             }
             // create a new Excel sheet
-            HSSFSheet sheetDatos = workbook.createSheet(dxs.get(indicedx)+" Datos");
+            nombreHoja = dxs.get(indicedx).replaceAll(" ","");
+            if (nombreHoja.length()>25) nombreHoja = nombreHoja.substring(0,25);
+            HSSFSheet sheetDatos = workbook.createSheet(nombreHoja+" Datos");
             int rowCountDat = 1;
             List<Object[]> dato = datos.get(indicedx);
             for (Object[] registro : dato) {
