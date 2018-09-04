@@ -186,7 +186,24 @@
                                 </div>
                             </section>
                         </div>
-
+                        <!-- START ROW -->
+                        <div class="row">
+                            <section class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="inline-group">
+                                    <section class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <label class="radio">
+                                            <input type="radio" name="rbFechaBusqueda" value="FIS" id="FIS" checked="checked">
+                                            <i></i><spring:message code="lbl.consolidate.by"/> <spring:message code="lbl.fis.short"/></label>
+                                    </section>
+                                    <section class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <label class="radio">
+                                            <input type="radio" name="rbFechaBusqueda" id="rbFA" value="FPROC">
+                                            <i></i><spring:message code="lbl.consolidate.by"/> <spring:message code="lbl.processing.date"/></label>
+                                    </section>
+                                </div>
+                            </section>
+                        </div>
+                        <!-- END ROW -->
                         <!-- END ROW -->
                         <footer>
                             <a id="exportExcel" class="btn btn-success btn-lg pull-right header-btn" href="#"><i class="fa fa-file-excel-o"></i> <spring:message code="lbl.export.excel" /></a>

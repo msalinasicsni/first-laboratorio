@@ -29,6 +29,7 @@ public class FiltrosReporte {
     String codLaboratio;
     boolean nivelCentral;
     String diagnosticos;
+    String consolidarPor;
 
     public String getCodArea() {
         return codArea;
@@ -188,5 +189,13 @@ public class FiltrosReporte {
 
     public void setDiagnosticos(String diagnosticos) {
         this.diagnosticos = diagnosticos;
+    }
+
+    public String getConsolidarPor() {
+        return consolidarPor;
+    }
+
+    public void setConsolidarPor(String consolidarPor) {
+        this.consolidarPor = consolidarPor;
     }
 }

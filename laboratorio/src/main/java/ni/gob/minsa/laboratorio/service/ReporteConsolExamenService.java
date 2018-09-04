@@ -33,6 +33,9 @@ public class ReporteConsolExamenService {
     private RespuestasExamenService respuestasExamenService;
 
     private static final String sqlLab = " and dx.labProcesa.codigo = :codigoLab ";
+    private static final String sqlFIS = " and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal ";
+    private static final String sqlFPROCExam = " and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal) ";
+    private static final String sqlFPROCResp = " and dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal ";
     /**
      * M?todo que retornar la informaci?n para generar reporte y gr?fico de notificaciones por tipo de resultado (positivo, negativo, sin resultado y % positividad)
      * @param filtro indicando el nivel (pais, silais, departamento, municipio, unidad salud), tipo notificaci?n, rango de fechas, factor tasas de poblaci?n
@@ -58,8 +61,7 @@ public class ReporteConsolExamenService {
                 (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
                 "and dx.anulado = false and dx.aprobada = true " +
                 "and dx.controlCalidad = false and oe.anulado = false " +
-                "and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal " +
-                //"and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal) " +
+                ( filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFPROCExam ) +
                 "and cal.anio = :anio and dx.codDx.idDiagnostico in ("+filtro.getDiagnosticos()+") " +
                 "and cal.noSemana between :semI and :semF " +
                 //" and noti.codSilaisAtencion.nombre = 'SILAIS RAAS' "+
@@ -76,9 +78,7 @@ public class ReporteConsolExamenService {
                 (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
                 "and dx.anulado = false and dx.aprobada = true " +
                 "and dx.controlCalidad = false and oe.anulado = false and dr.pasivo = false " +
-                "and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal " +
-                //"and dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal " +
-                //" and noti.codSilaisAtencion.nombre = 'SILAIS RAAS' "+
+                ( filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFPROCResp ) +
                 "and cal.anio = :anio and dx.codDx.idDiagnostico in ("+filtro.getDiagnosticos()+") " +
                 "and cal.noSemana between :semI and :semF ");
 
@@ -126,6 +126,7 @@ public class ReporteConsolExamenService {
                                 (examenRespuesta.getValor().toLowerCase().contains("positivo")
                                         || examenRespuesta.getValor().toUpperCase().contains("MTB-DET")
                                         || (examenRespuesta.getValor().trim().toLowerCase().contains("reactor") && !examenRespuesta.getValor().trim().toLowerCase().contains("no reactor"))
+                                        || (!examenRespuesta.getValor().trim().toLowerCase().contains("negativo") && !examenRespuesta.getValor().trim().toLowerCase().contains("indetermin") && !examenRespuesta.getValor().trim().toLowerCase().equals("mx inadecuada"))
                                 );
                     }
                 };
