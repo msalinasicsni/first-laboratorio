@@ -78,7 +78,7 @@ var consolidatedExams = function () {
                     filtro['semFinal'] = $('#semF').find('option:selected').val();
                     filtro['semInicial'] = $('#semI').find('option:selected').val();
                     filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
-                    filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val()
+                    filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
                     var valores = $('#idDx').val();
                     var strValores = '';
                    for (var i = 0; i < valores.length; i++) {

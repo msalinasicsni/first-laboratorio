@@ -409,7 +409,6 @@ public class TrasladoMxController {
                                     }
                                     //si ning�n examen es v�lido para el traslado, no procesar traslado
                                     if (contExamenesValidos <= 0) {
-                                        tomaMxService.updateSolicitudDx(solicitudDx);//actualizar laboratorio que procesa solicitud dx
                                         procesarTraslado = false;
                                     }
                                 }
@@ -418,6 +417,7 @@ public class TrasladoMxController {
                                 //throw new Exception("No se logr� recuperar diagn�stico existente de la muestra: "+(tomaMx.getCodigoLab()!=null?tomaMx.getCodigoLab():tomaMx.getCodigoUnicoMx()));
                             }
                             if (procesarTraslado) {
+                                tomaMxService.updateSolicitudDx(solicitudDx);//actualizar laboratorio que procesa solicitud dx
                                 tomaMx.setEstadoMx(estadoMx);//cambiar a estado trasladada
 
                                 DaEnvioMx envioMx = new DaEnvioMx();

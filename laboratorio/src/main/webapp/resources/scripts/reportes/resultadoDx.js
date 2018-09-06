@@ -175,7 +175,7 @@ var resultReport = function () {
                 //filtro['codZona'] = $('#codZona').find('option:selected').val();
                 filtro['idDx'] = $('#idDx').find('option:selected').val();
                 filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
-
+                filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sActionUrl, {
                     filtro: JSON.stringify(filtro),
@@ -377,13 +377,14 @@ var resultReport = function () {
                 filtro['codSilais'] = $('#codSilais').find('option:selected').val();
                 filtro['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
                 //filtro['codDepartamento'] = $('#codDepartamento').find('option:selected').val();
-                //filtro['codMunicipio'] = $('#codMunicipio').find('option:selected').val();
+                filtro['codMunicipio'] = $('#codMunicipio').find('option:selected').val();
                 filtro['codArea'] = $('#codArea').find('option:selected').val();
                 //filtro['tipoNotificacion'] = $('#codTipoNoti').find('option:selected').val();
                 filtro['porSilais'] = $('input[name="rbNivelPais"]:checked', '#result_form').val();
                 //filtro['codZona'] = $('#codZona').find('option:selected').val();
                 filtro['idDx'] = $('#idDx').find('option:selected').val();
-
+                filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
+                filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sMailUrl, {
                     filtro: JSON.stringify(filtro),

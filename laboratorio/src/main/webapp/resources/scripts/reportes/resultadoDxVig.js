@@ -164,6 +164,8 @@ var resultReportDxVig = function () {
                 filtro['idDx'] = $('#idDx').find('option:selected').val();
                 filtro['incluirMxInadecuadas']=($('#ckbmxinadecuada').is(':checked'));
                 filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
+                filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
+
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sMailUrl, {
                     filtro: JSON.stringify(filtro),
@@ -204,6 +206,7 @@ var resultReportDxVig = function () {
                     filtro['idDx'] = $('#idDx').find('option:selected').val();
                     filtro['incluirMxInadecuadas']=($('#ckbmxinadecuada').is(':checked'));
                     filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
+                    filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
                     $(this).attr("href",parametros.excelUrl+"?filtro="+JSON.stringify(filtro));
                     desbloquearUI();
                 }

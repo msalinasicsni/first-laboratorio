@@ -72,7 +72,7 @@
 <!-- row -->
 <div class="row">
 <!-- NEW WIDGET START -->
-<article class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+<article class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
     <!-- Widget ID (each widget will need unique ID)-->
     <div class="jarviswidget jarviswidget-color-darken" id="wid-id-0">
         <!-- widget options:
@@ -254,6 +254,24 @@
                             </section>
 
                         </div>
+                        <!-- START ROW -->
+                        <div class="row">
+                            <section class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="inline-group">
+                                    <section class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <label class="radio">
+                                            <input type="radio" name="rbFechaBusqueda" value="FIS" id="FIS" checked="checked">
+                                            <i></i><spring:message code="lbl.filter.by"/> <spring:message code="lbl.fis.short"/></label>
+                                    </section>
+                                    <section class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <label class="radio">
+                                            <input type="radio" name="rbFechaBusqueda" id="rbFA" value="FPROC">
+                                            <i></i><spring:message code="lbl.filter.by"/> <spring:message code="lbl.approve.date"/></label>
+                                    </section>
+                                </div>
+                            </section>
+                        </div>
+                        <!-- END ROW -->
                         <div class="row">
                             <section class="col col-sm-12 col-md-6 col-lg-6">
                                 <label class="text-left txt-color-blue font-md"><spring:message

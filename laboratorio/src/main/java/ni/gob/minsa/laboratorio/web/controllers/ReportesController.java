@@ -3530,6 +3530,7 @@ public class ReportesController {
         String codZona = null;
         Integer idDx = null;
         String codLabo = null;
+        String consolidarPor = null;
 
         if (jObjectFiltro.get("codSilais") != null && !jObjectFiltro.get("codSilais").getAsString().isEmpty())
             codSilais = jObjectFiltro.get("codSilais").getAsLong();
@@ -3559,6 +3560,8 @@ public class ReportesController {
             idDx = jObjectFiltro.get("idDx").getAsInt();
         if (jObjectFiltro.get("codLabo") != null && !jObjectFiltro.get("codLabo").getAsString().isEmpty())
             codLabo = jObjectFiltro.get("codLabo").getAsString();
+        if (jObjectFiltro.get("consolidarPor") != null && !jObjectFiltro.get("consolidarPor").getAsString().isEmpty())
+            consolidarPor = jObjectFiltro.get("consolidarPor").getAsString();
 
         filtroRep.setSubunidades(subunidad);
         filtroRep.setCodSilais(codSilais);
@@ -3574,10 +3577,9 @@ public class ReportesController {
         filtroRep.setPorSilais(porSilais);
         filtroRep.setCodZona(codZona);
         filtroRep.setIdDx(idDx);
-
-        //filtroRep.setCodLaboratio(laboratorio.getCodigo());
         filtroRep.setCodLaboratio(codLabo);
         filtroRep.setNivelCentral(usuario.getNivelCentral());
+        filtroRep.setConsolidarPor(consolidarPor);
         return filtroRep;
     }
 
