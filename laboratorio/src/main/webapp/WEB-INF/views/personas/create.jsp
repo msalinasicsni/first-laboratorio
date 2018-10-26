@@ -163,7 +163,7 @@
                                                         <label class="input">
                                                             <i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>
                                                         <!--<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>-->
-                                                        <input class="form-control date-picker" data-date-end-date="+0d"
+                                                        <input class="form-control date-picker" data-date-start-date="-100y" data-date-end-date="+0d"
                                                                type="text" name="fechaNacimiento" id="fechaNacimiento" value="<fmt:formatDate value="${persona.fechaNacimiento}" pattern="dd/MM/yyyy" />"
                                                         placeholder=" <spring:message code="act.enter" /> <spring:message code="person.fecnac" />">
                                                         <!--<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>-->
