@@ -50,6 +50,11 @@ public class GeneralUtils {
         return (page.getMediaBox().getWidth() - titleWidth) / 2;
     }
 
+    public static float centerTextPositionXHorizontal(PDPage page, PDFont font, float fontSize, String texto) throws IOException {
+        float titleWidth = font.getStringWidth(texto) / 1000 * fontSize;
+        return (page.getMediaBox().getHeight() - titleWidth) / 2;
+    }
+
     public static void drawTEXT(String texto, float inY, float inX, PDPageContentStream stream, float textSize, PDFont textStyle) throws IOException {
         stream.beginText();
         stream.setFont(textStyle, textSize);
