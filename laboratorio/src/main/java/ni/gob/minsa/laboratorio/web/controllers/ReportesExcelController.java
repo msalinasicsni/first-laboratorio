@@ -2026,9 +2026,9 @@ public class ReportesExcelController {
                 }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                     String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                     resultados+=valorBoleano;
-                } /*else { // no tomar en cuenta respuestas auxiliares
+                } else if (res.getValor().toLowerCase().contains("inadecuada")) {
                     resultados+=res.getValor();
-                }*/
+                }
             }else if (res.getRespuestaExamen()!=null){
                 //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                 if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
