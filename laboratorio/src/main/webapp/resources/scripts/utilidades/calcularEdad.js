@@ -27,7 +27,7 @@ var getAge = function(dateString) {
     if ( age.months> 1 ) monthString = " meses"; else monthString = " mes";
     if ( age.days > 1 ) dayString = " días"; else dayString = " día";
     if ( (age.years > 0) && (age.months > 0) && (age.days > 0) ) ageString = age.years + yearString + ", " + age.months + monthString + ", " + age.days + dayString;
-    else if ( (age.years == 0) && (age.months == 0) && (age.days > 0) ) ageString = age.days + dayString;
+    else if ( (age.years == 0) && (age.months == 0) && (age.days >= 0) ) ageString = age.days + dayString;
     else if ( (age.years > 0) && (age.months == 0) && (age.days == 0) ) ageString = age.years + yearString;
     else if ( (age.years > 0) && (age.months > 0) && (age.days == 0) ) ageString = age.years + yearString + ", " + age.months + monthString;
     else if ( (age.years == 0) && (age.months > 0) && (age.days > 0) ) ageString = age.months + monthString + ", " + age.days + dayString;
