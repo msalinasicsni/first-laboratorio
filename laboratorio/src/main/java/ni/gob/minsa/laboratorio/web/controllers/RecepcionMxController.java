@@ -733,171 +733,179 @@ public class RecepcionMxController {
             CondicionMx condicionMx = catalogosService.getCondicionMx(codCondicionMx);
             //se obtiene recepci�n a actualizar
             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(idRecepcion);
-            //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
-            List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
-            boolean esEstudio = solicitudEstudioList.size()>0;
-            //se setean valores a actualizar
-            //recepcionMx.setUsuarioRecepcionLab(usuario);
-            //recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
-            recepcionMx.setCalidadMx(calidadMx);
-            recepcionMx.setCondicionMx(condicionMx);
-            if (causaRechazo!=null) {
-                CausaRechazoMx causaRechazoMx = catalogosService.getCausaRechazoMx(causaRechazo);
-                recepcionMx.setCausaRechazo(causaRechazoMx);
-                mxInadecuada = true;
-            }
-            RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
-            recepcionMxLab.setRecepcionMx(recepcionMx);
-            recepcionMxLab.setUsuarioRecepcion(usuario);
-            if(fechaRecibido != null && !fechaRecibido.isEmpty()){
-                if (horaRecibido !=null && !horaRecibido.isEmpty()){
-                    recepcionMxLab.setFechaHoraRecepcion(new Timestamp(DateUtil.StringToDate(fechaRecibido +" "+ horaRecibido, "dd/MM/yyyy HH:mm").getTime()));
-                }else {
-                    recepcionMxLab.setFechaHoraRecepcion(new Timestamp(DateUtil.StringToDate(fechaRecibido, "dd/MM/yyyy").getTime()));
-                }
-            }else {
-                recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-            }
-            recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
-            TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
-            boolean actualizarTraslado = false;
-            if (trasladoMxActivo!=null) {
-                if (!trasladoMxActivo.isTrasladoExterno()) {
-                    if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
-                        recepcionMxLab.setArea(trasladoMxActivo.getAreaDestino());
-                        //si tiene traslado activo marcarlo como recepcionado
-                        trasladoMxActivo.setRecepcionado(true);
-                        trasladoMxActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-                        trasladoMxActivo.setUsuarioRecepcion(usuario);
-                        actualizarTraslado = true;
-                    }
-                }
-            }else{
-                //si no hay traslado, obtener area de dx con mayor prioridad
-                if (solicitudDxList.size() > 0) {
-                    int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
-                    for(DaSolicitudDx solicitudDx: solicitudDxList) {
-                        if (prioridad==solicitudDx.getCodDx().getPrioridad()) {
-                            if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
-                                recepcionMxLab.setArea(solicitudDx.getCodDx().getArea());
-                                break;
-                            }
-                        }else break;
-                        prioridad = solicitudDx.getCodDx().getPrioridad();
-                    }
-                    //deberia ser siempre distinto de null, pero para evitar null pointer
-                    if (recepcionMxLab.getArea()==null){
-                        recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
-                    }
 
-                }else{ //es estudio, se toma el area del estudio. S�lo se permite un estudio por muestra
-                    if (solicitudEstudioList.size()>0){
-                        recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
-                    }
+            if (recepcionMx.getTomaMx().getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|TRAS") || recepcionMx.getTomaMx().getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|EPLAB")) {
+                //se determina si es una muestra para estudio o para vigilancia rutinaria(Dx)
+                List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+                boolean esEstudio = solicitudEstudioList.size() > 0;
+                //se setean valores a actualizar
+                //recepcionMx.setUsuarioRecepcionLab(usuario);
+                //recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
+                recepcionMx.setCalidadMx(calidadMx);
+                recepcionMx.setCondicionMx(condicionMx);
+                if (causaRechazo != null) {
+                    CausaRechazoMx causaRechazoMx = catalogosService.getCausaRechazoMx(causaRechazo);
+                    recepcionMx.setCausaRechazo(causaRechazoMx);
+                    mxInadecuada = true;
                 }
-            }
-
-            try {
-                recepcionMxService.updateRecepcionMx(recepcionMx);
-                //Si el usuario tiene autoridad sobre mas de un area seg�n los dx solicitados en la muestra, agregar recepcion en lab para cada area
-                List<AutoridadArea> autoridadesArea = autoridadesService.getAutoridadesArea(usuario.getUsername());
-                List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), usuario.getUsername());
-                if (autoridadesArea.size() > 1){
-                    for (AutoridadArea autoridadArea : autoridadesArea){
-                        for (Area area : areasDx){
-                            if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())){
-                                recepcionMxLab.setArea(autoridadArea.getArea());
-                                recepcionMxService.addRecepcionMxLab(recepcionMxLab);
-                            }
+                RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
+                recepcionMxLab.setRecepcionMx(recepcionMx);
+                recepcionMxLab.setUsuarioRecepcion(usuario);
+                if (fechaRecibido != null && !fechaRecibido.isEmpty()) {
+                    if (horaRecibido != null && !horaRecibido.isEmpty()) {
+                        recepcionMxLab.setFechaHoraRecepcion(new Timestamp(DateUtil.StringToDate(fechaRecibido + " " + horaRecibido, "dd/MM/yyyy HH:mm").getTime()));
+                    } else {
+                        recepcionMxLab.setFechaHoraRecepcion(new Timestamp(DateUtil.StringToDate(fechaRecibido, "dd/MM/yyyy").getTime()));
+                    }
+                } else {
+                    recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                }
+                recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
+                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
+                TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
+                boolean actualizarTraslado = false;
+                if (trasladoMxActivo != null) {
+                    if (!trasladoMxActivo.isTrasladoExterno()) {
+                        if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())) {
+                            recepcionMxLab.setArea(trasladoMxActivo.getAreaDestino());
+                            //si tiene traslado activo marcarlo como recepcionado
+                            trasladoMxActivo.setRecepcionado(true);
+                            trasladoMxActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                            trasladoMxActivo.setUsuarioRecepcion(usuario);
+                            actualizarTraslado = true;
                         }
                     }
-                }else{
-                    recepcionMxService.addRecepcionMxLab(recepcionMxLab);
-                }
-                if (actualizarTraslado)
-                    trasladosService.saveTrasladoMx(trasladoMxActivo);
-                //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
-                if (mxInadecuada){
-                    User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
-                    if (!esEstudio) {
-                        List<DaSolicitudDx> solicitudDxListInd = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
-                        for (DaSolicitudDx solicitudDx : solicitudDxListInd) {
-                            RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
-                            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
-                            resultadoFinal.setPasivo(false);
-                            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
-                            resultadoFinal.setRespuesta(respuestaDefecto);
-                            resultadoFinal.setSolicitudDx(solicitudDx);
-                            resultadoFinal.setValor(respuestaDefecto.getNombre());
-                            resultadoFinalService.saveDetResFinal(resultadoFinal);
-
-                            solicitudDx.setAprobada(true);
-                            solicitudDx.setFechaAprobacion(new Timestamp(new Date().getTime()));
-                            solicitudDx.setUsuarioAprobacion(usuApro);
-                            tomaMxService.updateSolicitudDx(solicitudDx);
-                        }
-                    }else{
-                        for (DaSolicitudEstudio solicitudEst : solicitudEstudioList){
-                            RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
-                            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
-                            resultadoFinal.setPasivo(false);
-                            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
-                            resultadoFinal.setRespuesta(respuestaDefecto);
-                            resultadoFinal.setSolicitudEstudio(solicitudEst);
-                            resultadoFinal.setValor(respuestaDefecto.getNombre());
-                            resultadoFinalService.saveDetResFinal(resultadoFinal);
-
-                            solicitudEst.setAprobada(true);
-                            solicitudEst.setFechaAprobacion(new Timestamp(new Date().getTime()));
-                            solicitudEst.setUsuarioAprobacion(usuApro);
-                            tomaMxService.updateSolicitudEstudio(solicitudEst);
-                        }
-                    }
-                }else {
-                    //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
-                    Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
-                    Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
-                    if (conceptoIFINegativo != null && valorIFINegativo != null)
+                } else {
+                    //si no hay traslado, obtener area de dx con mayor prioridad
+                    if (solicitudDxList.size() > 0) {
+                        int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
                         for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                            if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
-                                List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
-                                for (OrdenExamen examen : ordenesExamen) {
-                                    RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
-                                    if (conceptoTmp != null) {
-                                        DetalleResultado detalleResultado = new DetalleResultado();
-                                        detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
-                                        detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
-                                        detalleResultado.setValor(valorIFINegativo.getValor());
-                                        detalleResultado.setRespuesta(conceptoTmp);
-                                        detalleResultado.setExamen(examen);
-                                        detalleResultado.setUsuarioRegistro(usuario);
-                                        if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
-                                            resultadosService.addDetalleResultado(detalleResultado);
-                                    }
+                            if (prioridad == solicitudDx.getCodDx().getPrioridad()) {
+                                if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
+                                    recepcionMxLab.setArea(solicitudDx.getCodDx().getArea());
+                                    break;
+                                }
+                            } else break;
+                            prioridad = solicitudDx.getCodDx().getPrioridad();
+                        }
+                        //deberia ser siempre distinto de null, pero para evitar null pointer
+                        if (recepcionMxLab.getArea() == null) {
+                            recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
+                        }
+
+                    } else { //es estudio, se toma el area del estudio. S�lo se permite un estudio por muestra
+                        if (solicitudEstudioList.size() > 0) {
+                            recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
+                        }
+                    }
+                }
+
+                try {
+                    recepcionMxService.updateRecepcionMx(recepcionMx);
+                    //Si el usuario tiene autoridad sobre mas de un area seg�n los dx solicitados en la muestra, agregar recepcion en lab para cada area
+                    List<AutoridadArea> autoridadesArea = autoridadesService.getAutoridadesArea(usuario.getUsername());
+                    List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), usuario.getUsername());
+                    if (autoridadesArea.size() > 1) {
+                        for (AutoridadArea autoridadArea : autoridadesArea) {
+                            for (Area area : areasDx) {
+                                if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())) {
+                                    recepcionMxLab.setArea(autoridadArea.getArea());
+                                    recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                                 }
                             }
                         }
-                }
+                    } else {
+                        recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                    }
+                    if (actualizarTraslado)
+                        trasladosService.saveTrasladoMx(trasladoMxActivo);
+                    //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
+                    if (mxInadecuada) {
+                        User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+                        if (!esEstudio) {
+                            List<DaSolicitudDx> solicitudDxListInd = tomaMxService.getSolicitudesDxByIdToma(recepcionMx.getTomaMx().getIdTomaMx(), labUsuario.getCodigo());
+                            for (DaSolicitudDx solicitudDx : solicitudDxListInd) {
+                                RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
+                                DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+                                resultadoFinal.setPasivo(false);
+                                resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+                                resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
+                                resultadoFinal.setRespuesta(respuestaDefecto);
+                                resultadoFinal.setSolicitudDx(solicitudDx);
+                                resultadoFinal.setValor(respuestaDefecto.getNombre());
+                                resultadoFinalService.saveDetResFinal(resultadoFinal);
 
-            }catch (Exception ex){
-                resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
-                resultado=resultado+". \n "+ex.getMessage();
-                ex.printStackTrace();
-            }
-            if (!idRecepcion.isEmpty()) {
-                //se tiene que actualizar la tomaMx
-                DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
-                tomaMx.setEstadoMx(estadoMx);
-                try {
-                    tomaMxService.updateTomaMx(tomaMx);
-                }catch (Exception ex){
-                    resultado = messageSource.getMessage("msg.update.order.error",null,null);
-                    resultado=resultado+". \n "+ex.getMessage();
+                                solicitudDx.setAprobada(true);
+                                solicitudDx.setFechaAprobacion(new Timestamp(new Date().getTime()));
+                                solicitudDx.setUsuarioAprobacion(usuApro);
+                                tomaMxService.updateSolicitudDx(solicitudDx);
+                            }
+                        } else {
+                            for (DaSolicitudEstudio solicitudEst : solicitudEstudioList) {
+                                RespuestaSolicitud respuestaDefecto = respuestasSolicitudService.getRespuestaDefectoMxInadecuada();
+                                DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+                                resultadoFinal.setPasivo(false);
+                                resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+                                resultadoFinal.setUsuarioRegistro(usuario);//ESTO SE DEBE CAMBIAR
+                                resultadoFinal.setRespuesta(respuestaDefecto);
+                                resultadoFinal.setSolicitudEstudio(solicitudEst);
+                                resultadoFinal.setValor(respuestaDefecto.getNombre());
+                                resultadoFinalService.saveDetResFinal(resultadoFinal);
+
+                                solicitudEst.setAprobada(true);
+                                solicitudEst.setFechaAprobacion(new Timestamp(new Date().getTime()));
+                                solicitudEst.setUsuarioAprobacion(usuApro);
+                                tomaMxService.updateSolicitudEstudio(solicitudEst);
+                            }
+                        }
+                    } else {
+                        //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
+                        Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
+                        Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
+                        if (conceptoIFINegativo != null && valorIFINegativo != null)
+                            for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
+                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                                    for (OrdenExamen examen : ordenesExamen) {
+                                        //no tiene resultado registrado aún
+                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size()<=0) {
+                                            RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
+                                            if (conceptoTmp != null) {
+                                                DetalleResultado detalleResultado = new DetalleResultado();
+                                                detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                                detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                                detalleResultado.setValor(valorIFINegativo.getValor());
+                                                detalleResultado.setRespuesta(conceptoTmp);
+                                                detalleResultado.setExamen(examen);
+                                                detalleResultado.setUsuarioRegistro(usuario);
+                                                if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                    resultadosService.addDetalleResultado(detalleResultado);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+
+                } catch (Exception ex) {
+                    resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
+                    resultado = resultado + ". \n " + ex.getMessage();
                     ex.printStackTrace();
                 }
+                if (!idRecepcion.isEmpty()) {
+                    //se tiene que actualizar la tomaMx
+                    DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
+                    tomaMx.setEstadoMx(estadoMx);
+                    try {
+                        tomaMxService.updateTomaMx(tomaMx);
+                    } catch (Exception ex) {
+                        resultado = messageSource.getMessage("msg.update.order.error", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
+                        ex.printStackTrace();
+                    }
+                }
+            }else{
+                resultado = messageSource.getMessage("msg.receipt.error.mx",null,null)+ " "+ recepcionMx.getTomaMx().getCodigoLab()+" - "+recepcionMx.getTomaMx().getEstadoMx().getDescripcion();
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(),ex);
@@ -1338,80 +1346,131 @@ public class RecepcionMxController {
             for(int i = 0; i< cantRecepciones;i++) {
                 String idRecepcion = jObjectRecepciones.get(String.valueOf(i)).getAsString();
                 RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(idRecepcion);
-                //se setean valores a actualizar
-                //recepcionMx.setUsuarioRecepcionLab(usuario);
-                //recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
-                recepcionMx.setCalidadMx(calidadMx);
-                recepcionMx.setCausaRechazo(null);
+                if (recepcionMx.getTomaMx().getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|TRAS") || recepcionMx.getTomaMx().getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|EPLAB")) {
+                    //se setean valores a actualizar
+                    //recepcionMx.setUsuarioRecepcionLab(usuario);
+                    //recepcionMx.setFechaHoraRecepcionLab(new Timestamp(new Date().getTime()));
+                    recepcionMx.setCalidadMx(calidadMx);
+                    recepcionMx.setCausaRechazo(null);
 
-                RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
-                recepcionMxLab.setRecepcionMx(recepcionMx);
-                recepcionMxLab.setUsuarioRecepcion(user);
-                recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-                recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
-                TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
-                boolean actualizarTraslado = false;
-                if (trasladoMxActivo!=null) {
-                    if (!trasladoMxActivo.isTrasladoExterno()) {
-                        if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())){
-                            recepcionMxLab.setArea(trasladoMxActivo.getAreaDestino());
-                            //si tiene traslado activo marcarlo como recepcionado
-                            trasladoMxActivo.setRecepcionado(true);
-                            trasladoMxActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
-                            trasladoMxActivo.setUsuarioRecepcion(user);
-                            actualizarTraslado = true;
+                    RecepcionMxLab recepcionMxLab = new RecepcionMxLab();
+                    recepcionMxLab.setRecepcionMx(recepcionMx);
+                    recepcionMxLab.setUsuarioRecepcion(user);
+                    recepcionMxLab.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                    recepcionMxLab.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
+                    TrasladoMx trasladoMxActivo = trasladosService.getTrasladoInternoActivoMxRecepcion(recepcionMx.getTomaMx().getIdTomaMx());
+                    boolean actualizarTraslado = false;
+                    if (trasladoMxActivo != null) {
+                        if (!trasladoMxActivo.isTrasladoExterno()) {
+                            if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), trasladoMxActivo.getAreaDestino().getIdArea())) {
+                                recepcionMxLab.setArea(trasladoMxActivo.getAreaDestino());
+                                //si tiene traslado activo marcarlo como recepcionado
+                                trasladoMxActivo.setRecepcionado(true);
+                                trasladoMxActivo.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
+                                trasladoMxActivo.setUsuarioRecepcion(user);
+                                actualizarTraslado = true;
+                            }
                         }
-                    }
-                }else {
-                    //se si no hay traslado, pero tiene mas de un dx validar si el usuario tiene acceso al de mayor prioridad
-                    List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
-                    if (solicitudDxList.size() > 0) {
-                        int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
-                        for(DaSolicitudDx solicitudDx: solicitudDxList) {
-                            if (prioridad==solicitudDx.getCodDx().getPrioridad()) {
-                                if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
-                                    recepcionMxLab.setArea(solicitudDx.getCodDx().getArea());
-                                    break;
-                                }
-                            }else break;
-                            prioridad = solicitudDx.getCodDx().getPrioridad();
-                        }
-                        //deberia ser siempre distinto de null, pero para evitar null pointer
-                        if (recepcionMxLab.getArea()==null){
-                            recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
-                        }
+                    } else {
+                        //se si no hay traslado, pero tiene mas de un dx validar si el usuario tiene acceso al de mayor prioridad
+                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
+                        if (solicitudDxList.size() > 0) {
+                            int prioridad = solicitudDxList.get(0).getCodDx().getPrioridad();
+                            for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                if (prioridad == solicitudDx.getCodDx().getPrioridad()) {
+                                    if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDx.getCodDx().getArea().getIdArea())) {
+                                        recepcionMxLab.setArea(solicitudDx.getCodDx().getArea());
+                                        break;
+                                    }
+                                } else break;
+                                prioridad = solicitudDx.getCodDx().getPrioridad();
+                            }
+                            //deberia ser siempre distinto de null, pero para evitar null pointer
+                            if (recepcionMxLab.getArea() == null) {
+                                recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
+                            }
                         /*if (seguridadService.usuarioAutorizadoArea(seguridadService.obtenerNombreUsuario(), solicitudDxList.get(0).getCodDx().getArea().getIdArea())) {
                             recepcionMxLab.setArea(solicitudDxList.get(0).getCodDx().getArea());
                         }*/
-                    }else{ //es estudio, se toma el area del estudio. S�lo se permite un estudio por muestra
-                        List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
-                        if (solicitudEstudioList.size()>0){
-                            recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
+                        } else { //es estudio, se toma el area del estudio. S�lo se permite un estudio por muestra
+                            List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+                            if (solicitudEstudioList.size() > 0) {
+                                recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
+                            }
                         }
                     }
-                }
 
-                boolean procesarRecepcion = false;
-                try {
-                    //se procesan las ordenes de examen
-                    //boolean tieneOrdenesAnuladas = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
-                    //Se valida en cada �rea que tenga asociada el usuario si se puede agregar el examen por defecto configurado
-                    for(AutoridadArea area : areasAutorizadas) {
-                        //List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), recepcionMxLab.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
-                        List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), area.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
-                        if (solicitudDxList != null && solicitudDxList.size() > 0) {
-                            for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                                List<Examen_Dx> examenesList = null;
-                                //se obtienen los id de los examenes por defecto
-                                examenesList = examenesService.getExamenesDefectoByIdDx(solicitudDx.getCodDx().getIdDiagnostico(), user.getUsername());
-                                if (examenesList != null) {
-                                    //se registran los examenes por defecto
-                                    for (Examen_Dx examenTmp : examenesList) {
-                                        //s�lo se agrega la oorden si a�n no tiene registrada orden de examen, misma toma, mismo dx, mismo examen y no est� anulado
-                                        if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudDx.getCodDx().getIdDiagnostico(), examenTmp.getExamen().getIdExamen(), seguridadService.obtenerNombreUsuario()).size() <= 0) {
+                    boolean procesarRecepcion = false;
+                    try {
+                        //se procesan las ordenes de examen
+                        //boolean tieneOrdenesAnuladas = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx()).size()>0;
+                        //Se valida en cada �rea que tenga asociada el usuario si se puede agregar el examen por defecto configurado
+                        for (AutoridadArea area : areasAutorizadas) {
+                            //List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), recepcionMxLab.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaArea(recepcionMx.getTomaMx().getIdTomaMx(), area.getArea().getIdArea(), seguridadService.obtenerNombreUsuario());
+                            if (solicitudDxList != null && solicitudDxList.size() > 0) {
+                                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                    List<Examen_Dx> examenesList = null;
+                                    //se obtienen los id de los examenes por defecto
+                                    examenesList = examenesService.getExamenesDefectoByIdDx(solicitudDx.getCodDx().getIdDiagnostico(), user.getUsername());
+                                    if (examenesList != null) {
+                                        //se registran los examenes por defecto
+                                        for (Examen_Dx examenTmp : examenesList) {
+                                            //s�lo se agrega la oorden si a�n no tiene registrada orden de examen, misma toma, mismo dx, mismo examen y no est� anulado
+                                            if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudDx.getCodDx().getIdDiagnostico(), examenTmp.getExamen().getIdExamen(), seguridadService.obtenerNombreUsuario()).size() <= 0) {
+                                                OrdenExamen ordenExamen = new OrdenExamen();
+                                                ordenExamen.setSolicitudDx(solicitudDx);
+                                                ordenExamen.setCodExamen(examenTmp.getExamen());
+                                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                ordenExamen.setUsuarioRegistro(user);
+                                                ordenExamen.setLabProcesa(labUsuario);
+                                                try {
+                                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                    procesarRecepcion = true; //si se agreg� al menos un examen se puede procesar la recepci�n
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                    logger.error("Error al agregar orden de examen", ex);
+                                                }
+                                            } else {//si ya esta registrada una orden v�lida, entonces se puede procesar
+                                                procesarRecepcion = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
+                        if (solicitudEstudioList != null && solicitudEstudioList.size() > 0) {
+                            //procesar examenes default para cada estudio
+                            for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
+                                String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
+                                //nombre par�metro que contiene los examenes que se deben aplicar para cada estudio puede estar configurado de 3 maneras:
+                                //cod_estudio+cod_categ+gravedad
+                                //cod_estudio+gravedad
+                                //cod_estudio
+                                String gravedad = null;
+                                String codUnicoMx = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
+                                if (codUnicoMx.contains("."))
+                                    gravedad = codUnicoMx.substring(codUnicoMx.lastIndexOf(".") + 1);
+
+                                if (solicitudEstudio.getIdTomaMx().getCategoriaMx() != null) {
+                                    nombreParametroExam += "_" + solicitudEstudio.getIdTomaMx().getCategoriaMx().getCodigo();
+                                    if (gravedad != null)
+                                        nombreParametroExam += "_" + gravedad;
+                                } else {
+                                    if (gravedad != null)
+                                        nombreParametroExam += "_" + gravedad;
+                                }
+
+                                Parametro examenesEstudio = parametrosService.getParametroByName(nombreParametroExam);
+                                if (examenesEstudio != null) {
+                                    List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
+                                    for (CatalogoExamenes examen : examenesList) {
+                                        //s�lo se agrega la oorden si a�n no tiene registrada orden de examen, misma toma, mismo estudio, mismo examen y no est� anulado
+                                        if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdEstIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudEstudio.getTipoEstudio().getIdEstudio(), examen.getIdExamen()).size() <= 0) {
                                             OrdenExamen ordenExamen = new OrdenExamen();
-                                            ordenExamen.setSolicitudDx(solicitudDx);
-                                            ordenExamen.setCodExamen(examenTmp.getExamen());
+                                            ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                            ordenExamen.setCodExamen(examen);
                                             ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
                                             ordenExamen.setUsuarioRegistro(user);
                                             ordenExamen.setLabProcesa(labUsuario);
@@ -1426,141 +1485,97 @@ public class RecepcionMxController {
                                             procesarRecepcion = true;
                                         }
                                     }
-                                }
-                            }
-                        }
-                    }
-                    List<DaSolicitudEstudio> solicitudEstudioList = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcionMx.getTomaMx().getIdTomaMx());
-                    if (solicitudEstudioList!=null && solicitudEstudioList.size()>0){
-                        //procesar examenes default para cada estudio
-                        for(DaSolicitudEstudio solicitudEstudio:solicitudEstudioList){
-                            String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
-                            //nombre par�metro que contiene los examenes que se deben aplicar para cada estudio puede estar configurado de 3 maneras:
-                            //cod_estudio+cod_categ+gravedad
-                            //cod_estudio+gravedad
-                            //cod_estudio
-                            String gravedad = null;
-                            String codUnicoMx = solicitudEstudio.getIdTomaMx().getCodigoUnicoMx();
-                            if (codUnicoMx.contains("."))
-                                gravedad = codUnicoMx.substring(codUnicoMx.lastIndexOf(".")+1);
-
-                            if (solicitudEstudio.getIdTomaMx().getCategoriaMx()!=null){
-                                nombreParametroExam += "_"+solicitudEstudio.getIdTomaMx().getCategoriaMx().getCodigo();
-                                if (gravedad!=null)
-                                    nombreParametroExam+= "_"+gravedad;
-                            }else{
-                                if (gravedad!=null)
-                                    nombreParametroExam+= "_"+gravedad;
-                            }
-
-                            Parametro examenesEstudio = parametrosService.getParametroByName(nombreParametroExam);
-                            if (examenesEstudio!=null){
-                                List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
-                                for(CatalogoExamenes examen : examenesList){
-                                    //s�lo se agrega la oorden si a�n no tiene registrada orden de examen, misma toma, mismo estudio, mismo examen y no est� anulado
-                                    if (ordenExamenMxService.getOrdExamenNoAnulByIdMxIdEstIdExamen(recepcionMx.getTomaMx().getIdTomaMx(), solicitudEstudio.getTipoEstudio().getIdEstudio(), examen.getIdExamen()).size() <= 0) {
-                                        OrdenExamen ordenExamen = new OrdenExamen();
-                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
-                                        ordenExamen.setCodExamen(examen);
-                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                        ordenExamen.setUsuarioRegistro(user);
-                                        ordenExamen.setLabProcesa(labUsuario);
-                                        try {
-                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                            procesarRecepcion = true; //si se agreg� al menos un examen se puede procesar la recepci�n
-                                        } catch (Exception ex) {
-                                            ex.printStackTrace();
-                                            logger.error("Error al agregar orden de examen", ex);
-                                        }
-                                    }else{//si ya esta registrada una orden v�lida, entonces se puede procesar
-                                        procesarRecepcion = true;
-                                    }
-                                }
-                            }else { // se consulta si hay configuraci�n s�lo por codigo de estudio
-                                examenesEstudio = parametrosService.getParametroByName(solicitudEstudio.getTipoEstudio().getCodigo());
-                                if (examenesEstudio!=null){
-                                    List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
-                                    for(CatalogoExamenes examen : examenesList){
-                                        OrdenExamen ordenExamen = new OrdenExamen();
-                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
-                                        ordenExamen.setCodExamen(examen);
-                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                        ordenExamen.setUsuarioRegistro(user);
-                                        ordenExamen.setLabProcesa(labUsuario);
-                                        try {
-                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                            procesarRecepcion = true; //si se agreg� al menos un examen se puede procesar la recepci�n
-                                        } catch (Exception ex) {
-                                            ex.printStackTrace();
-                                            logger.error("Error al agregar orden de examen", ex);
+                                } else { // se consulta si hay configuraci�n s�lo por codigo de estudio
+                                    examenesEstudio = parametrosService.getParametroByName(solicitudEstudio.getTipoEstudio().getCodigo());
+                                    if (examenesEstudio != null) {
+                                        List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdsExamenes(examenesEstudio.getValor());
+                                        for (CatalogoExamenes examen : examenesList) {
+                                            OrdenExamen ordenExamen = new OrdenExamen();
+                                            ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                            ordenExamen.setCodExamen(examen);
+                                            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                            ordenExamen.setUsuarioRegistro(user);
+                                            ordenExamen.setLabProcesa(labUsuario);
+                                            try {
+                                                ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                procesarRecepcion = true; //si se agreg� al menos un examen se puede procesar la recepci�n
+                                            } catch (Exception ex) {
+                                                ex.printStackTrace();
+                                                logger.error("Error al agregar orden de examen", ex);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    if (procesarRecepcion) {
-                        //Si el usuario tiene autoridad sobre mas de un area seg�n los dx solicitados en la muestra, agregar recepcion en lab para cada area
-                        List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), user.getUsername());
-                        if (areasAutorizadas.size() > 1){
-                            for (AutoridadArea autoridadArea : areasAutorizadas){
-                                for (Area area : areasDx){
-                                    if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())){
-                                        recepcionMxLab.setArea(autoridadArea.getArea());
-                                        recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                        if (procesarRecepcion) {
+                            //Si el usuario tiene autoridad sobre mas de un area seg�n los dx solicitados en la muestra, agregar recepcion en lab para cada area
+                            List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), user.getUsername());
+                            if (areasAutorizadas.size() > 1) {
+                                for (AutoridadArea autoridadArea : areasAutorizadas) {
+                                    for (Area area : areasDx) {
+                                        if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())) {
+                                            recepcionMxLab.setArea(autoridadArea.getArea());
+                                            recepcionMxService.addRecepcionMxLab(recepcionMxLab);
+                                        }
                                     }
                                 }
+                            } else {
+                                recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                             }
-                        }else{
-                            recepcionMxService.addRecepcionMxLab(recepcionMxLab);
-                        }
-                        recepcionMxService.updateRecepcionMx(recepcionMx);
-                        if (actualizarTraslado)
-                            trasladosService.saveTrasladoMx(trasladoMxActivo);
-                        //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
-                        Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
-                        Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
-                        if (conceptoIFINegativo!=null && valorIFINegativo!=null) {
-                            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
-                            for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                                if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
-                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
-                                    for (OrdenExamen examen : ordenesExamen) {
-                                        RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
-                                        if (conceptoTmp != null) {
-                                            DetalleResultado detalleResultado = new DetalleResultado();
-                                            detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
-                                            detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
-                                            detalleResultado.setValor(valorIFINegativo.getValor());
-                                            detalleResultado.setRespuesta(conceptoTmp);
-                                            detalleResultado.setExamen(examen);
-                                            detalleResultado.setUsuarioRegistro(user);
-                                            if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
-                                                resultadosService.addDetalleResultado(detalleResultado);
+                            recepcionMxService.updateRecepcionMx(recepcionMx);
+                            if (actualizarTraslado)
+                                trasladosService.saveTrasladoMx(trasladoMxActivo);
+                            //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
+                            Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
+                            Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
+                            if (conceptoIFINegativo != null && valorIFINegativo != null) {
+                                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
+                                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                                    if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
+                                        List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                                        for (OrdenExamen examen : ordenesExamen) {
+                                            //no tiene resultado registrado aún
+                                            if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
+                                                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
+                                                if (conceptoTmp != null) {
+                                                    DetalleResultado detalleResultado = new DetalleResultado();
+                                                    detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                                    detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                                    detalleResultado.setValor(valorIFINegativo.getValor());
+                                                    detalleResultado.setRespuesta(conceptoTmp);
+                                                    detalleResultado.setExamen(examen);
+                                                    detalleResultado.setUsuarioRegistro(user);
+                                                    if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                        resultadosService.addDetalleResultado(detalleResultado);
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                }catch (Exception ex){
-                    resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
-                    resultado=resultado+". \n "+ex.getMessage();
-                    ex.printStackTrace();
-                }
-                if (!idRecepcion.isEmpty() && procesarRecepcion) {
-                    //se tiene que actualizar la tomaMx
-                    DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
-                    tomaMx.setEstadoMx(estadoMx);
-                    try {
-                        tomaMxService.updateTomaMx(tomaMx);
-                        cantRecepProc++;
-                    }catch (Exception ex){
-                        resultado = messageSource.getMessage("msg.update.order.error",null,null);
-                        resultado=resultado+". \n "+ex.getMessage();
+                    } catch (Exception ex) {
+                        resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
                         ex.printStackTrace();
                     }
+                    if (!idRecepcion.isEmpty() && procesarRecepcion) {
+                        //se tiene que actualizar la tomaMx
+                        DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
+                        tomaMx.setEstadoMx(estadoMx);
+                        try {
+                            tomaMxService.updateTomaMx(tomaMx);
+                            cantRecepProc++;
+                        } catch (Exception ex) {
+                            resultado = messageSource.getMessage("msg.update.order.error", null, null);
+                            resultado = resultado + ". \n " + ex.getMessage();
+                            ex.printStackTrace();
+                        }
+                    }
+                }else{
+                    resultado = messageSource.getMessage("msg.receipt.error.mx",null,null)+ " "+ recepcionMx.getTomaMx().getCodigoLab()+" - "+recepcionMx.getTomaMx().getEstadoMx().getDescripcion();
                 }
             }
         } catch (Exception ex) {
@@ -1676,28 +1691,34 @@ public class RecepcionMxController {
         if (ordenExamenList!=null && ordenExamenList.size()>0) {
             resultado = messageSource.getMessage("msg.receipt.test.exist", null, null);
         }else{
+            String username = seguridadService.obtenerNombreUsuario();
             CatalogoExamenes examen = examenesService.getExamenById(idExamen);
-            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
-            Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-            OrdenExamen ordenExamen = new OrdenExamen();
-            DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
-            if (solicitudDx!=null){
-                ordenExamen.setSolicitudDx(solicitudDx);
-                ordenExamen.setCodExamen(examen);
-                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                ordenExamen.setUsuarioRegistro(usuario);
-                ordenExamen.setLabProcesa(labUsuario);
-                try {
-                    ordenExamenMxService.addOrdenExamen(ordenExamen);
-                } catch (Exception ex) {
-                    resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
-                    resultado = resultado + ". \n " + ex.getMessage();
-                    ex.printStackTrace();
+            if (autoridadesService.tieneAutoridadExamen(username, idExamen)) {
+                User usuario = seguridadService.getUsuario(username);
+                Laboratorio labUsuario = seguridadService.getLaboratorioUsuario(username);
+                OrdenExamen ordenExamen = new OrdenExamen();
+                DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, idDiagnostico);
+                if (solicitudDx != null) {
+                    ordenExamen.setSolicitudDx(solicitudDx);
+                    ordenExamen.setCodExamen(examen);
+                    ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                    ordenExamen.setUsuarioRegistro(usuario);
+                    ordenExamen.setLabProcesa(labUsuario);
+                    try {
+                        ordenExamenMxService.addOrdenExamen(ordenExamen);
+                    } catch (Exception ex) {
+                        resultado = messageSource.getMessage("msg.receipt.add.test.error", null, null);
+                        resultado = resultado + ". \n " + ex.getMessage();
+                        ex.printStackTrace();
+                    }
+                } else {
+                    Catalogo_Dx dx = tomaMxService.getDxById(String.valueOf(idDiagnostico));
+                    resultado = messageSource.getMessage("msg.receipt.add.test.error2", null, null);
+                    resultado = resultado.replace("{0}", dx.getNombre());
                 }
             }else{
-                Catalogo_Dx dx = tomaMxService.getDxById(String.valueOf(idDiagnostico));
-                resultado = messageSource.getMessage("msg.receipt.add.test.error2", null, null);
-                resultado = resultado.replace("{0}", dx.getNombre());
+                resultado = messageSource.getMessage("msg.receipt.test.denied", null, null);
+                resultado = resultado.replace("{0}", examen.getNombre());
             }
         }
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);

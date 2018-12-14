@@ -146,6 +146,15 @@ public class AutoridadesService {
         return query.list();
     }
 
+    public boolean tieneAutoridadExamen(String userName, Integer idExamen) {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM AutoridadExamen as a inner join a.examen as e where a.pasivo = false and e.pasivo = false and a.autoridadArea.user.username = :userName and e.idExamen = :idExamen");
+        query.setParameter("userName",userName);
+        query.setParameter("idExamen",idExamen);
+        return query.list().size()>0;
+    }
+
     public List<AutoridadDireccion> getAutoridadDireccion(String userName) {
         // Retrieve session from Hibernate
         Session session = sessionFactory.getCurrentSession();

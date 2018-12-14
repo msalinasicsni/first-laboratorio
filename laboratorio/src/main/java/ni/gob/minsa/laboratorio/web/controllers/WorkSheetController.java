@@ -116,28 +116,30 @@ public class WorkSheetController {
             List<String[]> filasSolicitudes = new ArrayList<String[]>();
             //Prepare the document.
             PDPage page = GeneralUtils.addNewPage(doc);
+            page.setRotation(90);
             PDPageContentStream stream = new PDPageContentStream(doc, page);
+            stream.concatenate2CTM(0, 1, -1, 0, page.getMediaBox().getWidth(), 0);
             HojaTrabajo hojaTrabajo = hojaTrabajoService.getHojaTrabajo(Integer.valueOf(numHoja),labProcesa.getCodigo());
             tomasHoja = hojaTrabajoService.getTomaMxByHojaTrabajo(Integer.valueOf(numHoja), hojaTrabajo.getLaboratorio().getCodigo());
             //dibujar encabezado pag y pie de pagina
-            GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
+            GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
 
             String pageNumber= String.valueOf(doc.getNumberOfPages());
-            GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
 
-            drawInfoLab(stream,page, labProcesa);
+            float y = drawInfoLab(stream,page, labProcesa);
 
-            float xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 12, messageSource.getMessage("lbl.work.sheet", null, null));
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.work.sheet", null, null), 630, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
-
+            float xCenter = GeneralUtils.centerTextPositionXHorizontal(page, PDType1Font.HELVETICA_BOLD, 12, messageSource.getMessage("lbl.work.sheet", null, null));
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.work.sheet", null, null), y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD);
+            y-=20;
             //draw worksheet info
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", 610, 30, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), 610, 120, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.number", null, null) + ": ", y, 40, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(String.valueOf(hojaTrabajo.getNumero()), y, 130, stream, 12, PDType1Font.HELVETICA);
 
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", 610, 310, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), 610, 410, stream, 12, PDType1Font.HELVETICA);
-            float y = 590;
-
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sheet.date", null, null) + ": ", y, 550, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(DateUtil.DateToString(hojaTrabajo.getFechaRegistro(), "dd/MM/yyyy hh:mm:ss a"), y, 650, stream, 12, PDType1Font.HELVETICA);
+            //float y = 590;
+            y-=10;
             for (DaTomaMx tomaMx_hoja : tomasHoja) {
 
                 //cod_mx, solicitud,lab_destino,techa toma mx, fec_inicio_sintomas
@@ -171,53 +173,64 @@ public class WorkSheetController {
                 if (tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas() != null) {
                     fis = DateUtil.DateToString(tomaMx_hoja.getIdNotificacion().getFechaInicioSintomas(), "dd/MM/yyyy");
                 }
+                String nombrePersona = tomaMx_hoja.getIdNotificacion().getPersona().getPrimerNombre();
+                if (tomaMx_hoja.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                    nombrePersona = nombrePersona + " " + tomaMx_hoja.getIdNotificacion().getPersona().getSegundoNombre();
+                nombrePersona = nombrePersona + " " + tomaMx_hoja.getIdNotificacion().getPersona().getPrimerApellido();
+                if (tomaMx_hoja.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                    nombrePersona = nombrePersona + " " + tomaMx_hoja.getIdNotificacion().getPersona().getSegundoApellido();
 
-                content = new String[6];
+                content = new String[7];
                 content[0] = tomaMx_hoja.getCodigoLab() != null ? tomaMx_hoja.getCodigoLab() : tomaMx_hoja.getCodigoUnicoMx();
-                content[1] = solicitudes;
-                content[2] = areaEntrega;
-                content[3] = DateUtil.DateToString(tomaMx_hoja.getFechaHTomaMx(), "dd/MM/yyyy") +
+                content[1] = nombrePersona;
+                content[2] = solicitudes;
+                content[3] = areaEntrega;
+                content[4] = DateUtil.DateToString(tomaMx_hoja.getFechaHTomaMx(), "dd/MM/yyyy") +
                         (tomaMx_hoja.getHoraTomaMx() != null ? " " + tomaMx_hoja.getHoraTomaMx() : "");
-                content[4] = fis;
-                content[5] = controlCalidad;
+                content[5] = fis;
+                content[6] = controlCalidad;
 
                 filasSolicitudes.add(content);
             }
             //Initialize table
-            float margin = 30;
-            float tableWidth = 530;
-            float yStartNewPage = 600;
+            float margin = 40;
+            float tableWidth = 750;
             float bottomMargin = 45;
-            BaseTable table = new BaseTable(yStartNewPage, yStartNewPage, bottomMargin, tableWidth, margin, doc, page, true, true);
+            BaseTable table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
 
             //Create Fact header row
             Row factHeaderrow = table.createRow(15f);
-            Cell cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
+            Cell cell = factHeaderrow.createCell(13, messageSource.getMessage("lbl.lab.code.mx", null, null));
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
             cell.setFillColor(Color.LIGHT_GRAY);
 
-            cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
+            cell = factHeaderrow.createCell((22), messageSource.getMessage("lbl.person", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
+            cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.requests", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
+            cell = factHeaderrow.createCell((15), messageSource.getMessage("lbl.solic.area.prc", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+            cell = factHeaderrow.createCell((16), messageSource.getMessage("lbl.sampling.datetime", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
 
-            cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
+            cell = factHeaderrow.createCell((12), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+            cell.setFillColor(Color.lightGray);
+            cell.setFont(PDType1Font.HELVETICA_BOLD);
+            cell.setFontSize(10);
+
+            cell = factHeaderrow.createCell((4), messageSource.getMessage("lbl.cc", null, null));
             cell.setFillColor(Color.lightGray);
             cell.setFont(PDType1Font.HELVETICA_BOLD);
             cell.setFontSize(10);
@@ -227,49 +240,53 @@ public class WorkSheetController {
 
             for (String[] fact : filasSolicitudes) {
 
-                if (y < 420){
+                if (y < 260){
                     table.draw();
                     stream.close();
                     page = GeneralUtils.addNewPage(doc);
+                    page.setRotation(90);
                     stream = new PDPageContentStream(doc, page);
-                    y = 700;
+                    stream.concatenate2CTM(0, 1, -1, 0, page.getMediaBox().getWidth(), 0);
+                    y = 490;
                     //dibujar encabezado pag y pie de pagina
-                    GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590,80,600,70);
+                    GeneralUtils.drawHeaderAndFooter(stream, doc, 500, 840, 90, 840, 70);
 
                     pageNumber = String.valueOf(doc.getNumberOfPages());
                     GeneralUtils.drawTEXT(pageNumber, 15, 800, stream, 10, PDType1Font.HELVETICA_BOLD);
 
-                    pageNumber= String.valueOf(doc.getNumberOfPages());
-                    GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
-
                     table = new BaseTable(y, y, bottomMargin, tableWidth, margin, doc, page, true, true);
                     factHeaderrow = table.createRow(15f);
-                    cell = factHeaderrow.createCell(16, messageSource.getMessage("lbl.lab.code.mx", null, null));
+                    cell = factHeaderrow.createCell(13, messageSource.getMessage("lbl.lab.code.mx", null, null));
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
                     cell.setFillColor(Color.LIGHT_GRAY);
 
-                    cell = factHeaderrow.createCell((19), messageSource.getMessage("lbl.requests", null, null));
+                    cell = factHeaderrow.createCell((22), messageSource.getMessage("lbl.person", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.solic.area.prc", null, null));
+                    cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.requests", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell((23), messageSource.getMessage("lbl.sampling.datetime", null, null));
+                    cell = factHeaderrow.createCell((15), messageSource.getMessage("lbl.solic.area.prc", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell((18), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+                    cell = factHeaderrow.createCell((16), messageSource.getMessage("lbl.sampling.datetime", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
 
-                    cell = factHeaderrow.createCell((6), messageSource.getMessage("lbl.cc", null, null));
+                    cell = factHeaderrow.createCell((12), messageSource.getMessage("lbl.receipt.symptoms.start.date", null, null));
+                    cell.setFillColor(Color.lightGray);
+                    cell.setFont(PDType1Font.HELVETICA_BOLD);
+                    cell.setFontSize(10);
+
+                    cell = factHeaderrow.createCell((4), messageSource.getMessage("lbl.cc", null, null));
                     cell.setFillColor(Color.lightGray);
                     cell.setFont(PDType1Font.HELVETICA_BOLD);
                     cell.setFontSize(10);
@@ -280,15 +297,19 @@ public class WorkSheetController {
                 y -= 15;
                 for (int i = 0; i < fact.length; i++) {
                     if (i==0) {
-                        cell = row.createCell(16, fact[i]);
+                        cell = row.createCell(13, fact[i]);
                     }else if (i==1) {
-                        cell = row.createCell(19, fact[i]);
-                    }else if (i==3) {
-                        cell = row.createCell(23, fact[i]);
-                    }else if (i==5) {
-                        cell = row.createCell(6, fact[i]);
-                    }else {
+                        cell = row.createCell(22, fact[i]);
+                    }else if (i==2) {
                         cell = row.createCell(18, fact[i]);
+                    }else if (i==3) {
+                        cell = row.createCell(15, fact[i]);
+                    }else if (i==5) {
+                        cell = row.createCell(12, fact[i]);
+                    }else if (i==6) {
+                        cell = row.createCell(4, fact[i]);
+                    }else {
+                        cell = row.createCell(16, fact[i]);
                     }
                     cell.setFont(PDType1Font.HELVETICA);
                     cell.setFontSize(10);
@@ -296,8 +317,8 @@ public class WorkSheetController {
             }
             table.draw();
 
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 105, 340, stream, 12, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaImpresion, 105, 450, stream, 10, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.print.datetime", null, null) + " ", 95, 600, stream, 12, PDType1Font.HELVETICA_BOLD);
+            GeneralUtils.drawTEXT(fechaImpresion, 95, 700, stream, 10, PDType1Font.HELVETICA);
 
 
             stream.close();
@@ -399,26 +420,26 @@ public class WorkSheetController {
         return escaper.translate(jsonResponse);
     }
 
-    private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
+    private float drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa) throws IOException {
         float xCenter;
 
-        float inY = 720;
+        float inY = 490;
         float m = 20;
 
-        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
+        xCenter = GeneralUtils.centerTextPositionXHorizontal(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
         inY -= m;
 
         if(labProcesa != null){
 
             if(labProcesa.getDescripcion()!= null){
-                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
+                xCenter = GeneralUtils.centerTextPositionXHorizontal(page, PDType1Font.HELVETICA_BOLD, 14, labProcesa.getDescripcion());
                 GeneralUtils.drawTEXT(labProcesa.getDescripcion(), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
 
             if(labProcesa.getDireccion() != null){
-                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getDireccion());
+                xCenter = GeneralUtils.centerTextPositionXHorizontal(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getDireccion());
                 GeneralUtils.drawTEXT(labProcesa.getDireccion(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             }
@@ -426,14 +447,16 @@ public class WorkSheetController {
             if(labProcesa.getTelefono() != null){
 
                 if(labProcesa.getTelefax() != null){
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono() + " - " + labProcesa.getTelefax());
+                    xCenter = GeneralUtils.centerTextPositionXHorizontal(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono() + " - " + labProcesa.getTelefax());
                     GeneralUtils.drawTEXT(labProcesa.getTelefono() + " " + labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }else{
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono());
+                    xCenter = GeneralUtils.centerTextPositionXHorizontal(page, PDType1Font.HELVETICA_BOLD, 11, labProcesa.getTelefono());
                     GeneralUtils.drawTEXT(labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }
+                inY -= m;
             }
         }
+        return inY;
     }
 
 
