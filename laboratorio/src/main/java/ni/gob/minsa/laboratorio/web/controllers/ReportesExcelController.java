@@ -125,7 +125,7 @@ public class ReportesExcelController {
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
         }catch (Exception e){
@@ -163,12 +163,12 @@ public class ReportesExcelController {
     }
 
     /*******************************************************************/
-    /***** REPORTE POSITIVIDAD CONSILIDADO POR TÉCNICA, DX Y SEMANA ****/
+    /***** REPORTE POSITIVIDAD CONSILIDADO POR Tï¿½CNICA, DX Y SEMANA ****/
     /*******************************************************************/
 
     @RequestMapping(value = "consolidatedexams/init", method = RequestMethod.GET)
     public String initReportConsolidatedByExams(Model model,HttpServletRequest request) throws Exception {
-        logger.debug("Reporte por examenes(técnica)");
+        logger.debug("Reporte por examenes(tï¿½cnica)");
         List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
         List<Semanas> semanas = catalogosService.getSemanas();
         List<Anios> anios = catalogosService.getAnios();
@@ -190,8 +190,8 @@ public class ReportesExcelController {
         return "reportes/consolidatedByExams";
     }
     /**
-     * Método para obtener data para Reporte por Resultado dx
-     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
+     * Mï¿½todo para obtener data para Reporte por Resultado dx
+     * @param filtro JSon con los datos de los filtros a aplicar en la bï¿½squeda
      * @return Object
      * @throws Exception
      */
@@ -338,7 +338,7 @@ public class ReportesExcelController {
     }
 
     /**
-     * Abrir sessión en servidor de correo
+     * Abrir sessiï¿½n en servidor de correo
      * @return SessionData
      */
     private SessionData getMailSessionData(){
@@ -380,7 +380,7 @@ public class ReportesExcelController {
         int contadorSemana = 1;
         //se determina la cantidad de semanas de cada mes
         for (CalendarioEpi semana : semanasEpi) {
-            //primera iteración
+            //primera iteraciï¿½n
             if (mesActual == null) {
                 mesActual = semana.getNoMes();
             }
@@ -393,7 +393,7 @@ public class ReportesExcelController {
             } else {
                 semanasMes++;
             }
-            //es último registro, agregar el mes correspondiente
+            //es ï¿½ltimo registro, agregar el mes correspondiente
             if (contadorSemana == semanasEpi.size()) {
                 meses.add(mesActual.toString() + "," + semanasMes.toString());
             }
@@ -403,11 +403,11 @@ public class ReportesExcelController {
         for (int i = filtroRep.getSemInicial(); i <= filtroRep.getSemFinal(); i++) {
             semanas.add(String.valueOf(i));
         }
-        //trae todos los registros que coinciden con el filtro de búsqueda
+        //trae todos los registros que coinciden con el filtro de bï¿½squeda
         List<ConsolidadoExamen> registros = reporteConsolExamenService.getDataDxResultReport(filtroRep);
         //por entidades es que se cuentan los datos
         List<EntidadesAdtvas> entidades = entidadAdmonService.getAllEntidadesAdtvas();
-        //la cantidad de entidades es la que indica cuanto registros debería tener cada tabla
+        //la cantidad de entidades es la que indica cuanto registros deberï¿½a tener cada tabla
         int registrosPorTabla = entidades.size();
         List<List<Object[]>> datos = new ArrayList<List<Object[]>>();
         List<List<Object[]>> consolidados = new ArrayList<List<Object[]>>();
@@ -416,7 +416,7 @@ public class ReportesExcelController {
             dxsList.add(dx.getNombre());
             List<Object[]> consolidadoList = new ArrayList<Object[]>();
             List<Object[]> datosList = new ArrayList<Object[]>();
-            //sacar todos los examenes(técnica) activos por cada dx
+            //sacar todos los examenes(tï¿½cnica) activos por cada dx
             List<CatalogoExamenes> examenesList = examenesService.getExamenesByIdDx(dx.getIdDiagnostico());
             for(final CatalogoExamenes examen : examenesList) {
                 Object[] salto = new Object[1];
@@ -433,7 +433,7 @@ public class ReportesExcelController {
                 //aplicar filtro por dx y examen
                 Collection<ConsolidadoExamen> registrosdx = FilterLists.filter(registros, byDxAndExam);
                 for (final EntidadesAdtvas SILAIS : entidades) {
-                    //representa una fila para la tabla de datos. El tamaño es: (semanas.size() * 2), porque cada semana de datos lleva total y positivos; y (+ 1), por que se agrega el nombre del SILAIS al inicio
+                    //representa una fila para la tabla de datos. El tamaï¿½o es: (semanas.size() * 2), porque cada semana de datos lleva total y positivos; y (+ 1), por que se agrega el nombre del SILAIS al inicio
                     Object[] registro = new Object[(semanas.size() * 2) + 1];
                     //representa una fila para la tabla de consolidados
                     Object[] registroMes = new Object[(meses.size() * 2) + 1];
@@ -452,7 +452,7 @@ public class ReportesExcelController {
                         };
                         //aplicar filtro por semana y SILAIS
                         Collection<ConsolidadoExamen> examenes = FilterLists.filter(registrosdx, totalBySilaisSemana);
-                        //el total es el tamaño del subconjunto resultado del filtro
+                        //el total es el tamaï¿½o del subconjunto resultado del filtro
                         registro[indice] = examenes.size();
 
                         //total positivos
@@ -465,7 +465,7 @@ public class ReportesExcelController {
                         };
                         //se aplica filtro de registros con resultado positivo
                         Collection<ConsolidadoExamen> positivos = FilterLists.filter(examenes, posBySilaisSemana);
-                        //el total de positivos es el tamaño del subconjunto resultado del filtro
+                        //el total de positivos es el tamaï¿½o del subconjunto resultado del filtro
                         registro[indice + 1] = positivos.size();
 
                         indice += 2;
@@ -1214,7 +1214,7 @@ public class ReportesExcelController {
             registro[21] = "";
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[22] = sexo.substring(sexo.length() - 1, sexo.length());
-            //la posición que contiene el resultado final
+            //la posiciï¿½n que contiene el resultado final
             if (registro[17].toString().toLowerCase().contains("positivo")) {
                 registro[0]= rowCountPos++;
                 registrosPos.add(registro);
@@ -1292,11 +1292,11 @@ public class ReportesExcelController {
             registro[18] = (sindFebril!=null?DateUtil.DateToString(sindFebril.getFechaIngreso(),"dd/MM/yyyy"):"");
             registro[19] = (sindFebril!=null && sindFebril.getFallecido()!=null?sindFebril.getFallecido().getValor():"");
             registro[20] = (sindFebril!=null?DateUtil.DateToString(sindFebril.getFechaFallecido(),"dd/MM/yyyy"):"");
-            //la posición que contiene el resultado final
-            if (registro[2].toString().toLowerCase().contains("no reactor")) {
+            //la posiciï¿½n que contiene el resultado final
+            if (registro[2].toString().toLowerCase().contains("no reactor") || registro[2].toString().toLowerCase().contains("positivo")) {
                 registro[0]= rowCountNeg++;
                 registrosNeg.add(registro);
-            }else if (registro[2].toString().toLowerCase().contains("reactor")) {
+            }else if (registro[2].toString().toLowerCase().contains("reactor") || registro[2].toString().toLowerCase().contains("negativo")) {
                 registro[0]= rowCountPos++;
                 registrosPos.add(registro);
             } else if (incluirMxInadecuadas && registro[2].toString().toLowerCase().contains("inadecuada")){
@@ -1346,15 +1346,15 @@ public class ReportesExcelController {
             registro[12] = solicitudDx.getIdTomaMx().getCodTipoMx().getNombre();
 
             validarPCRTB(registro, solicitudDx.getIdSolicitudDx(), 15, 14);
-
-             if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuada")){
-                registro[0]= rowCountInadec++;
+            String resSol = parseFinalResultDetails(solicitudDx.getIdSolicitudDx());
+            if (incluirMxInadecuadas && (resSol.toLowerCase().contains("inadecuada") || (registro[15] != null && registro[15].toString().toLowerCase().contains("inadecuada")))) {
+                registro[0] = rowCountInadec++;
                 registrosMxInadec.add(registro);
-            }else {
-                 //la posición que contiene el resultado final
-                 registro[0]= rowCountPos++;
-                 registrosPos.add(registro);
-             }
+            } else {
+                //la posiciï¿½n que contiene el resultado final
+                registro[0] = rowCountPos++;
+                registrosPos.add(registro);
+            }
         }
     }
 
@@ -1397,22 +1397,22 @@ public class ReportesExcelController {
             registro[12] = solicitudDx.getIdTomaMx().getCodTipoMx().getNombre();
 
             validarCultivoTB(registro, solicitudDx.getIdSolicitudDx());
-
-            if (incluirMxInadecuadas && registro[19].toString().toLowerCase().contains("inadecuada")){
-                registro[0]= rowCountInadec++;
-                registrosMxInadec.add(registro);
-            }else {
-                //la posición que contiene el resultado final
-                registro[0]= rowCountPos++;
-                registrosPos.add(registro);
-            }
-
-            List<DaSolicitudDx> buscarCultivoTb = tomaMxService.getSoliDxAprobByIdToma(solicitudDx.getIdTomaMx().getIdTomaMx());
-            for(DaSolicitudDx cultivoDx : buscarCultivoTb){
-                if (cultivoDx.getCodDx().getNombre().toLowerCase().contains("mycobacterium") && (cultivoDx.getCodDx().getNombre().toLowerCase().contains("tuberculosis") || cultivoDx.getCodDx().getNombre().toLowerCase().contains("tb"))){
-                    validarPCRTB(registro, cultivoDx.getIdSolicitudDx(), 15, 14);
+            String resSol = parseFinalResultDetails(solicitudDx.getIdSolicitudDx());
+                if (incluirMxInadecuadas && (resSol.toLowerCase().contains("inadecuada") || (registro[19] != null && registro[19].toString().toLowerCase().contains("inadecuada")))) {
+                    registro[0] = rowCountInadec++;
+                    registrosMxInadec.add(registro);
+                } else {
+                    //la posiciï¿½n que contiene el resultado final
+                    registro[0] = rowCountPos++;
+                    registrosPos.add(registro);
                 }
-            }
+
+                List<DaSolicitudDx> buscarCultivoTb = tomaMxService.getSoliDxAprobByIdToma(solicitudDx.getIdTomaMx().getIdTomaMx());
+                for (DaSolicitudDx cultivoDx : buscarCultivoTb) {
+                    if (cultivoDx.getCodDx().getNombre().toLowerCase().contains("mycobacterium") && (cultivoDx.getCodDx().getNombre().toLowerCase().contains("tuberculosis") || cultivoDx.getCodDx().getNombre().toLowerCase().contains("tb"))) {
+                        validarPCRTB(registro, cultivoDx.getIdSolicitudDx(), 15, 14);
+                    }
+                }
         }
     }
 
@@ -1474,7 +1474,7 @@ public class ReportesExcelController {
             String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
             registro[12] = sexo.substring(sexo.length() - 1, sexo.length());
             */
-            //la posición que contiene el resultado final
+            //la posiciï¿½n que contiene el resultado final
             registros.add(registro);
         }
     }
@@ -2026,9 +2026,9 @@ public class ReportesExcelController {
                 }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                     String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                     resultados+=valorBoleano;
-                } /*else { // no tomar en cuenta respuestas auxiliares
+                } else if (res.getValor().toLowerCase().contains("inadecuada")) {
                     resultados+=res.getValor();
-                }*/
+                }
             }else if (res.getRespuestaExamen()!=null){
                 //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                 if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
@@ -2076,7 +2076,7 @@ public class ReportesExcelController {
         return resultados;
     }
     /**
-     * Convierte un JSON con los filtros de búsqueda a objeto FiltrosReporte
+     * Convierte un JSON con los filtros de bï¿½squeda a objeto FiltrosReporte
      * @param strJson filtros
      * @return FiltrosReporte
      * @throws Exception
