@@ -320,6 +320,7 @@ public class ReportesController {
 
             }
 
+            map.put("usuario", receivedMx.getUsuarioRecepcion().getCompleteName());
             mapResponse.put(indice, map);
             indice++;
         }

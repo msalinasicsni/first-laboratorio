@@ -645,12 +645,12 @@ public class OrdenExamenMxService {
         Session session = sessionFactory.getCurrentSession();
         List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
         //se toman las que son de diagnóstico.
-        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx where sdx.idSolicitudDx =:idSolicitud ");
+        Query q = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudDx as sdx where sdx.idSolicitudDx =:idSolicitud and oe.anulado = false ");
         q.setParameter("idSolicitud",idSolicitud);
         ordenExamenList = q.list();
         if (ordenExamenList.size()<=0) {
             //se toman las que son de estudio
-            Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud ");
+            Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false ");
             q2.setParameter("idSolicitud", idSolicitud);
             ordenExamenList.addAll(q2.list());
         }
