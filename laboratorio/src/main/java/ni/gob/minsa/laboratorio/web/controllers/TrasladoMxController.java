@@ -240,7 +240,7 @@ public class TrasladoMxController {
                 temperaturaTermo = jsonpObject.get("temperaturaTermo").getAsFloat();
 
             if (jsonpObject.get("idExamenes")!=null && !jsonpObject.get("idExamenes").toString().isEmpty())
-                idExamenes = jsonpObject.get("idExamenes").getAsString();
+                idExamenes = jsonpObject.get("idExamenes").toString();
 
             if (jsonpObject.get("labDestino")!=null && !jsonpObject.get("labDestino").toString().isEmpty())
                 codLabDestino = jsonpObject.get("labDestino").getAsString();
@@ -376,7 +376,7 @@ public class TrasladoMxController {
                                 } else {
                                     //externo, validar si el dx tiene el examanen y el ex�men sin resultado
                                     //si ya tiene registrado ex�menes con resultado, no se va a trasladar
-                                    String[] arrayExamenes = idExamenes.split(",");
+                                    String[] arrayExamenes = idExamenes.replaceAll("\\[","").replaceAll("\\]","").replaceAll("\"","").split(",");
                                     List<OrdenExamen> ordenExamenList;
                                     int contExamenesValidos = 0;
                                     for (String idExamen : arrayExamenes) {

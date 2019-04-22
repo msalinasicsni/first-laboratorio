@@ -340,7 +340,18 @@ public class RecepcionMxService {
                                     .setProjection(Property.forName("toma.idTomaMx"))));
 
                     crit.add(conditGroup);
+                    DetachedCriteria maxDateQuery = DetachedCriteria.forClass(RecepcionMx.class);
+                    maxDateQuery.createAlias("tomaMx", "mx");
+                    maxDateQuery.add(Restrictions.eqProperty("mx.idTomaMx", "tomaMx.idTomaMx"));
+                    maxDateQuery.setProjection(Projections.max("fechaHoraRecepcion"));
+                    crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));
+
                 }else if (filtro.getCodEstado().equalsIgnoreCase("ESTDMX|RCP")){
+                    DetachedCriteria maxDateQuery = DetachedCriteria.forClass(RecepcionMx.class);
+                    maxDateQuery.createAlias("tomaMx", "mx");
+                    maxDateQuery.add(Restrictions.eqProperty("mx.idTomaMx", "tomaMx.idTomaMx"));
+                    maxDateQuery.setProjection(Projections.max("fechaHoraRecepcion"));
+                    crit.add(Property.forName("fechaHoraRecepcion").eq(maxDateQuery));
                     crit.add(Restrictions.isNull("calidadMx.codigo"));//si no tiene calidad significa que no ha sido procesada. esto es por los traslados CC
                 }
                 //sólo la última recepción de cada muestra, cuando es para envio al area que procesa

@@ -454,7 +454,7 @@ var EditarMxLab = function () {
                 nuevaSolicitudObj['idEstudio'] = $('#codEstudioNuevo').find('option:selected').val();
                 nuevaSolicitudObj['esEstudio'] = $('#esEstudio').val();
                 nuevaSolicitudObj['mensaje'] = '';
-                bloquearUI();
+                bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.sAgregarSolicitudUrl,
@@ -500,7 +500,7 @@ var EditarMxLab = function () {
                 ordenExamenObj['idExamen'] = $('#codExamen').find('option:selected').val();
                 ordenExamenObj['esEstudio'] = $('#esEstudio').val();
                 ordenExamenObj['mensaje'] = '';
-                bloquearUI();
+                bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.sAgregarOrdenExamenUrl,
@@ -543,7 +543,7 @@ var EditarMxLab = function () {
                 anulacionObj['idSolicitud'] = idSolicitud;
                 anulacionObj['causaAnulacion'] = $("#causaAnulacion").val();
                 anulacionObj['mensaje'] = '';
-                bloquearUI();
+                bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.sAnularSolicitudUrl,
@@ -588,7 +588,7 @@ var EditarMxLab = function () {
                 anulacionObj['idOrdenExamen'] = idOrdenExamen;
                 anulacionObj['causaAnulacion'] = $("#causaAnulacionEx").val();
                 anulacionObj['mensaje'] = '';
-                bloquearUI();
+                bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.sAnularExamenUrl,
