@@ -759,7 +759,7 @@ public class ReportesService {
                     " (select coalesce(sum(count(noti.idNotificacion)),0) from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx " +
                     " where noti.idNotificacion = mx.idNotificacion.idNotificacion" +
                     " and noti.codUnidadAtencion.codigo =  uni.codigo " +
-                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx and noti.pasivo = false and dx.anulado = false and mx.anulada = false " +
+                    " and mx.idTomaMx = dx.idTomaMx.idTomaMx and noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.controlCalidad = false " +
                     sqlRutina +(filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) + (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
                     " group by  noti.codUnidadAtencion.unidadId) as dx, " +
                     " coalesce( " +
@@ -769,7 +769,7 @@ public class ReportesService {
                     " and mx.idTomaMx = dx.idTomaMx.idTomaMx " +
                     " and  noti.codUnidadAtencion.codigo =  uni.codigo " +
                     sqlRutina +(filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) + (!filtro.getCodLaboratio().equalsIgnoreCase("ALL")?sqlLab:"") +
-                    " and noti.pasivo = false and dx.anulado = false " +
+                    " and noti.pasivo = false and dx.anulado = false and dx.controlCalidad = false " +
                     " and mx.anulada = false),0) as conresultado, " +
                     " coalesce( " +
                     " (select  sum(case dx.aprobada when false then 1 else 0 end) " +

@@ -341,7 +341,6 @@ public class TrasladoMxController {
                             //se recupera la solicitud de dx existente para la muestra y el dx seleccionado por el usuario
                             DaSolicitudDx solicitudDx = tomaMxService.getSolicitudesDxByMxDx(idTomaMx, dxTraslado.getIdDiagnostico());
                             if (solicitudDx != null) {
-                                solicitudDx.setLabProcesa(labDestino);
                                 // control de calidad //crear envio y solicitud dx
                                 if (tipoTraslado.equals("cc")) {
                                     DaSolicitudDx solicitudDxCC = new DaSolicitudDx();
@@ -374,6 +373,7 @@ public class TrasladoMxController {
                                     }
 
                                 } else {
+                                    solicitudDx.setLabProcesa(labDestino);
                                     //externo, validar si el dx tiene el examanen y el ex�men sin resultado
                                     //si ya tiene registrado ex�menes con resultado, no se va a trasladar
                                     String[] arrayExamenes = idExamenes.replaceAll("\\[","").replaceAll("\\]","").replaceAll("\"","").split(",");
