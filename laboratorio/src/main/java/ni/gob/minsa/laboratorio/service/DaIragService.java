@@ -46,4 +46,18 @@ public class DaIragService {
         session.saveOrUpdate(irag);
     }
 
+    public void deleteDaIrag(DaIrag dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
+            }
+            else
+                throw new Exception("Objeto DaIrag es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
+
 }

@@ -38,4 +38,18 @@ public class SindFebrilService {
 		session.saveOrUpdate(daSindFebril.getIdNotificacion());
 		session.saveOrUpdate(daSindFebril);
 	}
+
+    public void deleteDaSindFebril(DaSindFebril dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
+            }
+            else
+                throw new Exception("Objeto DaSindFebril es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
 }

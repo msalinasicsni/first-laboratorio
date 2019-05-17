@@ -93,7 +93,7 @@ public class DatosSolicitudService {
         Session s = sessionFactory.openSession();
         Transaction tx = s.beginTransaction();
 
-        String hqlDelete = "delete DatoSolicitudDetalle dato where dato.solicitudDx.idTomaMx.idTomaMx = :idTomaMx";
+        String hqlDelete = "delete DatoSolicitudDetalle dato where dato.solicitudDx in (from DaSolicitudDx where idTomaMx.idTomaMx = :idTomaMx)";
         int deletedEntities = s.createQuery( hqlDelete )
                 .setString("idTomaMx", idTomaMx)
                 .executeUpdate();
