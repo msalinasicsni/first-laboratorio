@@ -22,6 +22,7 @@ public class RegistroSolicitud {
     private String fechaTomaMx;
     private String horaTomaMx;
     private String volumen;
+    private String seguimiento;
 
     private String diagnosticos;
     private String codigoLab;
@@ -130,6 +131,14 @@ public class RegistroSolicitud {
 
     public void setVolumen(String volumen) {
         this.volumen = volumen;
+    }
+
+    public String getSeguimiento() {
+        return seguimiento;
+    }
+
+    public void setSeguimiento(String seguimiento) {
+        this.seguimiento = seguimiento;
     }
 
     public String getDiagnosticos() {

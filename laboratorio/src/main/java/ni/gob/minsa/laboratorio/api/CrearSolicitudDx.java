@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Miguel Salinas on 16/05/2019.
@@ -96,52 +97,71 @@ public class CrearSolicitudDx {
                         resultado.setError("Usuario enviado no se reconoce como usuario válido!");
                     }
 
-                    //registrar notificacion
-                    DaNotificacion notificacion = new DaNotificacion();
+                    DaNotificacion notificacion = null;
                     DaTomaMx tomaMx = new DaTomaMx();
-                    notificacion.setPersona(personaService.getPersona(Integer.valueOf(solicitud.getCodExpedienteUnico())));
-                    if (!solicitud.getCodSilais().isEmpty()) {
-                        notificacion.setCodSilaisAtencion(entidadAdmonService.getSilaisByCodigo(Integer.valueOf(solicitud.getCodSilais())));
-                        tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
+                    boolean esSeguimiento = solicitud.getSeguimiento().equalsIgnoreCase("1");
+                    if (esSeguimiento){
+                        List<DaNotificacion> notificaciones = daNotificacionService.getNoticesByPerson(Integer.valueOf(solicitud.getCodExpedienteUnico()), solicitud.getCodTipoNoti());
+                        if (notificaciones.size()>0) notificacion = notificaciones.get(0);
                     }
-                    if (!solicitud.getCodUnidadSalud().isEmpty()) {
-                        notificacion.setCodUnidadAtencion(unidadesService.getUnidadByCodigo(Integer.valueOf(solicitud.getCodUnidadSalud())));
-                        tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
-                    }
-                    if (!solicitud.getCodTipoNoti().isEmpty()) {
-                        notificacion.setCodTipoNotificacion(catalogoService.getTipoNotificacion(solicitud.getCodTipoNoti()));
-                    }
-                    if (!solicitud.getFechaInicioSintomas().isEmpty()) {
-                        notificacion.setFechaInicioSintomas(DateUtil.StringToDate(solicitud.getFechaInicioSintomas(), "dd/MM/yyyy"));
-                    }
-                    if (!solicitud.getUrgente().isEmpty()) {
-                        notificacion.setUrgente(catalogoService.getRespuesta(solicitud.getUrgente()));
-                    }
-                    if (!solicitud.getEmbarazada().isEmpty()) {
-                        notificacion.setEmbarazada(catalogoService.getRespuesta(solicitud.getEmbarazada()));
-                    }
-                    if (!solicitud.getSemanasEmbarazo().isEmpty()) {
-                        notificacion.setSemanasEmbarazo(Integer.valueOf(solicitud.getSemanasEmbarazo()));
-                    }
-                    if (!solicitud.getCodExpediente().isEmpty()) {
-                        notificacion.setCodExpediente(solicitud.getCodExpediente());
-                    }
-                    notificacion.setFechaRegistro(new Timestamp(new Date().getTime()));
-                    notificacion.setUsuarioRegistro(usuarioRegistro);
-                    notificacion.setPasivo(false);
-                    notificacion.setCompleta(false);
 
-                    daNotificacionService.addNotification(notificacion);
-                    tomaMx.setIdNotificacion(notificacion);
-                    //crear ficha si es necesario
-                    try {
-                        crearFicha(notificacion);
-                    } catch (Throwable ex) {
-                        daNotificacionService.deleteNotificacion(notificacion);
-                        resultado.setError(messageSource.getMessage("msg.error.update.noti", null, null) + ". \n " + ex.getMessage());
-                        ex.printStackTrace();
-                        return createJsonResponse(resultado);
+                    //registrar notificacion, si no es seguimiento o si es seguimiento pero no se encontró notificación registrada
+                    if (notificacion==null) {
+                        notificacion = new DaNotificacion();
+                        notificacion.setPersona(personaService.getPersona(Integer.valueOf(solicitud.getCodExpedienteUnico())));
+                        if (!solicitud.getCodSilais().isEmpty()) {
+                            notificacion.setCodSilaisAtencion(entidadAdmonService.getSilaisByCodigo(Integer.valueOf(solicitud.getCodSilais())));
+                            tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
+                        }
+                        if (!solicitud.getCodUnidadSalud().isEmpty()) {
+                            notificacion.setCodUnidadAtencion(unidadesService.getUnidadByCodigo(Integer.valueOf(solicitud.getCodUnidadSalud())));
+                            tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
+                        }
+                        if (!solicitud.getCodTipoNoti().isEmpty()) {
+                            notificacion.setCodTipoNotificacion(catalogoService.getTipoNotificacion(solicitud.getCodTipoNoti()));
+                        }
+                        if (!solicitud.getFechaInicioSintomas().isEmpty()) {
+                            notificacion.setFechaInicioSintomas(DateUtil.StringToDate(solicitud.getFechaInicioSintomas(), "dd/MM/yyyy"));
+                        }
+                        if (!solicitud.getUrgente().isEmpty()) {
+                            notificacion.setUrgente(catalogoService.getRespuesta(solicitud.getUrgente()));
+                        }
+                        if (!solicitud.getEmbarazada().isEmpty()) {
+                            notificacion.setEmbarazada(catalogoService.getRespuesta(solicitud.getEmbarazada()));
+                        }
+                        if (!solicitud.getSemanasEmbarazo().isEmpty()) {
+                            notificacion.setSemanasEmbarazo(Integer.valueOf(solicitud.getSemanasEmbarazo()));
+                        }
+                        if (!solicitud.getCodExpediente().isEmpty()) {
+                            notificacion.setCodExpediente(solicitud.getCodExpediente());
+                        }
+                        notificacion.setFechaRegistro(new Timestamp(new Date().getTime()));
+                        notificacion.setUsuarioRegistro(usuarioRegistro);
+                        notificacion.setPasivo(false);
+                        notificacion.setCompleta(false);
+
+                        daNotificacionService.addNotification(notificacion);
+
+                        //crear ficha si es necesario
+                        try {
+                            crearFicha(notificacion);
+                        } catch (Throwable ex) {
+                            daNotificacionService.deleteNotificacion(notificacion);
+                            resultado.setError(messageSource.getMessage("msg.error.update.noti", null, null) + ". \n " + ex.getMessage());
+                            ex.printStackTrace();
+                            return createJsonResponse(resultado);
+                        }
+
+                    }else{
+                        if (!solicitud.getCodSilais().isEmpty()) {
+                            tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
+                        }
+                        if (!solicitud.getCodUnidadSalud().isEmpty()) {
+                            tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
+                        }
                     }
+                    tomaMx.setIdNotificacion(notificacion);
+
 
                     //registrar envio de la muestra hacia el lab que procesa
                     DaEnvioMx envioOrden = new DaEnvioMx();
@@ -153,11 +173,13 @@ public class CrearSolicitudDx {
                     try {
                         tomaMxService.addEnvioOrden(envioOrden);
                     } catch (Exception ex) {
-                        if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|SINFEB"))
-                            sindFebrilService.deleteDaSindFebril(sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion()));
-                        else if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|IRAG"))
-                            daIragService.deleteDaIrag(daIragService.getFormById(notificacion.getIdNotificacion()));
-                        daNotificacionService.deleteNotificacion(notificacion);
+                        if (!esSeguimiento) {
+                            if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|SINFEB"))
+                                sindFebrilService.deleteDaSindFebril(sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion()));
+                            else if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|IRAG"))
+                                daIragService.deleteDaIrag(daIragService.getFormById(notificacion.getIdNotificacion()));
+                            daNotificacionService.deleteNotificacion(notificacion);
+                        }
                         resultado.setError(messageSource.getMessage("msg.sending.error.add", null, null) + ". \n " + ex.getMessage());
                         ex.printStackTrace();
                         return createJsonResponse(resultado);
@@ -192,11 +214,13 @@ public class CrearSolicitudDx {
                         }
                     } catch (Exception ex) {
                         tomaMxService.deleteEnvioOrden(envioOrden);
-                        if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|SINFEB"))
-                            sindFebrilService.deleteDaSindFebril(sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion()));
-                        else if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|IRAG"))
-                            daIragService.deleteDaIrag(daIragService.getFormById(notificacion.getIdNotificacion()));
-                        daNotificacionService.deleteNotificacion(notificacion);
+                        if (!esSeguimiento) {
+                            if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|SINFEB"))
+                                sindFebrilService.deleteDaSindFebril(sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion()));
+                            else if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|IRAG"))
+                                daIragService.deleteDaIrag(daIragService.getFormById(notificacion.getIdNotificacion()));
+                            daNotificacionService.deleteNotificacion(notificacion);
+                        }
                         resultado.setError(ex.getMessage());
                         ex.printStackTrace();
                         return createJsonResponse(resultado);
@@ -210,13 +234,14 @@ public class CrearSolicitudDx {
                         tomaMxService.deleteSolicitudesDxByTomaMx(tomaMx.getIdTomaMx());
                         tomaMxService.deleteTomaMx(tomaMx);
                         tomaMxService.deleteEnvioOrden(envioOrden);
+                        if (!esSeguimiento) {
+                            if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|SINFEB"))
+                                sindFebrilService.deleteDaSindFebril(sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion()));
+                            else if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|IRAG"))
+                                daIragService.deleteDaIrag(daIragService.getFormById(notificacion.getIdNotificacion()));
 
-                        if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|SINFEB"))
-                            sindFebrilService.deleteDaSindFebril(sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion()));
-                        else if (notificacion.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|IRAG"))
-                            daIragService.deleteDaIrag(daIragService.getFormById(notificacion.getIdNotificacion()));
-
-                        daNotificacionService.deleteNotificacion(notificacion);
+                            daNotificacionService.deleteNotificacion(notificacion);
+                        }
                         resultado.setError("Dx no fueron agregados");
                     }
                 } else {
@@ -232,14 +257,15 @@ public class CrearSolicitudDx {
     }
 
     private String validarParametrosEntrada(RegistroSolicitud solicitud){
-        if (solicitud.getCodTipoNoti().isEmpty()) return "Debe proporcionar valor para 'codTipoNoti'";
-        if (solicitud.getCodTipoMx().isEmpty()) return "Debe proporcionar valor para 'codTipoMx'";
-        if (solicitud.getCodigoLab().isEmpty()) return "Debe proporcionar valor para 'codigoLab'";
-        if (solicitud.getCodSilais().isEmpty()) return "Debe proporcionar valor para 'codSilais'";
-        if (solicitud.getCodUnidadSalud().isEmpty()) return "Debe proporcionar valor para 'codUnidadSalud'";
-        if (solicitud.getCodExpedienteUnico().isEmpty()) return "Debe proporcionar valor para 'codExpedienteUnico'";
-        if (solicitud.getDiagnosticos().isEmpty()) return "Debe proporcionar valor para 'diagnosticos'";
-        if (solicitud.getIdUsuario().isEmpty()) return "Debe proporcionar valor para 'idUsuario'";
+        if (solicitud.getCodTipoNoti()==null || solicitud.getCodTipoNoti().isEmpty()) return "Debe proporcionar valor para 'codTipoNoti'";
+        if (solicitud.getCodTipoMx()==null || solicitud.getCodTipoMx().isEmpty()) return "Debe proporcionar valor para 'codTipoMx'";
+        if (solicitud.getCodigoLab()==null || solicitud.getCodigoLab().isEmpty()) return "Debe proporcionar valor para 'codigoLab'";
+        if (solicitud.getCodSilais()==null || solicitud.getCodSilais().isEmpty()) return "Debe proporcionar valor para 'codSilais'";
+        if (solicitud.getCodUnidadSalud()==null || solicitud.getCodUnidadSalud().isEmpty()) return "Debe proporcionar valor para 'codUnidadSalud'";
+        if (solicitud.getCodExpedienteUnico()==null || solicitud.getCodExpedienteUnico().isEmpty()) return "Debe proporcionar valor para 'codExpedienteUnico'";
+        if (solicitud.getDiagnosticos()==null || solicitud.getDiagnosticos().isEmpty()) return "Debe proporcionar valor para 'diagnosticos'";
+        if (solicitud.getIdUsuario()==null || solicitud.getIdUsuario().isEmpty()) return "Debe proporcionar valor para 'idUsuario'";
+        if (solicitud.getSeguimiento()==null || solicitud.getSeguimiento().isEmpty()) return "Debe proporcionar valor para 'seguimiento'";
 
         return "";
 

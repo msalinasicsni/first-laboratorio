@@ -62,10 +62,12 @@ public class DaNotificacionService {
         //todas las notificaciones tipo CASO ESPECIAL registradas para la persona seleccionada
             return session.createCriteria(DaNotificacion.class, "noti")
                     .createAlias("noti.persona", "persona")
+                    .add(Restrictions.eq("noti.pasivo", false))
                     .add(Restrictions.and(
                                     Restrictions.eq("persona.personaId", idPersona),
                                     Restrictions.eq("codTipoNotificacion.codigo", tipoNotificacion))
                     )
+                    .addOrder(Order.desc("noti.fechaRegistro"))
                     .list();
 
     }
