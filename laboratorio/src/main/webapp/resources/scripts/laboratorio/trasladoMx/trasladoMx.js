@@ -17,6 +17,7 @@ var TrasladoMx = function () {
         });
     };
 
+    var clickConfirm = 0;
     var desbloquearUI = function () {
         setTimeout($.unblockUI, 500);
     };
@@ -109,6 +110,7 @@ var TrasladoMx = function () {
                     }
                 },
                 submitHandler: function (form) {
+                    clickConfirm =0;
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
                     trasladarMx();
                 }
@@ -229,64 +231,67 @@ var TrasladoMx = function () {
                         buttons: '[' + opcSi + '][' + opcNo + ']'
                     }, function (ButtonPressed) {
                         if (ButtonPressed === opcSi) {
-                            //bloquearUI(parametros.blockMess);
-                            var idMuestras = {};
-                            //el input hidden debe estar siempre en la primera columna
-                            for (var i = 0; i < len; i++) {
-                                var texto = aSelectedTrs[i].firstChild.innerHTML;
-                                var input = texto.substring(texto.lastIndexOf("<"), texto.length);
-                                idMuestras[i] = $(input).val();
-                            }
-                            var muestrasObj = {};
-                            muestrasObj['strMuestras'] = idMuestras;
-                            muestrasObj['mensaje'] = '';
-                            muestrasObj['cantMuestras'] = len;
-                            muestrasObj['cantMxProc'] = '';
-                            //muestrasObj['codigosUnicosMx'] = '';
-                            muestrasObj['tipoTraslado'] = $("#tipoTraslado").val();
-                            muestrasObj['idRutina'] = $('#idDxSolicitado').find('option:selected').val();
-                            muestrasObj['nombreTransporta'] = $("#txtNombreTransporta").val();
-                            muestrasObj['temperaturaTermo'] = $("#txtTemperatura").val();
-                            muestrasObj['labDestino'] = $('#labDestino').find('option:selected').val();
-                            muestrasObj['idExamenes'] = $('#idExamenes').val();
-                            $.ajax(
-                                {
-                                    url: parametros.sTrasladoUrl,
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: JSON.stringify(muestrasObj),
-                                    contentType: 'application/json',
-                                    mimeType: 'application/json',
-                                    async: false,
-                                    success: function (data) {
-                                        if (data.mensaje.length > 0) {
-                                            $.smallBox({
-                                                title: data.mensaje,
-                                                content: $("#smallBox_content").val(),
-                                                color: "#C46A69",
-                                                iconSmall: "fa fa-warning",
-                                                timeout: 4000
-                                            });
-                                        } else {
-                                            var msg = $("#msg_reception_lab_success").val();
-                                            msg = msg.replace(/\{0\}/, data.cantMxProc);
-                                            $.smallBox({
-                                                title: msg,
-                                                content: $("#smallBox_content").val(),
-                                                color: "#739E73",
-                                                iconSmall: "fa fa-success",
-                                                timeout: 4000
-                                            });
-                                            table1.fnClearTable();
-                                            //getMxs(false);
+                            clickConfirm = clickConfirm +1;
+                            if (clickConfirm == 1) {
+                                //bloquearUI(parametros.blockMess);
+                                var idMuestras = {};
+                                //el input hidden debe estar siempre en la primera columna
+                                for (var i = 0; i < len; i++) {
+                                    var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                    var input = texto.substring(texto.lastIndexOf("<"), texto.length);
+                                    idMuestras[i] = $(input).val();
+                                }
+                                var muestrasObj = {};
+                                muestrasObj['strMuestras'] = idMuestras;
+                                muestrasObj['mensaje'] = '';
+                                muestrasObj['cantMuestras'] = len;
+                                muestrasObj['cantMxProc'] = '';
+                                //muestrasObj['codigosUnicosMx'] = '';
+                                muestrasObj['tipoTraslado'] = $("#tipoTraslado").val();
+                                muestrasObj['idRutina'] = $('#idDxSolicitado').find('option:selected').val();
+                                muestrasObj['nombreTransporta'] = $("#txtNombreTransporta").val();
+                                muestrasObj['temperaturaTermo'] = $("#txtTemperatura").val();
+                                muestrasObj['labDestino'] = $('#labDestino').find('option:selected').val();
+                                muestrasObj['idExamenes'] = $('#idExamenes').val();
+                                $.ajax(
+                                    {
+                                        url: parametros.sTrasladoUrl,
+                                        type: 'POST',
+                                        dataType: 'json',
+                                        data: JSON.stringify(muestrasObj),
+                                        contentType: 'application/json',
+                                        mimeType: 'application/json',
+                                        async: false,
+                                        success: function (data) {
+                                            if (data.mensaje.length > 0) {
+                                                $.smallBox({
+                                                    title: data.mensaje,
+                                                    content: $("#smallBox_content").val(),
+                                                    color: "#C46A69",
+                                                    iconSmall: "fa fa-warning",
+                                                    timeout: 4000
+                                                });
+                                            } else {
+                                                var msg = $("#msg_reception_lab_success").val();
+                                                msg = msg.replace(/\{0\}/, data.cantMxProc);
+                                                $.smallBox({
+                                                    title: msg,
+                                                    content: $("#smallBox_content").val(),
+                                                    color: "#739E73",
+                                                    iconSmall: "fa fa-success",
+                                                    timeout: 4000
+                                                });
+                                                table1.fnClearTable();
+                                                //getMxs(false);
+                                            }
+                                            desbloquearUI();
+                                        },
+                                        error: function (jqXHR) {
+                                            desbloquearUI();
+                                            validateLogin(jqXHR);
                                         }
-                                        desbloquearUI();
-                                    },
-                                    error: function (jqXHR) {
-                                        desbloquearUI();
-                                        validateLogin(jqXHR);
-                                    }
-                                });
+                                    });
+                            }
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({

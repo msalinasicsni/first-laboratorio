@@ -272,7 +272,7 @@ public class TrasladoMxController {
                 //por defecto se procesa traslado
                 procesarTraslado = true;
                 boolean crearSolicitud = true;
-                Timestamp fhRegistro = new Timestamp(new Date().getTime());
+                //Timestamp fhRegistro = new Timestamp(new Date().getTime());
                 String idTomaMx = jObjectRecepciones.get(String.valueOf(i)).getAsString();
                 RecepcionMxLab lastRecepcionMxLab = recepcionMxService.getLastRecepcionMxLabByIdTomaMx(idTomaMx);
 
@@ -280,10 +280,11 @@ public class TrasladoMxController {
                 DaTomaMx tomaMx = tomaMxService.getTomaMxById(idTomaMx);
                 TrasladoMx trasladoMx = new TrasladoMx();
                 trasladoMx.setTomaMx(tomaMx);
-                trasladoMx.setFechaHoraRegistro(fhRegistro);
+                trasladoMx.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
                 trasladoMx.setRecepcionado(false);
                 trasladoMx.setUsuarioRegistro(seguridadService.obtenerNombreUsuario());
 
+                TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
                 if (tipoTraslado.equals("interno")){
                     trasladoMx.setTrasladoInterno(true);
                     if (dxTraslado!=null){
@@ -291,7 +292,6 @@ public class TrasladoMxController {
                         trasladoMx.setPrioridad(dxTraslado.getPrioridad());
                     }
                     //si tiene traslado activo tomar area destino
-                    TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
                     if (trasladoActivo!=null) {
                         trasladoMx.setAreaOrigen(trasladoActivo.getAreaDestino());
                     }else{//si no tien traslados, tomar el area del dx con mayor prioridad
@@ -302,14 +302,18 @@ public class TrasladoMxController {
                         procesarTraslado = false;
                     //estadoMx = catalogosService.getEstadoMx("ESTDMX|EPLAB");
                 }else {
-                    if (tipoTraslado.equals("cc")) {
-                        trasladoMx.setControlCalidad(true);
-                    }else{
-                        trasladoMx.setTrasladoExterno(true);
+                    if (trasladoActivo!=null && (trasladoActivo.isControlCalidad() || trasladoActivo.isTrasladoExterno())) {
+                        procesarTraslado = false;
+                    }else {
+                        if (tipoTraslado.equals("cc")) {
+                            trasladoMx.setControlCalidad(true);
+                        } else {
+                            trasladoMx.setTrasladoExterno(true);
+                        }
+                        trasladoMx.setLaboratorioDestino(labDestino);
+                        trasladoMx.setLaboratorioOrigen(labOrigen);
+                        trasladoMx.setPrioridad(1);
                     }
-                    trasladoMx.setLaboratorioDestino(labDestino);
-                    trasladoMx.setLaboratorioOrigen(labOrigen);
-                    trasladoMx.setPrioridad(1);
                 }
 
                 try {
@@ -330,7 +334,7 @@ public class TrasladoMxController {
                                 solicitudDx.setIdTomaMx(tomaMx);
                                 solicitudDx.setAprobada(false);
                                 solicitudDx.setCodDx(dxTraslado);
-                                solicitudDx.setFechaHSolicitud(fhRegistro);
+                                solicitudDx.setFechaHSolicitud(new Timestamp(new Date().getTime()));
                                 solicitudDx.setControlCalidad(false);
                                 solicitudDx.setUsarioRegistro(usurioRegistro);
                                 solicitudDx.setLabProcesa(seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario()));
@@ -347,7 +351,7 @@ public class TrasladoMxController {
                                     solicitudDxCC.setIdTomaMx(tomaMx);
                                     solicitudDxCC.setAprobada(false);
                                     solicitudDxCC.setCodDx(dxTraslado);
-                                    solicitudDxCC.setFechaHSolicitud(fhRegistro);
+                                    solicitudDxCC.setFechaHSolicitud(new Timestamp(new Date().getTime()));
                                     solicitudDxCC.setControlCalidad(true);
                                     solicitudDxCC.setUsarioRegistro(usurioRegistro);
                                     solicitudDxCC.setLabProcesa(labDestino);
@@ -423,7 +427,7 @@ public class TrasladoMxController {
                                 DaEnvioMx envioMx = new DaEnvioMx();
                                 envioMx.setLaboratorioDestino(labDestino);
                                 envioMx.setUsarioRegistro(usurioRegistro);
-                                envioMx.setFechaHoraEnvio(fhRegistro);
+                                envioMx.setFechaHoraEnvio(new Timestamp(new Date().getTime()));
                                 envioMx.setNombreTransporta(nombreTransporta);
                                 envioMx.setTemperaturaTermo(temperaturaTermo);
 
@@ -439,7 +443,7 @@ public class TrasladoMxController {
                                 HistoricoEnvioMx historicoEnvioMx = new HistoricoEnvioMx();
                                 historicoEnvioMx.setEnvioMx(tomaMx.getEnvio());
                                 historicoEnvioMx.setTomaMx(tomaMx);
-                                historicoEnvioMx.setFechaHoraRegistro(fhRegistro);
+                                historicoEnvioMx.setFechaHoraRegistro(new Timestamp(new Date().getTime()));
                                 historicoEnvioMx.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
                                 trasladosService.saveHistoricoEnvioMx(historicoEnvioMx);
                                 //se setea nuevo envio
