@@ -22,6 +22,8 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.HL7.SimpleMLLPBasedTCPClient;
+import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
@@ -886,6 +888,36 @@ public class RecepcionMxController {
                                 }
                             }
                     }
+
+                    try {
+                        TestOrder testOrder = new TestOrder();
+                        testOrder.setIpServer("localhost");
+                        testOrder.setPuertoServer(50001);
+                        testOrder.setMessageId("1");
+                        testOrder.setCodExpediente("401MASRM21128901");
+                        testOrder.setPersonaId(String.valueOf(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPersonaId()));
+
+                        testOrder.setApellido1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido());
+                        testOrder.setApellido2(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido());
+                        testOrder.setNombre1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre());
+                        testOrder.setNombre2(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre());
+                        testOrder.setFechaNac(DateUtil.DateToString(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(),"yyyyMMdd"));
+                        String sexo = recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
+                        testOrder.setSexo(sexo.substring(sexo.length()-1, sexo.length()));
+                        testOrder.setIdMuestra("1907220999");
+                        testOrder.setFechaHoraMx(DateUtil.DateToString(recepcionMx.getTomaMx().getFechaHTomaMx(),"yyyyMMddHHmmss"));//"20190722094500"
+                        testOrder.setIdUnidadSalud(String.valueOf(recepcionMx.getTomaMx().getCodUnidadAtencion().getUnidadId()));
+                        testOrder.setNombreUnidadSalud(recepcionMx.getTomaMx().getCodUnidadAtencion().getNombre());
+                        testOrder.setIdOrigen("3");
+                        testOrder.setNombreOrigen("COMPONENTE");
+                        testOrder.setIdSilais(String.valueOf(recepcionMx.getTomaMx().getCodSilaisAtencion().getEntidadAdtvaId()));
+                        testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
+                        testOrder.setIdExamenes("393217,1002,1001");
+                        SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
 
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
