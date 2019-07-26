@@ -137,6 +137,8 @@ public class RecepcionMxController {
     @Resource(name = "respuestasExamenService")
     private RespuestasExamenService respuestasExamenService;
 
+    @Resource(name = "equiposProcesamientoService")
+    private EquiposProcesamientoService equiposProcesamientoService;
     @Autowired
     MessageSource messageSource;
 
@@ -890,6 +892,7 @@ public class RecepcionMxController {
                     }
 
                     try {
+                        if (equiposProcesamientoService.examenIsProcessedInfinity(1)){
                         TestOrder testOrder = new TestOrder();
                         testOrder.setIpServer("localhost");
                         testOrder.setPuertoServer(50001);
@@ -914,6 +917,7 @@ public class RecepcionMxController {
                         testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
                         testOrder.setIdExamenes("393217,1002,1001");
                         SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
+                        }
                     }catch (Exception e){
                         e.printStackTrace();
                     }

@@ -96,13 +96,16 @@
                                 </p>
                                 <input id="blockUI_message" type="hidden" value="<spring:message code="blockUI.message"/>"/>
                                 <input id="msgSave" type="hidden" value="<spring:message code="msg.save.equipment"/>"/>
+                                <input id="msgSaveTest" type="hidden" value="<spring:message code="msg.save.equipment.test"/>"/>
                                 <input id="msgOverride" type="hidden" value="<spring:message code="msg.override.equipment"/>"/>
+                                <input id="msgOverrideTest" type="hidden" value="<spring:message code="msg.override.equipment.test"/>"/>
                                 <input id="disappear" type="hidden" value="<spring:message code="msg.disappear"/>"/>
                                 <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                 <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                 <input id="msgConfirmOverride" type="hidden" value="<spring:message code="msg.confirm.override"/>"/>
                                 <input id="msgOverrideCanceled" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
                                 <input id="msgConfirmTitle" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                                <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                                 <table class="table table-striped table-bordered table-hover" width="100%" id="equiposList">
                                     <thead>
                                     <tr>
@@ -111,6 +114,7 @@
                                         <th><spring:message code="lbl.model" /></th>
                                         <th><spring:message code="lbl.description" /></th>
                                         <th><spring:message code="lbl.enabled" /></th>
+                                        <th style="width: 5%" align="center"><spring:message code="lbl.tests" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.edit" /></th>
                                         <th style="width: 5%" align="center"><spring:message code="act.override" /></th>
                                     </tr>
@@ -234,6 +238,75 @@
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
 
+        <!-- Modal SILAIS-->
+        <div class="modal fade" id="modalExamenes" aria-hidden="true" data-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="alert alert-info">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+
+                            <h4 class="modal-title">
+                                <i class="fa-fw fa fa-sitemap"></i>
+                                <spring:message code="lbl.header.modal.equipment.test"/>
+
+                            </h4>
+
+                        </div>
+                    </div>
+                    <div class="modal-body"> <!--  no-padding -->
+                        <div class="row">
+                            <div class="col col-sm-12 col-md-12 col-lg-12">
+                                <form id="testForm" class="smart-form" novalidate="novalidate">
+                                    <input type="hidden" id="idEquipoDet" value="">
+                                    <input id="equipo" type="hidden" value="<spring:message code="lbl.equipment"/>"/>
+                                    <div style="padding-left: 15px; padding-bottom: 5px" class="row">
+                                        <h4 id="equipmentName" ></h4>
+                                    </div>
+
+                                    <div class="row">
+                                        <section class="col col-sm-12 col-md-9 col-lg-10">
+                                            <label class="text-left txt-color-blue font-md">
+                                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.test2" />
+                                            </label>
+                                            <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <i class="fa fa-location-arrow fa-fw"></i>
+                                    </span>
+                                                <select  class="select2" id="idExamen" name="idExamen" >
+                                                </select>
+                                            </div>
+                                        </section>
+                                        <section class="col col-sm-12 col-md-3 col-lg-2">
+                                            <button type="submit" class="btn btn-success styleButton">
+                                                <i class="fa fa-save"></i>
+                                            </button>
+                                        </section>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="widget-body no-padding">
+                            <div class="row">
+                                <section class="col col-sm-12 col-md-12 col-lg-12">
+                                    <table class="table table-striped table-bordered table-hover" id="testsList">
+                                        <thead>
+                                        <tr>
+                                            <th data-class="expand"><i class="fa fa-fw fa-file-text-o text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.name"/></th>
+                                            <th><spring:message code="lbl.override"/></th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
     </div>
 </div>
 
@@ -258,6 +331,9 @@
 <spring:url value="/resources/js/plugin/jquery-validate/messages_{language}.js" var="jQValidationLoc">
     <spring:param name="language" value="${pageContext.request.locale.language}" /></spring:url>
 <script src="${jQValidationLoc}"></script>
+<!-- jQuery Selecte2 Input -->
+<spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
+<script src="${selectPlugin}"></script>
 <!-- JQUERY BLOCK UI -->
 <spring:url value="/resources/js/plugin/jquery-blockui/jquery.blockUI.js" var="jqueryBlockUi" />
 <script src="${jqueryBlockUi}"></script>
@@ -267,9 +343,13 @@
 <script src="${equipJs}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:url var="saveUrl" value="/administracion/equipos/save"/>
+<c:url var="saveTestUrl" value="/administracion/equipos/saveExamenEquipo"/>
 <c:url var="equiposUrl" value="/administracion/equipos/getEquiposProcesamiento"/>
 <c:url var="overrideUrl" value="/administracion/equipos/override"/>
+<c:url var="overrideTestUrl" value="/administracion/equipos/overrideTest"/>
 <c:url var="equipoUrl" value="/administracion/equipos/getEquipoProcesamiento"/>
+<c:url var="examenesUrl" value="/administracion/equipos/getExamenesEquipo"/>
+<c:url var="examenesDispUrl" value="/administracion/equipos/getExamenesDisponiblesEquipo"/>
 
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
@@ -278,7 +358,11 @@
             saveUrl : "${saveUrl}",
             equiposUrl : "${equiposUrl}",
             overrideUrl : "${overrideUrl}",
-            equipoUrl : "${equipoUrl}"
+            equipoUrl : "${equipoUrl}",
+            examenesUrl : "${examenesUrl}",
+            overrideTestUrl : "${overrideTestUrl}",
+            examenesDispUrl : "${examenesDispUrl}",
+            saveTestUrl : "${saveTestUrl}"
         };
 
         Equipment.init(parametros);
