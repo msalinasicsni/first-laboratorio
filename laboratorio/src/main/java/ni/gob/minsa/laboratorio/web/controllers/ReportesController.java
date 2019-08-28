@@ -801,7 +801,7 @@ public class ReportesController {
                                     || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
                                     || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
                                     || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
-                                    || (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                                    && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
                                 mostrar = true;
                             }
 
@@ -809,7 +809,7 @@ public class ReportesController {
                             if (res.getValor().trim().toLowerCase().equals("positivo")
                                     || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
                                     || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
-                                    || (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
+                                    && (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
                                 mostrar = true;
                             }
                         }
@@ -822,7 +822,7 @@ public class ReportesController {
                                     || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
                                     || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
                                     || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
-                                    || (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                                    && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
                                 mostrar = true;
                             }
 
@@ -830,7 +830,7 @@ public class ReportesController {
                             if (res.getValor().trim().toLowerCase().equals("positivo")
                                     || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
                                     || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
-                                    || (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
+                                    && (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
                                 mostrar = true;
                             }
                         }
@@ -1616,7 +1616,7 @@ public class ReportesController {
                         || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
                         || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
                         || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
-                        || (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                        && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
@@ -1626,7 +1626,7 @@ public class ReportesController {
                         || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
                         || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
                         || (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))
-                        || (!res.getValor().trim().toLowerCase().contains("negativo") && !res.getValor().trim().toLowerCase().contains("indetermin") && !res.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                        && (!res.getValor().trim().toLowerCase().contains("negativo") && !res.getValor().trim().toLowerCase().contains("indetermin") && !res.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -1640,7 +1640,7 @@ public class ReportesController {
                         || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
                         || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
                         || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
-                        || (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                        && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
                     mostrar = true;
                     valorResultado = valor.getValor();
                 }
@@ -1650,7 +1650,7 @@ public class ReportesController {
                         || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
                         || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
                         || (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))
-                        || (!res.getValor().trim().toLowerCase().contains("negativo") && !res.getValor().trim().toLowerCase().contains("indetermin") && !res.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                        && (!res.getValor().trim().toLowerCase().contains("negativo") && !res.getValor().trim().toLowerCase().contains("indetermin") && !res.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
                     mostrar = true;
                     valorResultado = res.getValor();
                 }
@@ -2102,11 +2102,11 @@ public class ReportesController {
             if (incluirResultados){
                 //detalle resultado final solicitud
                 List<DetalleResultadoFinal> detalleResultadoCC = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
-                String resCC = parseResultDetails(detalleResultadoCC);
+                String resCC = parseResultDetails(detalleResultadoCC, false);
                 map.put("resultadocc", resCC);
                 DaSolicitudDx solicitudNoCC = tomaMxService.getSolicitudDxByMxDxNoCC(diagnostico.getIdTomaMx().getIdTomaMx(),diagnostico.getCodDx().getIdDiagnostico());
                 List<DetalleResultadoFinal> detalleResultadoNoCC = resultadoFinalService.getDetResActivosBySolicitud(solicitudNoCC.getIdSolicitudDx());
-                String resNoCC = parseResultDetails(detalleResultadoNoCC);
+                String resNoCC = parseResultDetails(detalleResultadoNoCC, false);
                 map.put("resultado",resNoCC);
                 map.put("coincide", (resCC.equalsIgnoreCase(resNoCC)?messageSource.getMessage("lbl.yes",null,null):messageSource.getMessage("lbl.no",null,null)));
             }
@@ -2764,7 +2764,7 @@ public class ReportesController {
                         map.put("persona", " ");
                     }
                     List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
-                    map.put("resultado",parseResultDetails(resFinal));
+                    map.put("resultado",parseResultDetails(resFinal, true));
                     map.put("procesa", (resFinal.size()>0?resFinal.get(0).getUsuarioRegistro().getUsername():""));
                     map.put("aprueba", (soli.getUsuarioAprobacion()!=null?soli.getUsuarioAprobacion().getUsername():""));
                     mapResponse.put(indice, map);
@@ -2811,7 +2811,7 @@ public class ReportesController {
                     }
 
                     List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(soliE.getIdSolicitudEstudio());
-                    map.put("resultado",parseResultDetails(resFinal));
+                    map.put("resultado",parseResultDetails(resFinal, true));
                     map.put("procesa", (resFinal.size()>0?resFinal.get(0).getUsuarioRegistro().getUsername():""));
                     map.put("aprueba", (soliE.getUsuarioAprobacion()!=null?soliE.getUsuarioAprobacion().getUsername():""));
                     mapResponse.put(indice, map);
@@ -2827,30 +2827,38 @@ public class ReportesController {
 
     }
 
-    private String parseResultDetails(List<DetalleResultadoFinal> resultList){
+    private String parseResultDetails(List<DetalleResultadoFinal> resultList, boolean incluirAuxiliares){
         String resultados="";
         for(DetalleResultadoFinal res: resultList){
             if (res.getRespuesta()!=null) {
-                resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
                 if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
                     Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
                     resultados+=": "+cat_lista.getValor();
                 }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
                     String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                     resultados+=": "+valorBoleano;
                 } else {
-                    resultados+=": "+res.getValor();
+                    if (incluirAuxiliares){
+                        resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                        resultados+=": "+res.getValor();
+                    }
                 }
             }else if (res.getRespuestaExamen()!=null){
-                resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                 if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                     Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
                     resultados+=": "+cat_lista.getValor();
                 } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
                     String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                     resultados+=": "+valorBoleano;
                 }else {
-                    resultados+=": "+res.getValor();
+                    if (incluirAuxiliares){
+                        resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                        resultados+=": "+res.getValor();
+                    }
                 }
             }
         }
