@@ -224,11 +224,16 @@ public class TomaMxController {
                         noti.getCodSilaisAtencion().getCodigo(), HealthUnitType.UnidadesPrimarias.getDiscriminator().split(","));
             }
             List<TipoNotificacion> tiposNotificacion = new ArrayList<TipoNotificacion>();
+            if (noti.getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|PCNT")){
+                tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+                tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
+                tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
+                tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
 
-            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
-            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
-            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
-            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            }else {
+                tiposNotificacion.add(noti.getCodTipoNotificacion());
+            }
+
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
