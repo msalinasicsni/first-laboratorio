@@ -1,7 +1,5 @@
 package ni.gob.minsa.laboratorio.api;
 
-import java.util.Date;
-
 /**
  * Created by Miguel Salinas on 16/05/2019.
  * V1.0
@@ -9,8 +7,8 @@ import java.util.Date;
 public class RegistroSolicitud {
 
     private String codTipoNoti;
-    private String codSilais;
-    private String codUnidadSalud;
+    private String idSilais;
+    private String idUnidadSalud;
     private String fechaInicioSintomas;
     private String urgente;
     private String embarazada;
@@ -18,7 +16,7 @@ public class RegistroSolicitud {
     private String codExpediente;
     private String codExpedienteUnico;
 
-    private String codTipoMx;
+    private String idTipoMx;
     private String fechaTomaMx;
     private String horaTomaMx;
     private String volumen;
@@ -37,20 +35,20 @@ public class RegistroSolicitud {
         this.codTipoNoti = codTipoNoti;
     }
 
-    public String getCodSilais() {
-        return codSilais;
+    public String getIdSilais() {
+        return idSilais;
     }
 
-    public void setCodSilais(String codSilais) {
-        this.codSilais = codSilais;
+    public void setIdSilais(String idSilais) {
+        this.idSilais = idSilais;
     }
 
-    public String getCodUnidadSalud() {
-        return codUnidadSalud;
+    public String getIdUnidadSalud() {
+        return idUnidadSalud;
     }
 
-    public void setCodUnidadSalud(String codUnidadSalud) {
-        this.codUnidadSalud = codUnidadSalud;
+    public void setIdUnidadSalud(String idUnidadSalud) {
+        this.idUnidadSalud = idUnidadSalud;
     }
 
     public String getFechaInicioSintomas() {
@@ -101,12 +99,12 @@ public class RegistroSolicitud {
         this.codExpedienteUnico = codExpedienteUnico;
     }
 
-    public String getCodTipoMx() {
-        return codTipoMx;
+    public String getIdTipoMx() {
+        return idTipoMx;
     }
 
-    public void setCodTipoMx(String codTipoMx) {
-        this.codTipoMx = codTipoMx;
+    public void setIdTipoMx(String idTipoMx) {
+        this.idTipoMx = idTipoMx;
     }
 
     public String getFechaTomaMx() {

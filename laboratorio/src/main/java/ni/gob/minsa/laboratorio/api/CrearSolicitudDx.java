@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
-import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
@@ -109,12 +108,12 @@ public class CrearSolicitudDx {
                     if (notificacion==null) {
                         notificacion = new DaNotificacion();
                         notificacion.setPersona(personaService.getPersona(Integer.valueOf(solicitud.getCodExpedienteUnico())));
-                        if (!solicitud.getCodSilais().isEmpty()) {
-                            notificacion.setCodSilaisAtencion(entidadAdmonService.getSilaisByCodigo(Integer.valueOf(solicitud.getCodSilais())));
+                        if (!solicitud.getIdSilais().isEmpty()) {
+                            notificacion.setCodSilaisAtencion(entidadAdmonService.getSilaisById(Long.valueOf(solicitud.getIdSilais())));
                             tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
                         }
-                        if (!solicitud.getCodUnidadSalud().isEmpty()) {
-                            notificacion.setCodUnidadAtencion(unidadesService.getUnidadByCodigo(Integer.valueOf(solicitud.getCodUnidadSalud())));
+                        if (!solicitud.getIdUnidadSalud().isEmpty()) {
+                            notificacion.setCodUnidadAtencion(unidadesService.getUnidadById(Long.valueOf(solicitud.getIdUnidadSalud())));
                             tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
                         }
                         if (!solicitud.getCodTipoNoti().isEmpty()) {
@@ -153,10 +152,10 @@ public class CrearSolicitudDx {
                         }
 
                     }else{
-                        if (!solicitud.getCodSilais().isEmpty()) {
+                        if (!solicitud.getIdSilais().isEmpty()) {
                             tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
                         }
-                        if (!solicitud.getCodUnidadSalud().isEmpty()) {
+                        if (!solicitud.getIdUnidadSalud().isEmpty()) {
                             tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
                         }
                     }
@@ -189,7 +188,7 @@ public class CrearSolicitudDx {
                         tomaMx.setFechaHTomaMx(DateUtil.StringToTimestamp(solicitud.getFechaTomaMx()));
                     }
 
-                    tomaMx.setCodTipoMx(tomaMxService.getTipoMxById(solicitud.getCodTipoMx()));
+                    tomaMx.setCodTipoMx(tomaMxService.getTipoMxById(solicitud.getIdTipoMx()));
                     tomaMx.setCanTubos(null);
                     tomaMx.setHoraTomaMx(solicitud.getHoraTomaMx());
 
@@ -258,15 +257,15 @@ public class CrearSolicitudDx {
 
     private String validarParametrosEntrada(RegistroSolicitud solicitud){
         if (solicitud.getCodTipoNoti()==null || solicitud.getCodTipoNoti().isEmpty()) return "Debe proporcionar valor para 'codTipoNoti'";
-        if (solicitud.getCodTipoMx()==null || solicitud.getCodTipoMx().isEmpty()) return "Debe proporcionar valor para 'codTipoMx'";
+        if (solicitud.getIdTipoMx()==null || solicitud.getIdTipoMx().isEmpty()) return "Debe proporcionar valor para 'idTipoMx'";
         if (solicitud.getCodigoLab()==null || solicitud.getCodigoLab().isEmpty()) return "Debe proporcionar valor para 'codigoLab'";
-        if (solicitud.getCodSilais()==null || solicitud.getCodSilais().isEmpty()) return "Debe proporcionar valor para 'codSilais'";
-        if (solicitud.getCodUnidadSalud()==null || solicitud.getCodUnidadSalud().isEmpty()) return "Debe proporcionar valor para 'codUnidadSalud'";
+        if (solicitud.getIdSilais()==null || solicitud.getIdSilais().isEmpty()) return "Debe proporcionar valor para 'idSilais'";
+        if (solicitud.getIdUnidadSalud()==null || solicitud.getIdUnidadSalud().isEmpty()) return "Debe proporcionar valor para 'idUnidadSalud'";
         if (solicitud.getCodExpedienteUnico()==null || solicitud.getCodExpedienteUnico().isEmpty()) return "Debe proporcionar valor para 'codExpedienteUnico'";
         if (solicitud.getDiagnosticos()==null || solicitud.getDiagnosticos().isEmpty()) return "Debe proporcionar valor para 'diagnosticos'";
         if (solicitud.getIdUsuario()==null || solicitud.getIdUsuario().isEmpty()) return "Debe proporcionar valor para 'idUsuario'";
         if (solicitud.getSeguimiento()==null || solicitud.getSeguimiento().isEmpty()) return "Debe proporcionar valor para 'seguimiento'";
-
+        if (solicitud.getFechaTomaMx()==null || solicitud.getFechaTomaMx().isEmpty()) return "Debe proporcionar valor para 'fechaTomaMx'";
         return "";
 
     }

@@ -154,7 +154,7 @@ public class RecepcionMxController {
         Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         mav.addObject("entidades",entidadesAdtvases);
         mav.addObject("tipoMuestra", tipoMxList);
-        mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
+        mav.addObject("mostrarPopUpMx",(labUser!=null?labUser.getPopUpCodigoMx():false));
         mav.setViewName("recepcionMx/searchOrders");
 
         return mav;
