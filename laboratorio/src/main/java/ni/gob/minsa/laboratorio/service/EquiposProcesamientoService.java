@@ -73,12 +73,15 @@ public class EquiposProcesamientoService {
     public List<EquiposProcesamiento> getEquiposExamen(int idExamen){
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("select ee.equipo from Examen_Equipo ee inner join ee.examen ex where ex.idExamen = :idExamen ");
+        query.setParameter("idExamen", idExamen);
         return query.list();
     }
 
     public boolean examenIsProcessedInfinity(int idExamen){
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select eq from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq where ex.idExamen = :idExamen and  upper(eq.nombre) like '%INFINITY%' and eq.pasivo = false  and ee.pasivo = false ");
+        Query query = session.createQuery("select eq from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq " +
+                "where ex.idExamen = :idExamen and  upper(eq.nombre) like '%INFINITY%' and eq.pasivo = false  and ee.pasivo = false ");
+        query.setParameter("idExamen", idExamen);
         return query.list().size()>0;
     }
 }

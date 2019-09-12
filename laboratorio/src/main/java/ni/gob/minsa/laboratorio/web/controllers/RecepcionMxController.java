@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.comunicacionResultados.SolicitudHL7;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
@@ -139,6 +140,10 @@ public class RecepcionMxController {
 
     @Resource(name = "equiposProcesamientoService")
     private EquiposProcesamientoService equiposProcesamientoService;
+
+    @Resource(name = "comunicacionResultadosService")
+    private ComunicacionResultadosService comunicacionResultadosService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -892,11 +897,11 @@ public class RecepcionMxController {
                     }
 
                     try {
-                        if (equiposProcesamientoService.examenIsProcessedInfinity(1)){
+                        if (equiposProcesamientoService.examenIsProcessedInfinity(327683)){
                         TestOrder testOrder = new TestOrder();
                         testOrder.setIpServer("localhost");
                         testOrder.setPuertoServer(50001);
-                        testOrder.setMessageId("1");
+                        testOrder.setMessageId(DateUtil.DateToString(new Date(), "yyyyMMddHHmmss"));
                         testOrder.setCodExpediente("401MASRM21128901");
                         testOrder.setPersonaId(String.valueOf(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPersonaId()));
 
@@ -907,7 +912,7 @@ public class RecepcionMxController {
                         testOrder.setFechaNac(DateUtil.DateToString(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(),"yyyyMMdd"));
                         String sexo = recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
                         testOrder.setSexo(sexo.substring(sexo.length()-1, sexo.length()));
-                        testOrder.setIdMuestra("1907220999");
+                        testOrder.setIdMuestra(comunicacionResultadosService.generarIdMuestra()); //AñoMesDía y consecutivo de 5 digitos ejemplo: 19021300001
                         testOrder.setFechaHoraMx(DateUtil.DateToString(recepcionMx.getTomaMx().getFechaHTomaMx(),"yyyyMMddHHmmss"));//"20190722094500"
                         testOrder.setIdUnidadSalud(String.valueOf(recepcionMx.getTomaMx().getCodUnidadAtencion().getUnidadId()));
                         testOrder.setNombreUnidadSalud(recepcionMx.getTomaMx().getCodUnidadAtencion().getNombre());
@@ -917,6 +922,16 @@ public class RecepcionMxController {
                         testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
                         testOrder.setIdExamenes("393217,1002,1001");
                         SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
+
+                            SolicitudHL7 solicitudHL7 = new SolicitudHL7();
+                            solicitudHL7.setAnulado(false);
+                            solicitudHL7.setExamenes(testOrder.getIdExamenes());
+                            solicitudHL7.setFechaRegistro(new Date());
+                            solicitudHL7.setIdMuestraSecundario(testOrder.getIdMuestra());
+                            solicitudHL7.setTrama(testOrder.getTrama());
+                            solicitudHL7.setMuestra(recepcionMx.getTomaMx());
+                            solicitudHL7.setUsuarioRegistro(usuario);
+                            comunicacionResultadosService.saveOrUpdateSolicitudHL7(solicitudHL7);
                         }
                     }catch (Exception e){
                         e.printStackTrace();

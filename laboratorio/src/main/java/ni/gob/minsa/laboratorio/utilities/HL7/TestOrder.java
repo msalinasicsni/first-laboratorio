@@ -26,6 +26,7 @@ public class TestOrder {
     private String idSilais; //Se debe agregar una M al inicio del id. Ejem: 10 -> M10
     private String nombreSilais;
     private String idExamenes; //si hay mas de uno se deben separar por coma. Ejem: 1,2,3
+    private String trama;
 
     public String getIpServer() {
         return ipServer;
@@ -185,5 +186,13 @@ public class TestOrder {
 
     public void setIdExamenes(String idExamenes) {
         this.idExamenes = idExamenes;
+    }
+
+    public String getTrama() {
+        return trama;
+    }
+
+    public void setTrama(String trama) {
+        this.trama = trama;
     }
 }

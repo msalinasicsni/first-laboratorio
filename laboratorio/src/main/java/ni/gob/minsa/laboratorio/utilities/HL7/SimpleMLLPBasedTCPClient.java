@@ -103,6 +103,7 @@ public class SimpleMLLPBasedTCPClient {
         OutputStream out = socket.getOutputStream();
 
         System.out.println(testHL7MessageToTransmit.toString().replace("\r", "\\r"));
+        testOrder.setTrama(testHL7MessageToTransmit.toString().replace("\r", "\\r"));
         // Send the MLLP-wrapped HL7 message to the server
         out.write(testHL7MessageToTransmit.toString().getBytes());
 
