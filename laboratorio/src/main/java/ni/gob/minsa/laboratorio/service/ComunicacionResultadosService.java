@@ -30,14 +30,14 @@ public class ComunicacionResultadosService {
         session.saveOrUpdate(obj);
     }
 
-    public int contarSolicitudesDelDia(){
+    public long contarSolicitudesDelDia(){
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("select count(s.idSolicitud) from SolicitudHL7 s where to_char(s.fechaRegistro, 'DDMMYYYY') = to_char(current_date, 'DDMMYYYY')");
-        return (int)query.uniqueResult();
+        return (long)query.uniqueResult();
     }
 
     public String generarIdMuestra(){
-        int total = this.contarSolicitudesDelDia();
+        long total = this.contarSolicitudesDelDia()+1;
         return DateUtil.DateToString(new Date(), "yyMMdd")+StringUtil.completarCerosIzquierda(total, 5);
     }
 

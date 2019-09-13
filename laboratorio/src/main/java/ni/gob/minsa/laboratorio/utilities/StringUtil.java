@@ -41,7 +41,7 @@ public class StringUtil {
         return true;
     }
 
-    public static String completarCerosIzquierda(int numero, int longitud){
+    public static String completarCerosIzquierda(long numero, int longitud){
         Formatter obj = new Formatter();
         return String.valueOf(obj.format("%0"+longitud+"d", numero));
     }

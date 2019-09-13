@@ -896,47 +896,7 @@ public class RecepcionMxController {
                             }
                     }
 
-                    try {
-                        if (equiposProcesamientoService.examenIsProcessedInfinity(327683)){
-                        TestOrder testOrder = new TestOrder();
-                        testOrder.setIpServer("localhost");
-                        testOrder.setPuertoServer(50001);
-                        testOrder.setMessageId(DateUtil.DateToString(new Date(), "yyyyMMddHHmmss"));
-                        testOrder.setCodExpediente("401MASRM21128901");
-                        testOrder.setPersonaId(String.valueOf(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPersonaId()));
-
-                        testOrder.setApellido1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido());
-                        testOrder.setApellido2(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido());
-                        testOrder.setNombre1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre());
-                        testOrder.setNombre2(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre());
-                        testOrder.setFechaNac(DateUtil.DateToString(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(),"yyyyMMdd"));
-                        String sexo = recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
-                        testOrder.setSexo(sexo.substring(sexo.length()-1, sexo.length()));
-                        testOrder.setIdMuestra(comunicacionResultadosService.generarIdMuestra()); //AñoMesDía y consecutivo de 5 digitos ejemplo: 19021300001
-                        testOrder.setFechaHoraMx(DateUtil.DateToString(recepcionMx.getTomaMx().getFechaHTomaMx(),"yyyyMMddHHmmss"));//"20190722094500"
-                        testOrder.setIdUnidadSalud(String.valueOf(recepcionMx.getTomaMx().getCodUnidadAtencion().getUnidadId()));
-                        testOrder.setNombreUnidadSalud(recepcionMx.getTomaMx().getCodUnidadAtencion().getNombre());
-                        testOrder.setIdOrigen("3");
-                        testOrder.setNombreOrigen("COMPONENTE");
-                        testOrder.setIdSilais(String.valueOf(recepcionMx.getTomaMx().getCodSilaisAtencion().getEntidadAdtvaId()));
-                        testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
-                        testOrder.setIdExamenes("393217,1002,1001");
-                        SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
-
-                            SolicitudHL7 solicitudHL7 = new SolicitudHL7();
-                            solicitudHL7.setAnulado(false);
-                            solicitudHL7.setExamenes(testOrder.getIdExamenes());
-                            solicitudHL7.setFechaRegistro(new Date());
-                            solicitudHL7.setIdMuestraSecundario(testOrder.getIdMuestra());
-                            solicitudHL7.setTrama(testOrder.getTrama());
-                            solicitudHL7.setMuestra(recepcionMx.getTomaMx());
-                            solicitudHL7.setUsuarioRegistro(usuario);
-                            comunicacionResultadosService.saveOrUpdateSolicitudHL7(solicitudHL7);
-                        }
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-
+                    validarEnviarSolicitudInfinity(recepcionMx, usuario);
 
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
@@ -977,6 +937,51 @@ public class RecepcionMxController {
         }
     }
 
+    private void validarEnviarSolicitudInfinity(RecepcionMx recepcionMx, User usuario) throws Exception{
+        try {
+            String idExamenes = equiposProcesamientoService.ordersProcessedInInfinity(recepcionMx.getTomaMx().getIdTomaMx());
+            if (idExamenes != null){
+                TestOrder testOrder = new TestOrder();
+                testOrder.setIpServer("localhost");
+                testOrder.setPuertoServer(50001);
+                testOrder.setMessageId(DateUtil.DateToString(new Date(), "yyyyMMddHHmmss"));
+                testOrder.setCodExpediente("401MASRM21128901");
+                testOrder.setPersonaId(String.valueOf(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPersonaId()));
+
+                testOrder.setApellido1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido());
+                testOrder.setApellido2(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido());
+                testOrder.setNombre1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerNombre());
+                testOrder.setNombre2(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSegundoNombre());
+                testOrder.setFechaNac(DateUtil.DateToString(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(),"yyyyMMdd"));
+                String sexo = recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
+                testOrder.setSexo(sexo.substring(sexo.length()-1, sexo.length()));
+                testOrder.setIdMuestra(comunicacionResultadosService.generarIdMuestra()); //AñoMesDía y consecutivo de 5 digitos ejemplo: 19021300001
+                testOrder.setFechaHoraMx(DateUtil.DateToString(recepcionMx.getTomaMx().getFechaHTomaMx(),"yyyyMMddHHmmss"));//"20190722094500"
+                testOrder.setIdUnidadSalud(String.valueOf(recepcionMx.getTomaMx().getCodUnidadAtencion().getUnidadId()));
+                testOrder.setNombreUnidadSalud(recepcionMx.getTomaMx().getCodUnidadAtencion().getNombre());
+                testOrder.setIdOrigen("3");
+                testOrder.setNombreOrigen("COMPONENTE");
+                testOrder.setIdSilais(String.valueOf(recepcionMx.getTomaMx().getCodSilaisAtencion().getEntidadAdtvaId()));
+                testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
+                testOrder.setIdExamenes(idExamenes);
+                SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
+
+                SolicitudHL7 solicitudHL7 = new SolicitudHL7();
+                solicitudHL7.setAnulado(false);
+                solicitudHL7.setExamenes(testOrder.getIdExamenes());
+                solicitudHL7.setFechaRegistro(new Date());
+                solicitudHL7.setIdMuestraSecundario(testOrder.getIdMuestra());
+                solicitudHL7.setTrama(testOrder.getTrama());
+                solicitudHL7.setMuestra(recepcionMx.getTomaMx());
+                solicitudHL7.setUsuarioRegistro(usuario);
+                comunicacionResultadosService.saveOrUpdateSolicitudHL7(solicitudHL7);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+
+    }
     /***
      * M�todo para recuperar las ordenes de examen registradas para la mx en la recepci�n.
      * @param idTomaMx id de la toma mx a obtener ordenes

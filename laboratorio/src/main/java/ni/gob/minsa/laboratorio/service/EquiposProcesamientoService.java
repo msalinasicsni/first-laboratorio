@@ -3,13 +3,16 @@ package ni.gob.minsa.laboratorio.service;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.examen.EquiposProcesamiento;
 import ni.gob.minsa.laboratorio.domain.examen.Examen_Equipo;
+import org.apache.poi.util.StringUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.security.web.util.TextEscapeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -83,5 +86,27 @@ public class EquiposProcesamientoService {
                 "where ex.idExamen = :idExamen and  upper(eq.nombre) like '%INFINITY%' and eq.pasivo = false  and ee.pasivo = false ");
         query.setParameter("idExamen", idExamen);
         return query.list().size()>0;
+    }
+
+    public String ordersProcessedInInfinity(String idTomaMx){
+        Session session = sessionFactory.getCurrentSession();
+        List<Long> nse = new ArrayList<Long>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery("select exs.idExamen from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq, " +
+                "OrdenExamen as oe inner join oe.solicitudDx dx inner join dx.idTomaMx as mx inner join oe.codExamen exs " +
+                "where exs.idExamen = ex.idExamen and mx.idTomaMx =:idTomaMx and dx.anulado = false and oe.anulado = false and ee.pasivo = false ");
+        q.setParameter("idTomaMx",idTomaMx);
+        nse = q.list();
+        //se toman las que son de estudio
+        Query q2 = session.createQuery("select exs.idExamen from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq, " +
+                "OrdenExamen as oe inner join oe.solicitudEstudio es inner join es.idTomaMx as mx inner join oe.codExamen exs " +
+                "where exs.idExamen = ex.idExamen and mx.idTomaMx =:idTomaMx and es.anulado = false and oe.anulado = false and ee.pasivo = false ");
+        q2.setParameter("idTomaMx",idTomaMx);
+        nse.addAll(q2.list());
+
+        if (nse.size()>0)
+            return StringUtil.join(nse.toArray(), ",");
+        else
+            return null;
     }
 }
