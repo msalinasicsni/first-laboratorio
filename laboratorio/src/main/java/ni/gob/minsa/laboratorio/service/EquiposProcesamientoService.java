@@ -80,14 +80,6 @@ public class EquiposProcesamientoService {
         return query.list();
     }
 
-    public boolean examenIsProcessedInfinity(int idExamen){
-        Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select eq from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq " +
-                "where ex.idExamen = :idExamen and  upper(eq.nombre) like '%INFINITY%' and eq.pasivo = false  and ee.pasivo = false ");
-        query.setParameter("idExamen", idExamen);
-        return query.list().size()>0;
-    }
-
     public String ordersProcessedInInfinity(String idTomaMx){
         Session session = sessionFactory.getCurrentSession();
         List<Long> nse = new ArrayList<Long>();
@@ -104,7 +96,7 @@ public class EquiposProcesamientoService {
         q2.setParameter("idTomaMx",idTomaMx);
         nse.addAll(q2.list());
 
-        if (nse.size()>0)
+        if (nse.size()>0) //pasar lista a string seperados por coma
             return StringUtil.join(nse.toArray(), ",");
         else
             return null;
