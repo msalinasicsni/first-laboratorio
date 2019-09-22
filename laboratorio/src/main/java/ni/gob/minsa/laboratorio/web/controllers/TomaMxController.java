@@ -284,7 +284,7 @@ public class TomaMxController {
     List<Dx_TipoMx_TipoNoti> getDxBySample(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
         logger.info("Obteniendo los diagn�sticos segun muestra y tipo de Notificacion en JSON");
         //nombre usuario null, para que no valide autoridad
-        return tomaMxService.getDx(codMx, tipoNoti,null);
+        return tomaMxService.getDx(codMx, tipoNoti,null, null);
     }
 
     private boolean saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas) throws Exception {

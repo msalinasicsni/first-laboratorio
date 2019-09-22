@@ -3361,9 +3361,14 @@ public class ReportesController {
         areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
 
         List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+        List<Catalogo_Estudio> catEs = null;
+        if (laboratorio!=null && laboratorio.getCodigo().equalsIgnoreCase("CNDR")) {
+            catEs = associationSamplesRequestService.getStudies();
+        }
         model.addAttribute("areas", areas);
         model.addAttribute("entidades", entidades);
         model.addAttribute("dxs", catDx);
+        model.addAttribute("estudios", catEs);
         model.addAttribute("laboratorios", laboratorios);
         return "reportes/resultadoDx";
     }
@@ -3379,8 +3384,11 @@ public class ReportesController {
     List<Object[]> fetchReportResultDxJson(@RequestParam(value = "filtro", required = true) String filtro) throws Exception{
         logger.info("Obteniendo los datos para Reporte por Resultado ");
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
-
-        return reportesService.getDataDxResultReport(filtroRep);
+        //TODO
+        if (filtroRep.getIdDx()!=null)
+            return reportesService.getDataDxResultReport(filtroRep);
+        else
+            return reportesService.getDataEstResultReport(filtroRep);
     }
 
     /**
@@ -3529,7 +3537,7 @@ public class ReportesController {
         boolean subunidad = false;
         boolean porSilais = true;//por defecto true
         String codZona = null;
-        Integer idDx = null;
+        String idSolicitud = null;
         String codLabo = null;
         String consolidarPor = null;
 
@@ -3558,7 +3566,7 @@ public class ReportesController {
         if (jObjectFiltro.get("codZona") != null && !jObjectFiltro.get("codZona").getAsString().isEmpty())
             codZona = jObjectFiltro.get("codZona").getAsString();
         if (jObjectFiltro.get("idDx") != null && !jObjectFiltro.get("idDx").getAsString().isEmpty())
-            idDx = jObjectFiltro.get("idDx").getAsInt();
+            idSolicitud = jObjectFiltro.get("idDx").getAsString();
         if (jObjectFiltro.get("codLabo") != null && !jObjectFiltro.get("codLabo").getAsString().isEmpty())
             codLabo = jObjectFiltro.get("codLabo").getAsString();
         if (jObjectFiltro.get("consolidarPor") != null && !jObjectFiltro.get("consolidarPor").getAsString().isEmpty())
@@ -3577,7 +3585,11 @@ public class ReportesController {
         filtroRep.setAnioInicial(DateUtil.DateToString(fechaInicio, "yyyy"));
         filtroRep.setPorSilais(porSilais);
         filtroRep.setCodZona(codZona);
-        filtroRep.setIdDx(idDx);
+        if (idSolicitud!=null && idSolicitud.contains("R")){
+            filtroRep.setIdDx(Integer.valueOf(idSolicitud.substring(0,idSolicitud.indexOf("-"))));
+        } else if (idSolicitud!=null && idSolicitud.contains("E")){
+            filtroRep.setIdEstudio(Integer.valueOf(idSolicitud.substring(0, idSolicitud.indexOf("-"))));
+        }
         filtroRep.setCodLaboratio(codLabo);
         filtroRep.setNivelCentral(usuario.getNivelCentral());
         filtroRep.setConsolidarPor(consolidarPor);

@@ -47,7 +47,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("resultados")
 public class ResultadosController {
-    private static final Logger logger = LoggerFactory.getLogger(RecepcionMxController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ResultadosController.class);
     @Autowired
     @Qualifier(value = "seguridadService")
     private SeguridadService seguridadService;
@@ -277,7 +277,7 @@ public class ResultadosController {
                         orden.getCodExamen().getArea().getIdArea())) {
                     agregar = true;
                     map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
-                    map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoLab());
+                    map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoLab()!=null?orden.getSolicitudDx().getIdTomaMx().getCodigoLab():orden.getSolicitudDx().getIdTomaMx().getCodigoUnicoMx());
                     map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
                     map.put("tipoDx", orden.getSolicitudDx().getCodDx().getNombre());
                     map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudDx().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy") +
@@ -324,42 +324,47 @@ public class ResultadosController {
                 }
             }
             else{
-                map.put("idTomaMx", orden.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
-                map.put("codigoUnicoMx", orden.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx());
-                map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
-                map.put("tipoDx", orden.getSolicitudEstudio().getTipoEstudio().getNombre());
-              //  map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
-               // map.put("codSilais", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                map.put("codUnidadSalud", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-              //  map.put("tipoMuestra", orden.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
-                //Si hay fecha de inicio de sintomas se muestra
-                Date fechaInicioSintomas = orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
-                if (fechaInicioSintomas != null)
-                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
-                else
-                    map.put("fechaInicioSintomas", " ");
-                //Si hay persona
-                if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                    /// se obtiene el nombre de la persona asociada a la ficha
-                    String nombreCompleto = "";
-                    nombreCompleto = orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                    if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                    nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                    if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                    map.put("persona", nombreCompleto);
-                } else if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
-                	map.put("persona", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
-                }
-                else {
-                    map.put("persona", " ");
-                }
+                if (recepcionMxService.validarMuestraRecepcionadaAreaLab(
+                        orden.getSolicitudEstudio().getIdTomaMx().getIdTomaMx(),
+                        labUser.getCodigo(),
+                        orden.getCodExamen().getArea().getIdArea())) {
+                    agregar = true;
+                    map.put("idTomaMx", orden.getSolicitudEstudio().getIdTomaMx().getIdTomaMx());
+                    map.put("codigoUnicoMx", orden.getSolicitudEstudio().getIdTomaMx().getCodigoUnicoMx());
+                    map.put("fechaHoraDx", DateUtil.DateToString(orden.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    map.put("tipoDx", orden.getSolicitudEstudio().getTipoEstudio().getNombre());
+                    //  map.put("fechaTomaMx", DateUtil.DateToString(orden.getSolicitudEstudio().getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy hh:mm:ss a"));
+                    // map.put("codSilais", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                    map.put("codUnidadSalud", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                    //  map.put("tipoMuestra", orden.getSolicitudEstudio().getIdTomaMx().getCodTipoMx().getNombre());
+                    //Si hay fecha de inicio de sintomas se muestra
+                    Date fechaInicioSintomas = orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
+                    if (fechaInicioSintomas != null)
+                        map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                    else
+                        map.put("fechaInicioSintomas", " ");
+                    //Si hay persona
+                    if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                        /// se obtiene el nombre de la persona asociada a la ficha
+                        String nombreCompleto = "";
+                        nombreCompleto = orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                        if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                            nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                        nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                        if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                            nombreCompleto = nombreCompleto + " " + orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                        map.put("persona", nombreCompleto);
+                    } else if (orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                        map.put("persona", orden.getSolicitudEstudio().getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                    } else {
+                        map.put("persona", " ");
+                    }
 
-                if(!resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen()).isEmpty()){
-                    map.put("resultadoExamen", "Si");
-                }else{
-                    map.put("resultadoExamen", "No");
+                    if (!resultadosService.getDetallesResultadoActivosByExamen(orden.getIdOrdenExamen()).isEmpty()) {
+                        map.put("resultadoExamen", "Si");
+                    } else {
+                        map.put("resultadoExamen", "No");
+                    }
                 }
             }
             if (agregar) {

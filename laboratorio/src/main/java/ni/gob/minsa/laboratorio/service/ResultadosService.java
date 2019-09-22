@@ -6,12 +6,15 @@ import ni.gob.minsa.laboratorio.domain.muestra.OrdenExamen;
 import ni.gob.minsa.laboratorio.domain.muestra.RecepcionMx;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.RespuestaExamen;
+import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoExamen;
+import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -112,6 +115,18 @@ public class ResultadosService {
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setParameter("idOrdenExamen", idOrdenExamen);
+        return  q.list();
+    }
+
+    public List<ResultadoExamen> getDetallesResultadoActivosByExamenV2(String idOrdenExamen){
+        String query = "select a.idDetalle as idDetalle, a.respuesta.nombre as respuesta, a.respuesta.concepto.tipo.codigo as tipo, a.fechahProcesa as fechahProcesa, a.valor as valor " +
+                "from DetalleResultado as a inner join a.examen as r where a.pasivo = false and r.idOrdenExamen = :idOrdenExamen order by a.respuesta.orden asc";
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setParameter("idOrdenExamen", idOrdenExamen);
+
+        q.setResultTransformer(Transformers.aliasToBean(ResultadoExamen.class));
         return  q.list();
     }
 

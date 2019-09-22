@@ -10,9 +10,11 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -365,6 +367,20 @@ public class TomaMxService {
         return q.list();
     }
 
+    public List<Solicitud> getSolicitudesDxByIdTomaV2(String idTomaMx, String codigoLab){
+        String query = "select distinct sdx.codDx.idDiagnostico as idSolicitud, sdx.codDx.nombre as nombre from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
+                "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
+                "and (sdx.labProcesa.codigo = :codigoLab" +
+                " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
+                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) ";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("codigoLab",codigoLab);
+        q.setResultTransformer(Transformers.aliasToBean(Solicitud.class));
+        return q.list();
+    }
+
     public List<DaSolicitudDx> getSolicitudesDxByIdTomaAreaLabUser(String idTomaMx, String username){
         String query = "select distinct sdx from DaSolicitudDx sdx inner join sdx.idTomaMx mx ," +
                 "AutoridadLaboratorio al, AutoridadArea aa " +
@@ -423,12 +439,15 @@ public class TomaMxService {
      *
      */
     @SuppressWarnings("unchecked")
-    public List<Dx_TipoMx_TipoNoti> getDx(String codMx, String tipoNoti, String userName) throws Exception {
+    public List<Dx_TipoMx_TipoNoti> getDx(String codMx, String tipoNoti, String userName, String idTomaMx) throws Exception {
         String query = "select dx from Dx_TipoMx_TipoNoti dx " +
                 "where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx " +
                 "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti and dx.diagnostico.pasivo = false";
         if (userName!=null) {
           query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.pasivo = false and aa.user.username = :userName)";
+        }
+        if (idTomaMx!=null) {
+            query += " and dx.diagnostico.idDiagnostico in (select sdx.codDx.idDiagnostico from DaSolicitudDx sdx where sdx.idTomaMx.idTomaMx = :idTomaMx )";
         }
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -436,6 +455,9 @@ public class TomaMxService {
         q.setString("tipoNoti", tipoNoti);
         if (userName!=null) {
             q.setString("userName", userName);
+        }
+        if (idTomaMx!=null) {
+            q.setString("idTomaMx", idTomaMx);
         }
         return q.list();
     }
@@ -600,16 +622,21 @@ public class TomaMxService {
      *
      */
     @SuppressWarnings("unchecked")
-    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti) throws Exception {
-        String query = "select est from Estudio_TipoMx_TipoNoti est, DaSolicitudEstudio as dse inner join dse.tipoEstudio as tes " +
-                "where dse.anulado = false and est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
-                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " +
-                "and tes.idEstudio = est.estudio.idEstudio " +
-                "and dse.idTomaMx.idTomaMx = :idTomaMx" ;
+    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti, String idTomaMx) {
+        String query = "select est from Estudio_TipoMx_TipoNoti est " +
+                "where est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " ;
+
+        if (idTomaMx!= null){
+            query += " and est.estudio.idEstudio in ( select tipoEstudio.idEstudio from DaSolicitudEstudio se where se.idTomaMx.idTomaMx = :idTomaMx )";
+        }
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setString("codTipoMx", codTipoMx);
         q.setString("codTipoNoti", codTipoNoti);
+        if (idTomaMx!= null){
+            q.setString("idTomaMx", idTomaMx);
+        }
 
         return q.list();
     }
@@ -1074,10 +1101,68 @@ public class TomaMxService {
      * Retorna rutina
      * @param idDiagnosticos
      */
-    public List<Catalogo_Dx> getDxs(String idDiagnosticos){
-        String query = "from Catalogo_Dx where idDiagnostico in ("+idDiagnosticos+")";
+    public List<Solicitud> getDxs(String idDiagnosticos){
+        String query = "select m.idDiagnostico as idSolicitud, m.nombre as nombre, 'R' as tipo from Catalogo_Dx m where idDiagnostico in ("+idDiagnosticos+")";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
+        q.setResultTransformer(Transformers.aliasToBean(Solicitud.class));
+        return q.list();
+    }
+
+    public List<Solicitud> getEstudios(String ids) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("select m.idEstudio as idSolicitud, m.nombre as nombre, 'E' as tipo"
+                + " from Catalogo_Estudio m where m.idEstudio in ("+ids+")");
+        query.setResultTransformer(Transformers.aliasToBean(Solicitud.class));
+        List<Solicitud> results = query.list();
+        return  results;
+    }
+
+    /**
+     *Retorna una lista de Catalogo_Dx segun tipoMx y tipo Notificacion y las autoridades del usuario
+     * @param codMx tipo de Mx
+     * @param tipoNoti tipo Notificacion
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public List<Catalogo_Dx> getDxByTipoMxTipoNoti(String codMx, String tipoNoti, String userName) {
+        String query = "select distinct dx.diagnostico from Dx_TipoMx_TipoNoti dx " +
+                "where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx " +
+                "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti and dx.diagnostico.pasivo = false";
+        if (userName!=null) {
+            query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.pasivo = false and aa.user.username = :userName)";
+        }
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codMx", codMx);
+        q.setString("tipoNoti", tipoNoti);
+        if (userName!=null) {
+            q.setString("userName", userName);
+        }
+        return q.list();
+    }
+
+    /**
+     *Retorna una lista de Catalogo_Estudio segun tipoMx y tipo Notificacion
+     * @param codTipoMx código del tipo de Mx
+     * @param codTipoNoti código del tipo Notificacion
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public List<Catalogo_Estudio> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti) {
+        String query = "select distinct est.estudio from Estudio_TipoMx_TipoNoti est " +
+                "where est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " +
+                "and est.pasivo = false and est.estudio.pasivo = false " +
+                "and est.tipoMx_tipoNotificacion.pasivo = false " +
+                "and est.tipoMx_tipoNotificacion.tipoMx.pasivo = false " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.pasivo = false" ;
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codTipoMx", codTipoMx);
+        q.setString("codTipoNoti", codTipoNoti);
+
         return q.list();
     }
 }

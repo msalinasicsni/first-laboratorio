@@ -1,10 +1,12 @@
 package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosDaSindFebril;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,4 +40,18 @@ public class SindFebrilService {
 		session.saveOrUpdate(daSindFebril.getIdNotificacion());
 		session.saveOrUpdate(daSindFebril);
 	}
+
+    public DatosDaSindFebril getDaSindFebrilV2(String idNotificacion){
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery(" select sf.nombPadre as nombPadre, sf.fechaFicha as fechaFicha,  " +
+                "coalesce((select c.valor from Procedencia c where c.codigo = sf.codProcedencia.codigo), null) as codProcedencia, " +
+                "coalesce((select c.valor from Respuesta c where c.codigo = sf.hosp.codigo), null) as hosp, " +
+                "coalesce((select c.valor from Respuesta c where c.codigo = sf.fallecido.codigo), null) as fallecido, " +
+                "sf.fechaIngreso as fechaIngreso, sf.fechaFallecido as fechaFallecido,  sf.dxPresuntivo as dxPresuntivo "+
+                "from DaSindFebril sf where sf.idNotificacion.idNotificacion = :idNotificacion ");
+        query.setParameter("idNotificacion",idNotificacion);
+        query.setResultTransformer(Transformers.aliasToBean(DatosDaSindFebril.class));
+        return (DatosDaSindFebril) query.uniqueResult();
+
+    }
 }

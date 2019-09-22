@@ -72,7 +72,7 @@ public class AssociationSamplesRequestService {
 
     @SuppressWarnings("unchecked")
     public List<Catalogo_Dx> getDxs() throws Exception {
-        String query = "from Catalogo_Dx dx where pasivo = false " ;
+        String query = "from Catalogo_Dx dx where pasivo = false order by dx.nombre " ;
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         return q.list();

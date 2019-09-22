@@ -30,6 +30,8 @@ public class FiltrosReporte {
     boolean nivelCentral;
     String diagnosticos;
     String consolidarPor;
+    Integer idEstudio;
+    String estudios;
 
     public String getCodArea() {
         return codArea;
@@ -197,5 +199,21 @@ public class FiltrosReporte {
 
     public void setConsolidarPor(String consolidarPor) {
         this.consolidarPor = consolidarPor;
+    }
+
+    public Integer getIdEstudio() {
+        return idEstudio;
+    }
+
+    public void setIdEstudio(Integer idEstudio) {
+        this.idEstudio = idEstudio;
+    }
+
+    public String getEstudios() {
+        return estudios;
+    }
+
+    public void setEstudios(String estudios) {
+        this.estudios = estudios;
     }
 }
