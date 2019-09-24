@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.utilities;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -172,6 +173,11 @@ public class DateUtil {
 
     }
 
+    public static Timestamp StringToTimestamp(String fechah) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = sdf.parse(fechah);
+        return new Timestamp(date.getTime());
+    }
 
 
 
