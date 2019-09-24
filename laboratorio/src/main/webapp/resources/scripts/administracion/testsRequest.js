@@ -187,9 +187,10 @@ var TestsRequest  = function () {
                             '" > <i class="fa fa-times"></i>' ;
                         var btnDefault = '<button type="button" title="Activar" class="btn btn-danger btn-xs" data-id="'+dataToLoad[i].id +"^"+dataToLoad[i].porDefecto+
                             '" > '+$("#msg_no").val();
-                        if ($('#tipo').val() === 'Estudio'){
+                        /*if ($('#tipo').val() === 'Estudio'){
                             btnDefault = "No Aplica";
-                        }else if (dataToLoad[i].porDefecto == 'true'){
+                        }else*/
+                        if (dataToLoad[i].porDefecto == 'true'){
                             btnDefault = '<button type="button" title="Desactivar" class="btn btn-success btn-xs" data-id="'+dataToLoad[i].id +"^"+dataToLoad[i].porDefecto+
                                 '" > '+$("#msg_yes").val();
                         }

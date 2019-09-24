@@ -147,13 +147,16 @@
                         <div class="row">
                             <section class="col col-sm-12 col-md-12 col-lg-12">
                                 <label class="text-left txt-color-blue font-md">
-                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dxs.large" /> </label>
+                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.request.large" /> </label>
                                 <div class="input-group">
                                     <span class="input-group-addon"> <i class="fa fa-list"></i></span>
-                                    <select  name="idDx" id="idDx" data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.dxs.large" />" class="select2">
+                                    <select  name="idDx" id="idDx" data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.request.large" />" class="select2">
                                         <option value=""></option>
                                         <c:forEach items="${dxs}" var="dx">
-                                            <option value="${dx.idDiagnostico}">${dx.nombre}</option>
+                                            <option value="${dx.idDiagnostico}-R">${dx.nombre}</option>
+                                        </c:forEach>
+                                        <c:forEach items="${estudios}" var="est">
+                                            <option value="${est.idEstudio}-E">${est.nombre}</option>
                                         </c:forEach>
                                     </select>
                                 </div>

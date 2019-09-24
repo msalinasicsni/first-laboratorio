@@ -377,43 +377,51 @@ public class TrasladoMxController {
                                     }
 
                                 } else {
-                                    solicitudDx.setLabProcesa(labDestino);
-                                    //externo, validar si el dx tiene el examanen y el ex�men sin resultado
-                                    //si ya tiene registrado ex�menes con resultado, no se va a trasladar
-                                    String[] arrayExamenes = idExamenes.replaceAll("\\[","").replaceAll("\\]","").replaceAll("\"","").split(",");
-                                    List<OrdenExamen> ordenExamenList;
-                                    int contExamenesValidos = 0;
-                                    for (String idExamen : arrayExamenes) {
-                                        ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, Integer.valueOf(idRutina), Integer.valueOf(idExamen), seguridadService.obtenerNombreUsuario());
-                                        if (ordenExamenList.size() > 0) {
-                                            if (resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
-                                                //solicitudDx.setSegundoLabProcesa2(labDestino);
-                                                //tomaMxService.updateSolicitudDx(solicitudDx);
-                                                OrdenExamen ordenProcesar = ordenExamenList.get(0);
-                                                ordenProcesar.setLabProcesa(labDestino);
-                                                ordenExamenMxService.updateOrdenExamen(ordenProcesar);
-                                                contExamenesValidos++;
-                                            }
-                                        }else{//Si examen solicitado aún no esta agregado en el lab origen, se agrega para procesar en lab destino
-                                            OrdenExamen ordenExamen = new OrdenExamen();
-                                            ordenExamen.setSolicitudDx(solicitudDx);
-                                            CatalogoExamenes examen = examenesService.getExamenById(Integer.valueOf(idExamen));
-                                            ordenExamen.setCodExamen(examen);
-                                            ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
-                                            ordenExamen.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                                            ordenExamen.setLabProcesa(labDestino);
-                                            try {
-                                                ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                                contExamenesValidos++;
-                                            } catch (Exception ex) {
-                                                ex.printStackTrace();
-                                                logger.error("Error al agregar orden de examen", ex);
+                                    if (!solicitudDx.getAprobada()) {
+                                        solicitudDx.setLabProcesa(labDestino);
+                                        //externo, validar si el dx tiene el examanen y el ex�men sin resultado
+                                        //si ya tiene registrado ex�menes con resultado, no se va a trasladar
+                                        String[] arrayExamenes = idExamenes.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "").split(",");
+                                        List<OrdenExamen> ordenExamenList;
+                                        int contExamenesValidos = 0;
+                                        for (String idExamen : arrayExamenes) {
+                                            ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, Integer.valueOf(idRutina), Integer.valueOf(idExamen), seguridadService.obtenerNombreUsuario());
+                                            if (ordenExamenList.size() > 0) {
+                                                if (resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
+                                                    //solicitudDx.setSegundoLabProcesa2(labDestino);
+                                                    //tomaMxService.updateSolicitudDx(solicitudDx);
+                                                    OrdenExamen ordenProcesar = ordenExamenList.get(0);
+                                                    ordenProcesar.setLabProcesa(labDestino);
+                                                    ordenExamenMxService.updateOrdenExamen(ordenProcesar);
+                                                    contExamenesValidos++;
+                                                }
+                                            } else {//Si examen solicitado aún no esta agregado en el lab origen, se agrega para procesar en lab destino
+                                                OrdenExamen ordenExamen = new OrdenExamen();
+                                                ordenExamen.setSolicitudDx(solicitudDx);
+                                                CatalogoExamenes examen = examenesService.getExamenById(Integer.valueOf(idExamen));
+                                                ordenExamen.setCodExamen(examen);
+                                                ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                                ordenExamen.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
+                                                ordenExamen.setLabProcesa(labDestino);
+                                                try {
+                                                    ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                                    contExamenesValidos++;
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
+                                                    logger.error("Error al agregar orden de examen", ex);
+                                                }
                                             }
                                         }
-                                    }
-                                    //si ning�n examen es v�lido para el traslado, no procesar traslado
-                                    if (contExamenesValidos <= 0) {
+                                        //si ning�n examen es v�lido para el traslado, no procesar traslado
+                                        if (contExamenesValidos <= 0) {
+                                            procesarTraslado = false;
+                                        }
+                                    }else {
+                                        //no procesar traslado porque la solicitud ya fue aprobada
                                         procesarTraslado = false;
+                                        if (cantMuestras==1){
+                                            throw new Exception(messageSource.getMessage("msg.transfer.dx.approved",null,null));
+                                        }
                                     }
                                 }
                             } else {//si no se encontr� la solicitud, no se permite el traslado

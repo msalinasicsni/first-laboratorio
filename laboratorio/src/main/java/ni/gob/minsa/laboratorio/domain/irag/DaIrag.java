@@ -51,8 +51,8 @@ public class DaIrag implements Serializable, Auditable {
     private Integer uci;
     private Integer noDiasHospitalizado;
     private Integer ventilacionAsistida;
-    private Cie10 diagnostico1Egreso;
-    private Cie10 diagnostico2Egreso;
+    private String diagnostico1Egreso;
+    private String diagnostico2Egreso;
     private Date fechaEgreso;
     private CondicionEgreso codCondEgreso;
     private String codClasFCaso;
@@ -372,28 +372,25 @@ public class DaIrag implements Serializable, Auditable {
         this.ventilacionAsistida = ventilacionAsistida;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Cie10.class)
-    @JoinColumn(name = "DIAG1_EGRESO", referencedColumnName = "CODIGO_CIE10")
-    @ForeignKey(name = "COD_CIE10_FK")
-    public Cie10 getDiagnostico1Egreso() {
+    @Basic
+    @Column(name = "DIAG1_EGRESO", nullable = true, insertable = true, updatable = true, length = 250)
+    public String getDiagnostico1Egreso() {
         return diagnostico1Egreso;
     }
 
-    public void setDiagnostico1Egreso(Cie10 diagnostico1Egreso) {
+    public void setDiagnostico1Egreso(String diagnostico1Egreso) {
         this.diagnostico1Egreso = diagnostico1Egreso;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Cie10.class)
-    @JoinColumn(name = "DIAG2_EGRESO", referencedColumnName = "CODIGO_CIE10")
-    @ForeignKey(name = "COD_CIE10_FK")
-    public Cie10 getDiagnostico2Egreso() {
+    @Basic
+    @Column(name = "DIAG2_EGRESO", nullable = true, insertable = true, updatable = true, length = 250)
+    public String getDiagnostico2Egreso() {
         return diagnostico2Egreso;
     }
 
-    public void setDiagnostico2Egreso(Cie10 diagnostico2Egreso) {
+    public void setDiagnostico2Egreso(String diagnostico2Egreso) {
         this.diagnostico2Egreso = diagnostico2Egreso;
     }
-
     @Basic
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     @Column(name = "FECHA_EGRESO", nullable = true, insertable = true, updatable = true)

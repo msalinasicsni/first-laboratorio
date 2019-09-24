@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.api;
 
+import com.google.gson.Gson;
 import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
@@ -14,6 +15,7 @@ import ni.gob.minsa.laboratorio.domain.poblacion.Sectores;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Herrold on 08/06/14 22:13
@@ -224,7 +228,7 @@ public class expose {
         logger.info("Obteniendo los dx por tipo mx en JSON");
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Dx_TipoMx_TipoNoti>();
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotisPermitidos = new ArrayList<Dx_TipoMx_TipoNoti>();
-        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
+        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario(), idTomaMx);
         TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
 
         if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
@@ -263,9 +267,8 @@ public class expose {
     @ResponseBody
     List<Estudio_TipoMx_TipoNoti> getEstudios(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti, @RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
         logger.info("Obteniendo los estudios por mx y tipo de notitificación en JSON");
-        List<Estudio_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Estudio_TipoMx_TipoNoti>();
-        dxTipoMxTipoNotis = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti);
-        return dxTipoMxTipoNotis;
+        List<Estudio_TipoMx_TipoNoti> estudiosByTipoMxTipoNoti = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti, idTomaMx);
+        return estudiosByTipoMxTipoNoti;
     }
 
     @RequestMapping(value = "getExamenesEstudio", method = RequestMethod.GET, produces = "application/json")
@@ -294,7 +297,37 @@ public class expose {
     List<Dx_TipoMx_TipoNoti> getDiagnosticosEdicion(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti,
                                              @RequestParam(value = "idTomaMx", required = true)String idTomaMx) throws Exception {
         logger.info("Obteniendo los dx por tipo mx en JSON");
-        return tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
+        return tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario(), idTomaMx);
 
+    }
+
+    @RequestMapping(value = "getCatDxCatEstPermitidos", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getCatDxCatEstPermitidos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti, @RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
+        logger.info("Obteniendo los estudios por mx y tipo de notitificación en JSON");
+        List<Estudio_TipoMx_TipoNoti> estudiosByTipoMxTipoNoti = this.getEstudios(codMx,tipoNoti, idTomaMx);
+        List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotisPermitidos = this.getDiagnosticos(codMx,tipoNoti, idTomaMx);
+        String jsonResponse="";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice=0;
+        for(Estudio_TipoMx_TipoNoti estActual : estudiosByTipoMxTipoNoti){
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", estActual.getEstudio().getIdEstudio()+"-E");
+            map.put("nombre", estActual.getEstudio().getNombre());
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+        for (Dx_TipoMx_TipoNoti dxActual : dxTipoMxTipoNotisPermitidos) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", dxActual.getDiagnostico().getIdDiagnostico()+"-R");
+            map.put("nombre", dxActual.getDiagnostico().getNombre());
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor num�rico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
     }
 }
