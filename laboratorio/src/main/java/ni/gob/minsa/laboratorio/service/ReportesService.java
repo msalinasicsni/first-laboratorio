@@ -1000,14 +1000,15 @@ public class ReportesService {
         queryNotiDx.setParameter("fechaFin", filtro.getFechaFin());
         resTemp1.addAll(queryNotiDx.list());
         for (Object[] reg : resTemp1) {
-            Object[] reg1 = new Object[8];
+            Object[] reg1 = new Object[9];
             reg1[0] = reg[1]; //Nombre Silais
             reg1[1] = reg[2]; //Cantidad Notificaciones (NO SE USA)
-            reg1[2] = (Long) reg[2]; //Cantidad Dx
+            reg1[2] = (Long) reg[2]; //Cantidad Dx //24072019
             if (!filtro.getCodArea().equals("AREAREP|MUNI") || (filtro.getCodArea().equals("AREAREP|MUNI") && (Long) reg[2]>0)) {
                 int pos = 0;
                 int neg = 0;
                 int inadecuada = 0;
+                int noProc = 0;
                 String idSolicitud = "";
                 for (Object[] sol : resTemp2) {
                     //identidad
@@ -1032,7 +1033,10 @@ public class ReportesService {
                                     } else if (valor.getValor().trim().toLowerCase().equals("mx inadecuada")){
                                         inadecuada++;
                                         idSolicitud = sol[1].toString();
-                                    } else if (valor.getValor().trim().toLowerCase().contains("positivo")
+                                    } else if (valor.getValor().trim().toLowerCase().equals("no procesado")){
+                                        noProc++;
+                                        idSolicitud = sol[1].toString();
+                                    }else if (valor.getValor().trim().toLowerCase().contains("positivo")
                                             || valor.getValor().trim().toLowerCase().contains("reactor")
                                             || valor.getValor().trim().toLowerCase().contains("detectado")
                                             || valor.getValor().trim().toUpperCase().contains("MTB-DET")
@@ -1051,6 +1055,9 @@ public class ReportesService {
                                     idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")) {
                                     inadecuada++;
+                                    idSolicitud = sol[1].toString();
+                                } else if (sol[2].toString().trim().toLowerCase().equals("no procesado")){
+                                    noProc++;
                                     idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("positivo")
                                         || sol[2].toString().trim().toLowerCase().contains("reactor")
@@ -1081,6 +1088,9 @@ public class ReportesService {
                                     } else if (valor.getValor().trim().toLowerCase().equals("mx inadecuada")){
                                         inadecuada++;
                                         idSolicitud = sol[1].toString();
+                                    } else if (valor.getValor().trim().toLowerCase().equals("no procesado")){
+                                        noProc++;
+                                        idSolicitud = sol[1].toString();
                                     } else if (valor.getValor().trim().toLowerCase().contains("positivo")
                                             || valor.getValor().trim().toLowerCase().contains("reactor")
                                             || valor.getValor().trim().toLowerCase().contains("detectado")
@@ -1102,6 +1112,9 @@ public class ReportesService {
                                 } else if (sol[2].toString().trim().toLowerCase().contains("mx inadecuada")) {
                                     inadecuada++;
                                     idSolicitud = sol[1].toString();
+                                } else if (sol[2].toString().trim().toLowerCase().equals("no procesado")){
+                                    noProc++;
+                                    idSolicitud = sol[1].toString();
                                 } else if (sol[2].toString().trim().toLowerCase().contains("positivo")
                                         || sol[2].toString().trim().toLowerCase().contains("reactor")
                                         || sol[2].toString().trim().toLowerCase().contains("detectado")
@@ -1119,9 +1132,10 @@ public class ReportesService {
                 reg1[3] = pos; // Positivo
                 reg1[4] = neg; // Negativo
                 reg1[5] = (Long) reg[4]; // Sin Resultado dx
-                Long totalConySinResultado = (Long) reg1[2];
+                Long totalConySinResultado = (long)pos + (long)neg;//solo tomar en cuenta positivos y negativos. Andrea 24072019 //(Long) reg1[2];
                 reg1[6] = (totalConySinResultado != 0 ? (double) Math.round(Integer.valueOf(reg1[3].toString()).doubleValue() / totalConySinResultado * 100 * 100) / 100 : 0);
                 reg1[7] = inadecuada; //muestras inadecuadas
+                reg1[8] = noProc; //muestras con resultado no procesados
                 resFinal.add(reg1);
             }
         }

@@ -362,6 +362,7 @@
                         <th><spring:message code="lbl.negative"/></th>
                         <th><spring:message code="lbl.without.result"/></th>
                         <th><spring:message code="lbl.sample.inadequate2"/></th>
+                        <th><spring:message code="lbl.sample.no.proc"/></th>
                         <th><spring:message code="lbl.pos.percentage"/></th>
                     </tr>
 
