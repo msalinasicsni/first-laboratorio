@@ -11,6 +11,7 @@ import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
+import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
@@ -105,7 +106,7 @@ public class TomaMxService {
                             Restrictions.eq("tomaMx.anulada", false))
             );
         }
-        //y las ordenes en estado seg鷑 filtro
+        //y las ordenes en estado seg煤n filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
@@ -177,7 +178,7 @@ public class TomaMxService {
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
-        //Se filtra por rango de fecha de notificaci髇
+        //Se filtra por rango de fecha de notificaci贸n
         if (filtro.getFechaInicioNotificacion()!=null && filtro.getFechaFinNotificacion()!=null){
             crit.add( Restrictions.and(
                             Restrictions.between("notifi.fechaRegistro", filtro.getFechaInicioNotificacion(),filtro.getFechaFinNotificacion()))
@@ -203,7 +204,7 @@ public class TomaMxService {
             );
         }
 
-        //Se filtra por rango de fecha de recepci髇
+        //Se filtra por rango de fecha de recepci贸n
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
                     .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
@@ -272,7 +273,7 @@ public class TomaMxService {
             */
             Junction conditGroup = Restrictions.disjunction();
 
-            //usuario tiene autorizado envio actual, o alguno que este en hist髍ico para la muestra
+            //usuario tiene autorizado envio actual, o alguno que este en hist贸rico para la muestra
             conditGroup.add(Subqueries.propertyIn("tomaMx.envio.idEnvio", DetachedCriteria.forClass(DaEnvioMx.class)
                     .createAlias("laboratorioDestino", "destino")
                     .add(Subqueries.propertyIn("destino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
@@ -313,9 +314,9 @@ public class TomaMxService {
             crit.add(conditGroup);
 
         }
-        //filtro s髄o control calidad en el laboratio del usuario
+        //filtro s贸lo control calidad en el laboratio del usuario
         if (filtro.getControlCalidad()!=null) {
-            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", s髄o incluir rutinas
+            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", s贸lo incluir rutinas
                 crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .add(Restrictions.eq("anulado",false))
                         .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
@@ -617,8 +618,8 @@ public class TomaMxService {
 
     /**
      *Retorna una lista de estudios segun tipoMx y tipo Notificacion
-     * @param codTipoMx c骴igo del tipo de Mx
-     * @param codTipoNoti c骴igo del tipo Notificacion
+     * @param codTipoMx c贸digo del tipo de Mx
+     * @param codTipoNoti c贸digo del tipo Notificacion
      *
      */
     @SuppressWarnings("unchecked")
@@ -773,7 +774,7 @@ public class TomaMxService {
     }
 
     /**
-     * Obtiene las areas a las que pertenecen los dx solicitidos en una muetra, seg鷑 la autoridad del usuario indicado
+     * Obtiene las areas a las que pertenecen los dx solicitidos en una muetra, seg煤n la autoridad del usuario indicado
      * @param idToma toma a obtener areas de dx
      * @param userName usuario que tiene la autoridad
      * @return
@@ -946,7 +947,7 @@ public class TomaMxService {
 
 
     /**
-     * Se toma las solicitudes dx cuya 醨ea no se encuentra en la tabla de traslados para esa mx
+     * Se toma las solicitudes dx cuya 谩rea no se encuentra en la tabla de traslados para esa mx
      * @param idTomaMx
      * @return
      */
@@ -975,7 +976,7 @@ public class TomaMxService {
     }
 
     /**
-     * M閠odo que obtiena las solicitudes de rutina por control de calidad para una muestra determinada, y que ya tenga resultado aprobado
+     * M茅todo que obtiena las solicitudes de rutina por control de calidad para una muestra determinada, y que ya tenga resultado aprobado
      * @param codigoMx
      * @return
      */
@@ -997,7 +998,7 @@ public class TomaMxService {
         String query = "from DaIrag where idNotificacion.idNotificacion = :idNotificacion and condiciones like :codCondicion";
         Query q = session.createQuery(query);
         q.setParameter("idNotificacion", strIdNotificacion);
-        q.setParameter("codCondicion","%"+"CONDPRE|EMB"+"%");//c骴igo para condici髇 embarazo
+        q.setParameter("codCondicion","%"+"CONDPRE|EMB"+"%");//c贸digo para condici贸n embarazo
 
         //SINDROMES FEBRILES
         String query2 = "from DaSindFebril where idNotificacion.idNotificacion = :idNotificacion" +
@@ -1018,7 +1019,7 @@ public class TomaMxService {
 
     /**
      *
-     * M閠odo que obtiene las solicitudes dx de una muestra, que tenga examenes a procesar en un lab determinado
+     * M茅todo que obtiene las solicitudes dx de una muestra, que tenga examenes a procesar en un lab determinado
      * @param idTomaMx toma a filtrar
      * @param codigoLab laboratorio a filtrar
      * @return List<DaSolicitudDx>
@@ -1058,7 +1059,7 @@ public class TomaMxService {
     }
 
     /**
-     * Obtiene las mx tomadas para una notificaci髇 en fecha de toma especifica
+     * Obtiene las mx tomadas para una notificaci贸n en fecha de toma especifica
      * @param id del estudio a buscar
      * @return Catalogo_Estudio
      */
@@ -1144,8 +1145,8 @@ public class TomaMxService {
 
     /**
      *Retorna una lista de Catalogo_Estudio segun tipoMx y tipo Notificacion
-     * @param codTipoMx c骴igo del tipo de Mx
-     * @param codTipoNoti c骴igo del tipo Notificacion
+     * @param codTipoMx c贸digo del tipo de Mx
+     * @param codTipoNoti c贸digo del tipo Notificacion
      *
      */
     @SuppressWarnings("unchecked")
@@ -1165,4 +1166,48 @@ public class TomaMxService {
 
         return q.list();
     }
+
+    /**
+     * M?todo para generar un string alfanum?rico de 8 caracteres, que se usar? como c?digo ?nico de muestra
+     * @return String codigoUnicoMx
+     */
+    public String generarCodigoUnicoMx(){
+        DaTomaMx validaC;
+        //Se genera el c?digo
+        String codigoUnicoMx = StringUtil.getCadenaAlfanumAleatoria(8);
+        //Se consulta BD para ver si existe toma de Mx que tenga mismo c?digo
+        validaC = this.getTomaMxByCodUnicoMx(codigoUnicoMx);
+        //si existe, de manera recursiva se solicita un nuevo c?digo
+        if (validaC!=null){
+            codigoUnicoMx = generarCodigoUnicoMx();
+        }
+        //si no existe se retorna el ?ltimo c?digo generado
+        return codigoUnicoMx;
+    }
+
+    public boolean existeTomaMx(String idNotificacion, String fechaToma, String dxs) throws Exception{
+        int totalEncontrados = 0;
+        boolean respuesta = false;
+        String[] dxArray = dxs.split(",");
+        Date fecha1 = DateUtil.StringToDate(fechaToma, "dd/MM/yyyy");
+        List<DaTomaMx> muestras = this.getTomaMxActivaByIdNoti(idNotificacion);
+        for(DaTomaMx muestra : muestras){
+            List<DaSolicitudDx> solicitudDxList = this.getSoliDxByIdMxFechaToma(muestra.getIdTomaMx(), fecha1);
+            for(String dx : dxArray) {
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (solicitudDx.getCodDx().getIdDiagnostico().equals(Integer.valueOf(dx))) {
+                        totalEncontrados++;
+                        break;
+                    }
+                }
+            }
+            if (totalEncontrados == dxArray.length && totalEncontrados == solicitudDxList.size()) {
+                respuesta = true;
+                break;
+            }
+            totalEncontrados = 0;
+        }
+        return respuesta;
+    }
+
 }

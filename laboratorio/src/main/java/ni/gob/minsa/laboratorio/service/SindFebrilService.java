@@ -41,6 +41,7 @@ public class SindFebrilService {
 		session.saveOrUpdate(daSindFebril);
 	}
 
+
     public DatosDaSindFebril getDaSindFebrilV2(String idNotificacion){
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery(" select sf.nombPadre as nombPadre, sf.fechaFicha as fechaFicha,  " +
@@ -52,6 +53,20 @@ public class SindFebrilService {
         query.setParameter("idNotificacion",idNotificacion);
         query.setResultTransformer(Transformers.aliasToBean(DatosDaSindFebril.class));
         return (DatosDaSindFebril) query.uniqueResult();
+}
+
+    public void deleteDaSindFebril(DaSindFebril dto) throws Exception {
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
+            }
+            else
+                throw new Exception("Objeto DaSindFebril es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
 
     }
 }

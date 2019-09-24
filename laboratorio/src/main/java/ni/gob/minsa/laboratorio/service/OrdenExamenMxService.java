@@ -697,4 +697,21 @@ public class OrdenExamenMxService {
         ordenExamenList.addAll(q2.list());
         return ordenExamenList;
     }
+
+    public List<OrdenExamen> getOrdenesExamenProcesadasInfinityByIdSolicitud(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery(" select eq from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq where upper(eq.nombre) like '%INFINITY%' and eq.pasivo = false  and ee.pasivo = false " +
+                " and ex.idExamen in (select ex.idExamen from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join oe.codExamen ex where sdx.idSolicitudDx =:idSolicitud and oe.anulado = false) ");
+        q.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList = q.list();
+        if (ordenExamenList.size()<=0) {
+            //se toman las que son de estudio
+            Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false ");
+            q2.setParameter("idSolicitud", idSolicitud);
+            ordenExamenList.addAll(q2.list());
+        }
+        return ordenExamenList;
+    }
 }

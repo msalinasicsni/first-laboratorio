@@ -180,6 +180,9 @@
                             <li class="sampleTypes">
                                 <a href="<spring:url value="/administracion/sampleTypes/init" htmlEscape="true "/>" title="<spring:message code="lbl.sample.types" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="lbl.sample.types" /></a>
                             </li>
+                            <li class="equipos">
+                                <a href="<spring:url value="/administracion/equipos/list" htmlEscape="true "/>" title="<spring:message code="menu.equipments" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <spring:message code="menu.equipments" /></a>
+                            </li>
                         </ul>
                     </li>
                     <li class="concepto">
