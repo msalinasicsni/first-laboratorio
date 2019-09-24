@@ -445,6 +445,7 @@ public class RecepcionMxController {
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdMxUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudDx> dxMostrar = new ArrayList<DaSolicitudDx>();
+
                 if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
                     for (DaSolicitudDx solicitudDx : solicitudDxList) {
                         if (trasladoActivo.getAreaDestino().getIdArea().equals(solicitudDx.getCodDx().getArea().getIdArea())){
@@ -465,11 +466,22 @@ public class RecepcionMxController {
                     datoSolicitudDetalles.addAll(datosSolicitudService.getDatosSolicitudDetalleBySolicitud(solicitudEstudio.getIdSolicitudEstudio()));
                 }
                 mav.addObject("datosList",datoSolicitudDetalles);
+                if (esEstudio) {
+                    List<Catalogo_Estudio> catalogoEstudios =
+                            tomaMxService.getEstudiosByTipoMxTipoNoti(recepcionMx.getTomaMx().getCodTipoMx().getIdTipoMx().toString(),
+                                    recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                    mav.addObject("catEst", catalogoEstudios);
+                }
+                List<Catalogo_Dx> catalogoDxs =
+                        tomaMxService.getDxByTipoMxTipoNoti(recepcionMx.getTomaMx().getCodTipoMx().getIdTipoMx().toString(),
+                                recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo(),seguridadService.obtenerNombreUsuario());
+                mav.addObject("catDx", catalogoDxs);
+
+
             }
 
 
             List<CausaRechazoMx> causaRechazoMxList = catalogosService.getCausaRechazoMxRecepLab();
-
             mav.addObject("recepcionMx",recepcionMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -1164,7 +1176,7 @@ public class RecepcionMxController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             esEstudio = jsonpObject.get("esEstudio").getAsBoolean();
-            if(esEstudio)
+            if(esEstudio)  //cuando es estudio tambien se pueden agregar dx de rutina
                 resultado = agregarSolicitudEstudio(jsonpObject);
             else
                 resultado = agregarSolicitudDx(jsonpObject, request);

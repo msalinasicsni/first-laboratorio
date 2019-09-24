@@ -643,14 +643,20 @@
                                             <c:when test="${esEstudio}">
                                                 <section class="col col-sm-12 col-md-12 col-lg-12">
                                                     <label class="text-left txt-color-blue font-md">
-                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.study.type" />
+                                                        <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.request.large" />
                                                     </label>
                                                     <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-location-arrow fa-fw"></i>
-                                </span>
+                                                        <span class="input-group-addon">
+                                                            <i class="fa fa-location-arrow fa-fw"></i>
+                                                        </span>
                                                         <select  class="select2" id="codEstudioNuevo" name="codEstudioNuevo" >
                                                             <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${catDx}" var="dx">
+                                                                <option value="${dx.idDiagnostico}-R">${dx.nombre}</option>
+                                                            </c:forEach>
+                                                            <c:forEach items="${catEst}" var="est">
+                                                                <option value="${est.idEstudio}-E">${est.nombre}</option>
+                                                            </c:forEach>
                                                         </select>
                                                     </div>
                                                 </section>
@@ -661,9 +667,9 @@
                                                         <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.dx.type" />
                                                     </label>
                                                     <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-location-arrow fa-fw"></i>
-                                </span>
+                                                        <span class="input-group-addon">
+                                                            <i class="fa fa-location-arrow fa-fw"></i>
+                                                        </span>
                                                         <select  class="select2" id="codDXNuevo" name="codDXNuevo" >
                                                             <option value=""><spring:message code="lbl.select" />...</option>
                                                         </select>
@@ -861,7 +867,7 @@
     <c:url var="sExamenesEstURL" value="/api/v1/getExamenesEstudio"/>
     <c:url var="sReglasExamenesURL" value="/administracion/examenes/obtenerReglasExamenes"/>
     <c:url var="sGetSolicitudesUrl" value="/recepcionMx/getSolicitudes"/>
-
+    <c:url var="sDxEstURL" value="/api/v1/getCatDxCatEstPermitidos"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -882,7 +888,8 @@
                 sReglasExamenesURL : "${sReglasExamenesURL}",
                 sGetSolicitudesUrl : "${sGetSolicitudesUrl}",
                 sAnularSolicitudUrl : "${sAnularSolicitudUrl}",
-                noRules : "${noRules}"
+                noRules : "${noRules}",
+                sDxEstURL : "${sDxEstURL}"
             };
 			ReceiptOrders.init(parametros);
             handleDatePickers("${pageContext.request.locale.language}");

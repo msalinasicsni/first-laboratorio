@@ -26,6 +26,14 @@ public class Catalogo_Dx implements Serializable, Auditable {
     private Date fechaRegistro;
     private User usuarioRegistro;
 
+    public Catalogo_Dx() {
+    }
+
+    public Catalogo_Dx(Integer idDiagnostico, String nombre) {
+        this.idDiagnostico = idDiagnostico;
+        this.nombre = nombre;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     @Column(name = "ID_DIAGNOSTICO", nullable = false, insertable = true, updatable = true, length = 10)

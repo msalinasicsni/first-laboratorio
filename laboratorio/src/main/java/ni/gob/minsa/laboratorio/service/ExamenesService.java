@@ -191,4 +191,17 @@ public class ExamenesService {
                 " order by regla.examen.nombre");
         return q.list();
     }
+
+    /**
+     * Obtiene lista de examenes asociados a un dx específico
+     * @param idEst id del diagnóstico a filtrar
+     * @return List<CatalogoExamenes>
+     */
+    public List<CatalogoExamenes> getExamenesByIdEst(int idEst){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select ex from Examen_Estudio as ee inner join ee.examen as ex inner join ee.estudio as es " +
+                "where es.idEstudio = :idEst and ee.pasivo = false and ex.pasivo = false");
+        q.setParameter("idEst",idEst);
+        return q.list();
+    }
 }
