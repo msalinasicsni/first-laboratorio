@@ -21,7 +21,7 @@ import java.util.Date;
  * V1.0
  */
 @Controller
-@RequestMapping(value = "elisaResult")
+@RequestMapping(value = "/api/v1/elisaResult")
 public class ControllerELISA {
 
     @Autowired
@@ -47,13 +47,13 @@ public class ControllerELISA {
             return "Fail. Resultado Null!";
         }
         else{
-            User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+            User usuario = seguridadService.getUsuario(resultado.getUsername());
             if (usuario ==null)
                 return "Fail. Usuario enviado no se reconoce como usuario válido!";
 
-            OrdenExamen ordenExamen = ordenExamenMxService.getOrdExamenNoAnulByCodLabMxIdDxIdExamen(resultado.getCodigoMx(), Integer.valueOf(resultado.getIdDx()), Integer.valueOf(resultado.getIdExamen()), seguridadService.obtenerNombreUsuario());
+            OrdenExamen ordenExamen = ordenExamenMxService.getOrdExamenNoAnulByCodLabMxIdDxIdExamen(resultado.getCodigoMx(), Integer.valueOf(resultado.getIdDx()), Integer.valueOf(resultado.getIdExamen()), resultado.getUsername());
             if (ordenExamen ==null)
-                return "Fail. No se encontró orden de exámen para la según codigo_mx="+resultado.getCodigoMx()+", dx="+resultado.getIdDx()+" y examen = "+resultado.getIdExamen()+" informado. ";
+                return "Fail. No se encontró orden de exámen para codigo_mx="+resultado.getCodigoMx()+", dx="+resultado.getIdDx()+" y examen = "+resultado.getIdExamen()+" informado. ";
 
             RespuestaExamen respuestaExamen = respuestasExamenService.getRespuestaByNombre(resultado.getNombreRespuesta());
             if (respuestaExamen ==null)

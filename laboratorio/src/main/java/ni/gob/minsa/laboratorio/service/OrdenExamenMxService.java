@@ -6,12 +6,15 @@ import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadExamen;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosOrdenExamen;
+import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoExamen;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -657,6 +660,25 @@ public class OrdenExamenMxService {
         return ordenExamenList;
     }
 
+    public List<DatosOrdenExamen> getOrdenesExamenByIdSolicitudV2(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        List<DatosOrdenExamen> ordenExamenList = new ArrayList<DatosOrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery("select oe.idOrdenExamen as idOrdenExamen, oe.codExamen.nombre as examen from OrdenExamen as oe inner join oe.solicitudDx as sdx where sdx.idSolicitudDx =:idSolicitud and oe.anulado = false ");
+        q.setParameter("idSolicitud",idSolicitud);
+        q.setResultTransformer(Transformers.aliasToBean(DatosOrdenExamen.class));
+        ordenExamenList = q.list();
+        if (ordenExamenList.size()<=0) {
+            //se toman las que son de estudio
+            Query q2 = session.createQuery("select oe.idOrdenExamen as idOrdenExamen, oe.codExamen.nombre as examen from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false ");
+            q2.setParameter("idSolicitud", idSolicitud);
+            q2.setResultTransformer(Transformers.aliasToBean(DatosOrdenExamen.class));
+            ordenExamenList.addAll(q2.list());
+        }
+
+        return ordenExamenList;
+    }
+
     public List<OrdenExamen> getOrdenesExamenNoAnuladasSinResulByIdSolicitud(String idSolicitud){
         Session session = sessionFactory.getCurrentSession();
         List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
@@ -673,6 +695,23 @@ public class OrdenExamenMxService {
                 "and oe.idOrdenExamen not in ( select a.examen.idOrdenExamen from DetalleResultado as a where a.pasivo = false  )");
         q2.setParameter("idSolicitud",idSolicitud);
         ordenExamenList.addAll(q2.list());
+        return ordenExamenList;
+    }
+
+    public List<OrdenExamen> getOrdenesExamenProcesadasInfinityByIdSolicitud(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        List<OrdenExamen> ordenExamenList = new ArrayList<OrdenExamen>();
+        //se toman las que son de diagnóstico.
+        Query q = session.createQuery(" select eq from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq where upper(eq.nombre) like '%INFINITY%' and eq.pasivo = false  and ee.pasivo = false " +
+                " and ex.idExamen in (select ex.idExamen from OrdenExamen as oe inner join oe.solicitudDx as sdx inner join oe.codExamen ex where sdx.idSolicitudDx =:idSolicitud and oe.anulado = false) ");
+        q.setParameter("idSolicitud",idSolicitud);
+        ordenExamenList = q.list();
+        if (ordenExamenList.size()<=0) {
+            //se toman las que son de estudio
+            Query q2 = session.createQuery("select oe from OrdenExamen as oe inner join oe.solicitudEstudio as se where se.idSolicitudEstudio =:idSolicitud and oe.anulado = false ");
+            q2.setParameter("idSolicitud", idSolicitud);
+            ordenExamenList.addAll(q2.list());
+        }
         return ordenExamenList;
     }
 }

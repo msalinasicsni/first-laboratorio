@@ -10,6 +10,7 @@ public class ResultadoELISA {
     private String idExamen;
     private String nombreRespuesta;
     private String valor;
+    private String username;
 
     public String getCodigoMx() {
         return codigoMx;
@@ -49,5 +50,13 @@ public class ResultadoELISA {
 
     public void setValor(String valor) {
         this.valor = valor;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

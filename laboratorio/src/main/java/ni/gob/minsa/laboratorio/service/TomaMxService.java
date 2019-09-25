@@ -10,9 +10,12 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
+import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,7 +106,7 @@ public class TomaMxService {
                             Restrictions.eq("tomaMx.anulada", false))
             );
         }
-        //y las ordenes en estado seg鷑 filtro
+        //y las ordenes en estado seg煤n filtro
         if (filtro.getCodEstado()!=null) {
             if (filtro.getIncluirTraslados()){
                 crit.add(Restrictions.or(
@@ -175,7 +178,7 @@ public class TomaMxService {
                             Restrictions.between("tomaMx.fechaHTomaMx", filtro.getFechaInicioTomaMx(),filtro.getFechaFinTomaMx()))
             );
         }
-        //Se filtra por rango de fecha de notificaci髇
+        //Se filtra por rango de fecha de notificaci贸n
         if (filtro.getFechaInicioNotificacion()!=null && filtro.getFechaFinNotificacion()!=null){
             crit.add( Restrictions.and(
                             Restrictions.between("notifi.fechaRegistro", filtro.getFechaInicioNotificacion(),filtro.getFechaFinNotificacion()))
@@ -201,7 +204,7 @@ public class TomaMxService {
             );
         }
 
-        //Se filtra por rango de fecha de recepci髇
+        //Se filtra por rango de fecha de recepci贸n
         if (filtro.getFechaInicioRecep()!=null && filtro.getFechaFinRecep()!=null){
             crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(RecepcionMx.class)
                     .createAlias("tomaMx", "toma").add(Restrictions.between("fechaHoraRecepcion", filtro.getFechaInicioRecep(),filtro.getFechaFinRecep()))
@@ -270,7 +273,7 @@ public class TomaMxService {
             */
             Junction conditGroup = Restrictions.disjunction();
 
-            //usuario tiene autorizado envio actual, o alguno que este en hist髍ico para la muestra
+            //usuario tiene autorizado envio actual, o alguno que este en hist贸rico para la muestra
             conditGroup.add(Subqueries.propertyIn("tomaMx.envio.idEnvio", DetachedCriteria.forClass(DaEnvioMx.class)
                     .createAlias("laboratorioDestino", "destino")
                     .add(Subqueries.propertyIn("destino.codigo", DetachedCriteria.forClass(AutoridadLaboratorio.class)
@@ -311,9 +314,9 @@ public class TomaMxService {
             crit.add(conditGroup);
 
         }
-        //filtro s髄o control calidad en el laboratio del usuario
+        //filtro s贸lo control calidad en el laboratio del usuario
         if (filtro.getControlCalidad()!=null) {
-            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", s髄o incluir rutinas
+            if (filtro.getControlCalidad()){  //si hay filtro por control de calidad y es "Si", s贸lo incluir rutinas
                 crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
                         .add(Restrictions.eq("anulado",false))
                         .add(Restrictions.eq("controlCalidad", filtro.getControlCalidad()))
@@ -362,6 +365,20 @@ public class TomaMxService {
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("codigoLab",codigoLab);
+        return q.list();
+    }
+
+    public List<Solicitud> getSolicitudesDxByIdTomaV2(String idTomaMx, String codigoLab){
+        String query = "select distinct sdx.codDx.idDiagnostico as idSolicitud, sdx.codDx.nombre as nombre from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
+                "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
+                "and (sdx.labProcesa.codigo = :codigoLab" +
+                " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
+                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) ";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("codigoLab",codigoLab);
+        q.setResultTransformer(Transformers.aliasToBean(Solicitud.class));
         return q.list();
     }
 
@@ -423,12 +440,15 @@ public class TomaMxService {
      *
      */
     @SuppressWarnings("unchecked")
-    public List<Dx_TipoMx_TipoNoti> getDx(String codMx, String tipoNoti, String userName) throws Exception {
+    public List<Dx_TipoMx_TipoNoti> getDx(String codMx, String tipoNoti, String userName, String idTomaMx) throws Exception {
         String query = "select dx from Dx_TipoMx_TipoNoti dx " +
                 "where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx " +
                 "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti and dx.diagnostico.pasivo = false";
         if (userName!=null) {
           query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.pasivo = false and aa.user.username = :userName)";
+        }
+        if (idTomaMx!=null) {
+            query += " and dx.diagnostico.idDiagnostico in (select sdx.codDx.idDiagnostico from DaSolicitudDx sdx where sdx.idTomaMx.idTomaMx = :idTomaMx )";
         }
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
@@ -436,6 +456,9 @@ public class TomaMxService {
         q.setString("tipoNoti", tipoNoti);
         if (userName!=null) {
             q.setString("userName", userName);
+        }
+        if (idTomaMx!=null) {
+            q.setString("idTomaMx", idTomaMx);
         }
         return q.list();
     }
@@ -595,21 +618,26 @@ public class TomaMxService {
 
     /**
      *Retorna una lista de estudios segun tipoMx y tipo Notificacion
-     * @param codTipoMx c骴igo del tipo de Mx
-     * @param codTipoNoti c骴igo del tipo Notificacion
+     * @param codTipoMx c贸digo del tipo de Mx
+     * @param codTipoNoti c贸digo del tipo Notificacion
      *
      */
     @SuppressWarnings("unchecked")
-    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti) throws Exception {
-        String query = "select est from Estudio_TipoMx_TipoNoti est, DaSolicitudEstudio as dse inner join dse.tipoEstudio as tes " +
-                "where dse.anulado = false and est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
-                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " +
-                "and tes.idEstudio = est.estudio.idEstudio " +
-                "and dse.idTomaMx.idTomaMx = :idTomaMx" ;
+    public List<Estudio_TipoMx_TipoNoti> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti, String idTomaMx) {
+        String query = "select est from Estudio_TipoMx_TipoNoti est " +
+                "where est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " ;
+
+        if (idTomaMx!= null){
+            query += " and est.estudio.idEstudio in ( select tipoEstudio.idEstudio from DaSolicitudEstudio se where se.idTomaMx.idTomaMx = :idTomaMx )";
+        }
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
         q.setString("codTipoMx", codTipoMx);
         q.setString("codTipoNoti", codTipoNoti);
+        if (idTomaMx!= null){
+            q.setString("idTomaMx", idTomaMx);
+        }
 
         return q.list();
     }
@@ -746,7 +774,7 @@ public class TomaMxService {
     }
 
     /**
-     * Obtiene las areas a las que pertenecen los dx solicitidos en una muetra, seg鷑 la autoridad del usuario indicado
+     * Obtiene las areas a las que pertenecen los dx solicitidos en una muetra, seg煤n la autoridad del usuario indicado
      * @param idToma toma a obtener areas de dx
      * @param userName usuario que tiene la autoridad
      * @return
@@ -919,7 +947,7 @@ public class TomaMxService {
 
 
     /**
-     * Se toma las solicitudes dx cuya 醨ea no se encuentra en la tabla de traslados para esa mx
+     * Se toma las solicitudes dx cuya 谩rea no se encuentra en la tabla de traslados para esa mx
      * @param idTomaMx
      * @return
      */
@@ -948,7 +976,7 @@ public class TomaMxService {
     }
 
     /**
-     * M閠odo que obtiena las solicitudes de rutina por control de calidad para una muestra determinada, y que ya tenga resultado aprobado
+     * M茅todo que obtiena las solicitudes de rutina por control de calidad para una muestra determinada, y que ya tenga resultado aprobado
      * @param codigoMx
      * @return
      */
@@ -970,7 +998,7 @@ public class TomaMxService {
         String query = "from DaIrag where idNotificacion.idNotificacion = :idNotificacion and condiciones like :codCondicion";
         Query q = session.createQuery(query);
         q.setParameter("idNotificacion", strIdNotificacion);
-        q.setParameter("codCondicion","%"+"CONDPRE|EMB"+"%");//c骴igo para condici髇 embarazo
+        q.setParameter("codCondicion","%"+"CONDPRE|EMB"+"%");//c贸digo para condici贸n embarazo
 
         //SINDROMES FEBRILES
         String query2 = "from DaSindFebril where idNotificacion.idNotificacion = :idNotificacion" +
@@ -991,7 +1019,7 @@ public class TomaMxService {
 
     /**
      *
-     * M閠odo que obtiene las solicitudes dx de una muestra, que tenga examenes a procesar en un lab determinado
+     * M茅todo que obtiene las solicitudes dx de una muestra, que tenga examenes a procesar en un lab determinado
      * @param idTomaMx toma a filtrar
      * @param codigoLab laboratorio a filtrar
      * @return List<DaSolicitudDx>
@@ -1031,7 +1059,7 @@ public class TomaMxService {
     }
 
     /**
-     * Obtiene las mx tomadas para una notificaci髇 en fecha de toma especifica
+     * Obtiene las mx tomadas para una notificaci贸n en fecha de toma especifica
      * @param id del estudio a buscar
      * @return Catalogo_Estudio
      */
@@ -1074,10 +1102,112 @@ public class TomaMxService {
      * Retorna rutina
      * @param idDiagnosticos
      */
-    public List<Catalogo_Dx> getDxs(String idDiagnosticos){
-        String query = "from Catalogo_Dx where idDiagnostico in ("+idDiagnosticos+")";
+    public List<Solicitud> getDxs(String idDiagnosticos){
+        String query = "select m.idDiagnostico as idSolicitud, m.nombre as nombre, 'R' as tipo from Catalogo_Dx m where idDiagnostico in ("+idDiagnosticos+")";
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
+        q.setResultTransformer(Transformers.aliasToBean(Solicitud.class));
         return q.list();
     }
+
+    public List<Solicitud> getEstudios(String ids) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("select m.idEstudio as idSolicitud, m.nombre as nombre, 'E' as tipo"
+                + " from Catalogo_Estudio m where m.idEstudio in ("+ids+")");
+        query.setResultTransformer(Transformers.aliasToBean(Solicitud.class));
+        List<Solicitud> results = query.list();
+        return  results;
+    }
+
+    /**
+     *Retorna una lista de Catalogo_Dx segun tipoMx y tipo Notificacion y las autoridades del usuario
+     * @param codMx tipo de Mx
+     * @param tipoNoti tipo Notificacion
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public List<Catalogo_Dx> getDxByTipoMxTipoNoti(String codMx, String tipoNoti, String userName) {
+        String query = "select distinct dx.diagnostico from Dx_TipoMx_TipoNoti dx " +
+                "where dx.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codMx " +
+                "and dx.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :tipoNoti and dx.diagnostico.pasivo = false";
+        if (userName!=null) {
+            query +=  " and dx.diagnostico.area.idArea in (select a.idArea from AutoridadArea as aa inner join aa.area as a where aa.pasivo = false and aa.user.username = :userName)";
+        }
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codMx", codMx);
+        q.setString("tipoNoti", tipoNoti);
+        if (userName!=null) {
+            q.setString("userName", userName);
+        }
+        return q.list();
+    }
+
+    /**
+     *Retorna una lista de Catalogo_Estudio segun tipoMx y tipo Notificacion
+     * @param codTipoMx c贸digo del tipo de Mx
+     * @param codTipoNoti c贸digo del tipo Notificacion
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public List<Catalogo_Estudio> getEstudiosByTipoMxTipoNoti(String codTipoMx, String codTipoNoti) {
+        String query = "select distinct est.estudio from Estudio_TipoMx_TipoNoti est " +
+                "where est.tipoMx_tipoNotificacion.tipoMx.idTipoMx = :codTipoMx " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.codigo = :codTipoNoti " +
+                "and est.pasivo = false and est.estudio.pasivo = false " +
+                "and est.tipoMx_tipoNotificacion.pasivo = false " +
+                "and est.tipoMx_tipoNotificacion.tipoMx.pasivo = false " +
+                "and est.tipoMx_tipoNotificacion.tipoNotificacion.pasivo = false" ;
+
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        q.setString("codTipoMx", codTipoMx);
+        q.setString("codTipoNoti", codTipoNoti);
+
+        return q.list();
+    }
+
+    /**
+     * M?todo para generar un string alfanum?rico de 8 caracteres, que se usar? como c?digo ?nico de muestra
+     * @return String codigoUnicoMx
+     */
+    public String generarCodigoUnicoMx(){
+        DaTomaMx validaC;
+        //Se genera el c?digo
+        String codigoUnicoMx = StringUtil.getCadenaAlfanumAleatoria(8);
+        //Se consulta BD para ver si existe toma de Mx que tenga mismo c?digo
+        validaC = this.getTomaMxByCodUnicoMx(codigoUnicoMx);
+        //si existe, de manera recursiva se solicita un nuevo c?digo
+        if (validaC!=null){
+            codigoUnicoMx = generarCodigoUnicoMx();
+        }
+        //si no existe se retorna el ?ltimo c?digo generado
+        return codigoUnicoMx;
+    }
+
+    public boolean existeTomaMx(String idNotificacion, String fechaToma, String dxs) throws Exception{
+        int totalEncontrados = 0;
+        boolean respuesta = false;
+        String[] dxArray = dxs.split(",");
+        Date fecha1 = DateUtil.StringToDate(fechaToma, "dd/MM/yyyy");
+        List<DaTomaMx> muestras = this.getTomaMxActivaByIdNoti(idNotificacion);
+        for(DaTomaMx muestra : muestras){
+            List<DaSolicitudDx> solicitudDxList = this.getSoliDxByIdMxFechaToma(muestra.getIdTomaMx(), fecha1);
+            for(String dx : dxArray) {
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (solicitudDx.getCodDx().getIdDiagnostico().equals(Integer.valueOf(dx))) {
+                        totalEncontrados++;
+                        break;
+                    }
+                }
+            }
+            if (totalEncontrados == dxArray.length && totalEncontrados == solicitudDxList.size()) {
+                respuesta = true;
+                break;
+            }
+            totalEncontrados = 0;
+        }
+        return respuesta;
+    }
+
 }

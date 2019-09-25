@@ -134,7 +134,10 @@
                                     <select  name="idDx" id="idDx" multiple data-placeholder="<spring:message code="act.select" /> <spring:message code="lbl.dxs.large" />" class="select2">
                                         <option value=""></option>
                                         <c:forEach items="${dxs}" var="dx">
-                                            <option value="${dx.idDiagnostico}">${dx.nombre}</option>
+                                            <option value="${dx.idDiagnostico}-R">${dx.nombre}</option>
+                                        </c:forEach>
+                                        <c:forEach items="${estudios}" var="est">
+                                            <option value="${est.idEstudio}-E">${est.nombre}</option>
                                         </c:forEach>
                                     </select>
                                 </div>
