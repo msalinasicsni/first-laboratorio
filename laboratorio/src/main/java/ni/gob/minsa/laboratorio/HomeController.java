@@ -40,7 +40,7 @@ public class HomeController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String init() {
-        logger.info("Starting project OPS");
+        logger.info("Starting project");
         return "home";
     }
 

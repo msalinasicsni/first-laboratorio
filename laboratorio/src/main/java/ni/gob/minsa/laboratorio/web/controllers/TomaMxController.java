@@ -343,12 +343,36 @@ public class TomaMxController {
         }
     }
 
+    private Timestamp StringToTimestamp(String fechah) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = sdf.parse(fechah);
+        return new Timestamp(date.getTime());
+    }
+
     private ResponseEntity<String> createJsonResponse(Object o) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         Gson gson = new Gson();
         String json = gson.toJson(o);
         return new ResponseEntity<String>(json, headers, HttpStatus.CREATED);
+    }
+
+    /**
+     * M�todo para generar un string alfanum�rico de 8 caracteres, que se usar� como c�digo �nico de muestra
+     * @return String codigoUnicoMx
+     */
+    private String generarCodigoUnicoMx(){
+        DaTomaMx validaC;
+        //Se genera el c�digo
+        String codigoUnicoMx = StringUtil.getCadenaAlfanumAleatoria(8);
+        //Se consulta BD para ver si existe toma de Mx que tenga mismo c�digo
+        validaC = tomaMxService.getTomaMxByCodUnicoMx(codigoUnicoMx);
+        //si existe, de manera recursiva se solicita un nuevo c�digo
+        if (validaC!=null){
+            codigoUnicoMx = generarCodigoUnicoMx();
+        }
+        //si no existe se retorna el �ltimo c�digo generado
+        return codigoUnicoMx;
     }
 
     /***************************************************************************/
@@ -363,13 +387,38 @@ public class TomaMxController {
                           @RequestParam(value = "dxs", required = true) String dxs) throws Exception {
         logger.info("Realizando validacion de Toma de Mx.");
         String respuesta = "OK";
-        if (tomaMxService.existeTomaMx(idNotificacion, fechaToma, dxs)){
+        if (existeTomaMx(idNotificacion, fechaToma, dxs)){
             respuesta = messageSource.getMessage("msg.existe.toma", null, null);
         }
         Map<String, String> map = new HashMap<String, String>();
         map.put("respuesta", respuesta);
         String jsonResponse = new Gson().toJson(map);
         return jsonResponse;
+    }
+
+    private boolean existeTomaMx(String idNotificacion, String fechaToma, String dxs) throws Exception{
+        int totalEncontrados = 0;
+        boolean respuesta = false;
+        String[] dxArray = dxs.split(",");
+        Date fecha1 = DateUtil.StringToDate(fechaToma, "dd/MM/yyyy");
+        List<DaTomaMx> muestras = tomaMxService.getTomaMxActivaByIdNoti(idNotificacion);
+        for(DaTomaMx muestra : muestras){
+            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSoliDxByIdMxFechaToma(muestra.getIdTomaMx(), fecha1);
+            for(String dx : dxArray) {
+                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (solicitudDx.getCodDx().getIdDiagnostico().equals(Integer.valueOf(dx))) {
+                        totalEncontrados++;
+                        break;
+                    }
+                }
+            }
+            if (totalEncontrados == dxArray.length && totalEncontrados == solicitudDxList.size()) {
+                respuesta = true;
+                break;
+            }
+            totalEncontrados = 0;
+        }
+        return respuesta;
     }
 
     @RequestMapping(value = "saveToma", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
@@ -498,7 +547,7 @@ public class TomaMxController {
             }
             tomaMx.setIdNotificacion(notificacion);
             if(fechaHTomaMx != null){
-                tomaMx.setFechaHTomaMx(DateUtil.StringToTimestamp(fechaHTomaMx));
+                tomaMx.setFechaHTomaMx(StringToTimestamp(fechaHTomaMx));
             }
 
             tomaMx.setCodTipoMx(tomaMxService.getTipoMxById(codTipoMx));
@@ -515,14 +564,14 @@ public class TomaMxController {
 
             tomaMx.setUsuario(usuarioRegistro);
             tomaMx.setEstadoMx(catalogoService.getEstadoMx("ESTDMX|RCP")); //quedan listas para enviar a procesar en el area que le corresponde
-            String codigo = tomaMxService.generarCodigoUnicoMx();
+            String codigo = generarCodigoUnicoMx();
             tomaMx.setCodigoUnicoMx(codigo);
             //todas deben tener codigo lab, porque son rutinas
             tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(),1));
             codigoGenerado = tomaMx.getCodigoLab();
             tomaMx.setEnvio(envioOrden);
             try {
-                if (tomaMxService.existeTomaMx(idNotificacion, fechaHTomaMx, dx)) {
+                if (existeTomaMx(idNotificacion, fechaHTomaMx, dx)) {
                     throw new Exception(messageSource.getMessage("msg.existe.toma", null, null));
                 } else {
                     tomaMxService.addTomaMx(tomaMx);

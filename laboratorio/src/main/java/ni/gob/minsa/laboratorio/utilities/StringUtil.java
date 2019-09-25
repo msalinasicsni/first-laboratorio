@@ -1,6 +1,5 @@
 package ni.gob.minsa.laboratorio.utilities;
 
-import java.util.Formatter;
 import java.util.Random;
 
 /**
@@ -39,10 +38,5 @@ public class StringUtil {
             return false;
         }
         return true;
-    }
-
-    public static String completarCerosIzquierda(long numero, int longitud){
-        Formatter obj = new Formatter();
-        return String.valueOf(obj.format("%0"+longitud+"d", numero));
     }
 }
