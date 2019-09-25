@@ -17,12 +17,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +30,7 @@ import java.util.List;
  * Created by Miguel Salinas on 16/05/2019.
  * V1.0
  */
+
 @Controller
 @RequestMapping(value = "/api/v1/crearSolicitudDx")
 public class CrearSolicitudDx {
@@ -71,7 +71,18 @@ public class CrearSolicitudDx {
     @Autowired
     MessageSource messageSource;
 
+    /*Sin esto no funciona el CORS*/
+    @RequestMapping(value = "/**",method = RequestMethod.OPTIONS)
+    public String getOption(HttpServletResponse response, Model model)
+    {
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+
+        return "";
+    }
+
     @RequestMapping(value = "save", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
     ResponseEntity<String> save(@RequestBody RegistroSolicitud solicitud) {
         RespuestaRegistroSolicitud resultado = new RespuestaRegistroSolicitud();
