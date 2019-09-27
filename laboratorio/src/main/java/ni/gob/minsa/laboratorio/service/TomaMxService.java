@@ -1,14 +1,11 @@
 package ni.gob.minsa.laboratorio.service;
 
-import ni.gob.minsa.laboratorio.domain.audit.AuditTrail;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
-import ni.gob.minsa.laboratorio.domain.irag.DaIrag;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
-import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;

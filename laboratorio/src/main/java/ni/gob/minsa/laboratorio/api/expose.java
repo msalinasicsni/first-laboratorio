@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.api;
 
 import com.google.gson.Gson;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
@@ -15,17 +16,17 @@ import ni.gob.minsa.laboratorio.domain.poblacion.Sectores;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud;
+import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoSolicitud;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -84,6 +85,17 @@ public class expose {
     @Autowired
     @Qualifier(value = "trasladosService")
     private TrasladosService trasladosService;
+
+    @Autowired
+    @Qualifier(value = "solicitudService")
+    private SolicitudService solicitudService;
+
+    @Autowired
+    @Qualifier(value = "resultadoFinalService")
+    private ResultadoFinalService resultadoFinalService;
+
+    @Autowired
+    MessageSource messageSource;
 
     @RequestMapping(value = "unidades", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public
@@ -329,5 +341,59 @@ public class expose {
         //escapar caracteres especiales, escape de los caracteres con valor num�rico mayor a 127
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
+    }
+
+    @RequestMapping(value = "getDxsVIHTBPersona/{idPersona}", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<DatosSolicitud> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona) throws Exception {
+        logger.info("Obteniendo los dx TB y VIH por persona en JSON");
+        List<DatosSolicitud> datosSolicitudes = solicitudService.getSolicitudesVIHTB(true, true, idPersona);
+        for(DatosSolicitud ds: datosSolicitudes){
+            List<ResultadoSolicitud> detRes = resultadoFinalService.getDetResActivosBySolicitudV2(ds.getIdSolicitud());
+            if (ds.getAprobada()!= null){
+                if (ds.getAprobada().equals(true)) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.approval.result", null, null));
+                } else {
+                    if (!detRes.isEmpty()) {
+                        ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                    } else {
+                        ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                    }
+                }
+            }else{
+                if (!detRes.isEmpty()) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                } else {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                }
+            }
+            String resultados="";
+            for(ResultadoSolicitud res: detRes){
+                if (res.getRespuesta()!=null) {
+                    //resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                    if (res.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados+=cat_lista.getEtiqueta();
+                    }else if (res.getTipo().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                        resultados+=valorBoleano;
+                    } else if (res.getValor().toLowerCase().contains("inadecuada")) {
+                        resultados+=res.getValor();
+                    }
+                }else if (res.getRespuestaExamen()!=null){
+                    //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                    if (res.getTipoExamen().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados+=cat_lista.getEtiqueta();
+                    } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                        resultados+=valorBoleano;
+                    }
+                }
+            }
+            ds.setResultado(resultados);
+        }
+        return datosSolicitudes;
     }
 }

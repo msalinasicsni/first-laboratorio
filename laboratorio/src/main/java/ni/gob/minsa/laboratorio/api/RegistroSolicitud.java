@@ -15,6 +15,7 @@ public class RegistroSolicitud {
     private String semanasEmbarazo;
     private String codExpediente;
     private String codExpedienteUnico;
+    private String codigoVIH;
 
     private String idTipoMx;
     private String fechaTomaMx;
@@ -97,6 +98,14 @@ public class RegistroSolicitud {
 
     public void setCodExpedienteUnico(String codExpedienteUnico) {
         this.codExpedienteUnico = codExpedienteUnico;
+    }
+
+    public String getCodigoVIH() {
+        return codigoVIH;
+    }
+
+    public void setCodigoVIH(String codigoVIH) {
+        this.codigoVIH = codigoVIH;
     }
 
     public String getIdTipoMx() {
