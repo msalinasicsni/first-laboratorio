@@ -145,7 +145,7 @@ public class CrearSolicitudDx {
                         if (!solicitud.getCodExpediente().isEmpty()) {
                             notificacion.setCodExpediente(solicitud.getCodExpediente());
                         }
-                        if (!solicitud.getCodigoVIH().isEmpty()) {
+                        if (solicitud.getCodigoVIH()!=null && !solicitud.getCodigoVIH().isEmpty()) {
                             notificacion.setCodigoPacienteVIH(solicitud.getCodigoVIH());
                         }
                         notificacion.setFechaRegistro(new Timestamp(new Date().getTime()));
@@ -172,7 +172,7 @@ public class CrearSolicitudDx {
                         if (!solicitud.getIdUnidadSalud().isEmpty()) {
                             tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
                         }
-                        if (!solicitud.getCodigoVIH().isEmpty()) {
+                        if (solicitud.getCodigoVIH()!=null && !solicitud.getCodigoVIH().isEmpty()) {
                             notificacion.setCodigoPacienteVIH(solicitud.getCodigoVIH());
                             daNotificacionService.updateNotificacion(notificacion);
                         }
@@ -269,6 +269,7 @@ public class CrearSolicitudDx {
             if (resultado.getError().isEmpty()) resultado.setMessage("Success");
         }catch (Exception ex){
             resultado.setError("-"+ex.getMessage());
+            ex.printStackTrace();
         }
 
         return createJsonResponse(resultado);
@@ -286,7 +287,7 @@ public class CrearSolicitudDx {
         if (solicitud.getSeguimiento()==null || solicitud.getSeguimiento().isEmpty()) return "Debe proporcionar valor para 'seguimiento'";
         if (solicitud.getFechaTomaMx()==null || solicitud.getFechaTomaMx().isEmpty()) return "Debe proporcionar valor para 'fechaTomaMx'";
         if (solicitud.getCodTipoNoti()!=null && solicitud.getCodTipoNoti().equalsIgnoreCase("TPNOTI|VIH")
-                && solicitud.getCodigoVIH()==null || solicitud.getCodigoVIH().isEmpty()) return "Debe proporcionar valor para 'codigoVIH'";
+                && (solicitud.getCodigoVIH()==null || solicitud.getCodigoVIH().isEmpty())) return "Debe proporcionar valor para 'codigoVIH'";
         return "";
 
     }

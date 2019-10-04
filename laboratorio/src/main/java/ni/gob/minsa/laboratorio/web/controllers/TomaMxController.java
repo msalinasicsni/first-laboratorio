@@ -174,6 +174,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|TB"));
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -229,6 +230,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|TB"));
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());

@@ -863,6 +863,7 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.health.unit.alt", null, null).toUpperCase()+"2");
         columnas.add(messageSource.getMessage("lbl.sector", null, null).toUpperCase()+"2");
         columnas.add(messageSource.getMessage("lbl.population.risk", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.location.infection", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.category.patient", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.chronic.diseases", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.requested.exam", null, null).toUpperCase());
