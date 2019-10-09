@@ -27,6 +27,8 @@ public class TestOrder {
     private String nombreSilais;
     private String idExamenes; //si hay mas de uno se deben separar por coma. Ejem: 1,2,3
     private String trama;
+    private String idMuestraLaboratorio;
+    private String usuarioRegistro;
 
     public String getIpServer() {
         return ipServer;
@@ -194,5 +196,21 @@ public class TestOrder {
 
     public void setTrama(String trama) {
         this.trama = trama;
+    }
+
+    public String getIdMuestraLaboratorio() {
+        return idMuestraLaboratorio;
+    }
+
+    public void setIdMuestraLaboratorio(String idMuestraLaboratorio) {
+        this.idMuestraLaboratorio = idMuestraLaboratorio;
+    }
+
+    public String getUsuarioRegistro() {
+        return usuarioRegistro;
+    }
+
+    public void setUsuarioRegistro(String usuarioRegistro) {
+        this.usuarioRegistro = usuarioRegistro;
     }
 }

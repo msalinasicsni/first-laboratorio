@@ -20,6 +20,7 @@ import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.Authority;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.restServices.CallRestServices;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -976,6 +977,11 @@ public class RecepcionMxController {
                 testOrder.setIdSilais(String.valueOf(recepcionMx.getTomaMx().getCodSilaisAtencion().getEntidadAdtvaId()));
                 testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
                 testOrder.setIdExamenes(idExamenes);
+                testOrder.setUsuarioRegistro(usuario.getUsername());
+                testOrder.setIdMuestraLaboratorio(recepcionMx.getTomaMx().getIdTomaMx());
+                //Llamar servicio que envia solicitud HL7 al infinity y la registra en base de datos
+                CallRestServices.crearSolicitud(testOrder);
+                /*
                 SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
 
                 SolicitudHL7 solicitudHL7 = new SolicitudHL7();
@@ -987,6 +993,7 @@ public class RecepcionMxController {
                 solicitudHL7.setMuestra(recepcionMx.getTomaMx());
                 solicitudHL7.setUsuarioRegistro(usuario);
                 comunicacionResultadosService.saveOrUpdateSolicitudHL7(solicitudHL7);
+                */
             }
         }catch (Exception e){
             e.printStackTrace();
