@@ -9,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
+import ni.gob.minsa.laboratorio.domain.vih.DaDatosVIH;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,13 @@ import java.util.List;
 public class CrearSolicitudDx {
 
     @Resource(name = "daNotificacionService")
-    public DaNotificacionService daNotificacionService;
+    private DaNotificacionService daNotificacionService;
 
     @Resource(name = "sindFebrilService")
-    public SindFebrilService sindFebrilService;
+    private SindFebrilService sindFebrilService;
 
     @Resource(name = "daIragService")
-    public DaIragService daIragService;
+    private DaIragService daIragService;
 
     @Resource(name="tomaMxService")
     private TomaMxService tomaMxService;
@@ -51,7 +52,7 @@ public class CrearSolicitudDx {
     private DatosSolicitudService datosSolicitudService;
 
     @Resource(name = "personaService")
-    public PersonaService personaService;
+    private PersonaService personaService;
 
     @Resource(name = "entidadAdmonService")
     private EntidadAdmonService entidadAdmonService;
@@ -67,6 +68,9 @@ public class CrearSolicitudDx {
 
     @Resource(name = "laboratoriosService")
     public LaboratoriosService laboratoriosService;
+
+    @Resource(name = "daDatosVIHService")
+    private DaDatosVIHService daDatosVIHService;
 
     @Autowired
     MessageSource messageSource;
@@ -157,7 +161,7 @@ public class CrearSolicitudDx {
 
                         //crear ficha si es necesario
                         try {
-                            crearFicha(notificacion);
+                            crearFicha(notificacion, solicitud);
                         } catch (Throwable ex) {
                             daNotificacionService.deleteNotificacion(notificacion);
                             resultado.setError(messageSource.getMessage("msg.error.update.noti", null, null) + ". \n " + ex.getMessage());
@@ -175,6 +179,14 @@ public class CrearSolicitudDx {
                         if (solicitud.getCodigoVIH()!=null && !solicitud.getCodigoVIH().isEmpty()) {
                             notificacion.setCodigoPacienteVIH(solicitud.getCodigoVIH());
                             daNotificacionService.updateNotificacion(notificacion);
+                        }
+                        //crear ficha si es necesario
+                        try {
+                            crearFicha(notificacion, solicitud);
+                        } catch (Throwable ex) {
+                            resultado.setError(messageSource.getMessage("msg.error.update.noti", null, null) + ". \n " + ex.getMessage());
+                            ex.printStackTrace();
+                            return createJsonResponse(resultado);
                         }
 
                     }
@@ -288,6 +300,8 @@ public class CrearSolicitudDx {
         if (solicitud.getFechaTomaMx()==null || solicitud.getFechaTomaMx().isEmpty()) return "Debe proporcionar valor para 'fechaTomaMx'";
         if (solicitud.getCodTipoNoti()!=null && solicitud.getCodTipoNoti().equalsIgnoreCase("TPNOTI|VIH")
                 && (solicitud.getCodigoVIH()==null || solicitud.getCodigoVIH().isEmpty())) return "Debe proporcionar valor para 'codigoVIH'";
+        if (solicitud.getCodTipoNoti()!=null && solicitud.getCodTipoNoti().equalsIgnoreCase("TPNOTI|VIH")
+                && (solicitud.getSeguimiento().equals("0") && solicitud.getDatosVIH()==null )) return "Debe proporcionar valor para 'datosVIH'";
         return "";
 
     }
@@ -301,7 +315,7 @@ public class CrearSolicitudDx {
         return new ResponseEntity<String>( json, headers, HttpStatus.CREATED );
     }
 
-    private void crearFicha(DaNotificacion notificacion) throws Exception{
+    private void crearFicha(DaNotificacion notificacion, RegistroSolicitud solicitud) throws Exception{
         switch (notificacion.getCodTipoNotificacion().getCodigo()){
             case "TPNOTI|SINFEB": {
                 DaSindFebril sindFebril = sindFebrilService.getDaSindFebril(notificacion.getIdNotificacion());
@@ -346,6 +360,47 @@ public class CrearSolicitudDx {
                     irag.setCodExpediente(notificacion.getCodExpediente());
                 }
                 daIragService.saveOrUpdateIrag(irag);
+                break;
+            }
+            case "TPNOTI|VIH": {
+                if (solicitud.getDatosVIH()!=null) {
+                    DaDatosVIH vih = daDatosVIHService.getDaDatosVIH(notificacion.getIdNotificacion());
+                    if (vih == null) {
+                        vih = new DaDatosVIH();
+                    }
+                    vih.setIdNotificacion(notificacion);
+                    if (solicitud.getDatosVIH().getResA1() != null) {
+                        vih.setResA1(solicitud.getDatosVIH().getResA1());
+                    }
+                    if (solicitud.getDatosVIH().getResA2() != null) {
+                        vih.setResA2(solicitud.getDatosVIH().getResA2());
+                    }
+                    if (solicitud.getDatosVIH().getFechaDxVIH() != null) {
+                        vih.setFechaDxVIH(new Timestamp(DateUtil.StringToDate(solicitud.getDatosVIH().getFechaDxVIH(), "dd/MM/yyyy").getTime()));
+                    }
+                    if (solicitud.getDatosVIH().getEmbarazo() != null) {
+                        vih.setEmbarazo(solicitud.getDatosVIH().getEmbarazo());
+                    }
+                    if (solicitud.getDatosVIH().getEstadoPx() != null) {
+                        vih.setEstadoPx(solicitud.getDatosVIH().getEstadoPx());
+                    }
+                    if (solicitud.getDatosVIH().getInfOport() != null) {
+                        vih.setInfOport(solicitud.getDatosVIH().getInfOport());
+                    }
+                    if (solicitud.getDatosVIH().getEstaTx() != null) {
+                        vih.setEstaTx(solicitud.getDatosVIH().getEstaTx());
+                    }
+                    if (solicitud.getDatosVIH().getFechaTAR() != null) {
+                        vih.setFechaTAR(new Timestamp(DateUtil.StringToDate(solicitud.getDatosVIH().getFechaTAR(), "dd/MM/yyyy").getTime()));
+                    }
+                    if (solicitud.getDatosVIH().getExposicionPeri() != null) {
+                        vih.setExposicionPeri(solicitud.getDatosVIH().getExposicionPeri());
+                    }
+                    if (solicitud.getDatosVIH().getCesarea() != null) {
+                        vih.setCesarea(solicitud.getDatosVIH().getCesarea());
+                    }
+                    daDatosVIHService.saveDaDatosVIH(vih);
+                }
                 break;
             }
             default:

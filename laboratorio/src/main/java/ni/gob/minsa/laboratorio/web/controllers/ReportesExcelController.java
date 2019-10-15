@@ -1594,10 +1594,20 @@ public class ReportesExcelController {
             //registro[1] = solicitudDx.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH();
             registro[2] = "expediente";
             registro[3] = "ocupacion";
-            registro[4] = "Edad";
-            registro[5] = "En";
-            registro[6] = "Sexo";
-            registro[7] = "Embarazada";
+            Integer edad = null;
+            String medidaEdad = "";
+            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getFechaNacimiento(), new Date()).split("/");
+            if (arrEdad[0] != null && !arrEdad[0].equalsIgnoreCase("0")) {
+                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
+            }else if (arrEdad[1] != null && !arrEdad[1].equalsIgnoreCase("0")) {
+                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
+            }else if (arrEdad[2] != null) {
+                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
+            }
+            registro[4] = edad;
+            registro[5] = medidaEdad;
+            String sexo = solicitudDx.getSexo();
+            registro[6] = sexo.substring(sexo.length() - 1, sexo.length());            registro[7] = "Embarazada";
             registro[8] = (solicitudDx.getCodigoSilaisNoti()!=null?solicitudDx.getNombreSilaisNoti(): //silais en la notificacion
                     (solicitudDx.getCodigoSilaisMx()!=null?solicitudDx.getNombreSilaisMx():"")); //silais en la toma mx
             registro[9] = (solicitudDx.getCodigoMuniNoti()!=null?solicitudDx.getNombreMuniNoti(): //unidad en la notif
@@ -1620,26 +1630,6 @@ public class ReportesExcelController {
             registro[16] = "FechaEntregaResultado";
 
             registro[18] = parseFinalResultDetails(solicitudDx.getIdSolicitud(), "observaci");
-
-
-
-
-            /*
-            Integer edad = null;
-            String medidaEdad = "";
-            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
-            if (arrEdad[0] != null && !arrEdad[0].equalsIgnoreCase("0")) {
-                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
-            }else if (arrEdad[1] != null && !arrEdad[1].equalsIgnoreCase("0")) {
-                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
-            }else if (arrEdad[2] != null) {
-                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
-            }
-            registro[10] = edad;
-            registro[11] = medidaEdad;
-            String sexo = solicitudDx.getIdTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
-            registro[12] = sexo.substring(sexo.length() - 1, sexo.length());
-            */
             //la posici�n que contiene el resultado final
             registros.add(registro);
         }

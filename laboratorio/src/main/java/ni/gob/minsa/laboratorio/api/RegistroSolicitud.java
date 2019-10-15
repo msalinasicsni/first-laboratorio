@@ -28,6 +28,16 @@ public class RegistroSolicitud {
 
     private String idUsuario;
 
+    private DatosVIH datosVIH;
+
+    public DatosVIH getDatosVIH() {
+        return datosVIH;
+    }
+
+    public void setDatosVIH(DatosVIH datosVIH) {
+        this.datosVIH = datosVIH;
+    }
+
     public String getCodTipoNoti() {
         return codTipoNoti;
     }
