@@ -160,6 +160,33 @@ var resultReport = function () {
                     }
                 });
 
+            $("#exportExcel").click(function(){
+                var $validarForm = $("#result_form").valid();
+                if (!$validarForm) {
+                    $validator.focusInvalid();
+                    return false;
+                } else {
+                    bloquearUI(parametros.blockMess);
+                    var filtro = {};
+                    //filtro['subunidades'] = $('#ckUS').is(':checked');
+                    filtro['fechaInicio'] = $('#initDate').val();
+                    filtro['fechaFin'] = $('#endDate').val();
+                    filtro['codSilais'] = $('#codSilais').find('option:selected').val();
+                    filtro['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
+                    //filtro['codDepartamento'] = $('#codDepartamento').find('option:selected').val();
+                    filtro['codMunicipio'] = $('#codMunicipio').find('option:selected').val();
+                    filtro['codArea'] = $('#codArea').find('option:selected').val();
+                    //filtro['tipoNotificacion'] = $('#codTipoNoti').find('option:selected').val();
+                    filtro['porSilais'] = "true"; //$('input[name="rbNivelPais"]:checked', '#result_form').val();
+                    //filtro['codZona'] = $('#codZona').find('option:selected').val();
+                    filtro['idDx'] = $('#idDx').find('option:selected').val();
+                    filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
+                    filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
+                    $(this).attr("href",parametros.sExcelResultDx+"?filtro="+JSON.stringify(filtro));
+                    desbloquearUI();
+                }
+            });
+
             function getData() {
                 var filtro = {};
                 //filtro['subunidades'] = $('#ckUS').is(':checked');

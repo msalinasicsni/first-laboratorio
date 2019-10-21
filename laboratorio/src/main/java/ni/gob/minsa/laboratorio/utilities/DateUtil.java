@@ -179,6 +179,50 @@ public class DateUtil {
         return new Timestamp(date.getTime());
     }
 
+    public static String getDiferenciaDiasHorasMinSegEntreFechas(Date fechaInicial, Date fechaFinal){
+        if (fechaInicial != null && fechaFinal != null) {
+            int diferencia = (int) ((fechaFinal.getTime() - fechaInicial.getTime()) / 1000);
+            int dias = 0;
+            int horas = 0;
+            int minutos = 0;
+            if (diferencia > 86400) {
+                dias = (int) Math.floor(diferencia / 86400);
+                diferencia = diferencia - (dias * 86400);
+            }
 
+            if (diferencia > 3600) {
+                horas = (int) Math.floor(diferencia / 3600);
+                diferencia = diferencia - (horas * 3600);
+            }
+
+            if (diferencia > 60) {
+                minutos = (int) Math.floor(diferencia / 60);
+                diferencia = diferencia - (minutos * 60);
+            }
+            return dias + " D, " + horas + " H, " + minutos + " M, " + diferencia + " S";
+        }else return "SIN DATOS";
+    }
+
+    public static String getDiferenciaDiasHorasMinEntreFechas(Date fechaInicial, Date fechaFinal){
+        int diferencia=(int) ((fechaFinal.getTime()-fechaInicial.getTime())/1000);
+        int dias=0;
+        int horas=0;
+        int minutos=0;
+        if(diferencia>86400) {
+            dias=(int)Math.floor(diferencia/86400);
+            diferencia=diferencia-(dias*86400);
+        }
+
+        if(diferencia>3600) {
+            horas=(int)Math.floor(diferencia/3600);
+            diferencia=diferencia-(horas*3600);
+        }
+
+        if(diferencia>60) {
+            minutos=(int)Math.floor(diferencia/60);
+            diferencia=diferencia-(minutos*60);
+        }
+        return dias+" D, "+horas+" H, "+minutos+" M";
+    }
 
 }

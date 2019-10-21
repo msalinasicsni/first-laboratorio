@@ -1,5 +1,9 @@
 package ni.gob.minsa.laboratorio.api;
 
+/**
+ * Clase que representa los datos de VIH que se solicitan por el servicio /api/v1/crearSolicitudDx/save
+ * para luego guardar en la tabla alerta.da_datos_vih
+ */
 public class DatosVIH {
     private String resA1;
     private String resA2;

@@ -3394,7 +3394,7 @@ public class ReportesController {
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
         //TODO
         if (filtroRep.getIdDx()!=null)
-            return reportesService.getDataDxResultReport(filtroRep);
+            return reportesService.getDataDxResultReport(filtroRep, null, 8);
         else
             return reportesService.getDataEstResultReport(filtroRep);
     }

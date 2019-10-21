@@ -114,6 +114,8 @@ public class ReportesExcelController {
     @Autowired
     MessageSource messageSource;
 
+    private User usuario = null;
+
     /*******************************************************************/
     /************************ REPORTE POR RESULTADO DX PARA VIGILANCIA ***********************/
     /*******************************************************************/
@@ -374,6 +376,44 @@ public class ReportesExcelController {
         }catch (Exception ex){
             return new Gson().toJson(messageSource.getMessage("msg.error.sending.email",null,null)+" "+ ex.getMessage());
         }
+    }
+
+    /*******************************************************************/
+    /****** REPORTE INDICADOR DE TIEMPOS DE PROCESAMIENTO DE MX ********/
+    /*******************************************************************/
+
+    @RequestMapping(value = "tiemposProcesamiento/init", method = RequestMethod.GET)
+    public String initTiemposProcesamiento(Model model,HttpServletRequest request) throws Exception {
+        logger.debug("Reporte tiempos procesamiento");
+        List<Laboratorio> laboratorios = null;
+        long idUsuario = seguridadService.obtenerIdUsuario(request);
+        List<EntidadesAdtvas> entidades = new ArrayList<EntidadesAdtvas>();
+        Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        if (seguridadService.esUsuarioNivelCentral(idUsuario, ConstantsSecurity.SYSTEM_CODE)) {
+            entidades = entidadAdmonService.getAllEntidadesAdtvas();
+            laboratorios = laboratoriosService.getLaboratoriosRegionales();
+        } else {
+            entidades = seguridadService.obtenerEntidadesPorUsuario((int) idUsuario, ConstantsSecurity.SYSTEM_CODE);
+            if (laboratorio != null) {
+                laboratorios = new ArrayList<Laboratorio>();
+                laboratorios.add(laboratorio);
+            }
+        }
+        List<AreaRep> areas = new ArrayList<AreaRep>();
+        areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
+        areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
+        areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
+        List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+        List<Catalogo_Estudio> catEs = null;
+        if (laboratorio != null && laboratorio.getCodigo().equalsIgnoreCase("CNDR")) {
+            catEs = associationSamplesRequestService.getStudies();
+        }
+        model.addAttribute("laboratorios", laboratorios);
+        model.addAttribute("areas", areas);
+        model.addAttribute("entidades", entidades);
+        model.addAttribute("dxs", catDx);
+        model.addAttribute("estudios", catEs);
+        return "reportes/tiemposProcesamiento";
     }
 
     /**
@@ -686,6 +726,104 @@ public class ReportesExcelController {
         excelView.addObject("sinDatos", messageSource.getMessage("lbl.nothing.to.show", null, null));
         return excelView;
     }
+
+    @RequestMapping(value = "/resultadoDx", method = RequestMethod.GET)
+    public ModelAndView resultadoDx(@RequestParam(value = "filtro", required = true) String filtro) throws Exception {
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        // create some sample data
+        logger.info("Obteniendo los datos para Reporte por Resultado dx vigilancia");
+        ModelAndView excelView = new ModelAndView("excelView");
+        Catalogo_Dx dx = null;
+        Catalogo_Estudio est = null;
+        String nombreDx = "";
+        String nivel = "";
+        List<String> columnas = new ArrayList<String>();
+        List<Object[]> datos = new ArrayList<Object[]>();
+        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+        Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());
+        if (filtroRep.getIdDx()!=null) {
+            dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
+            if (dx!=null) nombreDx = dx.getNombre().toUpperCase();
+        }
+        if (filtroRep.getIdEstudio()!=null) {
+            est = tomaMxService.getEstudioById(filtroRep.getIdEstudio());
+            nombreDx = est.getNombre().toUpperCase();
+        }
+        if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|PAIS")) {
+            nivel = messageSource.getMessage("lbl.pais", null, null).toUpperCase();
+        } else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|SILAIS")) {
+            nivel = messageSource.getMessage("lbl.silais", null, null).toUpperCase();
+        }else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|MUNI")) {
+            nivel = messageSource.getMessage("lbl.muni", null, null).toUpperCase();
+        }else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|UNI")){
+            nivel = messageSource.getMessage("lbl.health.unit", null, null).toUpperCase();
+        }
+        setNombreColumnasResultadoDX(filtroRep, columnas, nombreDx);
+        datos = reportesService.getDataDxResultReport(filtroRep, nombreDx, columnas.size());
+        excelView.addObject("titulo", messageSource.getMessage("lbl.minsa", null, null) + " - " + (labUser!=null?labUser.getNombre():messageSource.getMessage("lbl.all.laboratories", null, null)));
+        excelView.addObject("subtitulo", String.format(messageSource.getMessage("lbl.resultDx.subtitle", null, null), nivel) + " / " + nombreDx);
+        excelView.addObject("rangoFechas", String.format(messageSource.getMessage("lbl.excel.filter.2", null, null),
+                DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
+        excelView.addObject("columnas", columnas);
+        excelView.addObject("reporte","RESULTDX");
+        excelView.addObject("datos", datos);
+        excelView.addObject("sinDatos", messageSource.getMessage("lbl.nothing.to.show", null, null));
+        return excelView;
+    }
+
+    @RequestMapping(value = "/tiemposProcesamiento", method = RequestMethod.GET)
+    public ModelAndView tiemposProcesamiento(@RequestParam(value = "filtro", required = true) String filtro) throws Exception {
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        // create some sample data
+        logger.info("Obteniendo los datos para Reporte de tiempos procesamiento");
+        ModelAndView excelView = new ModelAndView("excelView");
+        Catalogo_Dx dx = null;
+        Catalogo_Estudio est = null;
+        String nombreDx = "";
+        String nivel = "";
+        String subtitulo = "";
+        List<String> columnas = new ArrayList<String>();
+        List<Object[]> datos = new ArrayList<Object[]>();
+        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+        Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());
+        if (filtroRep.getIdDx()!=null) {
+            dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
+            if (dx!=null) nombreDx = dx.getNombre().toUpperCase();
+        }
+        if (filtroRep.getIdEstudio()!=null) {
+            est = tomaMxService.getEstudioById(filtroRep.getIdEstudio());
+            nombreDx = est.getNombre().toUpperCase();
+        }
+        if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|PAIS")) {
+            nivel = messageSource.getMessage("lbl.pais", null, null).toUpperCase();
+            subtitulo = String.format(messageSource.getMessage("lbl.proc.times.subtitle", null, null), nivel, "");
+        } else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|SILAIS")) {
+            nivel = messageSource.getMessage("lbl.silais", null, null).toUpperCase();
+            EntidadesAdtvas entidadesAdtva = entidadAdmonService.getSilaisById(filtroRep.getCodSilais());
+            if (entidadesAdtva != null)
+                subtitulo = String.format(messageSource.getMessage("lbl.proc.times.subtitle", null, null), nivel, entidadesAdtva.getNombre());
+        }else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|UNI")){
+            nivel = messageSource.getMessage("lbl.health.unit", null, null).toUpperCase();
+            Unidades unidad = unidadesService.getUnidadByCodigo(filtroRep.getCodUnidad().intValue());
+            if (unidad != null)
+                subtitulo = String.format(messageSource.getMessage("lbl.proc.times.subtitle", null, null), nivel, unidad.getNombre());
+        }
+        setNombreColumnasTiemposProc(columnas);
+        if (filtroRep.getIdDx()!=null) datos = reportesService.getFechasDiagnosticosAprobadosByFiltro(filtroRep);
+        else datos = reportesService.getFechasEstudiosAprobadosByFiltro(filtroRep);
+        excelView.addObject("titulo", messageSource.getMessage("lbl.minsa", null, null) + " - " + (labUser!=null?labUser.getNombre():messageSource.getMessage("lbl.all.laboratories", null, null)));
+        excelView.addObject("subtitulo",  subtitulo+ " / " + nombreDx);
+        excelView.addObject("rangoFechas", String.format(messageSource.getMessage("lbl.excel.filter.3", null, null),
+                DateUtil.DateToString(filtroRep.getFechaInicio(), "dd/MM/yyyy"),
+                DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
+        excelView.addObject("columnas", columnas);
+        excelView.addObject("reporte","TIEMPOSMX");
+        excelView.addObject("datos", datos);
+        excelView.addObject("sinDatos", messageSource.getMessage("lbl.nothing.to.show", null, null));
+        return excelView;
+    }
+
 
     private String getSubtituloTabla1(String tipoReporte, FiltrosReporte filtroRep){
         String subTituloPos = "";
@@ -1120,6 +1258,66 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.res.final", null, null).toUpperCase());
     }
 
+    private void setNombreColumnasResultadoDX(FiltrosReporte filtroRep, List<String> columnas, String nombreDx) throws Exception{
+        if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|PAIS")) {
+            columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
+        } else if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|SILAIS")) {
+            columnas.add(messageSource.getMessage("lbl.muni", null, null).toUpperCase());
+        }
+        if (filtroRep.getCodArea().equalsIgnoreCase("AREAREP|MUNI") || filtroRep.getCodArea().equalsIgnoreCase("AREAREP|UNI")) {
+            columnas.add(messageSource.getMessage("lbl.health.unit", null, null).toUpperCase());
+        }
+        columnas.add(messageSource.getMessage("lbl.total", null, null).toUpperCase());
+        if (nombreDx.toLowerCase().contains("dengue") || nombreDx.toLowerCase().contains("chikun") || nombreDx.toLowerCase().contains("zika")
+                || (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("molec"))) {
+            columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+        } else if (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("serolog")){
+            columnas.add(messageSource.getMessage("lbl.reactor", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.no.reactor", null, null).toUpperCase());
+        } else if (nombreDx.toLowerCase().contains("ifi virus respiratorio")){
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.a", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.b", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.rsv", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.adv", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.piv1", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.piv2", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.piv3", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.ifi.flu.mpv", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+        } else if (nombreDx.toLowerCase().contains("molecular virus respiratorio") || nombreDx.toLowerCase().contains("influenza")) {
+            columnas.add(messageSource.getMessage("lbl.pcr.flu.a", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.pcr.flu.b", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+        } else if (nombreDx.toLowerCase().contains("mycobacterium") && (nombreDx.toLowerCase().contains("tuberculosis") || nombreDx.contains("tb"))) {
+            columnas.add(messageSource.getMessage("lbl.mtb.det", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.mtb.nd", null, null).toUpperCase());
+        } else{
+            columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+        }
+        columnas.add(messageSource.getMessage("lbl.without.result", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.sample.inadequate2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.sample.no.proc", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.pos.percentage", null, null).toUpperCase());
+    }
+
+    private void setNombreColumnasTiemposProc(List<String> columnas) throws Exception{
+        columnas.add(messageSource.getMessage("lbl.num", null, null));
+        columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
+        //columnas.add(messageSource.getMessage("lbl.dxs.large", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.ftm", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.general.reception.datetime", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.general.reception.time", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lab.reception.datetime", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lab.reception.time", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.processing.datetime.2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.processing.time.2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.approve.datetime", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.approval.time", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.total.time", null, null).toUpperCase());
+    }
+
     public Integer getSemanaEpi(Date fechaSemana) throws Exception{
         CalendarioEpi calendario = null;
         if (fechaSemana != null)
@@ -1128,7 +1326,6 @@ public class ReportesExcelController {
             return calendario.getNoSemana();
         } else return null;
     }
-
 
     private void setDatosDengue(List<ResultadoVigilancia> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, String codigoLab, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec, int numColumnas) throws Exception{
 // create data rows
@@ -1634,7 +1831,6 @@ public class ReportesExcelController {
             registros.add(registro);
         }
     }
-
 
     private void setDatosDefecto(List<ResultadoVigilancia> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec) throws Exception{
 // create data rows
@@ -2226,7 +2422,6 @@ public class ReportesExcelController {
         }
     }
 
-
     private void validarPCRIgMDefecto(Object[] dato, String idSolicitudDx){
 
         List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(idSolicitudDx);
@@ -2447,6 +2642,7 @@ public class ReportesExcelController {
         filtroRep.setSemFinal(semFinal);
         filtroRep.setAnioInicial(anio);
         filtroRep.setConsolidarPor(consolidarPor);
+        filtroRep.setNivelCentral(usuario.getNivelCentral());
         filtroRep.setEstudios(estudios);
         return filtroRep;
     }

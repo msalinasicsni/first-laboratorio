@@ -248,6 +248,9 @@
                     <li class="consolidatedexams">
                         <a href="<spring:url value="/reports/consolidatedexams/init" htmlEscape="true "/>" title="<spring:message code="menu.report.consol.exams" />"><i class="fa fa-lg fa-fw fa-list-alt"></i> <spring:message code="menu.report.consol.exams" /></a>
                     </li>
+                    <li class="tiemposProcesamiento">
+                        <a href="<spring:url value="/reports/tiemposProcesamiento/init" htmlEscape="true "/>" title="<spring:message code="menu.report.proc.times" />"><i class="fa fa-lg fa-fw fa-clock-o"></i> <spring:message code="menu.report.proc.times" /></a>
+                    </li>
                 </ul>
             </li>
 

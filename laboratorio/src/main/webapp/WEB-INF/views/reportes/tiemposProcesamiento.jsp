@@ -40,7 +40,7 @@
     <ol class="breadcrumb">
         <li><a href="<spring:url value="/" htmlEscape="true "/>"><spring:message code="menu.home" /></a> <i class="fa fa-angle-right"></i>
             <spring:message code="menu.reports" />
-            <i class="fa fa-angle-right"></i> <a href="<spring:url value="/reports/reportResultDx/init" htmlEscape="true "/>"><spring:message code="menu.report.result.dx" /></a></li>
+            <i class="fa fa-angle-right"></i> <a href="<spring:url value="/reports/reportResultDx/init" htmlEscape="true "/>"><spring:message code="menu.report.proc.times" /></a></li>
     </ol>
     <!-- end breadcrumb -->
     <jsp:include page="../fragments/layoutOptions.jsp" />
@@ -57,7 +57,7 @@
             <i class="fa-fw fa fa-line-chart"></i>
             <spring:message code="menu.reports" />
 						<span> <i class="fa fa-angle-right"></i>
-							<spring:message code="menu.report.result.dx" />
+							<spring:message code="menu.report.proc.times" />
 						</span>
         </h1>
     </div>
@@ -120,7 +120,7 @@
                 <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                 <input id="msg_email_ok" type="hidden" value="<spring:message code="msg.email.sent"/>"/>
                 <input id="fileName" type="hidden" value="reporteResDx"/>
-                <input id="fileTitle" type="hidden" value="<spring:message code="menu.report.result.dx"/>"/>
+                <input id="fileTitle" type="hidden" value="<spring:message code="menu.report.proc.times"/>"/>
                 <form id="result_form" class ="smart-form">
                     <fieldset>
                         <!-- START ROW -->
@@ -243,73 +243,30 @@
                             </section>
                         </div>
                         <!-- END ROW -->
-
-                        <!-- START ROW -->
-                        <div id="dSubUnits" hidden="hidden" class="row">
-                            <section class="col col-sm-6 col-md-6 col-lg-5">
-                                <label class="text-left txt-color-blue font-sm"><spring:message code="lbl.include.subunits"/></label>
-
-                            </section>
-
-                            <section class="col col-sm-4 col-md-3 col-lg-2">
-                                <label class="checkbox">
-                                    <input type="checkbox" checked name="ckUS" id="ckUS">
-                                    <i></i>
-                                </label>
-                            </section>
-                        </div>
-                        <!-- END ROW -->
                         <!-- START ROW -->
                         <div class="row">
 
                             <section class="col col-sm-12 col-md-12 col-lg-6">
                                 <label class="text-left txt-color-blue font-md">
-                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.init.date" /> </label>
+                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>
+                                    <spring:message code="lbl.receipt.start.date.mx" />
+                                </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i
                                         class="icon-append fa fa-calendar fa-fw"></i>
-                                    <input class="form-control date-picker"
-                                           type="text" name="initDate" id="initDate"
-
-                                           placeholder=" <spring:message code="lbl.init.date"/>"/>
+                                    <input class="form-control date-picker" type="text" name="initDate" id="initDate" placeholder=" <spring:message code="lbl.receipt.start.date.mx"/>"/>
                                 </label>
-
-
                             </section>
-
                             <section class="col col-sm-12 col-md-6 col-lg-6">
                                 <label class="text-left txt-color-blue font-md">
-                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.end.date"/>
-                                  </label>
+                                    <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.receipt.end.date.mx"/>
+                                </label>
                                 <label class="input">
                                     <i class="icon-prepend fa fa-pencil"></i> <i
                                         class="icon-append fa fa-calendar fa-fw"></i>
-                                    <input class="form-control date-picker"
-                                           type="text" name="endDate" id="endDate"
-
-                                           placeholder=" <spring:message code="lbl.end.date"/>"/>
+                                    <input class="form-control date-picker" type="text" name="endDate" id="endDate" placeholder=" <spring:message code="lbl.receipt.end.date.mx"/>"/>
                                 </label>
-
-                            </section>
-
-                        </div>
-                        <!-- END ROW -->
-                        <!-- START ROW -->
-                        <div class="row">
-                            <section class="col col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <div class="inline-group">
-                                    <section class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                        <label class="radio">
-                                            <input type="radio" name="rbFechaBusqueda" value="FIS" id="FIS" checked="checked">
-                                            <i></i><spring:message code="lbl.consolidate.by"/> <spring:message code="lbl.fis.short"/></label>
-                                    </section>
-                                    <section class="col col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                        <label class="radio">
-                                            <input type="radio" name="rbFechaBusqueda" id="rbFA" value="FPROC">
-                                            <i></i><spring:message code="lbl.consolidate.by"/> <spring:message code="lbl.approve.date"/></label>
-                                    </section>
-                                </div>
-                            </section>
+                           </section>
                         </div>
                         <!-- END ROW -->
                         <footer>
@@ -326,64 +283,6 @@
     <!-- end widget -->
 </article>
 
-<article class="col-xs-12 col-sm-12 col-md-7 col-lg-12">
-    <!-- Widget ID (each widget will need unique ID)-->
-    <div class="jarviswidget jarviswidget-color-darken" id="wid-id-4">
-        <!-- widget options:
-            usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
-            data-widget-colorbutton="false"
-            data-widget-editbutton="false"
-            data-widget-togglebutton="false"
-            data-widget-deletebutton="false"
-            data-widget-fullscreenbutton="false"
-            data-widget-custombutton="false"
-            data-widget-collapsed="true"
-            data-widget-sortable="false"
-        -->
-        <header>
-            <span class="widget-icon"> <i class="fa fa-table"></i> </span>
-            <h2><spring:message code="lbl.distritution.by.result"/> </h2>
-        </header>
-        <!-- widget div-->
-        <div>
-            <!-- widget edit box -->
-            <div class="jarviswidget-editbox">
-                <!-- This area used as dropdown edit box -->
-                <input class="form-control" type="text">
-            </div>
-            <!-- end widget edit box -->
-            <!-- widget content -->
-            <div class="widget-body">
-                <table id="tableRES" class="table table-striped table-bordered table-hover" width="100%">
-                    <thead>
-                    <tr>
-                        <th id="firstTh"></th>
-                        <th><spring:message code="lbl.total"/></th>
-                        <th><spring:message code="lbl.positive"/></th>
-                        <th><spring:message code="lbl.negative"/></th>
-                        <th><spring:message code="lbl.without.result"/></th>
-                        <th><spring:message code="lbl.sample.inadequate2"/></th>
-                        <th><spring:message code="lbl.sample.no.proc"/></th>
-                        <th><spring:message code="lbl.pos.percentage"/></th>
-                    </tr>
-
-                    </thead>
-                </table>
-                <form id="mail-form" class="smart-form" novalidate="novalidate">
-                    <footer>
-                        <a href="#" class="export btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-excel-o"></i> <spring:message code="lbl.export.csv" /></a>
-                        <button type="button" id="sendMail" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-envelope-o"></i> <spring:message code="act.send.mail" /></button>
-                    </footer>
-                </form>
-            </div>
-            <!-- end widget content -->
-        </div>
-        <!-- end widget div -->
-    </div>
-    <!-- end widget -->
-</article>
-<!-- WIDGET END -->
-
 </div>
 <!-- end row -->
 
@@ -399,16 +298,6 @@
 <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
 <jsp:include page="../fragments/corePlugins.jsp" />
 <!-- BEGIN PAGE LEVEL PLUGINS -->
-<spring:url value="/resources/js/plugin/datatables/jquery.dataTables.min.js" var="dataTables" />
-<script src="${dataTables}"></script>
-<spring:url value="/resources/js/plugin/datatables/dataTables.colVis.min.js" var="dataTablesColVis" />
-<script src="${dataTablesColVis}"></script>
-<spring:url value="/resources/js/plugin/datatables/dataTables.tableTools.min.js" var="dataTablesTableTools" />
-<script src="${dataTablesTableTools}"></script>
-<spring:url value="/resources/js/plugin/datatables/dataTables.bootstrap.min.js" var="dataTablesBootstrap" />
-<script src="${dataTablesBootstrap}"></script>
-<spring:url value="/resources/js/plugin/datatable-responsive/datatables.responsive.min.js" var="dataTablesResponsive" />
-<script src="${dataTablesResponsive}"></script>
 <!-- JQUERY VALIDATE -->
 <spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 <script src="${jqueryValidate}"></script>
@@ -436,37 +325,32 @@
 <script src="${jqueryBlockUi}"></script>
 <!-- END PAGE LEVEL PLUGINS -->
 <!-- BEGIN PAGE LEVEL SCRIPTS -->
-<spring:url value="/resources/scripts/reportes/resultadoDx.js" var="porResJS" />
+<spring:url value="/resources/scripts/reportes/tiemposProcesamiento.js" var="porResJS" />
 <script src="${porResJS}"></script>
-<spring:url value="/resources/scripts/utilidades/table2Csv.js" var="table2Csvjs" />
-<script src="${table2Csvjs}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
-<c:url var="sActionUrl" value="/reports/dataReportResultDx"/>
 <c:set var="msgTitle"><spring:message code="lbl.alert" /></c:set>
 <c:set var="msgNoData"><spring:message code="lbl.no.data.found" /></c:set>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="unidadesURL" value="/api/v1/unidadesPrimHosp"/>
 <c:url var="municipiosURL" value="/api/v1/municipiosbysilais"/>
-<c:url var="sMailUrl" value="/reports/dataReportResultDxMail"/>
-<c:url var="sExcelResultDx" value="/reports/resultadoDx"/>
+<c:url var="sExcelUrl" value="/reports/tiemposProcesamiento"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();
-        var parametros = {sActionUrl: "${sActionUrl}",
+        var parametros = {
             blockMess:"${blockMess}",
             sUnidadesUrl: "${unidadesURL}",
             sMunicipiosUrl:"${municipiosURL}",
             msgNoData: "${msgNoData}",
             msgTitle: "${msgTitle}",
-            sMailUrl: "${sMailUrl}",
-            sExcelResultDx: "${sExcelResultDx}"
+            sExcelUrl: "${sExcelUrl}"
         };
-        resultReport.init(parametros);
+        tiemposProcesamiento.init(parametros);
         handleDatePickers("${pageContext.request.locale.language}");
         $("li.reportes").addClass("open");
-        $("li.resultDx").addClass("active");
+        $("li.tiemposProcesamiento").addClass("active");
         if("top"!=localStorage.getItem("sm-setmenu")){
-            $("li.resultDx").parents("ul").slideDown(200);
+            $("li.tiemposProcesamiento").parents("ul").slideDown(200);
         }
     });
 </script>
