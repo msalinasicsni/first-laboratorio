@@ -1445,7 +1445,7 @@ public class ReportesService {
                     Long totalPosNeg = positivos + (long) neg;//solo tomar en cuenta positivos y negativos. Andrea 24072019 //(Long) reg1[2];
                     reg1[14] = (totalPosNeg != 0 ? (double) Math.round(positivos.doubleValue() / totalPosNeg * 100 * 100) / 100 : 0);
                     resFinal.add(reg1);
-                }else if (nombreDx.toLowerCase().contains("molecular virus respiratorio")){ //TODO
+                }/*else if (nombreDx.toLowerCase().contains("molecular virus respiratorio")){ //TODO
                     reg1[2] = flua; // flua a
                     reg1[3] = flub; // flua b
                     reg1[4] = neg; // Negativo
@@ -1456,7 +1456,7 @@ public class ReportesService {
                     Long totalPosNeg = positivos + (long) neg;//solo tomar en cuenta positivos y negativos. Andrea 24072019 //(Long) reg1[2];
                     reg1[8] = (totalPosNeg != 0 ? (double) Math.round(positivos.doubleValue() / totalPosNeg * 100 * 100) / 100 : 0);
                     resFinal.add(reg1);
-                }else if (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("serolog")){
+                }*/else if (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("serolog")){
                     reg1[2] = pos; // Reactor
                     reg1[3] = neg; // No Reactor
                     reg1[4] = (Long) reg[4]; // Sin Resultado dx

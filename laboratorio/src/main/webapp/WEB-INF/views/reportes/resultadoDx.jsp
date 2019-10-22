@@ -325,63 +325,6 @@
     </div>
     <!-- end widget -->
 </article>
-
-<article class="col-xs-12 col-sm-12 col-md-7 col-lg-12">
-    <!-- Widget ID (each widget will need unique ID)-->
-    <div class="jarviswidget jarviswidget-color-darken" id="wid-id-4">
-        <!-- widget options:
-            usage: <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
-            data-widget-colorbutton="false"
-            data-widget-editbutton="false"
-            data-widget-togglebutton="false"
-            data-widget-deletebutton="false"
-            data-widget-fullscreenbutton="false"
-            data-widget-custombutton="false"
-            data-widget-collapsed="true"
-            data-widget-sortable="false"
-        -->
-        <header>
-            <span class="widget-icon"> <i class="fa fa-table"></i> </span>
-            <h2><spring:message code="lbl.distritution.by.result"/> </h2>
-        </header>
-        <!-- widget div-->
-        <div>
-            <!-- widget edit box -->
-            <div class="jarviswidget-editbox">
-                <!-- This area used as dropdown edit box -->
-                <input class="form-control" type="text">
-            </div>
-            <!-- end widget edit box -->
-            <!-- widget content -->
-            <div class="widget-body">
-                <table id="tableRES" class="table table-striped table-bordered table-hover" width="100%">
-                    <thead>
-                    <tr>
-                        <th id="firstTh"></th>
-                        <th><spring:message code="lbl.total"/></th>
-                        <th><spring:message code="lbl.positive"/></th>
-                        <th><spring:message code="lbl.negative"/></th>
-                        <th><spring:message code="lbl.without.result"/></th>
-                        <th><spring:message code="lbl.sample.inadequate2"/></th>
-                        <th><spring:message code="lbl.sample.no.proc"/></th>
-                        <th><spring:message code="lbl.pos.percentage"/></th>
-                    </tr>
-
-                    </thead>
-                </table>
-                <form id="mail-form" class="smart-form" novalidate="novalidate">
-                    <footer>
-                        <a href="#" class="export btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-excel-o"></i> <spring:message code="lbl.export.csv" /></a>
-                        <button type="button" id="sendMail" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-envelope-o"></i> <spring:message code="act.send.mail" /></button>
-                    </footer>
-                </form>
-            </div>
-            <!-- end widget content -->
-        </div>
-        <!-- end widget div -->
-    </div>
-    <!-- end widget -->
-</article>
 <!-- WIDGET END -->
 
 </div>

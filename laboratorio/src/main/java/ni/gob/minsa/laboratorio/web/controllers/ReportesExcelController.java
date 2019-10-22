@@ -1286,8 +1286,9 @@ public class ReportesExcelController {
             columnas.add(messageSource.getMessage("lbl.ifi.flu.mpv", null, null).toUpperCase());
             columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
         } else if (nombreDx.toLowerCase().contains("molecular virus respiratorio") || nombreDx.toLowerCase().contains("influenza")) {
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.a", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.b", null, null).toUpperCase());
+            //columnas.add(messageSource.getMessage("lbl.pcr.flu.a", null, null).toUpperCase());
+            //columnas.add(messageSource.getMessage("lbl.pcr.flu.b", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
             columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
         } else if (nombreDx.toLowerCase().contains("mycobacterium") && (nombreDx.toLowerCase().contains("tuberculosis") || nombreDx.contains("tb"))) {
             columnas.add(messageSource.getMessage("lbl.mtb.det", null, null).toUpperCase());

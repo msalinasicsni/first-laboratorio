@@ -316,6 +316,14 @@ public class ExcelBuilder extends AbstractExcelView {
         //validar positividad
         for(int i=4; i < rowCount-1; i++){
             HSSFRow aRow = sheet.getRow(i);
+            //validar valores positivos
+            for (int j=2; j < columnas.size()-5; j++){
+                HSSFCell aCell = aRow.getCell(j);
+                Double valor = aCell.getNumericCellValue();
+                if (valor>0){
+                    aCell.setCellStyle(alertCellStyle);
+                }
+            }
             HSSFCell aCell = aRow.getCell(columnas.size()-1); //en la última que esta la positividad
             Double valor = aCell.getNumericCellValue();
             if (valor>0){
