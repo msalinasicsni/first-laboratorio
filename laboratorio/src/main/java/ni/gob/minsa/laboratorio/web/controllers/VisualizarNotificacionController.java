@@ -1878,17 +1878,17 @@ public class VisualizarNotificacionController {
 
                     String ventilacion = irag.getVentilacionAsistida() != null ? irag.getVentilacionAsistida().toString() : null;
 
-                    String dxEgreso1 = irag.getDiagnostico1Egreso() != null ? irag.getDiagnostico1Egreso().getNombreCie10() : "----------";
+                    String dxEgreso1 = irag.getDiagnostico1Egreso() != null ? irag.getDiagnostico1Egreso() : "----------";
 
-                    String dxEgreso2 = irag.getDiagnostico2Egreso() != null ? irag.getDiagnostico2Egreso().getNombreCie10() : "----------";
+                    String dxEgreso2 = irag.getDiagnostico2Egreso() != null ? irag.getDiagnostico2Egreso() : "----------";
 
                     String fechaEgreso = irag.getFechaEgreso() != null ? DateUtil.DateToString(irag.getFechaEgreso(), "dd/MM/yyyy") : "----------";
 
                     String condicionEgreso = irag.getCodCondEgreso() != null ? irag.getCodCondEgreso().getCodigo() : null;
 
-                    String codEgreso1 = irag.getDiagnostico1Egreso() != null ? irag.getDiagnostico1Egreso().getCodigoCie10() : null;
+                    String codEgreso1 = irag.getDiagnostico1Egreso() != null ? irag.getDiagnostico1Egreso() : null;
 
-                    String codEgreso2 = irag.getDiagnostico2Egreso() != null ? irag.getDiagnostico2Egreso().getCodigoCie10() : null;
+                    String codEgreso2 = irag.getDiagnostico2Egreso() != null ? irag.getDiagnostico2Egreso() : null;
 
                     String clasFinal = irag.getCodClasFCaso() != null ? irag.getCodClasFCaso() : null;
 

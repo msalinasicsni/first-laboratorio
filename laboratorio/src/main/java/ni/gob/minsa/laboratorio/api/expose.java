@@ -1,5 +1,7 @@
 package ni.gob.minsa.laboratorio.api;
 
+import com.google.gson.Gson;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.CalendarioEpi;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
@@ -14,20 +16,23 @@ import ni.gob.minsa.laboratorio.domain.poblacion.Sectores;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud;
+import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoSolicitud;
+import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Herrold on 08/06/14 22:13
@@ -80,6 +85,17 @@ public class expose {
     @Autowired
     @Qualifier(value = "trasladosService")
     private TrasladosService trasladosService;
+
+    @Autowired
+    @Qualifier(value = "solicitudService")
+    private SolicitudService solicitudService;
+
+    @Autowired
+    @Qualifier(value = "resultadoFinalService")
+    private ResultadoFinalService resultadoFinalService;
+
+    @Autowired
+    MessageSource messageSource;
 
     @RequestMapping(value = "unidades", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public
@@ -224,7 +240,7 @@ public class expose {
         logger.info("Obteniendo los dx por tipo mx en JSON");
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Dx_TipoMx_TipoNoti>();
         List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotisPermitidos = new ArrayList<Dx_TipoMx_TipoNoti>();
-        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
+        dxTipoMxTipoNotis = tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario(), idTomaMx);
         TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
 
         if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
@@ -263,9 +279,8 @@ public class expose {
     @ResponseBody
     List<Estudio_TipoMx_TipoNoti> getEstudios(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti, @RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
         logger.info("Obteniendo los estudios por mx y tipo de notitificación en JSON");
-        List<Estudio_TipoMx_TipoNoti> dxTipoMxTipoNotis = new ArrayList<Estudio_TipoMx_TipoNoti>();
-        dxTipoMxTipoNotis = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti);
-        return dxTipoMxTipoNotis;
+        List<Estudio_TipoMx_TipoNoti> estudiosByTipoMxTipoNoti = tomaMxService.getEstudiosByTipoMxTipoNoti(codMx,tipoNoti, idTomaMx);
+        return estudiosByTipoMxTipoNoti;
     }
 
     @RequestMapping(value = "getExamenesEstudio", method = RequestMethod.GET, produces = "application/json")
@@ -294,7 +309,91 @@ public class expose {
     List<Dx_TipoMx_TipoNoti> getDiagnosticosEdicion(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti,
                                              @RequestParam(value = "idTomaMx", required = true)String idTomaMx) throws Exception {
         logger.info("Obteniendo los dx por tipo mx en JSON");
-        return tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario());
+        return tomaMxService.getDx(codMx,tipoNoti,seguridadService.obtenerNombreUsuario(), idTomaMx);
 
+    }
+
+    @RequestMapping(value = "getCatDxCatEstPermitidos", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    String getCatDxCatEstPermitidos(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti, @RequestParam(value = "idTomaMx", required = true) String idTomaMx) throws Exception {
+        logger.info("Obteniendo los estudios por mx y tipo de notitificación en JSON");
+        List<Estudio_TipoMx_TipoNoti> estudiosByTipoMxTipoNoti = this.getEstudios(codMx,tipoNoti, idTomaMx);
+        List<Dx_TipoMx_TipoNoti> dxTipoMxTipoNotisPermitidos = this.getDiagnosticos(codMx,tipoNoti, idTomaMx);
+        String jsonResponse="";
+        Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
+        Integer indice=0;
+        for(Estudio_TipoMx_TipoNoti estActual : estudiosByTipoMxTipoNoti){
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", estActual.getEstudio().getIdEstudio()+"-E");
+            map.put("nombre", estActual.getEstudio().getNombre());
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+        for (Dx_TipoMx_TipoNoti dxActual : dxTipoMxTipoNotisPermitidos) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("id", dxActual.getDiagnostico().getIdDiagnostico()+"-R");
+            map.put("nombre", dxActual.getDiagnostico().getNombre());
+            mapResponse.put(indice, map);
+            indice ++;
+        }
+        jsonResponse = new Gson().toJson(mapResponse);
+        //escapar caracteres especiales, escape de los caracteres con valor num�rico mayor a 127
+        UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+        return escaper.translate(jsonResponse);
+    }
+
+    @RequestMapping(value = "getDxsVIHTBPersona/{idPersona}", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<DatosSolicitud> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona) throws Exception {
+        logger.info("Obteniendo los dx TB y VIH por persona en JSON");
+        List<DatosSolicitud> datosSolicitudes = solicitudService.getSolicitudesVIHTB(true, true, idPersona);
+        for(DatosSolicitud ds: datosSolicitudes){
+            List<ResultadoSolicitud> detRes = resultadoFinalService.getDetResActivosBySolicitudV2(ds.getIdSolicitud());
+            if (ds.getAprobada()!= null){
+                if (ds.getAprobada().equals(true)) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.approval.result", null, null));
+                } else {
+                    if (!detRes.isEmpty()) {
+                        ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                    } else {
+                        ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                    }
+                }
+            }else{
+                if (!detRes.isEmpty()) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                } else {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                }
+            }
+            String resultados="";
+            for(ResultadoSolicitud res: detRes){
+                if (res.getRespuesta()!=null) {
+                    //resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                    if (res.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados+=cat_lista.getEtiqueta();
+                    }else if (res.getTipo().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                        resultados+=valorBoleano;
+                    } else if (res.getValor().toLowerCase().contains("inadecuada")) {
+                        resultados+=res.getValor();
+                    }
+                }else if (res.getRespuestaExamen()!=null){
+                    //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                    if (res.getTipoExamen().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados+=cat_lista.getEtiqueta();
+                    } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                        resultados+=valorBoleano;
+                    }
+                }
+            }
+            ds.setResultado(resultados);
+        }
+        return datosSolicitudes;
     }
 }

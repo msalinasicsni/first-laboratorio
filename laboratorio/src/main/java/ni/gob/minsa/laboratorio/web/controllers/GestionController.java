@@ -149,6 +149,8 @@ public class GestionController {
             List<TipoNotificacion> tiposNotificacion = new ArrayList<TipoNotificacion>();
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|TB"));
 
             mav.addObject("entidades", entidadesAdtvases);
             mav.addObject("tipoMuestra", tipoMxList);
@@ -188,6 +190,8 @@ public class GestionController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|TB"));
 
             mav.addObject("entidades", entidadesAdtvases);
             mav.addObject("notificaciones",tiposNotificacion);

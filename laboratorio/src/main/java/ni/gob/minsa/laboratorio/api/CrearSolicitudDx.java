@@ -17,12 +17,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +30,7 @@ import java.util.List;
  * Created by Miguel Salinas on 16/05/2019.
  * V1.0
  */
+
 @Controller
 @RequestMapping(value = "/api/v1/crearSolicitudDx")
 public class CrearSolicitudDx {
@@ -71,7 +71,18 @@ public class CrearSolicitudDx {
     @Autowired
     MessageSource messageSource;
 
+    /*Sin esto no funciona el CORS*/
+    @RequestMapping(value = "/**",method = RequestMethod.OPTIONS)
+    public String getOption(HttpServletResponse response, Model model)
+    {
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+
+        return "";
+    }
+
     @RequestMapping(value = "save", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public @ResponseBody
     ResponseEntity<String> save(@RequestBody RegistroSolicitud solicitud) {
         RespuestaRegistroSolicitud resultado = new RespuestaRegistroSolicitud();
@@ -134,6 +145,9 @@ public class CrearSolicitudDx {
                         if (!solicitud.getCodExpediente().isEmpty()) {
                             notificacion.setCodExpediente(solicitud.getCodExpediente());
                         }
+                        if (solicitud.getCodigoVIH()!=null && !solicitud.getCodigoVIH().isEmpty()) {
+                            notificacion.setCodigoPacienteVIH(solicitud.getCodigoVIH());
+                        }
                         notificacion.setFechaRegistro(new Timestamp(new Date().getTime()));
                         notificacion.setUsuarioRegistro(usuarioRegistro);
                         notificacion.setPasivo(false);
@@ -158,6 +172,11 @@ public class CrearSolicitudDx {
                         if (!solicitud.getIdUnidadSalud().isEmpty()) {
                             tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
                         }
+                        if (solicitud.getCodigoVIH()!=null && !solicitud.getCodigoVIH().isEmpty()) {
+                            notificacion.setCodigoPacienteVIH(solicitud.getCodigoVIH());
+                            daNotificacionService.updateNotificacion(notificacion);
+                        }
+
                     }
                     tomaMx.setIdNotificacion(notificacion);
 
@@ -250,6 +269,7 @@ public class CrearSolicitudDx {
             if (resultado.getError().isEmpty()) resultado.setMessage("Success");
         }catch (Exception ex){
             resultado.setError("-"+ex.getMessage());
+            ex.printStackTrace();
         }
 
         return createJsonResponse(resultado);
@@ -266,6 +286,8 @@ public class CrearSolicitudDx {
         if (solicitud.getIdUsuario()==null || solicitud.getIdUsuario().isEmpty()) return "Debe proporcionar valor para 'idUsuario'";
         if (solicitud.getSeguimiento()==null || solicitud.getSeguimiento().isEmpty()) return "Debe proporcionar valor para 'seguimiento'";
         if (solicitud.getFechaTomaMx()==null || solicitud.getFechaTomaMx().isEmpty()) return "Debe proporcionar valor para 'fechaTomaMx'";
+        if (solicitud.getCodTipoNoti()!=null && solicitud.getCodTipoNoti().equalsIgnoreCase("TPNOTI|VIH")
+                && (solicitud.getCodigoVIH()==null || solicitud.getCodigoVIH().isEmpty())) return "Debe proporcionar valor para 'codigoVIH'";
         return "";
 
     }

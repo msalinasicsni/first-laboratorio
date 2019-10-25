@@ -174,6 +174,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|TB"));
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -229,6 +230,7 @@ public class TomaMxController {
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|SINFEB"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|IRAG"));
             tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|VIH"));
+            tiposNotificacion.add(catalogoService.getTipoNotificacion("TPNOTI|TB"));
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -284,7 +286,7 @@ public class TomaMxController {
     List<Dx_TipoMx_TipoNoti> getDxBySample(@RequestParam(value = "codMx", required = true) String codMx, @RequestParam(value = "tipoNoti", required = true) String tipoNoti) throws Exception {
         logger.info("Obteniendo los diagn�sticos segun muestra y tipo de Notificacion en JSON");
         //nombre usuario null, para que no valide autoridad
-        return tomaMxService.getDx(codMx, tipoNoti,null);
+        return tomaMxService.getDx(codMx, tipoNoti,null, null);
     }
 
     private boolean saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas) throws Exception {

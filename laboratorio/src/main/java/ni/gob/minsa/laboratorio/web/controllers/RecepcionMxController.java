@@ -20,6 +20,7 @@ import ni.gob.minsa.laboratorio.domain.resultados.RespuestaSolicitud;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.Authority;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadArea;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.restServices.CallRestServices;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
@@ -445,6 +446,7 @@ public class RecepcionMxController {
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaAreaLabUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdMxUser(recepcionMx.getTomaMx().getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudDx> dxMostrar = new ArrayList<DaSolicitudDx>();
+
                 if (trasladoActivo!=null && trasladoActivo.isTrasladoInterno()){
                     for (DaSolicitudDx solicitudDx : solicitudDxList) {
                         if (trasladoActivo.getAreaDestino().getIdArea().equals(solicitudDx.getCodDx().getArea().getIdArea())){
@@ -465,11 +467,22 @@ public class RecepcionMxController {
                     datoSolicitudDetalles.addAll(datosSolicitudService.getDatosSolicitudDetalleBySolicitud(solicitudEstudio.getIdSolicitudEstudio()));
                 }
                 mav.addObject("datosList",datoSolicitudDetalles);
+                if (esEstudio) {
+                    List<Catalogo_Estudio> catalogoEstudios =
+                            tomaMxService.getEstudiosByTipoMxTipoNoti(recepcionMx.getTomaMx().getCodTipoMx().getIdTipoMx().toString(),
+                                    recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                    mav.addObject("catEst", catalogoEstudios);
+                }
+                List<Catalogo_Dx> catalogoDxs =
+                        tomaMxService.getDxByTipoMxTipoNoti(recepcionMx.getTomaMx().getCodTipoMx().getIdTipoMx().toString(),
+                                recepcionMx.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo(),seguridadService.obtenerNombreUsuario());
+                mav.addObject("catDx", catalogoDxs);
+
+
             }
 
 
             List<CausaRechazoMx> causaRechazoMxList = catalogosService.getCausaRechazoMxRecepLab();
-
             mav.addObject("recepcionMx",recepcionMx);
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
@@ -964,6 +977,11 @@ public class RecepcionMxController {
                 testOrder.setIdSilais(String.valueOf(recepcionMx.getTomaMx().getCodSilaisAtencion().getEntidadAdtvaId()));
                 testOrder.setNombreSilais(recepcionMx.getTomaMx().getCodSilaisAtencion().getNombre());
                 testOrder.setIdExamenes(idExamenes);
+                testOrder.setUsuarioRegistro(usuario.getUsername());
+                testOrder.setIdMuestraLaboratorio(recepcionMx.getTomaMx().getIdTomaMx());
+                //Llamar servicio que envia solicitud HL7 al infinity y la registra en base de datos
+                CallRestServices.crearSolicitud(testOrder);
+                /*
                 SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
 
                 SolicitudHL7 solicitudHL7 = new SolicitudHL7();
@@ -975,6 +993,7 @@ public class RecepcionMxController {
                 solicitudHL7.setMuestra(recepcionMx.getTomaMx());
                 solicitudHL7.setUsuarioRegistro(usuario);
                 comunicacionResultadosService.saveOrUpdateSolicitudHL7(solicitudHL7);
+                */
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -1164,7 +1183,7 @@ public class RecepcionMxController {
             //Recuperando Json enviado desde el cliente
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             esEstudio = jsonpObject.get("esEstudio").getAsBoolean();
-            if(esEstudio)
+            if(esEstudio)  //cuando es estudio tambien se pueden agregar dx de rutina
                 resultado = agregarSolicitudEstudio(jsonpObject);
             else
                 resultado = agregarSolicitudDx(jsonpObject, request);

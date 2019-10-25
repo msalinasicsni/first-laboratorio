@@ -81,14 +81,24 @@ var consolidatedExams = function () {
                     filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
                     var valores = $('#idDx').val();
                     var strValores = '';
-                   for (var i = 0; i < valores.length; i++) {
-                        if (i == 0)
-                            strValores = +valores[i];
-                        else
-                            strValores = strValores + ',' + valores[i];
+                    var strValoresEst = '';
+                    for (var i = 0; i < valores.length; i++) {
+                        if (valores[i].indexOf("-R") != -1) {
+                            if (strValores.length > 0)
+                                strValores = strValores + ',' + valores[i].substr(0, valores[i].indexOf("-R"));
+                            else
+                                strValores = +valores[i].substr(0, valores[i].indexOf("-R"));
+                        }
+                        else {
+                            if (strValoresEst.length > 0)
+                                strValoresEst = strValoresEst + ',' + valores[i].substr(0, valores[i].indexOf("-E"));
+                            else
+                                strValoresEst = +valores[i].substr(0, valores[i].indexOf("-E"));
+                        }
                     }
                     filtro['diagnosticos'] = strValores;
-                    $(this).attr("href",parametros.excelUrl+"?filtro="+JSON.stringify(filtro));
+                    filtro['estudios'] = strValoresEst;
+                    $(this).attr("href", parametros.excelUrl + "?filtro=" + JSON.stringify(filtro));
                     desbloquearUI();
                 }
             });
