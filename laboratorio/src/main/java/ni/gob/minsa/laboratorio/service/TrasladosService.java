@@ -368,6 +368,24 @@ public class TrasladosService {
             crit.add(conditGroup);
         }
 
+        //Se filtra por rango de fecha de aprobacion
+        if (filtro.getFechaInicioAprob()!=null && filtro.getFechaFinAprob()!=null){
+            Junction conditGroup = Restrictions.disjunction();
+            conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                    .add(Restrictions.and(
+                            Restrictions.between("fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob())))
+                    .createAlias("idTomaMx", "toma")
+                    .setProjection(Property.forName("toma.idTomaMx"))))
+
+                    .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                            .add(Restrictions.and(
+                                    Restrictions.between("fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob())))
+                            .createAlias("idTomaMx", "toma")
+                            .setProjection(Property.forName("toma.idTomaMx"))));
+
+            crit.add(conditGroup);
+        }
+
         return crit.list();
     }
 

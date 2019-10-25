@@ -99,11 +99,13 @@
                                     <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                                     <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
                                     <input id="msg_reception_lab_success" type="hidden" value="<spring:message code="msg.transfer.successfully"/>"/>
-                                    <input id="text_request" type="hidden" value="<spring:message code="lbl.send.request"/>"/>
+                                    <input id="text_request" type="hidden" value="<spring:message code="lbl.response.name"/>"/>
                                     <input id="text_request_date" type="hidden" value="<spring:message code="lbl.send.request.date"/>"/>
                                     <input id="text_request_type" type="hidden" value="<spring:message code="lbl.send.request.type"/>"/>
+                                    <input id="text_approve_date" type="hidden" value="<spring:message code="lbl.approve.date"/>"/>
+                                    <input id="text_final_result" type="hidden" value="<spring:message code="lbl.final.result"/>"/>
 
-                                    <form id="searchMx-form" class="smart-form" autocomplete="off">
+                                    <form id="searchMxCC-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <div class="row">
                                             <section class="col col-sm-12 col-md-12 col-lg-5">
@@ -117,26 +119,26 @@
                                             </section>
                                             <section class="col col-sm-6 col-md-4 col-lg-3">
                                                 <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.start.date.mx" />
+                                                    <spring:message code="lbl.start.approval.date" />
                                                 </label>
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
                                                     <input type="text" name="fecInicioTomaMx" id="fecInicioTomaMx"
                                                            placeholder="<spring:message code="lbl.date.format"/>"
                                                            class="form-control from_date" data-date-end-date="+0d"/>
-                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.startdate"/></b>
+                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.start.approval.date"/></b>
                                                 </label>
                                             </section>
                                             <section class="col col-sm-6 col-md-4 col-lg-3">
                                                 <label class="text-left txt-color-blue font-md">
-                                                    <spring:message code="lbl.receipt.end.date.mx" />
+                                                    <spring:message code="lbl.end.approval.date" />
                                                 </label>
                                                 <label class="input">
                                                     <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
                                                     <input type="text" name="fecFinTomaMx" id="fecFinTomaMx"
                                                            placeholder="<spring:message code="lbl.date.format"/>"
                                                            class="form-control to_date" data-date-end-date="+0d"/>
-                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="tooltip.receipt.enddate"/></b>
+                                                    <b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i> <spring:message code="lbl.end.approval.date"/></b>
                                                 </label>
                                             </section>
 
@@ -203,7 +205,7 @@
                                             </div>
                                         </fieldset>
                                         <footer>
-                                            <button type="button" id="all-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
+                                            <button type="button" id="all-ordersCC" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.show.all" /></button>
                                             <button type="submit" id="search-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
                                         </footer>
                                     </form>
@@ -233,17 +235,14 @@
                                 <!-- end widget edit box -->
                                 <!-- widget content -->
                                 <div class="widget-body no-padding">
-                                    <table id="muestras_result" class="table table-striped table-bordered table-hover" width="100%">
+                                    <table id="mx_result" class="table table-striped table-bordered table-hover" width="100%">
                                         <thead>
                                         <tr>
                                             <th data-class="expand"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.lab.code.mx"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sample.type"/></th>
-                                            <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.sampling.datetime"/></th>
                                             <th data-hide="phone"><i class="fa fa-fw fa-calendar text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.symptoms.start.date"/></th>
                                             <th data-hide="phone"><spring:message code="lbl.silais"/></th>
-                                            <th data-hide="phone"><spring:message code="lbl.health.unit"/></th>
-                                            <th data-class="expand"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
-                                            <th><spring:message code="lbl.request"/></th>
+                                            <th><spring:message code="lbl.requests"/></th>
                                         </tr>
                                         </thead>
                                     </table>
