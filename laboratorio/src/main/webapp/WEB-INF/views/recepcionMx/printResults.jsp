@@ -116,6 +116,30 @@
                                 </label>
                             </section>
                         </div>
+                        <div class="row">
+                            <section class="col col-sm-6 col-md-4 col-lg-3">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.prc.start.date" />
+                                </label>
+                                <label class="input">
+                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
+                                    <input type="text" name="fecInicioProc" id="fecInicioProc"
+                                           placeholder="<spring:message code="lbl.date.format"/>"
+                                           class="form-control from_date" data-date-end-date="+0d"/>
+                                </label>
+                            </section>
+                            <section class="col col-sm-6 col-md-4 col-lg-3">
+                                <label class="text-left txt-color-blue font-md">
+                                    <spring:message code="lbl.prc.end.date" />
+                                </label>
+                                <label class="input">
+                                    <i class="icon-prepend fa fa-pencil"></i> <i class="icon-append fa fa-calendar"></i>
+                                    <input type="text" name="fecFinProc" id="fecFinProc"
+                                           placeholder="<spring:message code="lbl.date.format"/>"
+                                           class="form-control to_date" data-date-end-date="+0d"/>
+                                </label>
+                            </section>
+                        </div>
                     </fieldset>
                     <footer>
                         <button type="submit" id="search-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
@@ -205,6 +229,12 @@
 <!-- jQuery Selecte2 Input -->
 <spring:url value="/resources/js/plugin/select2/select2.min.js" var="selectPlugin"/>
 <script src="${selectPlugin}"></script>
+<!-- bootstrap datepicker -->
+<spring:url value="/resources/js/plugin/bootstrap-datepicker/bootstrap-datepicker.js" var="datepickerPlugin" />
+<script src="${datepickerPlugin}"></script>
+<spring:url value="/resources/js/plugin/bootstrap-datepicker/locales/bootstrap-datepicker.{languagedt}.js" var="datePickerLoc">
+    <spring:param name="languagedt" value="${pageContext.request.locale.language}" /></spring:url>
+<script src="${datePickerLoc}"></script>
 <!-- JQUERY VALIDATE -->
 <spring:url value="/resources/js/plugin/jquery-validate/jquery.validate.min.js" var="jqueryValidate" />
 <script src="${jqueryValidate}"></script>
@@ -220,6 +250,8 @@
 <script src="${resultJs}"></script>
 <spring:url value="/resources/scripts/utilidades/generarReporte.js" var="reporteUtilJs" />
 <script src="${reporteUtilJs}"></script>
+<spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
+<script src="${handleDatePickers}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="sSearchUrl" value="/recepcionMx/searchResults"/>
@@ -233,6 +265,7 @@
             blockMess: "${blockMess}"
         };
         PrintResults.init(parametros);
+        handleDatePickers("${pageContext.request.locale.language}");
 
         $("li.reportes").addClass("open");
         $("li.printresults").addClass("active");

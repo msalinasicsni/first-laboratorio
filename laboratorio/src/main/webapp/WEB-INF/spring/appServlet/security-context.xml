@@ -55,6 +55,7 @@
         <intercept-url pattern="/reports/consolidadoTecnica/**" access="ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/tiemposProcesamiento/**" access="ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/reports/resultadoDx/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
+        <intercept-url pattern="/reports/searchSamplesQC/**" access="ROLE_ANALISTA,ROLE_DIR,ROLE_JEFE" />
         <intercept-url pattern="/searchMx/*" access="ROLE_RECEPCION" />
         <intercept-url pattern="/administracion/request/*" access="ROLE_ADMIN" />
         <intercept-url pattern="/solicitante/**" access="ROLE_ADMIN,ROLE_RECEPCION" />

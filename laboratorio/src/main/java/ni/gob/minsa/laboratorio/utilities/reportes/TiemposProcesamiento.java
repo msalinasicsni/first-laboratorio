@@ -5,6 +5,8 @@ import java.util.Date;
 public class TiemposProcesamiento {
     private String IDTOMAMX;
     private String CODIGOMX;
+    private String SILAIS;
+    private String MUNICIPIO;
     private String IDSOLICITUDDX;
     private int IDDX;
     private String NOMBREDX;
@@ -119,5 +121,21 @@ public class TiemposProcesamiento {
 
     public void setHORARECIBIDOGRAL(String HORARECIBIDOGRAL) {
         this.HORARECIBIDOGRAL = HORARECIBIDOGRAL;
+    }
+
+    public String getSILAIS() {
+        return SILAIS;
+    }
+
+    public void setSILAIS(String SILAIS) {
+        this.SILAIS = SILAIS;
+    }
+
+    public String getMUNICIPIO() {
+        return MUNICIPIO;
+    }
+
+    public void setMUNICIPIO(String MUNICIPIO) {
+        this.MUNICIPIO = MUNICIPIO;
     }
 }

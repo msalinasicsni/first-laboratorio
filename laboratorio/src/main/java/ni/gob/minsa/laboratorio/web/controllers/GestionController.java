@@ -419,7 +419,6 @@ public class GestionController {
             Map<String, String> mapDx = new HashMap<String, String>();
             int subIndice = 0;
 
-            if (!solicitudDxList.isEmpty()) {
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     mapDx.put("idSolicitud", solicitudDx.getIdSolicitudDx());
                     mapDx.put("nombre", solicitudDx.getCodDx().getNombre());
@@ -460,7 +459,7 @@ public class GestionController {
                     mapDxList.put(subIndice, mapDx);
                     mapDx = new HashMap<String, String>();
                 }
-            } else {
+
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEList) {
                     mapDx.put("idSolicitud", solicitudEstudio.getIdSolicitudEstudio());
                     mapDx.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
@@ -470,8 +469,14 @@ public class GestionController {
                     if (solicitudEstudio.getAprobada() != null) {
                         if (solicitudEstudio.getAprobada().equals(true)) {
                             mapDx.put("estado", (messageSource.getMessage("lbl.approval.result", null, null)));
+                            mapDx.put("fechaAprobacion", DateUtil.DateToString(solicitudEstudio.getFechaAprobacion(), "dd/MM/yyyy"));
                         } else {
-                            mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                            if (!detRes.isEmpty()) {
+                                mapDx.put("estado", (messageSource.getMessage("lbl.result.pending.approval", null, null)));
+                            } else {
+                                mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
+                            }
+                            mapDx.put("fechaAprobacion", "");
                         }
                     } else {
                         if (!detRes.isEmpty()) {
@@ -479,6 +484,7 @@ public class GestionController {
                         } else {
                             mapDx.put("estado", (messageSource.getMessage("lbl.without.result", null, null)));
                         }
+                        mapDx.put("fechaAprobacion", "");
                     }
 
                     mapDx.put("cc", (messageSource.getMessage("lbl.not.apply", null, null)));
@@ -488,7 +494,7 @@ public class GestionController {
                     mapDxList.put(subIndice, mapDx);
                     mapDx = new HashMap<String, String>();
                 }
-            }
+
 
 
             map.put("solicitudes", new Gson().toJson(mapDxList));
@@ -715,7 +721,9 @@ public class GestionController {
                 if(dxList != null){
                     for(DaSolicitudDx diagnostico : dxList){
                         Map<String, String> mapSolicDx = new HashMap<String, String>();
-                        mapSolicDx.put("codigoUnicoMx", (diagnostico.getIdTomaMx().getCodigoLab()!=null ? diagnostico.getIdTomaMx().getCodigoLab() : messageSource.getMessage("lbl.undefined", null, null)));
+                        mapSolicDx.put("codigoUnicoMx", (diagnostico.getIdTomaMx().getCodigoLab()!=null ? diagnostico.getIdTomaMx().getCodigoLab() :
+                                (diagnostico.getIdTomaMx().getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|PEND") || diagnostico.getIdTomaMx().getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|ENV")?
+                                        messageSource.getMessage("lbl.undefined", null, null) : diagnostico.getIdTomaMx().getCodigoUnicoMx())));
                         mapSolicDx.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
                                 (diagnostico.getIdTomaMx().getHoraTomaMx()!=null?" "+diagnostico.getIdTomaMx().getHoraTomaMx():""));
                         mapSolicDx.put("diagnostico", diagnostico.getCodDx().getNombre());

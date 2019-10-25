@@ -318,12 +318,21 @@ public class TrasladosService {
                             Restrictions.eq("tomaMx.codTipoMx.idTipoMx", Integer.valueOf(filtro.getCodTipoMx())))
             );
         }
-
-        //se filtran sólo las muestras de rutina
-        crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
-                .add(Restrictions.eq("anulado", false))
-                .createAlias("idTomaMx", "idTomaMx")
-                .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+        //Se filtra por rango de fecha de aprobacion
+        if (filtro.getFechaInicioAprob()!=null && filtro.getFechaFinAprob()!=null){
+            //se filtran sólo las muestras de rutina aprobadas según rango de fecha
+            crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                    .add(Restrictions.eq("anulado", false))
+                    .add(Restrictions.between("fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob()))
+                    .createAlias("idTomaMx", "idTomaMx")
+                    .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+        }else {
+            //se filtran sólo las muestras de rutina
+            crit.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                    .add(Restrictions.eq("anulado", false))
+                    .createAlias("idTomaMx", "idTomaMx")
+                    .setProjection(Property.forName("idTomaMx.idTomaMx"))));
+        }
 
         if(filtro.getCodigoUnicoMx()!=null){
             crit.add( Restrictions.and(

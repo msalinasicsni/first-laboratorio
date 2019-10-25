@@ -378,7 +378,7 @@ public class expose {
                     }else if (res.getTipo().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                         resultados+=valorBoleano;
-                    } else if (res.getValor().toLowerCase().contains("inadecuada")) {
+                    } else if (res.getValor().toLowerCase().contains("inadecuad")) {
                         resultados+=res.getValor();
                     }
                 }else if (res.getRespuestaExamen()!=null){

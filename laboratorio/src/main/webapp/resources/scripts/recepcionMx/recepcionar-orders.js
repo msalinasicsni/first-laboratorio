@@ -836,6 +836,7 @@ var ReceiptOrders = function () {
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
+                            console.log(data);
                             if (data.mensaje.length > 0) {
                                 $.smallBox({
                                     title: data.mensaje,
@@ -853,7 +854,7 @@ var ReceiptOrders = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
-                                limpiarDatosRecepcion();
+                                //limpiarDatosRecepcion();
                                 setTimeout(function () {
                                     window.close(); //window.location.href = parametros.sSearchReceiptUrl
                                 }, 2000);

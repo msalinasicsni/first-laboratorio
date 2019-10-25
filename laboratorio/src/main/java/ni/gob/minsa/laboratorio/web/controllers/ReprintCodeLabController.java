@@ -169,7 +169,7 @@ public class ReprintCodeLabController {
             Map<String, String> mapSolicitud = new HashMap<String, String>();
             String areaEntrega = "";
             int prioridad = 100;
-            if (solicitudDxList.size() > 0) {
+
                 int subIndice = 0;
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     if (prioridad >= solicitudDx.getCodDx().getPrioridad()) {
@@ -184,9 +184,9 @@ public class ReprintCodeLabController {
                     mapSolicitud = new HashMap<String, String>();
                 }
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
-            } else {
+
                 List<DaSolicitudEstudio> solicitudEstudios = tomaMxService.getSolicitudesEstudioByIdTomaMx(recepcion.getTomaMx().getIdTomaMx());
-                int subIndice = 0;
+
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEstudios) {
                     areaEntrega = solicitudEstudio.getTipoEstudio().getArea().getNombre();
                     mapSolicitud.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
@@ -197,7 +197,7 @@ public class ReprintCodeLabController {
                     mapSolicitud = new HashMap<String, String>();
                 }
                 map.put("solicitudes", new Gson().toJson(mapSolicitudesList));
-            }
+
             map.put("area",areaEntrega);
             mapResponse.put(indice, map);
             indice++;

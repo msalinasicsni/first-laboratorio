@@ -127,7 +127,7 @@ var QualityReport = function () {
                     mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
                     mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
                     mxFiltros['codTipoSolicitud'] = $('#tipo').find('option:selected').val();
-                    mxFiltros['nombreSolicitud'] = encodeURI($('#nombreSoli').val());
+                    mxFiltros['nombreSolicitud'] = ''; //encodeURI($('#nombreSoli').val());
                     mxFiltros['laboratorio'] = $('#codLaboratorioOri').find('option:selected').val();
 
                 }

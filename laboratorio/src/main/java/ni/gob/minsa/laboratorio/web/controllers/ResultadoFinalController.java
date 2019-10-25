@@ -128,10 +128,9 @@ public class ResultadoFinalController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
 
-        if(dxList != null){
             for(DaSolicitudDx diagnostico : dxList){
                 Map<String, String> map = new HashMap<String, String>();
-                map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab());
+                map.put("codigoUnicoMx", (diagnostico.getIdTomaMx().getCodigoLab()!=null?diagnostico.getIdTomaMx().getCodigoLab():diagnostico.getIdTomaMx().getCodigoUnicoMx()));
                 map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
                 map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
                         (diagnostico.getIdTomaMx().getHoraTomaMx()!=null?" "+diagnostico.getIdTomaMx().getHoraTomaMx():""));
@@ -185,9 +184,6 @@ public class ResultadoFinalController {
                 mapResponse.put(indice, map);
                 indice ++;
             }
-        }
-
-      if(estudioList != null){
           for(DaSolicitudEstudio estudio : estudioList){
               boolean agregar = true;
               //para estudios cohorte dengue y clinico dengue, sólo tomar en cuenta la muestra inicial
@@ -245,7 +241,6 @@ public class ResultadoFinalController {
                   mapResponse.put(indice, map);
                   indice++;
               }
-          }
       }
 
 

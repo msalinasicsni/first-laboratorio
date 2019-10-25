@@ -340,10 +340,9 @@ public class EditarSolicitudesMxController {
                 Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx(), labUser.getCodigo());
                 DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
-
+                String dxs = "";
                 if (!solicitudDxList.isEmpty()) {
                     int cont = 0;
-                    String dxs = "";
                     for (DaSolicitudDx solicitudDx : solicitudDxList) {
                         cont++;
                         if (cont == solicitudDxList.size()) {
@@ -354,13 +353,11 @@ public class EditarSolicitudesMxController {
 
                     }
                     map.put("solicitudes", dxs);
-                } else {
-                    if(solicitudE != null){
-                        map.put("solicitudes", solicitudE.getTipoEstudio().getNombre());
-                    }else{
-                        map.put("solicitudes", "");
-                    }
-
+                }
+                if(solicitudE != null){
+                    map.put("solicitudes",(dxs.isEmpty()?solicitudE.getTipoEstudio().getNombre():dxs+", "+solicitudE.getTipoEstudio().getNombre()));
+                }else{
+                    map.put("solicitudes", dxs);
                 }
 
                 mapResponse.put(indice, map);

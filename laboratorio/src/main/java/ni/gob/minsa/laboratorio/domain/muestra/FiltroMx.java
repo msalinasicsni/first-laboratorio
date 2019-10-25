@@ -6,42 +6,42 @@ import java.util.Date;
  * Created by FIRSTICT on 11/21/2014.
  */
 public class FiltroMx {
-    String nombreApellido;
-    Date fechaInicioTomaMx;
-    Date fechaFinTomaMx;
-    String codSilais;
-    String codUnidadSalud;
-    String codTipoMx;
-    String codEstado;
-    Date fechaInicioRecep;
-    Date fechaFinRecep;
-    Date fechaInicioRecepLab;
-    Date fechaFinRecepLab;
-    Boolean incluirMxInadecuada;
-    String codigoUnicoMx;
-    String codTipoSolicitud;
-    String nombreSolicitud;
-    String resultado;
-    Boolean solicitudAprobada;
-    String nombreUsuario;
-    Integer nivelLaboratorio;
-    Date fechaInicioAprob;
-    Date fechaFinAprob;
-    Boolean incluirTraslados;
-    Boolean controlCalidad;
-    String area;
-    String resultadoFinal;
-    String codLaboratio;
-    Date fechaInicioProcesamiento;
-    Date fechaFinProcesamiento;
-    Date fechaInicioRechazo;
-    Date fechaFinRechazo;
-    boolean nivelCentral;
-    Date fechaInicioNotificacion;
-    Date fechaFinNotificacion;
-    String tipoNotificacion;
-    Boolean incluirAnuladas = false;
-    String codigoVIH;
+    private String nombreApellido;
+    private Date fechaInicioTomaMx;
+    private Date fechaFinTomaMx;
+    private String codSilais;
+    private String codUnidadSalud;
+    private String codTipoMx;
+    private String codEstado;
+    private Date fechaInicioRecep;
+    private Date fechaFinRecep;
+    private Date fechaInicioRecepLab;
+    private Date fechaFinRecepLab;
+    private Boolean incluirMxInadecuada;
+    private String codigoUnicoMx;
+    private String codTipoSolicitud;
+    private String nombreSolicitud;
+    private String resultado;
+    private Boolean solicitudAprobada;
+    private String nombreUsuario;
+    private Integer nivelLaboratorio;
+    private Date fechaInicioAprob;
+    private Date fechaFinAprob;
+    private Boolean incluirTraslados;
+    private Boolean controlCalidad;
+    private String area;
+    private String resultadoFinal;
+    private String codLaboratio;
+    private Date fechaInicioProcesamiento;
+    private Date fechaFinProcesamiento;
+    private Date fechaInicioRechazo;
+    private Date fechaFinRechazo;
+    private boolean nivelCentral;
+    private Date fechaInicioNotificacion;
+    private Date fechaFinNotificacion;
+    private String tipoNotificacion;
+    private Boolean incluirAnuladas = false;
+    private String codigoVIH;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -294,6 +294,4 @@ public class FiltroMx {
 	public void setCodigoVIH(String codigoVIH) {
 		this.codigoVIH = codigoVIH;
 	}
-    
-    
 }

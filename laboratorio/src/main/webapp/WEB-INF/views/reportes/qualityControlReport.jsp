@@ -205,22 +205,24 @@
                                     <b class="tooltip tooltip-bottom-right"><i class="fa fa-warning txt-color-pink"></i><spring:message code="tooltip.send.request.name"/></b>
                                 </label>
                             </section>-->
-                            <section class="col col-sm-12 col-md-6 col-lg-4">
-                                <label class="text-left txt-color-blue font-md">
-                                    <spring:message code="lbl.transfer.origin.lab" /> </label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
-                                    <select id="codLaboratorioOri" name="codLaboratorioOri"
-                                            class="select2">
-                                        <option value=""><spring:message code="lbl.select" />...</option>
-                                        <c:forEach items="${laboratorios}" var="laboratorio">
-                                            <c:if test="${laboratorio.codigo ne 'LABCNDR'}">
-                                                <option value="${laboratorio.codigo}">${laboratorio.nombre}</option>
-                                            </c:if>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                            </section>
+                            <c:if test="${esCNDR}">
+                                <section class="col col-sm-12 col-md-6 col-lg-4">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.transfer.origin.lab" /> </label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                        <select id="codLaboratorioOri" name="codLaboratorioOri"
+                                                class="select2">
+                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                            <c:forEach items="${laboratorios}" var="laboratorio">
+                                                <c:if test="${laboratorio.codigo ne 'LABCNDR'}">
+                                                    <option value="${laboratorio.codigo}">${laboratorio.nombre}</option>
+                                                </c:if>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                </section>
+                            </c:if>
                         </div>
                     </fieldset>
                     <footer>

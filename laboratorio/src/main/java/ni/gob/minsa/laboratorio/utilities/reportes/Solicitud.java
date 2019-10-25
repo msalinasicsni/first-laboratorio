@@ -9,6 +9,8 @@ public class Solicitud {
     Integer idSolicitud;
     String nombre;
     String tipo;
+    boolean aprobada;
+    Integer idArea;
 
     public Integer getIdSolicitud() {
         return idSolicitud;
@@ -32,5 +34,21 @@ public class Solicitud {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    public boolean getAprobada() {
+        return aprobada;
+    }
+
+    public void setAprobada(boolean aprobada) {
+        this.aprobada = aprobada;
+    }
+
+    public Integer getIdArea() {
+        return idArea;
+    }
+
+    public void setIdArea(Integer idArea) {
+        this.idArea = idArea;
     }
 }

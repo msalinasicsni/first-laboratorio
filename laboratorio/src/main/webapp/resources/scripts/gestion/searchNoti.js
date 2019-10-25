@@ -230,15 +230,9 @@ var BuscarNotificacion = function () {
                     }
                     unBlockUI();
                 })
-                    .fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                    .fail(function (jqXHR) {
                         unBlockUI();
-                        $.smallBox({
-                            title: "FAIL" ,
-                            content: errorThrown,
-                            color: "#C46A69",
-                            iconSmall: "fa fa-warning",
-                            timeout: 8000
-                        });
+                        validateLogin(jqXHR);
                     });
             }
 

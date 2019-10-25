@@ -562,7 +562,7 @@
                     <c:when test="${esEstudio}">
                         <section class="col col-sm-12 col-md-5 col-lg-5">
                             <label class="text-left txt-color-blue font-md">
-                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.study.type" />
+                                <i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i><spring:message code="lbl.request.type" />
                             </label>
                             <div class="input-group">
                                 <span class="input-group-addon">

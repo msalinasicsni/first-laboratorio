@@ -374,7 +374,7 @@ public class SearchMxController {
             Map<String, String> mapDx = new HashMap<String, String>();
             int subIndice = 0;
 
-            if (!solicitudDxList.isEmpty()) {
+
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     mapDx.put("idSolicitud", solicitudDx.getIdSolicitudDx());
                     mapDx.put("nombre", solicitudDx.getCodDx().getNombre());
@@ -412,7 +412,7 @@ public class SearchMxController {
                     mapDxList.put(subIndice, mapDx);
                     mapDx = new HashMap<String, String>();
                 }
-            } else {
+
                 for (DaSolicitudEstudio solicitudEstudio : solicitudEList) {
                     mapDx.put("idSolicitud", solicitudEstudio.getIdSolicitudEstudio());
                     mapDx.put("nombre", solicitudEstudio.getTipoEstudio().getNombre());
@@ -440,7 +440,7 @@ public class SearchMxController {
                     mapDxList.put(subIndice, mapDx);
                     mapDx = new HashMap<String, String>();
                 }
-            }
+
 
 
             map.put("solicitudes", new Gson().toJson(mapDxList));

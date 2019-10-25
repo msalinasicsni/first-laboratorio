@@ -29,6 +29,7 @@ import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
+import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -908,8 +909,8 @@ public class RecepcionMxController {
                                 }
                             }
                     }
-
-                    validarEnviarSolicitudInfinity(recepcionMx, usuario);
+                    //TODO
+                    //validarEnviarSolicitudInfinity(recepcionMx, usuario);
 
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
@@ -2164,10 +2165,10 @@ public class RecepcionMxController {
                 //se arma estructura de diagn�sticos o estudios
                 List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(recepcion.getTomaMx().getIdTomaMx(), labUser.getCodigo());
                 DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(recepcion.getTomaMx().getCodigoUnicoMx());
-
+                String dxs = "";
                 if (!solicitudDxList.isEmpty()) {
                     int cont = 0;
-                    String dxs = "";
+
                     for (DaSolicitudDx solicitudDx : solicitudDxList) {
                         cont++;
                         if (cont == solicitudDxList.size()) {
@@ -2178,14 +2179,14 @@ public class RecepcionMxController {
 
                     }
                     map.put("solicitudes", dxs);
-                } else {
-                    if(solicitudE != null){
-                        map.put("solicitudes", solicitudE.getTipoEstudio().getNombre());
-                    }else{
-                        map.put("solicitudes", "");
-                    }
-
                 }
+                if(solicitudE != null){
+                    map.put("solicitudes",(dxs.isEmpty()?solicitudE.getTipoEstudio().getNombre():dxs+", "+solicitudE.getTipoEstudio().getNombre()));
+                }else{
+                    map.put("solicitudes", dxs);
+                }
+
+
 
                 mapResponse.put(indice, map);
                 indice++;
@@ -2338,6 +2339,8 @@ public class RecepcionMxController {
         String nombreSolicitud = null;
         Boolean controlCalidad = null;
         String codigoVIH = null;
+        Date fechaInicioProc = null;
+        Date fechaFinProc = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -2367,6 +2370,10 @@ public class RecepcionMxController {
             controlCalidad = jObjectFiltro.get("controlCalidad").getAsBoolean();
         if (jObjectFiltro.get("codigoVIH") != null && !jObjectFiltro.get("codigoVIH").getAsString().isEmpty())
         	codigoVIH = jObjectFiltro.get("codigoVIH").getAsString();
+        if (jObjectFiltro.get("fecInicioProc") != null && !jObjectFiltro.get("fecInicioProc").getAsString().isEmpty())
+            fechaInicioProc = DateUtil.StringToDate(jObjectFiltro.get("fecInicioProc").getAsString()+" 00:00:00");
+        if (jObjectFiltro.get("fecFinProc") != null && !jObjectFiltro.get("fecFinProc").getAsString().isEmpty())
+            fechaFinProc =DateUtil. StringToDate(jObjectFiltro.get("fecFinProc").getAsString()+" 23:59:59");
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -2390,6 +2397,8 @@ public class RecepcionMxController {
         filtroMx.setIncluirTraslados(true);
         filtroMx.setControlCalidad(controlCalidad);
         filtroMx.setCodigoVIH(codigoVIH);
+        filtroMx.setFechaInicioProcesamiento(fechaInicioProc);
+        filtroMx.setFechaFinProcesamiento(fechaFinProc);
 
         return filtroMx;
     }
@@ -2471,41 +2480,40 @@ public class RecepcionMxController {
         for(DaTomaMx tomaMx : tomaMxList){
             Map<String, String> map = new HashMap<String, String>();
             //se arma estructura de diagn�sticos o estudios
-            List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(), labUser.getCodigo());
+            List<Solicitud> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaV2(tomaMx.getIdTomaMx(), labUser.getCodigo());
             Authority esAnalista = usuarioService.getAuthority(userName, "ROLE_ANALISTA");
+            String dxs = "";
             if (!solicitudDxList.isEmpty()) {
                 int cont = 0;
-                String dxs = "";
-                for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                for (Solicitud solicitudDx : solicitudDxList) {
                     if (solicitudDx.getAprobada()) {
                         cont++;
                         if (cont == solicitudDxList.size()) {
-                            dxs += solicitudDx.getCodDx().getNombre();
+                            dxs += solicitudDx.getNombre();
                         } else {
-                            dxs += solicitudDx.getCodDx().getNombre() + ", ";
+                            dxs += solicitudDx.getNombre() + ", ";
                         }
                         //Si no es analista, es recepcionista mostrar muestra o si es analista y tiene autoridad en al menos uno de los dx solicitados mostrar muestra
-                        if (esAnalista==null || (esAnalista!=null && seguridadService.usuarioAutorizadoArea(userName, solicitudDx.getCodDx().getArea().getIdArea()) && !mostrar)){
+                        if (esAnalista==null || (esAnalista!=null && seguridadService.usuarioAutorizadoArea(userName, solicitudDx.getIdArea()) && !mostrar)){
                             mostrar = true;
                         }
                     }
 
                 }
                 map.put("solicitudes", dxs);
-            } else {
+            }
                 DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(tomaMx.getCodigoUnicoMx());
                 if(solicitudE != null && solicitudE.getAprobada()){
-                    map.put("solicitudes", solicitudE.getTipoEstudio().getNombre());
+                    map.put("solicitudes",(dxs.isEmpty()?solicitudE.getTipoEstudio().getNombre():dxs+", "+solicitudE.getTipoEstudio().getNombre()));
                     if (esAnalista==null || (esAnalista!=null && seguridadService.usuarioAutorizadoArea(userName, solicitudE.getTipoEstudio().getArea().getIdArea()) && !mostrar)){
                         mostrar = true;
                     }
                 }else{
-                    map.put("solicitudes", "");
+                    map.put("solicitudes", dxs);
                 }
 
-            }
             if (mostrar) {
-                esEstudio = tomaMxService.getSolicitudesEstudioByIdTomaMx(tomaMx.getIdTomaMx()).size() > 0;
+                esEstudio = tomaMxService.tieneEstudiosByIdTomaMx(tomaMx.getIdTomaMx());
                 //map.put("idOrdenExamen",tomaMx.getIdOrdenExamen());
                 map.put("idTomaMx", tomaMx.getIdTomaMx());
                 map.put("codigoUnicoMx", esEstudio ? tomaMx.getCodigoUnicoMx() : tomaMx.getCodigoLab());
@@ -2574,6 +2582,7 @@ public class RecepcionMxController {
                     List<Area> areaDxList = tomaMxService.getAreaSoliDxAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                     Authority esRecepcionista = usuarioService.getAuthority(userName, "ROLE_RECEPCION");
                     int count = 1;
+                    float yPosicionExamen = 0;
                     for (Area area : areaDxList) {
                         if (esRecepcionista!=null || seguridadService.usuarioAutorizadoArea(userName, area.getIdArea())) {
                             PDPage page = GeneralUtils.addNewPage(doc);
@@ -2645,7 +2654,7 @@ public class RecepcionMxController {
                             GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getMunicipio().getNombre() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
                             y = y - 15;
                             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
-                            GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getNombre() : "", y, 150, stream, 10, PDType1Font.HELVETICA_BOLD);
+                            GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getNombre() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
                             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 400, stream, 11, PDType1Font.HELVETICA);
                             GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy"), y, 490, stream, 11, PDType1Font.HELVETICA_BOLD);
 
@@ -2689,7 +2698,8 @@ public class RecepcionMxController {
                                         }
                                         List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
                                         if (resultados.size() > 0) {
-                                            GeneralUtils.drawTEXT(examen.getCodExamen().getNombre(), y, 100, stream, 10, PDType1Font.HELVETICA);
+                                            yPosicionExamen = y;
+                                            //GeneralUtils.drawTEXT(examen.getCodExamen().getNombre(), y, 100, stream, 10, PDType1Font.HELVETICA);
                                             y = y - 15;
                                         }
 
@@ -2710,24 +2720,24 @@ public class RecepcionMxController {
                                             y = y - 15;
                                         }
                                         if (resultados.size() > 0) {
-                                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.processing.date", null, null) + ": " + fechaProcesamiento, y, 150, stream, 12, PDType1Font.HELVETICA);
-                                            y = y - 15;
+                                            GeneralUtils.drawTEXT(examen.getCodExamen().getNombre()+ " - "+messageSource.getMessage("lbl.processing.date", null, null) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
+                                            //y = y - 15;
                                         }
                                     }
                                 }
                             }
                             count++;
                             //fecha impresi?n
-                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, null) + ": ", 225, 60, stream, 11, PDType1Font.HELVETICA);
-                            GeneralUtils.drawTEXT(fechaImpresion, 225, 190, stream, 10, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, null) + ": ", 160, 60, stream, 11, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(fechaImpresion, 160, 190, stream, 10, PDType1Font.HELVETICA);
 
-                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, null) + ": ", 180, 60, stream, 11, PDType1Font.HELVETICA);
-                            GeneralUtils.drawTEXT(procesadoPor, 180, 122, stream, 10, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, null) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(procesadoPor, 130, 122, stream, 10, PDType1Font.HELVETICA);
 
-                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, null) + ": ", 180, 300, stream, 11, PDType1Font.HELVETICA);
-                            GeneralUtils.drawTEXT(aprobadoPor, 180, 370, stream, 10, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, null) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(aprobadoPor, 130, 370, stream, 10, PDType1Font.HELVETICA);
 
-                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, null), 140, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, null), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                             stream.close();
                         }

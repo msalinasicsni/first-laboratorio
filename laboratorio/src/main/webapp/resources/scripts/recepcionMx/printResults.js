@@ -68,7 +68,13 @@ var PrintResults = function () {
                     }},
                     fecInicioTomaMx: {required: function () {
                         return $('#fecFinTomaMx').val().length > 0;
-                    }}
+                    }},
+                    fecFinProc: {required: function () {
+                            return $('#fecInicioProc').val().length > 0;
+                        }},
+                    fecInicioProc: {required: function () {
+                            return $('#fecFinProc').val().length > 0;
+                        }}
                 },
                 // Do not change code below
                 errorPlacement: function (error, element) {
@@ -95,6 +101,8 @@ var PrintResults = function () {
                     filtros['nombreSolicitud'] = '';
                     filtros['conResultado'] = 'Si';
                     filtros['solicitudAprobada'] = 'true';
+                    filtros['fecInicioProc'] = '';
+                    filtros['fecFinProc'] = '';
                 } else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
                     filtros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
@@ -108,6 +116,8 @@ var PrintResults = function () {
                     filtros['nombreSolicitud'] = $('#nombreSoli').val();
                     filtros['conResultado'] = 'Si';
                     filtros['solicitudAprobada'] = 'true';
+                    filtros['fecInicioProc'] = $('#fecInicioProc').val();
+                    filtros['fecFinProc'] = $('#fecFinProc').val();
 
                 }
                 bloquearUI(parametros.blockMess);
