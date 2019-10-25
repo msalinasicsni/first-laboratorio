@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
@@ -10,6 +11,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.traslado.HistoricoEnvioMx;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
+import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -100,6 +102,9 @@ public class TrasladoMxController {
 
     @Autowired
     MessageSource messageSource;
+
+    @Resource(name = "resultadoFinalService")
+    private ResultadoFinalService resultadoFinalService;
 
     @RequestMapping(value = "init", method = RequestMethod.GET)
     public ModelAndView initSearchForm() throws Exception {
@@ -553,8 +558,6 @@ public class TrasladoMxController {
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
-        filtroMx.setFechaInicioTomaMx(fechaInicioTomaMx);
-        filtroMx.setFechaFinTomaMx(fechaFinTomaMx);
         filtroMx.setFechaInicioRecep(fechaInicioRecep);
         filtroMx.setFechaFinRecep(fechaFinRecep);
         filtroMx.setNombreApellido(nombreApellido);
@@ -566,9 +569,13 @@ public class TrasladoMxController {
         filtroMx.setNombreUsuario(seguridadService.obtenerNombreUsuario());
         if (tipoTraslado.equals("cc")){ //para traslado al CNDR la solicitud tiene que estar aprobada
             filtroMx.setSolicitudAprobada(true);
-        }/*else if(tipoTraslado.equals("externo")){ //para traslado externo la solicitud puedo estar o no aprobada
-            filtroMx.setSolicitudAprobada(false);
-        }*/
+            filtroMx.setFechaInicioAprob(fechaInicioTomaMx);
+            filtroMx.setFechaFinAprob(fechaFinTomaMx);
+
+        }else{
+            filtroMx.setFechaInicioTomaMx(fechaInicioTomaMx);
+            filtroMx.setFechaFinTomaMx(fechaFinTomaMx);
+        }
         return filtroMx;
     }
 
@@ -643,6 +650,14 @@ public class TrasladoMxController {
                         mapSolicitud.put("nombre", solicitudDx.getCodDx().getNombre());
                         mapSolicitud.put("tipo", "Rutina");
                         mapSolicitud.put("fechaSolicitud", DateUtil.DateToString(solicitudDx.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+
+                        if (solicitudDx.getFechaAprobacion() != null){
+                            mapSolicitud.put("fechaAprobacion", DateUtil.DateToString(solicitudDx.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
+
+                        }else{
+                            mapSolicitud.put("fechaAprobacion", "");
+                        }
+
                         //obtener los examenes solicitados para la solicitud
                         List<OrdenExamen> ordenes = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
                         int cont = 0;
@@ -656,6 +671,17 @@ public class TrasladoMxController {
                             }
 
                         }
+
+                        //detalle de resultado
+                        List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(solicitudDx.getIdSolicitudDx());
+                        if (!resFinal.isEmpty()) {
+                            map.put("resultadoS", messageSource.getMessage("lbl.yes", null, null));
+                        } else {
+                            map.put("resultadoS", messageSource.getMessage("lbl.no", null, null));
+                        }
+                        mapSolicitud.put("detResultado",parseResultDetails(resFinal));
+
+
                         mapSolicitud.put("examenes", ordenesEx);
                         subIndice++;
                         mapSolicitudesList.put(subIndice, mapSolicitud);
@@ -696,6 +722,36 @@ public class TrasladoMxController {
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
+    }
+
+    private String parseResultDetails(List<DetalleResultadoFinal> resultList){
+        String resultados="";
+        for(DetalleResultadoFinal res: resultList){
+            if (res.getRespuesta()!=null) {
+                resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados+=": "+cat_lista.getValor();
+                }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    resultados+=": "+valorBoleano;
+                } else {
+                    resultados+=": "+res.getValor();
+                }
+            }else if (res.getRespuestaExamen()!=null){
+                resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados+=": "+cat_lista.getValor();
+                } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    resultados+=": "+valorBoleano;
+                }else {
+                    resultados+=": "+res.getValor();
+                }
+            }
+        }
+        return resultados;
     }
 
 }

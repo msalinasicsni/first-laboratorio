@@ -68,6 +68,37 @@ var TrasladoMx = function () {
                 }
             });
 
+            var table2 = $('#mx_result').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                "T" +
+                "t" +
+                "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth": true,
+                "columns": [
+                    null, null, null, null, null
+                ],
+                "preDrawCallback": function () {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#mx_result'), breakpointDefinition);
+                    }
+                },
+                "rowCallback": function (nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback": function (oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                },
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
+                }
+            });
+
             <!-- formulario de búsqueda de ordenes -->
             $('#searchMx-form').validate({
                 // Rules for form validation
@@ -87,6 +118,28 @@ var TrasladoMx = function () {
                     table1.fnClearTable();
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
                     getMxs(false)
+                }
+            });
+
+            <!-- formulario de búsqueda de Ordenes de Control de Calidad-->
+            $('#searchMxCC-form').validate({
+                // Rules for form validation
+                rules: {
+                    fecFinTomaMx: {required: function () {
+                            return $('#fecInicioTomaMx').val().length > 0;
+                        }},
+                    fecInicioTomaMx: {required: function () {
+                            return $('#fecFinTomaMx').val().length > 0;
+                        }}
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    table2.fnClearTable();
+                    //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
+                    getMxCC(false)
                 }
             });
 
@@ -214,8 +267,99 @@ var TrasladoMx = function () {
                     });
             }
 
-            $("#all-orders").click(function () {
-                getMxs(true);
+            /*PARA MOSTRAR detalle de solicitudes*/
+            function format1(d, indice) {
+                // `d` is the original data object for the row
+                var texto = d[indice]; //indice donde esta el input hidden
+                var diagnosticos = $(texto).val();
+                var json = JSON.parse(diagnosticos);
+                var len = Object.keys(json).length;
+                var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                    '<tr><td style="font-weight: bold">' + $('#text_request').val() + '</td><td style="font-weight: bold">' + $('#text_request_date').val() + '</td><td style="font-weight: bold">' + $('#text_request_type').val() + '</td></tr>';
+                for (var i = 1; i <= len; i++) {
+                    childTable = childTable +
+                        '<tr><td>' + json[i].nombre + '</td>' +
+                        '<td>' + json[i].detResultado + '</td>' +
+                        '<td>' + json[i].fechaAprobacion + '</td>' +
+                        '</tr>';
+                }
+                childTable = childTable + '</table>';
+                return childTable;
+            }
+
+
+            //Filtro modificado para busqueda por fechas de aprobacion
+            function getMxCC(showAll) {
+                var mxFiltros = {};
+                if (showAll) {
+                    mxFiltros['nombreApellido'] = '';
+                    mxFiltros['fechaInicioAprob'] = '';
+                    mxFiltros['fechaFinAprob'] = '';
+                    mxFiltros['codSilais'] = '';
+                    mxFiltros['codUnidadSalud'] = '';
+                    mxFiltros['codTipoMx'] = '';
+                    mxFiltros['esLab'] = '';
+                    mxFiltros['codTipoSolicitud'] = '';
+                    mxFiltros['nombreSolicitud'] = '';
+                    mxFiltros['tipoTraslado'] = $("#tipoTraslado").val();
+                } else {
+                    mxFiltros['nombreApellido'] = $('#txtfiltroNombre').val();
+                    mxFiltros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
+                    mxFiltros['fechaFinTomaMx'] = $('#fecFinTomaMx').val();
+
+                    mxFiltros['codSilais'] = $('#codSilais').find('option:selected').val();
+                    mxFiltros['codUnidadSalud'] = $('#codUnidadSalud').find('option:selected').val();
+                    mxFiltros['codTipoMx'] = $('#codTipoMx').find('option:selected').val();
+                    mxFiltros['esLab'] = '';
+                    mxFiltros['codigoUnicoMx'] = $('#txtCodUnicoMx').val();
+                    mxFiltros['codTipoSolicitud'] = '';
+                    mxFiltros['nombreSolicitud'] = $('#nombreSoli').val();
+                    mxFiltros['tipoTraslado'] = $("#tipoTraslado").val();
+                }
+                bloquearUI(parametros.blockMess);
+                $.getJSON(parametros.sOrdersUrl, {
+                    strFilter: JSON.stringify(mxFiltros),
+                    ajax: 'true'
+                }, function (dataToLoad) {
+                    table2.fnClearTable();
+                    var len = Object.keys(dataToLoad).length;
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            var json = JSON.parse(dataToLoad[i].solicitudes);
+                            var len2 = Object.keys(json).length;
+                            var childTable = '<table style="padding-left:20px;border-collapse: separate;border-spacing:  10px 3px;">' +
+                                '<tr><td style="font-weight: bold; width: 40%">' + $('#text_request').val() + '</td><td style="font-weight: bold; width: 40%">' + $('#text_final_result').val() + '</td><td style="font-weight: bold; width: 20%">' + $('#text_approve_date').val() + '</td></tr>';
+                            for (var j = 1; j <= len2; j++) {
+                                childTable = childTable +
+                                    '<tr><td style="width: 40%">' + json[j].nombre + '</td>' +
+                                    '<td style="width: 40%">' + json[j].detResultado + '</td>' +
+                                    '<td style="width: 20%">' + json[j].fechaAprobacion + '</td>' +
+                                    '</tr>';
+                            }
+                            childTable = childTable + '</table>';
+                        table2.fnAddData(
+                            [dataToLoad[i].codigoUnicoMx + " <input type='hidden' value='" + dataToLoad[i].idTomaMx + "'/>", dataToLoad[i].tipoMuestra, dataToLoad[i].fechaInicioSintomas,
+                                dataToLoad[i].codSilais, childTable]);
+                    }
+                    } else {
+                        $.smallBox({
+                            title: $("#msg_no_results_found").val(),
+                            content: $("#smallBox_content").val(),
+                            color: "#C79121",
+                            iconSmall: "fa fa-warning",
+                            timeout: 4000
+                        });
+                    }
+                    desbloquearUI();
+                })
+                    .fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+            }
+
+            $("#all-ordersCC").click(function () {
+                getMxCC(true);
             });
 
             function trasladarMx() {
