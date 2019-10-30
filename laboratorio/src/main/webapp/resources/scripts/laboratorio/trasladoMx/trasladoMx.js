@@ -364,6 +364,7 @@ var TrasladoMx = function () {
 
             function trasladarMx() {
                 var oTT = TableTools.fnGetInstance('muestras_result');
+                if (oTT == null ) oTT = TableTools.fnGetInstance('mx_result');
                 var aSelectedTrs = oTT.fnGetSelected();
                 var len = aSelectedTrs.length;
                 var opcSi = $("#confirm_msg_opc_yes").val();

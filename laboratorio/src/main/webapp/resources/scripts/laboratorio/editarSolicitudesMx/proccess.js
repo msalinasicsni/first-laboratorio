@@ -400,26 +400,44 @@ var EditarMxLab = function () {
 
             <!-- cargar dx -->
             function getDiagnosticos(idTipoMx, codTipoNoti, esSolicitud) {
-                $.getJSON(parametros.sDxURL, {
-                    codMx: idTipoMx, tipoNoti: codTipoNoti, idTomaMx: $("#idTomaMx").val(),
-                    ajax: 'true'
-                }, function (data) {
-                    var html = null;
-                    var len = data.length;
-                    html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
-                    for (var i = 0; i < len; i++) {
-                        html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
-                            + data[i].diagnostico.nombre
-                            + '</option>';
-                    }
-                    if (!esSolicitud)
-                        $('#codDX').html(html);
-                    else
-                        $('#codDXNuevo').html(html);
-                }).fail(function (jqXHR) {
-                    setTimeout($.unblockUI, 10);
-                    validateLogin(jqXHR);
-                });
+                if (esSolicitud) {
+                    $.getJSON(parametros.sDxURL, {
+                        codMx: idTipoMx, tipoNoti: codTipoNoti, idTomaMx: "",
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
+                                + data[i].diagnostico.nombre
+                                + '</option>';
+                        }
+                            $('#codDXNuevo').html(html);
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                }else {
+                    $.getJSON(parametros.sDxURL, {
+                        codMx: idTipoMx, tipoNoti: codTipoNoti, idTomaMx: $("#idTomaMx").val(),
+                        ajax: 'true'
+                    }, function (data) {
+                        var html = null;
+                        var len = data.length;
+                        html += '<option value="">' + $("#text_opt_select").val() + '...</option>';
+                        for (var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].diagnostico.idDiagnostico + '">'
+                                + data[i].diagnostico.nombre
+                                + '</option>';
+                        }
+                            $('#codDX').html(html);
+
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                }
             }
 
             <!-- cargar estudios -->
