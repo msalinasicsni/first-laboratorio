@@ -73,31 +73,35 @@ public class EquiposProcesamientoService {
         return query.list();
     }
 
-    public List<EquiposProcesamiento> getEquiposExamen(int idExamen){
+    public EquiposProcesamiento getEquipoExamenes(String idExamenes){
+        List<EquiposProcesamiento> equipos = new ArrayList<EquiposProcesamiento>();
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("select ee.equipo from Examen_Equipo ee inner join ee.examen ex where ex.idExamen = :idExamen ");
-        query.setParameter("idExamen", idExamen);
-        return query.list();
+        Query query = session.createQuery("select ee.equipo from Examen_Equipo ee inner join ee.examen ex where ee.pasivo = false and ee.equipo.pasivo = false and ex.idExamen in (:idExamenes) and to_upper(ee.equipo.nombre) like '%INFINITY%' " +
+                "order by ee.fechaRegistro desc ");
+        query.setParameter("idExamenes", idExamenes);
+        equipos = query.list();
+        if (equipos.size()>0) return equipos.get(0);//el equipo mas reciente
+        else return null;
     }
 
     public String ordersProcessedInInfinity(String idTomaMx){
         Session session = sessionFactory.getCurrentSession();
-        List<Long> nse = new ArrayList<Long>();
+        List<Long> idExamenes = new ArrayList<Long>();
         //se toman las que son de diagnóstico.
         Query q = session.createQuery("select exs.idExamen from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq, " +
                 "OrdenExamen as oe inner join oe.solicitudDx dx inner join dx.idTomaMx as mx inner join oe.codExamen exs " +
-                "where exs.idExamen = ex.idExamen and mx.idTomaMx =:idTomaMx and dx.anulado = false and oe.anulado = false and ee.pasivo = false ");
+                "where exs.idExamen = ex.idExamen and mx.idTomaMx =:idTomaMx and dx.anulado = false and oe.anulado = false and ee.pasivo = false and to_upper(eq.nombre) like '%INFINITY%' ");
         q.setParameter("idTomaMx",idTomaMx);
-        nse = q.list();
+        idExamenes = q.list();
         //se toman las que son de estudio
         Query q2 = session.createQuery("select exs.idExamen from Examen_Equipo ee inner join ee.examen ex inner join ee.equipo eq, " +
                 "OrdenExamen as oe inner join oe.solicitudEstudio es inner join es.idTomaMx as mx inner join oe.codExamen exs " +
-                "where exs.idExamen = ex.idExamen and mx.idTomaMx =:idTomaMx and es.anulado = false and oe.anulado = false and ee.pasivo = false ");
+                "where exs.idExamen = ex.idExamen and mx.idTomaMx =:idTomaMx and es.anulado = false and oe.anulado = false and ee.pasivo = false and to_upper(eq.nombre) like '%INFINITY%'");
         q2.setParameter("idTomaMx",idTomaMx);
-        nse.addAll(q2.list());
+        idExamenes.addAll(q2.list());
 
-        if (nse.size()>0) //pasar lista a string seperados por coma
-            return StringUtil.join(nse.toArray(), ",");
+        if (idExamenes.size()>0) //pasar lista a string seperados por coma
+            return StringUtil.join(idExamenes.toArray(), ",");
         else
             return null;
     }

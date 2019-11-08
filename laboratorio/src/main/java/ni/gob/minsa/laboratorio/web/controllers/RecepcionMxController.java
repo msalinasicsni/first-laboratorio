@@ -6,10 +6,7 @@ import ni.gob.minsa.laboratorio.domain.comunicacionResultados.SolicitudHL7;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
-import ni.gob.minsa.laboratorio.domain.examen.Area;
-import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.examen.Direccion;
-import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
+import ni.gob.minsa.laboratorio.domain.examen.*;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
@@ -969,6 +966,7 @@ public class RecepcionMxController {
                 testOrder.setFechaNac(DateUtil.DateToString(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(),"yyyyMMdd"));
                 String sexo = recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
                 testOrder.setSexo(sexo.substring(sexo.length()-1, sexo.length()));
+
                 testOrder.setIdMuestra(comunicacionResultadosService.generarIdMuestra()); //AñoMesDía y consecutivo de 5 digitos ejemplo: 19021300001
                 testOrder.setFechaHoraMx(DateUtil.DateToString(recepcionMx.getTomaMx().getFechaHTomaMx(),"yyyyMMddHHmmss"));//"20190722094500"
                 testOrder.setIdUnidadSalud(String.valueOf(recepcionMx.getTomaMx().getCodUnidadAtencion().getUnidadId()));
@@ -980,6 +978,8 @@ public class RecepcionMxController {
                 testOrder.setIdExamenes(idExamenes);
                 testOrder.setUsuarioRegistro(usuario.getUsername());
                 testOrder.setIdMuestraLaboratorio(recepcionMx.getTomaMx().getIdTomaMx());
+                EquiposProcesamiento equiposProcesamiento = equiposProcesamientoService.getEquipoExamenes(idExamenes);
+                if (equiposProcesamiento!=null) testOrder.setEquipo(equiposProcesamiento.getIdEquipo());
                 //Llamar servicio que envia solicitud HL7 al infinity y la registra en base de datos
                 CallRestServices.crearSolicitud(testOrder);
                 /*
