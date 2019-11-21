@@ -6,10 +6,7 @@ import ni.gob.minsa.laboratorio.domain.comunicacionResultados.SolicitudHL7;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
-import ni.gob.minsa.laboratorio.domain.examen.Area;
-import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
-import ni.gob.minsa.laboratorio.domain.examen.Direccion;
-import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
+import ni.gob.minsa.laboratorio.domain.examen.*;
 import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
@@ -910,7 +907,12 @@ public class RecepcionMxController {
                             }
                     }
                     //TODO
-                    //validarEnviarSolicitudInfinity(recepcionMx, usuario);
+                    try {
+                        validarEnviarSolicitudInfinity(recepcionMx, usuario);
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+
 
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
@@ -955,11 +957,19 @@ public class RecepcionMxController {
         try {
             String idExamenes = equiposProcesamientoService.ordersProcessedInInfinity(recepcionMx.getTomaMx().getIdTomaMx());
             if (idExamenes != null){
+                Parametro ipSocketInfinity = parametrosService.getParametroByName("IP_SOCKET_INFINITY");
+                Parametro puertoSocketInfinity = parametrosService.getParametroByName("PUERTO_SOCKET_INFINITY");
                 TestOrder testOrder = new TestOrder();
-                testOrder.setIpServer("localhost");
-                testOrder.setPuertoServer(50001);
+                testOrder.setIpServer(ipSocketInfinity.getValor());
+                testOrder.setPuertoServer(Integer.valueOf(puertoSocketInfinity.getValor()));
                 testOrder.setMessageId(DateUtil.DateToString(new Date(), "yyyyMMddHHmmss"));
-                testOrder.setCodExpediente("401MASRM21128901");
+                if (recepcionMx.getTomaMx().getIdNotificacion().getCodigoPacienteVIH()!=null){
+                    testOrder.setCodExpediente(recepcionMx.getTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                    //testOrder.setCodExpediente("401JMPSM21128901");
+                }else{
+                    testOrder.setCodExpediente(String.valueOf(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPersonaId()));
+                }
+
                 testOrder.setPersonaId(String.valueOf(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPersonaId()));
 
                 testOrder.setApellido1(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getPrimerApellido());
@@ -969,8 +979,11 @@ public class RecepcionMxController {
                 testOrder.setFechaNac(DateUtil.DateToString(recepcionMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(),"yyyyMMdd"));
                 String sexo = recepcionMx.getTomaMx().getIdNotificacion().getPersona().getSexo().getCodigo();
                 testOrder.setSexo(sexo.substring(sexo.length()-1, sexo.length()));
-                testOrder.setIdMuestra(comunicacionResultadosService.generarIdMuestra()); //AñoMesDía y consecutivo de 5 digitos ejemplo: 19021300001
+
+                testOrder.setIdMuestra(comunicacionResultadosService.generarIdMuestra()); //Inicia en un millon uno (1000001)
+                //testOrder.setIdMuestra("1000001");
                 testOrder.setFechaHoraMx(DateUtil.DateToString(recepcionMx.getTomaMx().getFechaHTomaMx(),"yyyyMMddHHmmss"));//"20190722094500"
+                //testOrder.setFechaHoraMx("201911111217");
                 testOrder.setIdUnidadSalud(String.valueOf(recepcionMx.getTomaMx().getCodUnidadAtencion().getUnidadId()));
                 testOrder.setNombreUnidadSalud(recepcionMx.getTomaMx().getCodUnidadAtencion().getNombre());
                 testOrder.setIdOrigen("3");
@@ -980,8 +993,15 @@ public class RecepcionMxController {
                 testOrder.setIdExamenes(idExamenes);
                 testOrder.setUsuarioRegistro(usuario.getUsername());
                 testOrder.setIdMuestraLaboratorio(recepcionMx.getTomaMx().getIdTomaMx());
+                EquiposProcesamiento equiposProcesamiento = equiposProcesamientoService.getEquipoExamenes(idExamenes);
+                if (equiposProcesamiento!=null) testOrder.setEquipo(equiposProcesamiento.getIdEquipo());
                 //Llamar servicio que envia solicitud HL7 al infinity y la registra en base de datos
-                CallRestServices.crearSolicitud(testOrder);
+                try {
+                    CallRestServices.crearSolicitud(testOrder);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+
                 /*
                 SimpleMLLPBasedTCPClient.sendHL7TestOrder(testOrder);
 

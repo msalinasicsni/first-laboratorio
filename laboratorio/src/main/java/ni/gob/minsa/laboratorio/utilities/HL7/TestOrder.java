@@ -29,6 +29,7 @@ public class TestOrder {
     private String trama;
     private String idMuestraLaboratorio;
     private String usuarioRegistro;
+    private Integer equipo;
 
     public String getIpServer() {
         return ipServer;
@@ -212,5 +213,13 @@ public class TestOrder {
 
     public void setUsuarioRegistro(String usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
+    }
+
+    public Integer getEquipo() {
+        return equipo;
+    }
+
+    public void setEquipo(Integer equipo) {
+        this.equipo = equipo;
     }
 }

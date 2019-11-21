@@ -180,7 +180,7 @@ public class ReportesExcelController {
         List<Semanas> semanas = catalogosService.getSemanas();
         List<Anios> anios = catalogosService.getAnios();
         List<Laboratorio> laboratorios = null;
-        User usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         if (usuario.getNivelCentral()){
             laboratorios = laboratoriosService.getLaboratoriosRegionales();
@@ -448,6 +448,7 @@ public class ReportesExcelController {
     @RequestMapping(value = "/consolidadoTecnica", method = RequestMethod.GET)
     public ModelAndView downloadExcelConsolidatedExam(@RequestParam(value = "filtro", required = true) String filtro) throws Exception {
         ModelAndView excelView = new ModelAndView("excelView");
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
         List<Solicitud> catalogoDxList = new ArrayList<Solicitud>();
         if (filtroRep.getDiagnosticos()!=null && !filtroRep.getDiagnosticos().isEmpty()) catalogoDxList = tomaMxService.getDxs(filtroRep.getDiagnosticos());

@@ -36,8 +36,16 @@ public class ComunicacionResultadosService {
         return (long)query.uniqueResult();
     }
 
+    public long getMaxIdMuestraSecun(){
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("select coalesce(max(cast(s.idMuestraSecundario as long)), 1000000) " +
+                "from SolicitudHL7 s where to_char(s.fechaRegistro, 'DDMMYYYY') = to_char(current_date, 'DDMMYYYY')");
+        return (long)query.uniqueResult();
+    }
+
     public String generarIdMuestra(){
-        long total = this.contarSolicitudesDelDia()+1;
+        //long total = this.contarSolicitudesDelDia()+1;
+        long total = this.getMaxIdMuestraSecun()+1;//el primer id debe ser 1000001 (un millon uno)
         return DateUtil.DateToString(new Date(), "yyMMdd")+StringUtil.completarCerosIzquierda(total, 5);
     }
 

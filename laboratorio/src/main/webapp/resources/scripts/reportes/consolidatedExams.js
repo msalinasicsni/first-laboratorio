@@ -87,13 +87,13 @@ var consolidatedExams = function () {
                             if (strValores.length > 0)
                                 strValores = strValores + ',' + valores[i].substr(0, valores[i].indexOf("-R"));
                             else
-                                strValores = +valores[i].substr(0, valores[i].indexOf("-R"));
+                                strValores = valores[i].substr(0, valores[i].indexOf("-R"));
                         }
                         else {
                             if (strValoresEst.length > 0)
                                 strValoresEst = strValoresEst + ',' + valores[i].substr(0, valores[i].indexOf("-E"));
                             else
-                                strValoresEst = +valores[i].substr(0, valores[i].indexOf("-E"));
+                                strValoresEst = valores[i].substr(0, valores[i].indexOf("-E"));
                         }
                     }
                     filtro['diagnosticos'] = strValores;
