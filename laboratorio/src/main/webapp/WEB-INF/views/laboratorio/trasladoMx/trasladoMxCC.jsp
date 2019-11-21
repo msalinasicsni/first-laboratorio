@@ -367,6 +367,8 @@
     <script src="${calculateAge}"></script>
     <spring:url value="/resources/scripts/utilidades/handleInputMask.js" var="handleInputMask" />
     <script src="${handleInputMask}"></script>
+    <spring:url value="/resources/scripts/utilidades/generarReporte.js" var="utilidadReporte" />
+    <script src="${utilidadReporte}"></script>
     <!-- END PAGE LEVEL SCRIPTS -->
 	<spring:url value="/personas/search" var="sPersonUrl"/>
     <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
@@ -374,6 +376,7 @@
 
     <c:url var="unidadesURL" value="/api/v1/unidadesPrimariasHospSilais"/>
     <c:url var="sTrasladoUrl" value="/trasladoMx/realizarTrasladoMx"/>
+    <spring:url var="sPrintUrl" value="/trasladoMx/printCCPdf"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -382,6 +385,7 @@
                 sUnidadesUrl : "${unidadesURL}",
                 blockMess: "${blockMess}",
                 sTableToolsPath : "${tabletools}",
+                sPrintUrl : "${sPrintUrl}",
                 sTrasladoUrl : "${sTrasladoUrl}"
             };
 			TrasladoMx.init(parametros);
