@@ -2089,8 +2089,12 @@ public class ReportesExcelController {
                 registrosPos.add(registro);
                 if (tieneBioMol)
                     registro[43] = registro[42].toString();
-                else
-                    registro[43] = registro[34].toString()+", "+messageSource.getMessage("lbl.pcr.flu.a.NS", null, null);
+                else {
+                    if(!registro[24].toString().equalsIgnoreCase("Positivo"))
+                        registro[43] = registro[34].toString();
+                    else
+                        registro[43] = registro[34].toString() + ", " + messageSource.getMessage("lbl.pcr.flu.a.NS.2", null, null);
+                }
             }
         }
     }
