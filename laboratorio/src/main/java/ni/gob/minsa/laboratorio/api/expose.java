@@ -396,4 +396,59 @@ public class expose {
         }
         return datosSolicitudes;
     }
+
+    @RequestMapping(value = "getDxsPersonNoti/{idPersona}/{tipoNoti}", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<DatosSolicitud> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona,
+                                            @PathVariable(value = "tipoNoti") String tipoNoti) throws Exception {
+        logger.info("Obteniendo los dx TB y VIH por persona en JSON");
+        List<DatosSolicitud> datosSolicitudes = solicitudService.getSolicitudesByIdPersonTipoNoti(idPersona, tipoNoti);
+        for(DatosSolicitud ds: datosSolicitudes){
+            List<ResultadoSolicitud> detRes = resultadoFinalService.getDetResActivosBySolicitudV2(ds.getIdSolicitud());
+            if (ds.getAprobada()!= null){
+                if (ds.getAprobada().equals(true)) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.approval.result", null, null));
+                } else {
+                    if (!detRes.isEmpty()) {
+                        ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                    } else {
+                        ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                    }
+                }
+            }else{
+                if (!detRes.isEmpty()) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                } else {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                }
+            }
+            String resultados="";
+            for(ResultadoSolicitud res: detRes){
+                if (res.getRespuesta()!=null) {
+                    //resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                    if (res.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados+=cat_lista.getEtiqueta();
+                    }else if (res.getTipo().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                        resultados+=valorBoleano;
+                    } else if (res.getValor().toLowerCase().contains("inadecuad")) {
+                        resultados+=res.getValor();
+                    }
+                }else if (res.getRespuestaExamen()!=null){
+                    //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                    if (res.getTipoExamen().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados+=cat_lista.getEtiqueta();
+                    } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                        resultados+=valorBoleano;
+                    }
+                }
+            }
+            ds.setResultado(resultados);
+        }
+        return datosSolicitudes;
+    }
 }

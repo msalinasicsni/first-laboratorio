@@ -30,10 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by souyen-ics.
@@ -104,8 +101,8 @@ public class ResultadoFinalController {
     String fetchDxJson(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo los diagnósticos con examenes realizados");
         FiltroMx filt= jsonToFiltroDx(filtro);
-        List<DaSolicitudDx> dxList = null;
-        List<DaSolicitudEstudio> estudioList = null;
+        List<DaSolicitudDx> dxList = new ArrayList<DaSolicitudDx>();
+        List<DaSolicitudEstudio> estudioList = new ArrayList<DaSolicitudEstudio>();
         Integer records = 0;
 
         if(filt.getCodTipoSolicitud()!= null){

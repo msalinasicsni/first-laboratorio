@@ -13,6 +13,7 @@ public class ResultadoVigilancia {
     private String idSolicitud;
     private String codigoMx;
     private String codUnicoMx;
+    private String codigoVIH;
 
     private String codigoExpUnico;
     private Date fechaNacimiento;
@@ -389,5 +390,13 @@ public class ResultadoVigilancia {
 
     public void setUrgente(String urgente) {
         this.urgente = urgente;
+    }
+
+    public String getCodigoVIH() {
+        return codigoVIH;
+    }
+
+    public void setCodigoVIH(String codigoVIH) {
+        this.codigoVIH = codigoVIH;
     }
 }

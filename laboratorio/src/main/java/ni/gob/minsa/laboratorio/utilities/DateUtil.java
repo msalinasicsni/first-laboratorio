@@ -66,20 +66,22 @@ public class DateUtil {
         return diffHours.intValue();
     }
 
-    public static long CalcularDiferenciaHorasFechas(Date fecha1, Date fecha2){
-        // Crear 2 instancias de Calendar
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
-        cal1.setTime(fecha1);
-        cal2.setTime(fecha2);
-        // conseguir la representacion de la fecha en milisegundos
-        long milis1 = cal1.getTimeInMillis();
-        long milis2 = cal2.getTimeInMillis();
-        // calcular la diferencia en milisengundos
-        long diff = milis2 - milis1;
-        // calcular la diferencia en horas
-        long diffHours = diff / (60 * 60 * 1000);
-        return diffHours;
+    public static Long CalcularDiferenciaHorasFechas(Date fecha1, Date fecha2){
+        if (fecha1!=null && fecha2 !=null) {
+            // Crear 2 instancias de Calendar
+            Calendar cal1 = Calendar.getInstance();
+            Calendar cal2 = Calendar.getInstance();
+            cal1.setTime(fecha1);
+            cal2.setTime(fecha2);
+            // conseguir la representacion de la fecha en milisegundos
+            long milis1 = cal1.getTimeInMillis();
+            long milis2 = cal2.getTimeInMillis();
+            // calcular la diferencia en milisengundos
+            long diff = milis2 - milis1;
+            // calcular la diferencia en horas
+            long diffHours = diff / (60 * 60 * 1000);
+            return diffHours;
+        }else return null;
     }
 
 

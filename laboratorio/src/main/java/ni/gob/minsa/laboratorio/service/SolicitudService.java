@@ -40,4 +40,20 @@ public class SolicitudService {
         query.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
         return query.list();
     }
+
+    public List<DatosSolicitud> getSolicitudesByIdPersonTipoNoti(String idPersona, String tipoNoti){
+        Session session = sessionFactory.getCurrentSession();
+        String sQuery = "select t1.idSolicitudDx as idSolicitud , t1.codDx.nombre as nombre, t2.codigoLab as codigoMx, t2.estadoMx.valor as estadoMx, " +
+                " t2.codTipoMx.nombre as tipoMx, to_char(t1.fechaHSolicitud, 'DD/MM/YYYY HH24:mi:ss') as fechaSolicitud, t1.aprobada as aprobada, to_char(t1.fechaAprobacion, 'DD/MM/YYYY HH24:mi:ss') as fechaAprobacion " +
+                "from DaSolicitudDx t1, DaTomaMx t2, DaNotificacion t3 " +
+                "where t1.idTomaMx = t2.idTomaMx and t2.idNotificacion = t3.idNotificacion " +
+                " and t3.persona.personaId = :idPersona and t3.codTipoNotificacion.codigo = :tipoNoti " +
+                " order by t1.fechaHSolicitud desc";
+
+        Query query = session.createQuery(sQuery);
+        query.setParameter("idPersona",Long.valueOf(idPersona));
+        query.setParameter("tipoNoti", tipoNoti);
+        query.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
+        return query.list();
+    }
 }

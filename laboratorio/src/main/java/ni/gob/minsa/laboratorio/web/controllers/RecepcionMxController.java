@@ -995,6 +995,7 @@ public class RecepcionMxController {
                 testOrder.setIdMuestraLaboratorio(recepcionMx.getTomaMx().getIdTomaMx());
                 EquiposProcesamiento equiposProcesamiento = equiposProcesamientoService.getEquipoExamenes(idExamenes);
                 if (equiposProcesamiento!=null) testOrder.setEquipo(equiposProcesamiento.getIdEquipo());
+                testOrder.setCodigoLab(recepcionMx.getTomaMx().getCodigoLab());
                 //Llamar servicio que envia solicitud HL7 al infinity y la registra en base de datos
                 try {
                     CallRestServices.crearSolicitud(testOrder);

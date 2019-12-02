@@ -30,6 +30,7 @@ public class TestOrder {
     private String idMuestraLaboratorio;
     private String usuarioRegistro;
     private Integer equipo;
+    private String codigoLab;
 
     public String getIpServer() {
         return ipServer;
@@ -221,5 +222,13 @@ public class TestOrder {
 
     public void setEquipo(Integer equipo) {
         this.equipo = equipo;
+    }
+
+    public String getCodigoLab() {
+        return codigoLab;
+    }
+
+    public void setCodigoLab(String codigoLab) {
+        this.codigoLab = codigoLab;
     }
 }
