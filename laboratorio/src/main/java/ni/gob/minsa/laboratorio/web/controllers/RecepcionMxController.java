@@ -2126,18 +2126,23 @@ public class RecepcionMxController {
                 //map.put("estadoOrden", ordenExamen.getOrdenExamen().getCodEstado().getValor());
                 //map.put("separadaMx", (recepcion.getTomaMx().getMxSeparada() != null ? (recepcion.getTomaMx().getMxSeparada() ? "Si" : "No") : ""));
                 //map.put("cantidadTubos", (recepcion.getTomaMx().getCanTubos() != null ? String.valueOf(recepcion.getTomaMx().getCanTubos()) : ""));
-                //map.put("tipoMuestra", recepcion.getTomaMx().getCodTipoMx().getNombre());
+                map.put("tipoMuestra", recepcion.getTomaMx().getCodTipoMx().getNombre());
                 //map.put("tipoExamen", ordenExamen.getOrdenExamen().getCodExamen().getNombre());
                 //map.put("areaProcesa", ordenExamen.getOrdenExamen().getCodExamen().getArea().getNombre());
                 //Si hay fecha de inicio de sintomas se muestra
                 Date fechaInicioSintomas = recepcion.getTomaMx().getIdNotificacion().getFechaInicioSintomas();
-                if (fechaInicioSintomas != null) {
-                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
-                    map.put("dias",String.valueOf(DateUtil.CalcularDiferenciaDiasFechas(fechaInicioSintomas, recepcion.getTomaMx().getFechaHTomaMx())+1));
-                }
-                else {
+                if (!recepcion.getTomaMx().getIdNotificacion().getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|VIH")) {
+                    if (fechaInicioSintomas != null) {
+                        map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                        map.put("dias", String.valueOf(DateUtil.CalcularDiferenciaDiasFechas(fechaInicioSintomas, recepcion.getTomaMx().getFechaHTomaMx()) + 1));
+                    } else {
+                        map.put("fechaInicioSintomas", " ");
+                        map.put("dias", "");
+                    }
+                }else {
                     map.put("fechaInicioSintomas", " ");
-                    map.put("dias","");
+                    //para VIH los dias son de la fecha de toma hasta la fecha actual en que se está recepcionando en lab
+                    map.put("dias", String.valueOf(DateUtil.CalcularDiferenciaDiasFechas(recepcion.getTomaMx().getFechaHTomaMx(), new Date()) + 1));
                 }
 
                 //Si hay persona
@@ -2620,7 +2625,7 @@ public class RecepcionMxController {
 
                             drawInfoLab(stream, page, labProcesa);
 
-                            float y = 640;
+                            float y = 648;
                             //nombre del reporte
                             float xCenter;
                             xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
@@ -2631,23 +2636,27 @@ public class RecepcionMxController {
                             y = y - 15;
                             xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
                             GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
-                            y = y - 30;
+                            y = y - 20;
 
                             String nombres = "";
                             String apellidos = "";
                             String edad = "";
-                            if (tomaMx.getIdNotificacion().getPersona() != null) {
-                                nombres = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
-                                    nombres = nombres + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                            if (!tomaMx.getIdNotificacion().getCodTipoNotificacion().getCodigo().equalsIgnoreCase("TPNOTI|VIH")) {
+                                if (tomaMx.getIdNotificacion().getPersona() != null) {
+                                    nombres = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                                    if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                        nombres = nombres + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
 
-                                apellidos = tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
-                                    apellidos = apellidos + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                            } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                                    apellidos = tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                                    if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                        apellidos = apellidos + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                                } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                                    nombres = tomaMx.getIdNotificacion().getCodigoPacienteVIH();
+                                } else {
+                                    nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
+                                }
+                            }else {
                                 nombres = tomaMx.getIdNotificacion().getCodigoPacienteVIH();
-                            } else {
-                                nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
                             }
                             if (tomaMx.getIdNotificacion().getPersona() != null) {
                                 String[] arrEdad = DateUtil.calcularEdad(tomaMx.getIdNotificacion().getPersona().getFechaNacimiento(), new Date()).split("/");
@@ -2678,10 +2687,13 @@ public class RecepcionMxController {
                             GeneralUtils.drawTEXT(tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getNombre() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
                             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 400, stream, 11, PDType1Font.HELVETICA);
                             GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy"), y, 490, stream, 11, PDType1Font.HELVETICA_BOLD);
+                            y = y - 15;
+                            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type", null, null)+ ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                            GeneralUtils.drawTEXT(tomaMx.getCodTipoMx().getNombre(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                             //resultados
                             List<DaSolicitudDx> listDx = tomaMxService.getSoliDxAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
-                            y = y - 10;
+                            y = y - 4;
                             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), labProcesa.getCodigo());
                             String procesadoPor = "";
                             String aprobadoPor = "";

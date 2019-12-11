@@ -114,10 +114,10 @@ public class CrearSolicitudDx {
                     DaNotificacion notificacion = null;
                     DaTomaMx tomaMx = new DaTomaMx();
                     boolean esSeguimiento = solicitud.getSeguimiento().equalsIgnoreCase("1");
-                    if (esSeguimiento){
+                    //if (esSeguimiento){
                         List<DaNotificacion> notificaciones = daNotificacionService.getNoticesByPerson(Integer.valueOf(solicitud.getCodExpedienteUnico()), solicitud.getCodTipoNoti());
                         if (notificaciones.size()>0) notificacion = notificaciones.get(0);
-                    }
+                    //}
 
                     //registrar notificacion, si no es seguimiento o si es seguimiento pero no se encontró notificación registrada
                     if (notificacion==null) {
