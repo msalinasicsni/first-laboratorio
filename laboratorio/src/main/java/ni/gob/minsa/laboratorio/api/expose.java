@@ -378,8 +378,11 @@ public class expose {
                     }else if (res.getTipo().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                         resultados+=valorBoleano;
-                    } else if (res.getValor().toLowerCase().contains("inadecuad")) {
+                    }else if (res.getValor().toLowerCase().contains("inadecuad")) {
                         resultados+=res.getValor();
+                    }else {
+                        resultados+=(resultados.isEmpty()?res.getRespuesta():", "+res.getRespuesta());
+                        resultados+=": "+res.getValor();
                     }
                 }else if (res.getRespuestaExamen()!=null){
                     //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
@@ -389,6 +392,9 @@ public class expose {
                     } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                         resultados+=valorBoleano;
+                    }else {
+                        resultados+=(resultados.isEmpty()?res.getRespuestaExamen():", "+res.getRespuestaExamen());
+                        resultados+=": "+res.getValor();
                     }
                 }
             }
@@ -433,8 +439,11 @@ public class expose {
                     }else if (res.getTipo().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                         resultados+=valorBoleano;
-                    } else if (res.getValor().toLowerCase().contains("inadecuad")) {
+                    }else if (res.getValor().toLowerCase().contains("inadecuad")) {
                         resultados+=res.getValor();
+                    }else {
+                        resultados+=(resultados.isEmpty()?res.getRespuesta():", "+res.getRespuesta());
+                        resultados+=": "+res.getValor();
                     }
                 }else if (res.getRespuestaExamen()!=null){
                     //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
@@ -444,6 +453,9 @@ public class expose {
                     } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
                         String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                         resultados+=valorBoleano;
+                    }else {
+                        resultados+=(resultados.isEmpty()?res.getRespuestaExamen():", "+res.getRespuestaExamen());
+                        resultados+=": "+res.getValor();
                     }
                 }
             }
