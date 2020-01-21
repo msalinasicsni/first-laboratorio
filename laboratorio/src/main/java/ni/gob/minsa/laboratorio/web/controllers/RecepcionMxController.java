@@ -826,12 +826,22 @@ public class RecepcionMxController {
                     List<AutoridadArea> autoridadesArea = autoridadesService.getAutoridadesArea(usuario.getUsername());
                     List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), usuario.getUsername());
                     if (autoridadesArea.size() > 1) {
+                        boolean agregarAreaEstudio =true; //13012020
                         for (AutoridadArea autoridadArea : autoridadesArea) {
                             for (Area area : areasDx) {
+                                if (esEstudio) {//para no duplicar recepcion en laboratorio con misma area en dx y est
+                                    if (area.getIdArea().equals(solicitudEstudioList.get(0).getTipoEstudio().getArea().getIdArea()))
+                                        agregarAreaEstudio = false;
+                                }
                                 if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())) {
                                     recepcionMxLab.setArea(autoridadArea.getArea());
                                     recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                                 }
+                            }
+                            //es estudio y tiene autoridad para varias areas y no se ha agregado recepcion en laboratorio del area del estudio
+                            if (agregarAreaEstudio){
+                                recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
+                                recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                             }
                         }
                     } else {
@@ -906,7 +916,7 @@ public class RecepcionMxController {
                                 }
                             }
                     }
-                    //TODO
+                    //VALIDA SI ES NECESARIO ENVIAR PRE ORDEN A SISTEMA INFINITY
                     try {
                         validarEnviarSolicitudInfinity(recepcionMx, usuario);
                     }catch (Exception ex){
@@ -1610,12 +1620,22 @@ public class RecepcionMxController {
                             //Si el usuario tiene autoridad sobre mas de un area seg�n los dx solicitados en la muestra, agregar recepcion en lab para cada area
                             List<Area> areasDx = tomaMxService.getAreaSolicitudDxByTomaAndUser(recepcionMx.getTomaMx().getIdTomaMx(), user.getUsername());
                             if (areasAutorizadas.size() > 1) {
+                                boolean agregarAreaEstudio =true; //13012020
                                 for (AutoridadArea autoridadArea : areasAutorizadas) {
                                     for (Area area : areasDx) {
+                                        if (solicitudEstudioList != null && solicitudEstudioList.size() > 0) {//para no duplicar recepcion en laboratorio con misma area en dx y est
+                                            if (area.getIdArea().equals(solicitudEstudioList.get(0).getTipoEstudio().getArea().getIdArea()))
+                                                agregarAreaEstudio = false;
+                                        }
                                         if (autoridadArea.getArea().getIdArea().equals(area.getIdArea())) {
                                             recepcionMxLab.setArea(autoridadArea.getArea());
                                             recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                                         }
+                                    }
+                                    //es estudio y tiene autoridad para varias areas y no se ha agregado recepcion en laboratorio del area del estudio
+                                    if (agregarAreaEstudio){
+                                        recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
+                                        recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                                     }
                                 }
                             } else {
@@ -1652,6 +1672,12 @@ public class RecepcionMxController {
                                     }
                                 }
                             }
+                        }
+                        //VALIDA SI ES NECESARIO ENVIAR PRE ORDEN A SISTEMA INFINITY
+                        try {
+                            validarEnviarSolicitudInfinity(recepcionMx, user);
+                        }catch (Exception ex){
+                            ex.printStackTrace();
                         }
                     } catch (Exception ex) {
                         resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
