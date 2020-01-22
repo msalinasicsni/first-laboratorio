@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "da_datos_vih", schema = "alerta", uniqueConstraints = @UniqueConstraint(columnNames = {"ID_NOTIFICACION"}))
@@ -16,6 +17,7 @@ public class DaDatosVIH implements Serializable, Auditable {
      */
     private static final long serialVersionUID = 1L;
 
+    private String idDatosVIH;
     private DaNotificacion idNotificacion;
 
     private String resA1;
@@ -35,8 +37,18 @@ public class DaDatosVIH implements Serializable, Auditable {
         super();
     }
 
-
     @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    @Column(name = "ID_DATOS_VIH", nullable = false, insertable = true, updatable = true, length = 36)
+    public String getIdDatosVIH() {
+        return idDatosVIH;
+    }
+
+    public void setIdDatosVIH(String idDatosVIH) {
+        this.idDatosVIH = idDatosVIH;
+    }
+
     @OneToOne(targetEntity=DaNotificacion.class)
     @JoinColumn(name = "ID_NOTIFICACION", referencedColumnName = "ID_NOTIFICACION")
     public DaNotificacion getIdNotificacion() {
@@ -155,7 +167,7 @@ public class DaDatosVIH implements Serializable, Auditable {
 
 	@Override
     public boolean isFieldAuditable(String fieldname) {
-        if (fieldname.matches("idNotificacion"))
+        if (fieldname.matches("idDatosVIH") || fieldname.matches("idNotificacion"))
             return  false;
         else
             return true;
@@ -165,7 +177,7 @@ public class DaDatosVIH implements Serializable, Auditable {
 
 	@Override
     public String toString() {
-        return idNotificacion.getIdNotificacion();
+        return idDatosVIH;
     }
 
     @Override
@@ -175,13 +187,13 @@ public class DaDatosVIH implements Serializable, Auditable {
 
         DaDatosVIH that = (DaDatosVIH) o;
 
-        if (!idNotificacion.getIdNotificacion().equals(that.idNotificacion.getIdNotificacion())) return false;
+        if (!idDatosVIH.equals(that.idDatosVIH)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return idNotificacion.getIdNotificacion().hashCode();
+        return idDatosVIH.hashCode();
     }
 }

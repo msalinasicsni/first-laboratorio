@@ -114,6 +114,9 @@ public class ReportesExcelController {
     @Resource(name = "daDatosVIHService")
     private DaDatosVIHService daDatosVIHService;
 
+    @Resource(name = "daDatosTBService")
+    private DaDatosTBService daDatosTBService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -1718,7 +1721,7 @@ public class ReportesExcelController {
         for (ResultadoVigilancia solicitudDx : dxList) {
             //String nombres = "";
             //String apellidos = "";
-
+            DatosTB datosTB = daDatosTBService.getDatosTB(solicitudDx.getIdNotificacion());
             Object[] registro = new Object[numColumnas];
             registro[1] = (solicitudDx.getCodigoMx()!=null?solicitudDx.getCodigoMx():solicitudDx.getCodUnicoMx());
             registro[2] = solicitudDx.getPrimerNombre();
@@ -1758,6 +1761,10 @@ public class ReportesExcelController {
             registro[16] = (solicitudDx.getCodigoMuniResid()!=null?solicitudDx.getNombreMuniResid():"");
             //registro[17] = ""; //no hay dato unidad de residencia
             //registro[18] = ""; //no hay dato sector de residencia
+            registro[19] = (datosTB!=null && datosTB.getPoblacion()!=null?datosTB.getPoblacion():""); //poblacion
+            registro[20] = (datosTB!=null && datosTB.getLocalizacion()!=null?datosTB.getLocalizacion():""); //localizacion
+            registro[21] = (datosTB!=null && datosTB.getCategoria()!=null?datosTB.getCategoria():""); //categoria
+            registro[22] = (datosTB!=null && datosTB.getComorbilidades()!=null?datosTB.getComorbilidades():""); //enfermedades
 
             registro[24] = solicitudDx.getNombreTipoMx();
 

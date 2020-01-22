@@ -2,7 +2,6 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.vih.DaDatosVIH;
 
-import ni.gob.minsa.laboratorio.utilities.reportes.DatosDaIrag;
 import ni.gob.minsa.laboratorio.utilities.reportes.DatosVIH;
 import org.hibernate.Query;
 import org.hibernate.Session;

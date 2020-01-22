@@ -8,6 +8,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.domain.tb.DaDatosTB;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
 import ni.gob.minsa.laboratorio.domain.vih.DaDatosVIH;
 import ni.gob.minsa.laboratorio.service.*;
@@ -71,6 +72,9 @@ public class CrearSolicitudDx {
 
     @Resource(name = "daDatosVIHService")
     private DaDatosVIHService daDatosVIHService;
+
+    @Resource(name = "daDatosTBService")
+    private DaDatosTBService daDatosTBService;
 
     @Autowired
     MessageSource messageSource;
@@ -302,6 +306,8 @@ public class CrearSolicitudDx {
                 && (solicitud.getCodigoVIH()==null || solicitud.getCodigoVIH().isEmpty())) return "Debe proporcionar valor para 'codigoVIH'";
         if (solicitud.getCodTipoNoti()!=null && solicitud.getCodTipoNoti().equalsIgnoreCase("TPNOTI|VIH")
                 && (solicitud.getSeguimiento().equals("0") && solicitud.getDatosVIH()==null )) return "Debe proporcionar valor para 'datosVIH'";
+        if (solicitud.getCodTipoNoti()!=null && solicitud.getCodTipoNoti().equalsIgnoreCase("TPNOTI|TB")
+                && solicitud.getDatosTB()==null) return "Debe proporcionar valor para 'datosTB'";
         return "";
 
     }
@@ -400,6 +406,29 @@ public class CrearSolicitudDx {
                         vih.setCesarea(solicitud.getDatosVIH().getCesarea());
                     }
                     daDatosVIHService.saveDaDatosVIH(vih);
+                }
+                break;
+            }
+            case "TPNOTI|TB": {
+                if (solicitud.getDatosTB()!=null) {
+                    DaDatosTB tb = daDatosTBService.getDaDatosTB(notificacion.getIdNotificacion());
+                    if (tb == null) {
+                        tb = new DaDatosTB();
+                    }
+                    tb.setIdNotificacion(notificacion);
+                    if (solicitud.getDatosTB().getCategoria() != null) {
+                        tb.setCategoria(solicitud.getDatosTB().getCategoria());
+                    }
+                    if (solicitud.getDatosTB().getComorbilidades() != null) {
+                        tb.setComorbilidades(solicitud.getDatosTB().getComorbilidades());
+                    }
+                    if (solicitud.getDatosTB().getLocalizacion() != null) {
+                        tb.setLocalizacion(solicitud.getDatosTB().getLocalizacion());
+                    }
+                    if (solicitud.getDatosTB().getPoblacion() != null) {
+                        tb.setPoblacion(solicitud.getDatosTB().getPoblacion());
+                    }
+                    daDatosTBService.saveDaDatosTB(tb);
                 }
                 break;
             }

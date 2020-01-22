@@ -30,6 +30,16 @@ public class RegistroSolicitud {
 
     private DatosVIH datosVIH;
 
+    private DatosTB datosTB;
+
+    public DatosTB getDatosTB() {
+        return datosTB;
+    }
+
+    public void setDatosTB(DatosTB datosTB) {
+        this.datosTB = datosTB;
+    }
+
     public DatosVIH getDatosVIH() {
         return datosVIH;
     }
