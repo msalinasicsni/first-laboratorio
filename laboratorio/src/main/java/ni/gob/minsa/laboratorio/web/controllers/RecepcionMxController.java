@@ -309,6 +309,7 @@ public class RecepcionMxController {
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
             List<Unidades> unidades = null;
             List<Examen_Dx> examenesList = null;
+            List<Examen_Estudio> examenesEstList = null;
             List<OrdenExamen> ordenExamenList;
             Date fechaInicioSintomas = null;
             boolean esEstudio = false;
@@ -394,6 +395,30 @@ public class RecepcionMxController {
                         if (solicitudEstudioList.size()>0) {
                             //procesar examenes default para cada estudio
                             for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
+                                //se obtienen los id de los examenes por defecto
+                                examenesEstList = examenesService.getExamenesDefectoByIdEst(solicitudEstudio.getTipoEstudio().getIdEstudio(), usuario.getUsername());
+                                if (examenesEstList != null) {
+                                    //se registran los examenes por defecto
+                                    for (Examen_Estudio examenTmp : examenesEstList) {
+                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                        ordenExamen.setCodExamen(examenTmp.getExamen());
+                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                        ordenExamen.setUsuarioRegistro(usuario);
+                                        ordenExamen.setLabProcesa(labUsuario);
+                                        try {
+                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            logger.error("Error al agregar orden de examen", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        /*if (solicitudEstudioList.size()>0) {
+                            //procesar examenes default para cada estudio
+                            for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
                                 String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
                                 //nombre parï¿½metro que contiene los examenes que se deben aplicar para cada estudio puede estar configurado de 3 maneras:
                                 //cod_estudio+cod_categ+gravedad
@@ -432,7 +457,7 @@ public class RecepcionMxController {
                                     }
                                 }
                             }
-                        }
+                        }*/
                     }
                     //List<OrdenExamen> ordenExamenListNew = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdMx(recepcionMx.getTomaMx().getIdTomaMx());
                     //mav.addObject("examenesList",ordenExamenListNew);
@@ -839,7 +864,7 @@ public class RecepcionMxController {
                                 }
                             }
                             //es estudio y tiene autoridad para varias areas y no se ha agregado recepcion en laboratorio del area del estudio
-                            if (agregarAreaEstudio){
+                            if (agregarAreaEstudio && solicitudEstudioList.size()>0){
                                 recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
                                 recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                             }
@@ -923,23 +948,22 @@ public class RecepcionMxController {
                         ex.printStackTrace();
                     }
 
-
+                    if (!idRecepcion.isEmpty()) {
+                        //se tiene que actualizar la tomaMx
+                        DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
+                        tomaMx.setEstadoMx(estadoMx);
+                        try {
+                            tomaMxService.updateTomaMx(tomaMx);
+                        } catch (Exception ex) {
+                            resultado = messageSource.getMessage("msg.update.order.error", null, null);
+                            resultado = resultado + ". \n " + ex.getMessage();
+                            ex.printStackTrace();
+                        }
+                    }
                 } catch (Exception ex) {
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
                     resultado = resultado + ". \n " + ex.getMessage();
                     ex.printStackTrace();
-                }
-                if (!idRecepcion.isEmpty()) {
-                    //se tiene que actualizar la tomaMx
-                    DaTomaMx tomaMx = tomaMxService.getTomaMxById(recepcionMx.getTomaMx().getIdTomaMx());
-                    tomaMx.setEstadoMx(estadoMx);
-                    try {
-                        tomaMxService.updateTomaMx(tomaMx);
-                    } catch (Exception ex) {
-                        resultado = messageSource.getMessage("msg.update.order.error", null, null);
-                        resultado = resultado + ". \n " + ex.getMessage();
-                        ex.printStackTrace();
-                    }
                 }
             }else{
                 resultado = messageSource.getMessage("msg.receipt.error.mx",null,null)+ " "+ recepcionMx.getTomaMx().getCodigoLab()+" - "+recepcionMx.getTomaMx().getEstadoMx().getDescripcion();
@@ -1550,7 +1574,27 @@ public class RecepcionMxController {
                         if (solicitudEstudioList != null && solicitudEstudioList.size() > 0) {
                             //procesar examenes default para cada estudio
                             for (DaSolicitudEstudio solicitudEstudio : solicitudEstudioList) {
-                                String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
+                                //se obtienen los id de los examenes por defecto
+                                List<Examen_Estudio> examenesEstList = examenesService.getExamenesDefectoByIdEst(solicitudEstudio.getTipoEstudio().getIdEstudio(), user.getUsername());
+                                if (examenesEstList != null) {
+                                    //se registran los examenes por defecto
+                                    for (Examen_Estudio examenTmp : examenesEstList) {
+                                        OrdenExamen ordenExamen = new OrdenExamen();
+                                        ordenExamen.setSolicitudEstudio(solicitudEstudio);
+                                        ordenExamen.setCodExamen(examenTmp.getExamen());
+                                        ordenExamen.setFechaHOrden(new Timestamp(new Date().getTime()));
+                                        ordenExamen.setUsuarioRegistro(user);
+                                        ordenExamen.setLabProcesa(labUsuario);
+                                        try {
+                                            ordenExamenMxService.addOrdenExamen(ordenExamen);
+                                            procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepciï¿½n
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            logger.error("Error al agregar orden de examen", ex);
+                                        }
+                                    }
+                                }
+                                /*String nombreParametroExam = solicitudEstudio.getTipoEstudio().getCodigo();
                                 //nombre parï¿½metro que contiene los examenes que se deben aplicar para cada estudio puede estar configurado de 3 maneras:
                                 //cod_estudio+cod_categ+gravedad
                                 //cod_estudio+gravedad
@@ -1612,7 +1656,7 @@ public class RecepcionMxController {
                                             }
                                         }
                                     }
-                                }
+                                }*/
                             }
                         }
 
@@ -1633,7 +1677,7 @@ public class RecepcionMxController {
                                         }
                                     }
                                     //es estudio y tiene autoridad para varias areas y no se ha agregado recepcion en laboratorio del area del estudio
-                                    if (agregarAreaEstudio){
+                                    if (agregarAreaEstudio && solicitudEstudioList.size()>0){
                                         recepcionMxLab.setArea(solicitudEstudioList.get(0).getTipoEstudio().getArea());
                                         recepcionMxService.addRecepcionMxLab(recepcionMxLab);
                                     }
@@ -2723,7 +2767,7 @@ public class RecepcionMxController {
                             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), labProcesa.getCodigo());
                             String procesadoPor = "";
                             String aprobadoPor = "";
-                            if (recepcionMx.getCalidadMx().getCodigo().equalsIgnoreCase("CALIDMX|IDC")) {
+                            if (recepcionMx.getCalidadMx()!=null && recepcionMx.getCalidadMx().getCodigo().equalsIgnoreCase("CALIDMX|IDC")) {
                                 y = y - 20;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, null), y, 100, stream, 10, PDType1Font.HELVETICA);
                             } else {

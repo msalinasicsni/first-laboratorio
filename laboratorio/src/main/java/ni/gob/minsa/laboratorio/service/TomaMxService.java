@@ -433,6 +433,17 @@ public class TomaMxService {
         return q.list();
     }
 
+    public List<DaSolicitudEstudio> getSolicitudesEstudioByIdTomaArea(String idTomaMx, int idArea, String username){
+        String query = "select sdx from DaSolicitudEstudio sdx, AutoridadArea al where al.pasivo = false and sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx " +
+                "and sdx.tipoEstudio.area.idArea = al.area.idArea and sdx.tipoEstudio.area.idArea = :idArea and al.user.username = :username " +
+                "ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idTomaMx",idTomaMx);
+        q.setParameter("idArea",idArea);
+        q.setParameter("username",username);
+        return q.list();
+    }
+
     public DaSolicitudDx getSolicitudesDxByMxDx(String idTomaMx,  Integer idDiagnostico){
         String query = "from DaSolicitudDx where anulado = false and idTomaMx.idTomaMx = :idTomaMx and idTomaMx.envio.laboratorioDestino.codigo = labProcesa.codigo " +
                 "and codDx.idDiagnostico = :idDiagnostico ORDER BY fechaHSolicitud";

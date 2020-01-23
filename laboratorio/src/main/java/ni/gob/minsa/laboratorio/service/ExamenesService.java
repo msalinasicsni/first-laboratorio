@@ -2,6 +2,7 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.examen.CatalogoExamenes;
 import ni.gob.minsa.laboratorio.domain.examen.Examen_Dx;
+import ni.gob.minsa.laboratorio.domain.examen.Examen_Estudio;
 import ni.gob.minsa.laboratorio.domain.examen.ReglaExamen;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -202,6 +203,16 @@ public class ExamenesService {
         Query q = session.createQuery("select ex from Examen_Estudio as ee inner join ee.examen as ex inner join ee.estudio as es " +
                 "where es.idEstudio = :idEst and ee.pasivo = false and ex.pasivo = false");
         q.setParameter("idEst",idEst);
+        return q.list();
+    }
+
+    public List<Examen_Estudio> getExamenesDefectoByIdEst(int idEst, String username){
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery("select ee from Examen_Estudio as ee inner join ee.examen as ex inner join ee.estudio as es, AutoridadExamen as ae " +
+                "where ae.examen.idExamen = ex.idExamen and ae.pasivo = false and ae.autoridadArea.pasivo = false and ae.autoridadArea.user.username = :username and es.idEstudio = :idEst "+
+                " and ee.porDefecto = true and ee.pasivo = false and ex.pasivo = false ");
+        q.setParameter("idEst",idEst);
+        q.setParameter("username", username);
         return q.list();
     }
 }
