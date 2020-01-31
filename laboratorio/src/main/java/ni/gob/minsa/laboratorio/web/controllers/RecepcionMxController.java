@@ -1587,7 +1587,7 @@ public class RecepcionMxController {
                                         ordenExamen.setLabProcesa(labUsuario);
                                         try {
                                             ordenExamenMxService.addOrdenExamen(ordenExamen);
-                                            procesarRecepcion = true; //si se agregó al menos un examen se puede procesar la recepciï¿½n
+                                            procesarRecepcion = true; //si se agregï¿½ al menos un examen se puede procesar la recepciï¿½n
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
                                             logger.error("Error al agregar orden de examen", ex);

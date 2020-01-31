@@ -515,7 +515,7 @@ public class TomaMxService {
     }
 
     public DaTomaMx getTomaMxByCodLab(String codigoLab){
-        String query = "from DaTomaMx as a where codigoLab= :codigoLab";
+        String query = "from DaTomaMx as a where codigoLab= :codigoLab or codigoUnicoMx = :codigoLab";
 
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery(query);
