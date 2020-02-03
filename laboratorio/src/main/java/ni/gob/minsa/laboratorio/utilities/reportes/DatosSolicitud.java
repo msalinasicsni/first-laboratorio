@@ -13,6 +13,7 @@ public class DatosSolicitud {
     private Boolean aprobada;
     private String fechaAprobacion;
     private String resultado;
+    private String usuarioAprobacion;
 
     public String getIdSolicitud() {
         return idSolicitud;
@@ -92,5 +93,13 @@ public class DatosSolicitud {
 
     public void setResultado(String resultado) {
         this.resultado = resultado;
+    }
+
+    public String getUsuarioAprobacion() {
+        return usuarioAprobacion;
+    }
+
+    public void setUsuarioAprobacion(String usuarioAprobacion) {
+        this.usuarioAprobacion = usuarioAprobacion;
     }
 }

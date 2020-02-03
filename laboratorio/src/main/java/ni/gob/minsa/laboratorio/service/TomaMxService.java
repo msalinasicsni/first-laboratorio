@@ -8,6 +8,7 @@ import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud;
 import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import org.apache.commons.codec.language.Soundex;
@@ -798,6 +799,33 @@ public class TomaMxService {
         q.setParameter("userName",userName);
         q.setParameter("idArea", idArea);
         return q.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DatosSolicitud> getSolicitudesAprobByToma_User_Area(String idToma, String userName, int idArea){
+        String query = " select sdx.idSolicitudEstudio as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudEstudio sdx, AutoridadLaboratorio al " +
+                "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and " +
+                "sdx.idSolicitudEstudio in (select oe.solicitudEstudio.idSolicitudEstudio from OrdenExamen oe where oe.solicitudEstudio.idSolicitudEstudio = sdx.idSolicitudEstudio and oe.labProcesa.codigo = al.laboratorio.codigo) " +
+                "and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.tipoEstudio.area.idArea = :idArea " +
+                "ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("userName",userName);
+        q.setParameter("idArea", idArea);
+        q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
+        List<DatosSolicitud> datos = q.list();
+        query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudDx sdx, AutoridadLaboratorio al " +
+                "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and " +
+                "(sdx.labProcesa.codigo = al.laboratorio.codigo or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo))" +
+                "and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.codDx.area.idArea = :idArea " +
+                "ORDER BY sdx.fechaHSolicitud";
+        q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("userName",userName);
+        q.setParameter("idArea", idArea);
+        q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
+        datos.addAll(q.list());
+        return datos;
     }
 
     @SuppressWarnings("unchecked")

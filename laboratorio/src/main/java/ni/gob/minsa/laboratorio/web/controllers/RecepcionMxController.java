@@ -26,6 +26,8 @@ import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosOrdenExamen;
+import ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud;
 import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -2762,7 +2764,7 @@ public class RecepcionMxController {
                             GeneralUtils.drawTEXT(tomaMx.getCodTipoMx().getNombre(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                             //resultados
-                            List<DaSolicitudDx> listDx = tomaMxService.getSoliDxAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
+                            List<DatosSolicitud> listDx = tomaMxService.getSolicitudesAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
                             y = y - 4;
                             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodigoUnicoMx(), labProcesa.getCodigo());
                             String procesadoPor = "";
@@ -2771,11 +2773,11 @@ public class RecepcionMxController {
                                 y = y - 20;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, null), y, 100, stream, 10, PDType1Font.HELVETICA);
                             } else {
-                                for (DaSolicitudDx dx : listDx) {
-                                    aprobadoPor = dx.getUsuarioAprobacion().getCompleteName();
+                                for (DatosSolicitud dx : listDx) {
+                                    aprobadoPor = dx.getUsuarioAprobacion();
                                     y = y - 20;
-                                    List<OrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitud(dx.getIdSolicitudDx());
-                                    for (OrdenExamen examen : examenes) {
+                                    List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(dx.getIdSolicitud());
+                                    for (DatosOrdenExamen examen : examenes) {
                                         //salto de página
                                         if ((y - 15) < 180){
                                             stream.close();
@@ -2823,7 +2825,7 @@ public class RecepcionMxController {
                                             y = y - 15;
                                         }
                                         if (resultados.size() > 0) {
-                                            GeneralUtils.drawTEXT(examen.getCodExamen().getNombre()+ " - "+messageSource.getMessage("lbl.processing.date", null, null) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
+                                            GeneralUtils.drawTEXT(examen.getExamen()+ " - "+messageSource.getMessage("lbl.processing.date", null, null) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
                                             //y = y - 15;
                                         }
                                     }

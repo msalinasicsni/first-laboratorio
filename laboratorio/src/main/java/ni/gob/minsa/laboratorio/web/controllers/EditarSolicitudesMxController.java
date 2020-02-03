@@ -430,6 +430,16 @@ public class EditarSolicitudesMxController {
                     datoSolicitudDetalles.addAll(datosSolicitudService.getDatosSolicitudDetalleBySolicitud(solicitudEstudio.getIdSolicitudEstudio()));
                 }
                 mav.addObject("datosList",datoSolicitudDetalles);
+                if (esEstudio) {
+                    List<Catalogo_Estudio> catalogoEstudios =
+                            tomaMxService.getEstudiosByTipoMxTipoNoti(tomaMx.getCodTipoMx().getIdTipoMx().toString(),
+                                    tomaMx.getIdNotificacion().getCodTipoNotificacion().getCodigo());
+                    mav.addObject("catEst", catalogoEstudios);
+                }
+                List<Catalogo_Dx> catalogoDxs =
+                        tomaMxService.getDxByTipoMxTipoNoti(tomaMx.getCodTipoMx().getIdTipoMx().toString(),
+                                tomaMx.getIdNotificacion().getCodTipoNotificacion().getCodigo(),seguridadService.obtenerNombreUsuario());
+                mav.addObject("catDx", catalogoDxs);
             }
             mav.addObject("esEstudio",esEstudio);
             mav.addObject("tomaMx",tomaMx);
@@ -528,7 +538,7 @@ public class EditarSolicitudesMxController {
     }
 
     /**
-     * Método para convertir una lista de Ordenes Examen a un string con estructura Json
+     * Método para convertir una lista de Solicitudes dx y estudios a un string con estructura Json
      * @param dxList lista con las solicitudes de diagnósticos a convertir
      * @param estudioList lista con las solicitudes de estudio a convertir
      * @return String
