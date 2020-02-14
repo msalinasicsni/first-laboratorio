@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -97,6 +98,7 @@ public class CrearSolicitudDx {
         resultado.setStatus("200");
         resultado.setError("");
         resultado.setMessage("");
+        resultado.setSolicitudes(new ArrayList<DatosSolicitud>());
         try {
             if (solicitud == null) {
                 resultado.setError("RegistroSolicitud Null!");
@@ -262,7 +264,7 @@ public class CrearSolicitudDx {
 
                     //registrar los dxs
                     //se procede a registrar los diagnosticos o rutinas solicitados (incluyendo los datos que se pidan para cada uno. En este caso no se requieren para los sistemas externos)
-                    if (!saveDxRequest(tomaMx.getIdTomaMx(), solicitud.getDiagnosticos(), null, 0, laboratorioProcesa, usuarioRegistro, null)) {
+                    if (!saveDxRequest(tomaMx.getIdTomaMx(), solicitud.getDiagnosticos(), null, 0, laboratorioProcesa, usuarioRegistro, null, resultado)) {
                         //rollback completo
                         datosSolicitudService.deleteDetallesDatosRecepcionByTomaMx(tomaMx.getIdTomaMx());
                         tomaMxService.deleteSolicitudesDxByTomaMx(tomaMx.getIdTomaMx());
@@ -443,9 +445,10 @@ public class CrearSolicitudDx {
         }
     }
 
-    private boolean saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas, Laboratorio laboratorio, Usuarios usuAlerta,  User usuLab) {
+    private boolean saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas, Laboratorio laboratorio, Usuarios usuAlerta,  User usuLab, RespuestaRegistroSolicitud resultado) {
         try {
             String[] arrayDx = dx.split(",");
+            List<DatosSolicitud> solicitudes = new ArrayList<DatosSolicitud>();
             for (String anArrayDx : arrayDx) {
                 DaSolicitudDx soli = new DaSolicitudDx();
                 soli.setCodDx(tomaMxService.getDxById(anArrayDx));
@@ -457,6 +460,7 @@ public class CrearSolicitudDx {
                 soli.setControlCalidad(false);
                 soli.setInicial(true);//es lo que viene en la ficha
                 tomaMxService.addSolicitudDx(soli);
+                solicitudes.add(new DatosSolicitud(soli.getIdSolicitudDx(), soli.getCodDx().getNombre()));
 
                 if (strRespuestas!=null) {
                     JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
@@ -483,6 +487,7 @@ public class CrearSolicitudDx {
                     }
                 }
             }
+            resultado.setSolicitudes(solicitudes);
             return true;
         }catch (Exception ex){
             ex.printStackTrace();

@@ -463,4 +463,63 @@ public class expose {
         }
         return datosSolicitudes;
     }
+
+    @RequestMapping(value = "getDxIdSolicitud/{idSolicitud}", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    DatosSolicitud getDxIdSolicitud(@PathVariable(value = "idSolicitud") String idSolicitud) throws Exception {
+        logger.info("Obteniendo dx por idSolicitud en JSON");
+        DatosSolicitud ds = solicitudService.getSolicitudesByIdSolicitud(idSolicitud);
+        List<ResultadoSolicitud> detRes = resultadoFinalService.getDetResActivosBySolicitudV2(ds.getIdSolicitud());
+        if (ds.getAprobada() != null) {
+            if (ds.getAprobada().equals(true)) {
+                ds.setEstadoSolicitud(messageSource.getMessage("lbl.approval.result", null, null));
+            } else {
+                if (!detRes.isEmpty()) {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+                } else {
+                    ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+                }
+            }
+        } else {
+            if (!detRes.isEmpty()) {
+                ds.setEstadoSolicitud(messageSource.getMessage("lbl.result.pending.approval", null, null));
+            } else {
+                ds.setEstadoSolicitud(messageSource.getMessage("lbl.without.result", null, null));
+            }
+        }
+        String resultados = "";
+        for (ResultadoSolicitud res : detRes) {
+            if (res.getRespuesta() != null) {
+                //resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
+                if (res.getTipo().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados += cat_lista.getEtiqueta();
+                } else if (res.getTipo().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                    resultados += valorBoleano;
+                } else if (res.getValor().toLowerCase().contains("inadecuad")) {
+                    resultados += res.getValor();
+                } else {
+                    resultados += (resultados.isEmpty() ? res.getRespuesta() : ", " + res.getRespuesta());
+                    resultados += ": " + res.getValor();
+                }
+            } else if (res.getRespuestaExamen() != null) {
+                //resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
+                if (res.getTipoExamen().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados += cat_lista.getEtiqueta();
+                } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                    resultados += valorBoleano;
+                } else {
+                    resultados += (resultados.isEmpty() ? res.getRespuestaExamen() : ", " + res.getRespuestaExamen());
+                    resultados += ": " + res.getValor();
+                }
+            }
+        }
+        ds.setResultado(resultados);
+
+        return ds;
+    }
 }
