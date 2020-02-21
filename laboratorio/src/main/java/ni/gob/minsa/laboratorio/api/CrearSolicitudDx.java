@@ -177,9 +177,14 @@ public class CrearSolicitudDx {
 
                     }else{
                         if (!solicitud.getIdSilais().isEmpty()) {
+                            tomaMx.setCodSilaisAtencion(entidadAdmonService.getSilaisById(Long.valueOf(solicitud.getIdSilais())));
+                        } else{
                             tomaMx.setCodSilaisAtencion(notificacion.getCodSilaisAtencion());
                         }
+
                         if (!solicitud.getIdUnidadSalud().isEmpty()) {
+                            tomaMx.setCodUnidadAtencion(unidadesService.getUnidadById(Long.valueOf(solicitud.getIdUnidadSalud())));
+                        } else {
                             tomaMx.setCodUnidadAtencion(notificacion.getCodUnidadAtencion());
                         }
                         if (solicitud.getCodigoVIH()!=null && !solicitud.getCodigoVIH().isEmpty()) {

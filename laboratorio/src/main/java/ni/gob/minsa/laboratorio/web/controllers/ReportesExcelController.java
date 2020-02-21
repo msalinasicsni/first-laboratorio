@@ -1146,13 +1146,14 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.consigned.unit", null, null));
         columnas.add(messageSource.getMessage("lbl.A1", null, null)+messageSource.getMessage("lbl.CS", null, null));
         columnas.add(messageSource.getMessage("lbl.A2", null, null)+messageSource.getMessage("lbl.CS", null, null));
-        columnas.add(messageSource.getMessage("lbl.A1", null, null)+messageSource.getMessage("lbl.CNDR", null, null));
-        columnas.add(messageSource.getMessage("lbl.A2", null, null)+messageSource.getMessage("lbl.CNDR", null, null));
-        columnas.add(messageSource.getMessage("lbl.A1", null, null)+messageSource.getMessage("lbl.CS", null, null));
-        columnas.add(messageSource.getMessage("lbl.fec", null, null)+messageSource.getMessage("lbl.A1", null, null));
-        columnas.add(messageSource.getMessage("lbl.fec", null, null)+messageSource.getMessage("lbl.A2", null, null));
-        columnas.add(messageSource.getMessage("lbl.elisa", null, null)+messageSource.getMessage("lbl.CS", null, null));
-        columnas.add(messageSource.getMessage("lbl.elisa", null, null)+messageSource.getMessage("lbl.CNDR", null, null));
+        columnas.add(messageSource.getMessage("lbl.sampling.date", null, null).replaceAll(" ",""));
+        //columnas.add(messageSource.getMessage("lbl.A1", null, null)+messageSource.getMessage("lbl.CNDR", null, null));
+        //columnas.add(messageSource.getMessage("lbl.A2", null, null)+messageSource.getMessage("lbl.CNDR", null, null));
+        //columnas.add(messageSource.getMessage("lbl.A1", null, null)+messageSource.getMessage("lbl.CS", null, null));
+        //columnas.add(messageSource.getMessage("lbl.fec", null, null)+messageSource.getMessage("lbl.A1", null, null));
+        //columnas.add(messageSource.getMessage("lbl.fec", null, null)+messageSource.getMessage("lbl.A2", null, null));
+        //columnas.add(messageSource.getMessage("lbl.elisa", null, null)+messageSource.getMessage("lbl.CS", null, null));
+        columnas.add(messageSource.getMessage("lbl.elisa", null, null));
         columnas.add(messageSource.getMessage("lbl.fec", null, null)+messageSource.getMessage("lbl.elisa", null, null));
         columnas.add(messageSource.getMessage("lbl.elisa.dup", null, null));
         columnas.add(messageSource.getMessage("lbl.fec.elisa.dup", null, null));
@@ -1981,28 +1982,30 @@ public class ReportesExcelController {
             registro[9] = (solicitudDx.getCodigoUnidadNoti()!=null?solicitudDx.getNombreUnidadNoti()://unidad en la notif
                     (solicitudDx.getCodigoUnidadMx()!=null?solicitudDx.getNombreUnidadMx():""));//unidad en la toma mx
             registro[10] = "";//unidad consignada
-            registro[12] = "";
+            registro[11] = (datosVIH!=null?datosVIH.getResA1():"");
+            registro[12] = (datosVIH!=null?datosVIH.getResA2():"");
+            registro[13] = DateUtil.DateToString(solicitudDx.getFechaTomaMx(),"dd/MM/yyyy");
+            validarElisaVIH(registro, solicitudDx.getIdSolicitud(), 14, 16, 18);
             //registro[12] = "";
             DatosRecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMxV2(solicitudDx.getCodigoMx(), codigoLab);
             if (recepcionMx!=null){
                 //registro[13] = recepcionMx.getCalidadMx();
                 if (recepcionMx.getFechaRecibido()!=null) {
-                    registro[27] = DateUtil.DateToString(recepcionMx.getFechaRecibido(),"dd/MM/yyyy");
+                    registro[22] = DateUtil.DateToString(recepcionMx.getFechaRecibido(),"dd/MM/yyyy");
                 }else{
-                    registro[27] = DateUtil.DateToString(recepcionMx.getFechaHoraRecepcion(),"dd/MM/yyyy");
+                    registro[22] = DateUtil.DateToString(recepcionMx.getFechaHoraRecepcion(),"dd/MM/yyyy");
                 }
             }
-            registro[19] = parseFinalResultDetails(solicitudDx.getIdSolicitud());
-            registro[20] = DateUtil.DateToString(solicitudDx.getFechaAprobacion(),"dd/MM/yyyy");
-            registro[25] = registro[19];
-            registro[31] = DateUtil.DateToString(new Date(),"dd/MM/yyyy");
-            if (registro[25].toString().toLowerCase().contains("negativo")) {
+            parseVIHSerFinalResultDetails(solicitudDx.getIdSolicitud(), registro, 20);
+            registro[23] = DateUtil.DateToString(solicitudDx.getFechaAprobacion(),"dd/MM/yyyy");
+            registro[26] = DateUtil.DateToString(new Date(),"dd/MM/yyyy");
+            if (registro[20].toString().toLowerCase().contains("negativo")) {
                 registro[0]= rowCountNeg++;
                 registrosNeg.add(registro);
-            } else if (incluirMxInadecuadas && registro[25].toString().toLowerCase().contains("inadecuad")){
+            } else if (incluirMxInadecuadas && registro[20].toString().toLowerCase().contains("inadecuad")){
                 registro[0]= rowCountInadec++;
                 registrosMxInadec.add(registro);
-            }else if (!registro[25].toString().toLowerCase().contains("indetermin") && !registro[25].toString().toLowerCase().contains("invalido")) {
+            }else if (!registro[20].toString().toLowerCase().contains("indetermin") && !registro[20].toString().toLowerCase().contains("invalido")) {
                 registro[0]= rowCountPos++;
                 registrosPos.add(registro);
             }
@@ -2802,6 +2805,65 @@ public class ReportesExcelController {
         }
     }
 
+    private void validarElisaVIH(Object[] dato, String idSolicitudDx, int indiceElisa, int indiceElisaDup, int indiceWB){
+        List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(idSolicitudDx);
+        for (DatosOrdenExamen examen : examenes) {
+            if (examen.getExamen().toUpperCase().contains("ELISA ") && examen.getExamen().toUpperCase().contains("CONFIRM") && examen.getExamen().toUpperCase().contains("VIH")){
+                List<ResultadoExamen> resultados = resultadosService.getDetallesResultadoActivosByExamenV2(examen.getIdOrdenExamen());
+                Date fechaProcesamiento = null;
+                String detalleResultado = "";
+                for (ResultadoExamen resultado : resultados) {
+
+                    if (resultado.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                        detalleResultado = cat_lista.getEtiqueta();
+                    } else if (resultado.getTipo().equals("TPDATO|LOG")) {
+                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                    }
+                    fechaProcesamiento = resultado.getFechahProcesa();
+                }
+                if (resultados.size() > 0) {
+                    dato[indiceElisaDup] = detalleResultado;
+                    dato[indiceElisaDup+1] = DateUtil.DateToString(fechaProcesamiento,"dd/MM/yyyy");
+                }
+            }else if (examen.getExamen().toUpperCase().contains("ELISA") && examen.getExamen().toUpperCase().contains("VIH")){
+                List<ResultadoExamen> resultados = resultadosService.getDetallesResultadoActivosByExamenV2(examen.getIdOrdenExamen());
+                Date fechaProcesamiento = null;
+                String detalleResultado = "";
+                for (ResultadoExamen resultado : resultados) {
+                    if (resultado.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                        detalleResultado = cat_lista.getEtiqueta();
+                    } else if (resultado.getTipo().equals("TPDATO|LOG")) {
+                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                    }
+                    fechaProcesamiento = resultado.getFechahProcesa();
+                }
+                if (resultados.size() > 0) {
+                    dato[indiceElisa] = detalleResultado;
+                    dato[indiceElisa+1] = DateUtil.DateToString(fechaProcesamiento,"dd/MM/yyyy");
+                }
+            } else if ((examen.getExamen().toUpperCase().contains("WESTERN BLOT") || examen.getExamen().toUpperCase().contains("WB")) && examen.getExamen().toUpperCase().contains("VIH")){
+                List<ResultadoExamen> resultados = resultadosService.getDetallesResultadoActivosByExamenV2(examen.getIdOrdenExamen());
+                Date fechaProcesamiento = null;
+                String detalleResultado = "";
+                for (ResultadoExamen resultado : resultados) {
+                    if (resultado.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                        detalleResultado = cat_lista.getEtiqueta();
+                    } else if (resultado.getTipo().equals("TPDATO|LOG")) {
+                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                    }
+                    fechaProcesamiento = resultado.getFechahProcesa();
+                }
+                if (resultados.size() > 0) {
+                    dato[indiceWB] = detalleResultado;
+                    dato[indiceWB+1] = DateUtil.DateToString(fechaProcesamiento,"dd/MM/yyyy");
+                }
+            }
+        }
+    }
+
     private String parseDxs(String idTomaMx, String codigoLab){
         List<Solicitud> solicitudDxList = tomaMxService.getSolicitudesDxByIdTomaV2(idTomaMx, codigoLab);
         String dxs = "";
@@ -2848,6 +2910,40 @@ public class ReportesExcelController {
             }
         }
         return resultados;
+    }
+
+    private void parseVIHSerFinalResultDetails(String idSolicitud, Object[] dato, int indiceRes) {
+        List<ResultadoSolicitud> resFinalList = resultadoFinalService.getDetResActivosBySolicitudV2(idSolicitud);
+        String resultados = "";
+        boolean resultadoSol = false;
+        for (ResultadoSolicitud res : resFinalList) {
+            if (res.getRespuesta() != null) {
+                //si es respuesta solicitud, verificar si es la observacion
+                if (res.getRespuesta().toLowerCase().contains("observac")) {
+                    dato[indiceRes + 1] = res.getValor();
+                } else {
+                    if (res.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                        resultados += cat_lista.getEtiqueta();
+                    } else if (res.getTipo().equals("TPDATO|LOG")) {
+                        String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                        resultados += valorBoleano;
+                    } else if (res.getValor().toLowerCase().contains("inadecuad")) {
+                        resultados += res.getValor();
+                    }
+                    resultadoSol = true;
+                }
+            } else if (res.getRespuestaExamen() != null && (!resultadoSol || resFinalList.size() == 1)) {
+                if (res.getTipoExamen().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    resultados += cat_lista.getEtiqueta();
+                } else if (res.getTipoExamen().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                    resultados += valorBoleano;
+                }
+            }
+        }
+        dato[indiceRes] = resultados;
     }
 
     private String parseFinalResultDetails(String idSolicitud, String respuesta){

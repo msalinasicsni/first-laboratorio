@@ -9,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud;
+import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoVigilancia;
 import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import org.apache.commons.codec.language.Soundex;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -1285,6 +1287,80 @@ public class TomaMxService {
             totalEncontrados = 0;
         }
         return respuesta;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Area> getAreaSoliDxAprobByTomaAndLabProcesa(String idToma, String codigoLab){
+        String query = "select a from Area as a where a.idArea in (select sdx.codDx.area.idArea from DaSolicitudDx as sdx " +
+                "where sdx.anulado = false " +
+                "and sdx.labProcesa.codigo = :codigoLab " +
+                " and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true " +
+                "group by sdx.codDx.area.idArea)";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("codigoLab", codigoLab);
+        return q.list();
+    }
+
+    public boolean muestraTieneDxProcesadosEnLab(String idToma, String codigoLab){
+        String query = "select count(sdx.idSolicitudDx) from DaSolicitudDx as sdx "+
+        "where sdx.anulado = false " +
+                "and sdx.labProcesa.codigo = :codigoLab " +
+                " and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true ";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigoLab", codigoLab);
+        q.setParameter("idToma", idToma);
+        Long total = (Long)q.uniqueResult();
+        return total.intValue()>0;
+    }
+
+    public ResultadoVigilancia getDatosMx(String codigomx){
+        Session session = sessionFactory.getCurrentSession();
+        Query queryMx = null;
+        queryMx = session.createQuery(" select cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, p.fechaNacimiento as fechaNacimiento, p.sexo.codigo as sexo, " +
+                " p.direccionResidencia as direccionResidencia, p.telefonoResidencia as telefonoResidencia, p.telefonoMovil as telefonoMovil, coalesce((select co.nombre from  Comunidades co where co.codigo=p.comunidadResidencia.codigo), null) as comunidadResidencia, " +
+                " noti.idNotificacion as idNotificacion, noti.codTipoNotificacion.codigo as codigoTipoNoti, noti.codExpediente as expediente, noti.semanasEmbarazo as semanasEmbarazo, noti.fechaInicioSintomas as fechaInicioSintomas, coalesce((select r.valor from Respuesta r where r.codigo = noti.urgente.codigo), null) as urgente,  coalesce((select r.valor from Respuesta r where r.codigo = noti.embarazada.codigo), null) as embarazada, " +
+                " coalesce((select ea.codigo from EntidadesAdtvas ea where ea.codigo = noti.codSilaisAtencion.codigo ), null) as codigoSilaisNoti, coalesce((select ea.nombre from EntidadesAdtvas ea where ea.codigo = noti.codSilaisAtencion.codigo ), null) as nombreSilaisNoti, " +
+                " coalesce((select u.codigo from Unidades u where u.codigo = noti.codUnidadAtencion.codigo), null) as codigoUnidadNoti, coalesce((select u.nombre from Unidades u where u.codigo = noti.codUnidadAtencion.codigo), null) as nombreUnidadNoti, " +
+                " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = noti.codUnidadAtencion.municipio.codigoNacional), null) as codigoMuniNoti, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = noti.codUnidadAtencion.municipio.codigoNacional), null) as nombreMuniNoti, " +
+                " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = noti.municipioResidencia.codigoNacional), null) as codigoMuniResid, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = noti.municipioResidencia.codigoNacional), null) as nombreMuniResid, " +
+                " coalesce((select ea.codigo from EntidadesAdtvas ea where ea.codigo = noti.municipioResidencia.dependenciaSilais.codigo ), null) as codigoSilaisResid, coalesce((select ea.nombre from EntidadesAdtvas ea where ea.codigo = noti.municipioResidencia.dependenciaSilais.codigo ), null) as nombreSilaisResid, " +
+                " coalesce((select ea.codigo from EntidadesAdtvas ea where ea.codigo = mx.codSilaisAtencion.codigo ), null) as codigoSilaisMx, coalesce((select ea.nombre from EntidadesAdtvas ea where ea.codigo = mx.codSilaisAtencion.codigo ), null) as nombreSilaisMx, " +
+                " coalesce((select u.codigo from Unidades u where u.codigo = mx.codUnidadAtencion.codigo), null) as codigoUnidadMx, coalesce((select u.nombre from Unidades u where u.codigo = mx.codUnidadAtencion.codigo), null) as nombreUnidadMx, " +
+                " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as codigoMuniMx, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as nombreMuniMx, " +
+                " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, noti.codigoPacienteVIH as codigoVIH  " +
+                " from DaTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
+                " where noti.pasivo = false and mx.anulada = false and mx.codigoLab = :codigomx or mx.codigoUnicoMx = :codigomx ");
+        queryMx.setParameter("codigomx", codigomx);
+        queryMx.setResultTransformer(Transformers.aliasToBean(ResultadoVigilancia.class));
+        return (ResultadoVigilancia)queryMx.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DatosSolicitud> getSolicitudesAprobByToma_Lab_Area(String idToma, String codigoLab, int idArea){
+        String query = " select sdx.idSolicitudEstudio as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudEstudio sdx " +
+                "where sdx.anulado = false and sdx.aprobada = true and " +
+                "sdx.idSolicitudEstudio in (select oe.solicitudEstudio.idSolicitudEstudio from OrdenExamen oe where oe.solicitudEstudio.idSolicitudEstudio = sdx.idSolicitudEstudio and oe.labProcesa.codigo = :codigoLab) " +
+                "and sdx.idTomaMx.idTomaMx = :idToma and sdx.tipoEstudio.area.idArea = :idArea " +
+                "ORDER BY sdx.fechaHSolicitud";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("codigoLab",codigoLab);
+        q.setParameter("idArea", idArea);
+        q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
+        List<DatosSolicitud> datos = q.list();
+        query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudDx sdx " +
+                "where sdx.anulado = false and sdx.aprobada = true and " +
+                "(sdx.labProcesa.codigo = :codigoLab or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab))" +
+                "and sdx.idTomaMx.idTomaMx = :idToma and sdx.codDx.area.idArea = :idArea " +
+                "ORDER BY sdx.fechaHSolicitud";
+        q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idToma",idToma);
+        q.setParameter("codigoLab",codigoLab);
+        q.setParameter("idArea", idArea);
+        q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
+        datos.addAll(q.list());
+        return datos;
     }
 
 }

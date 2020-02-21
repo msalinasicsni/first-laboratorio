@@ -677,7 +677,7 @@ public class ResultadoFinalService {
         Session session = sessionFactory.getCurrentSession();
         String query = "select a.idDetalle as idDetalle, coalesce((select rs.nombre from RespuestaSolicitud rs where rs.idRespuesta = a.respuesta.idRespuesta), null) as respuesta, coalesce((select rs.codigo from Catalogo rs where rs.codigo = a.respuesta.concepto.tipo.codigo), null) as tipo, a.valor as valor," +
                 " coalesce((select rs.nombre from RespuestaExamen rs where rs.idRespuesta = a.respuestaExamen.idRespuesta), null) as respuestaExamen, coalesce((select rs.codigo from Catalogo rs where rs.codigo = a.respuestaExamen.concepto.tipo.codigo), null) as tipoExamen " +
-                "from DetalleResultadoFinal as a inner join a.solicitudDx as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud ";
+                "from DetalleResultadoFinal as a inner join a.solicitudDx as r where a.pasivo = false and r.idSolicitudDx = :idSolicitud order by a.fechahRegistro desc";
 
         Query q = session.createQuery(query);
         q.setParameter("idSolicitud", idSolicitud);
@@ -686,7 +686,7 @@ public class ResultadoFinalService {
         if (resultadoFinals.size()<=0) {
             String query2 = "select a.idDetalle as idDetalle, coalesce((select rs.nombre from RespuestaSolicitud rs where rs.idRespuesta = a.respuesta.idRespuesta), null) as respuesta, coalesce((select rs.codigo from Catalogo rs where rs.codigo = a.respuesta.concepto.tipo.codigo), null) as tipo, a.valor as valor," +
                     " coalesce((select rs.nombre from RespuestaExamen rs where rs.idRespuesta = a.respuestaExamen.idRespuesta), null) as respuestaExamen, coalesce((select rs.codigo from Catalogo rs where rs.codigo = a.respuestaExamen.concepto.tipo.codigo), null) as tipoExamen " +
-                    "from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud ";
+                    "from DetalleResultadoFinal as a inner join a.solicitudEstudio as r where a.pasivo = false and r.idSolicitudEstudio = :idSolicitud  order by a.fechahRegistro desc";
             Query q2 = session.createQuery(query2);
             q2.setParameter("idSolicitud", idSolicitud);
             q2.setResultTransformer(Transformers.aliasToBean(ResultadoSolicitud.class));
