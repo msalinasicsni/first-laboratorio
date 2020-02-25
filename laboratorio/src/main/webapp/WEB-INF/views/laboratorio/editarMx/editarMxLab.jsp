@@ -598,6 +598,9 @@
                                                         </span>
                                                         <select  class="select2" id="codDXNuevo" name="codDXNuevo" >
                                                             <option value=""><spring:message code="lbl.select" />...</option>
+                                                            <c:forEach items="${catDx}" var="dx">
+                                                                <option value="${dx.idDiagnostico}">${dx.nombre}</option>
+                                                            </c:forEach>
                                                         </select>
                                                     </div>
                                                 </section>
