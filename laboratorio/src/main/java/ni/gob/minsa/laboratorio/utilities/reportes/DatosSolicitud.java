@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.utilities.reportes;
 
 import java.util.Date;
+import java.util.List;
 
 public class DatosSolicitud {
     private String idSolicitud;
@@ -12,7 +13,7 @@ public class DatosSolicitud {
     private String estadoSolicitud;
     private Boolean aprobada;
     private String fechaAprobacion;
-    private String resultado;
+    private List<ValorResultado> resultado;
     private String usuarioAprobacion;
 
     public String getIdSolicitud() {
@@ -87,11 +88,11 @@ public class DatosSolicitud {
         this.fechaAprobacion = fechaAprobacion;
     }
 
-    public String getResultado() {
+    public List<ValorResultado> getResultado() {
         return resultado;
     }
 
-    public void setResultado(String resultado) {
+    public void setResultado(List<ValorResultado> resultado) {
         this.resultado = resultado;
     }
 

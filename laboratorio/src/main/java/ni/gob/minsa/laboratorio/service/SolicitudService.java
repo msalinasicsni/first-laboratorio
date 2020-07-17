@@ -25,7 +25,7 @@ public class SolicitudService {
                 " t2.codTipoMx.nombre as tipoMx, to_char(t1.fechaHSolicitud, 'DD/MM/YYYY HH24:mi:ss') as fechaSolicitud, t1.aprobada as aprobada, to_char(t1.fechaAprobacion, 'DD/MM/YYYY HH24:mi:ss') as fechaAprobacion " +
                 "from DaSolicitudDx t1, DaTomaMx t2, DaNotificacion t3 " +
                 "where t1.idTomaMx = t2.idTomaMx and t2.idNotificacion = t3.idNotificacion " +
-                "and t1.aprobada = true and t1.controlCalidad = false " + //se solicita que solo las dx con resultado aprobado se envie al SIVE
+                "and t1.controlCalidad = false " +
                 " and t3.persona.personaId = :idPersona ";
         if (incluirVIH && incluirTB){
             sQuery += "and t3.codTipoNotificacion.codigo in ('TPNOTI|VIH','TPNOTI|TB')";
@@ -49,7 +49,7 @@ public class SolicitudService {
                 "from DaSolicitudDx t1, DaTomaMx t2, DaNotificacion t3 " +
                 "where t1.idTomaMx = t2.idTomaMx and t2.idNotificacion = t3.idNotificacion " +
                 " and t3.persona.personaId = :idPersona and t3.codTipoNotificacion.codigo = :tipoNoti " +
-                "and t1.aprobada = true and t1.controlCalidad = false " + //se solicita que solo las dx con resultado aprobado se envie al SIVE
+                "and t1.controlCalidad = false " +
                 " order by t1.fechaHSolicitud desc";
 
         Query query = session.createQuery(sQuery);
@@ -65,7 +65,7 @@ public class SolicitudService {
                 " t2.codTipoMx.nombre as tipoMx, to_char(t1.fechaHSolicitud, 'DD/MM/YYYY HH24:mi:ss') as fechaSolicitud, t1.aprobada as aprobada, to_char(t1.fechaAprobacion, 'DD/MM/YYYY HH24:mi:ss') as fechaAprobacion " +
                 "from DaSolicitudDx t1, DaTomaMx t2, DaNotificacion t3 " +
                 "where t1.idTomaMx = t2.idTomaMx and t2.idNotificacion = t3.idNotificacion " +
-                "and t1.aprobada = true and t1.controlCalidad = false " + //se solicita que solo las dx con resultado aprobado se envie al SIVE
+                "and t1.controlCalidad = false " + //se solicita que solo las dx con resultado aprobado se envie al SIVE
                 " and t1.idSolicitudDx = :idSolicitud " +
                 " order by t1.fechaHSolicitud desc";
 

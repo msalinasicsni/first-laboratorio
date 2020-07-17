@@ -916,16 +916,18 @@ public class RecepcionMxController {
                             }
                         }
                     } else {
-                        //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
+                        //Registrar resultados por defecto como negativo para dx ifi virus respiratorio y Biologia Molecular Covid19
                         Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
                         Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
-                        if (conceptoIFINegativo != null && valorIFINegativo != null)
+                        Parametro conceptoCovid19Negativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_BMCOV19");
+                        Parametro valorCovid19Negativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_BMCOV19");
+                        if ((conceptoIFINegativo != null && valorIFINegativo != null) || (conceptoCovid19Negativo != null && valorCovid19Negativo != null)) {
                             for (DaSolicitudDx solicitudDx : solicitudDxList) {
                                 if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
                                     List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
                                     for (OrdenExamen examen : ordenesExamen) {
                                         //no tiene resultado registrado aún
-                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size()<=0) {
+                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
                                             RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
                                             if (conceptoTmp != null) {
                                                 DetalleResultado detalleResultado = new DetalleResultado();
@@ -940,8 +942,30 @@ public class RecepcionMxController {
                                             }
                                         }
                                     }
+                                } else if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("molecular covid19")) {
+                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                                    boolean soloUnExamen = ordenesExamen.size()==1;
+                                    for (OrdenExamen examen : ordenesExamen) {
+                                        //no tiene resultado registrado aún
+                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
+                                            RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoCovid19Negativo.getValor()));
+                                            if (conceptoTmp != null) {
+                                                DetalleResultado detalleResultado = new DetalleResultado();
+                                                detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                                detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                                detalleResultado.setValor(valorCovid19Negativo.getValor());
+                                                detalleResultado.setRespuesta(conceptoTmp);
+                                                detalleResultado.setExamen(examen);
+                                                detalleResultado.setUsuarioRegistro(usuario);
+                                                if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                    resultadosService.addDetalleResultado(detalleResultado);
+                                                if (soloUnExamen) guardarResultadoFinal(detalleResultado, false);
+                                            }
+                                        }
+                                    }
                                 }
                             }
+                        }
                     }
                     //VALIDA SI ES NECESARIO ENVIAR PRE ORDEN A SISTEMA INFINITY
                     try {
@@ -1693,11 +1717,14 @@ public class RecepcionMxController {
                             //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
                             Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
                             Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
-                            if (conceptoIFINegativo != null && valorIFINegativo != null) {
-                                List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
-                                for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                                    if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
-                                        List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                            Parametro conceptoCovid19Negativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_BMCOV19");
+                            Parametro valorCovid19Negativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_BMCOV19");
+
+                            if ((conceptoIFINegativo != null && valorIFINegativo != null) || (conceptoCovid19Negativo != null && valorCovid19Negativo != null)) {
+                                List<DatosSolicitud> solicitudDxList = tomaMxService.getDatosSolicitudesPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
+                                for (DatosSolicitud solicitudDx : solicitudDxList) {
+                                    if (!solicitudDx.getAprobada() && solicitudDx.getNombre().toLowerCase().contains("ifi virus respiratorio")) {
+                                        List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitud());
                                         for (OrdenExamen examen : ordenesExamen) {
                                             //no tiene resultado registrado aún
                                             if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
@@ -1712,6 +1739,27 @@ public class RecepcionMxController {
                                                     detalleResultado.setUsuarioRegistro(user);
                                                     if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
                                                         resultadosService.addDetalleResultado(detalleResultado);
+                                                }
+                                            }
+                                        }
+                                    } else if (!solicitudDx.getAprobada() && solicitudDx.getNombre().toLowerCase().contains("molecular covid19")) {
+                                        List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitud());
+                                        boolean soloUnExamen = ordenesExamen.size()==1;
+                                        for (OrdenExamen examen : ordenesExamen) {
+                                            //no tiene resultado registrado aún
+                                            if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
+                                                RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoCovid19Negativo.getValor()));
+                                                if (conceptoTmp != null) {
+                                                    DetalleResultado detalleResultado = new DetalleResultado();
+                                                    detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                                    detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                                    detalleResultado.setValor(valorCovid19Negativo.getValor());
+                                                    detalleResultado.setRespuesta(conceptoTmp);
+                                                    detalleResultado.setExamen(examen);
+                                                    detalleResultado.setUsuarioRegistro(user);
+                                                    if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                        resultadosService.addDetalleResultado(detalleResultado);
+                                                    if (soloUnExamen) guardarResultadoFinal(detalleResultado, false);
                                                 }
                                             }
                                         }
@@ -1762,6 +1810,45 @@ public class RecepcionMxController {
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();
+        }
+    }
+
+    /***
+     * M�todo para registrar resultado de una orden examen como resultado final de la solicitud a la que pertenece dicha orden
+     * @param detalleResultado Detalle del resultado del examen
+     * @param esUpdate True si es un update del resultado, false si es nuevo
+     * @throws Exception
+     */
+    private void guardarResultadoFinal(DetalleResultado detalleResultado, boolean esUpdate) throws Exception {
+        try {
+            String idSolicitud="";
+            DetalleResultadoFinal resultadoFinal = new DetalleResultadoFinal();
+            resultadoFinal.setFechahRegistro(new Timestamp(new Date().getTime()));
+            resultadoFinal.setValor(detalleResultado.getValor());
+            resultadoFinal.setRespuestaExamen(detalleResultado.getRespuesta());
+            if (detalleResultado.getExamen().getSolicitudDx()!=null){
+                resultadoFinal.setSolicitudDx(detalleResultado.getExamen().getSolicitudDx());
+                idSolicitud = detalleResultado.getExamen().getSolicitudDx().getIdSolicitudDx();
+            }
+            if (detalleResultado.getExamen().getSolicitudEstudio()!=null) {
+                resultadoFinal.setSolicitudEstudio(detalleResultado.getExamen().getSolicitudEstudio());
+                idSolicitud =detalleResultado.getExamen().getSolicitudEstudio().getIdSolicitudEstudio();
+            }
+            resultadoFinal.setUsuarioRegistro(detalleResultado.getUsuarioRegistro());
+            DetalleResultadoFinal resFinalRegistrado = null;
+            //si es un update del detalle resultado se valida si la solicitud tiene la misma respuesta final para actualizarla
+            if (esUpdate) resFinalRegistrado = resultadoFinalService.getDetResBySolicitudAndRespuestaExa(idSolicitud, detalleResultado.getRespuesta().getIdRespuesta());
+            if (resFinalRegistrado != null) {
+                resultadoFinal.setIdDetalle(resFinalRegistrado.getIdDetalle());
+                resultadoFinalService.updateDetResFinal(resultadoFinal);
+            } else {
+                if (resultadoFinal.getValor() != null && !resultadoFinal.getValor().isEmpty() && !esUpdate) {
+                    resultadoFinalService.saveDetResFinal(resultadoFinal);
+                }
+            }
+        }catch (Exception ex)
+        {
+            throw new Exception(ex);
         }
     }
 
@@ -2009,7 +2096,15 @@ public class RecepcionMxController {
                 else
                     map.put("fechaInicioSintomas", " ");
                 //Si hay persona
-                if (tomaMx.getIdNotificacion().getPersona() != null) {
+                if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
+                    map.put("persona", tomaMx.getIdNotificacion().getCodigoPacienteVIH());
+                    if (tomaMx.getIdNotificacion().getEmbarazada()!=null) {
+                        map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
+                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
+                    }else{
+                        map.put("embarazada", "--");
+                    }
+                }else if (tomaMx.getIdNotificacion().getPersona() != null) {
                     /// se obtiene el nombre de la persona asociada a la ficha
                     String nombreCompleto = "";
                     nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
@@ -2037,15 +2132,7 @@ public class RecepcionMxController {
                 } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
                     map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
                     map.put("embarazada", "--");
-                } else if (tomaMx.getIdNotificacion().getCodigoPacienteVIH() != null) {
-                	map.put("persona", tomaMx.getIdNotificacion().getCodigoPacienteVIH());
-                	if (tomaMx.getIdNotificacion().getEmbarazada()!=null) {
-                        map.put("embarazada", (tomaMx.getIdNotificacion().getEmbarazada().getCodigo().equalsIgnoreCase("RESP|S") ?
-                                messageSource.getMessage("lbl.yes", null, null) : messageSource.getMessage("lbl.no", null, null)));
-                    }else{
-                        map.put("embarazada", "--");
-                    }
-                }else {
+                } else  {
                     map.put("persona", " ");
                     map.put("embarazada", "--");
                 }
