@@ -50,6 +50,7 @@ public class SolicitudService {
                 "where t1.idTomaMx = t2.idTomaMx and t2.idNotificacion = t3.idNotificacion " +
                 " and t3.persona.personaId = :idPersona and t3.codTipoNotificacion.codigo = :tipoNoti " +
                 "and t1.controlCalidad = false " +
+                "and t1.codDx.nombre not like '%Covid19'"+ //Datos de Covid19, solo en sistema Laboratorio. Andrea 22/07/2020
                 " order by t1.fechaHSolicitud desc";
 
         Query query = session.createQuery(sQuery);

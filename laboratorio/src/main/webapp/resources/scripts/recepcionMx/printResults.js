@@ -28,8 +28,11 @@ var PrintResults = function () {
                 tablet: 1024,
                 phone: 480
             };
+            var text_selected_all = $("#text_selected_all").val();
+            var text_selected_none = $("#text_selected_none").val();
             var table1 = $('#list_result').dataTable({
                 "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "T" +
                     "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true, //"T<'clear'>"+
@@ -56,6 +59,14 @@ var PrintResults = function () {
                     $('.fPdf')
                         .off("click", pdfHandler)
                         .on("click", pdfHandler);
+                },
+                "oTableTools": {
+                    "sSwfPath": parametros.sTableToolsPath,
+                    "sRowSelect": "multi",
+                    "aButtons": [
+                        {"sExtends": "select_all", "sButtonText": text_selected_all},
+                        {"sExtends": "select_none", "sButtonText": text_selected_none}
+                    ]
                 }
             });
 
@@ -85,6 +96,10 @@ var PrintResults = function () {
                     //add here some ajax code to submit your form or just call form.submit() if you want to submit the form without ajax
                     getResultadosAprobados(false);
                 }
+            });
+
+            $('#btnExport').click(function () {
+                exportSelected();
             });
 
             function getResultadosAprobados(showAll) {
@@ -160,14 +175,14 @@ var PrintResults = function () {
                 }
             }
 
-            function exportPDF(id) {
-                bloquearUI("");
+            function exportPDF(codes) {
+                bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.pdfUrl,
                         type: 'GET',
                         dataType: 'text',
-                        data: {codes: id},
+                        data: {codes: codes},
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
@@ -193,6 +208,57 @@ var PrintResults = function () {
                         }
                     });
 
+
+            }
+
+            function exportSelected() {
+                var oTT = TableTools.fnGetInstance('list_result');
+                var aSelectedTrs = oTT.fnGetSelected();
+                var len = aSelectedTrs.length;
+                var opcSi = $("#yes").val();
+                var opcNo = $("#no").val();
+                if (len > 0) {
+                    $.SmartMessageBox({
+                        title: $("#msg_confirm_print").val(),
+                        content: $("#msg_print_confirm_c").val(),
+                        buttons: '[' + opcSi + '][' + opcNo + ']'
+                    }, function (ButtonPressed) {
+                        if (ButtonPressed === opcSi) {
+                            var codesLab = [];
+                            for (var i = 0; i < len; i++) {
+                                var texto = aSelectedTrs[i].firstChild.innerHTML;
+                                if (i + 1 < len) {
+                                    codesLab += texto+ ",";
+                                } else {
+                                    codesLab += texto;
+                                }
+
+                                //desbloquearUI();
+                            }
+                            //codesLab = reemplazar(codesLab, ".", "*");
+                            exportPDF(codesLab);
+
+                        }
+                        if (ButtonPressed === opcNo) {
+                            $.smallBox({
+                                title: $("#msg_print_canceled").val(),
+                                content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                color: "#3276B1",
+                                iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                                timeout: 4000
+                            });
+                        }
+
+                    });
+                } else {
+                    $.smallBox({
+                        title: $("#msg_print_select").val(),
+                        content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                        color: "#C46A69",
+                        iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                        timeout: 4000
+                    });
+                }
 
             }
 

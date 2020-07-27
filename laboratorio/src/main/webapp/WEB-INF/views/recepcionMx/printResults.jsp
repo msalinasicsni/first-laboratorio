@@ -94,6 +94,14 @@
                 <input id="text_value" type="hidden" value="<spring:message code="lbl.result.value"/>"/>
                 <input id="text_date" type="hidden" value="<spring:message code="lbl.result.date"/>"/>
                 <input id="text_response" type="hidden" value="<spring:message code="lbl.approve.response"/>"/>
+                <input id="text_selected_all" type="hidden" value="<spring:message code="lbl.selected.all"/>"/>
+                <input id="text_selected_none" type="hidden" value="<spring:message code="lbl.selected.none"/>"/>
+                <input id="msg_print_confirm_c" type="hidden" value="<spring:message code="msg.print.result.confirm"/>"/>
+                <input id="msg_print_select" type="hidden" value="<spring:message code="msg.print.result.select"/>"/>
+                <input id="msg_confirm_print" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                <input id="msg_print_canceled" type="hidden" value="<spring:message code="msg.print.result.canceled"/>"/>
+                <input id="yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                <input id="no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
 
                 <form id="searchResults-form" class="smart-form" autocomplete="off">
                     <fieldset>
@@ -185,6 +193,11 @@
                 </tr>
                 </thead>
             </table>
+                <form id="sendOrders-form" class="smart-form" autocomplete="off">
+                    <footer>
+                        <button type="button" id="btnExport" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o"></i> <spring:message code="act.export.selected" /></button>
+                    </footer>
+                </form>
             </div>
             <!-- end widget content -->
         </div>
@@ -262,7 +275,8 @@
         var parametros = {
             sSearchUrl : "${sSearchUrl}",
             pdfUrl : "${pdfUrl}",
-            blockMess: "${blockMess}"
+            blockMess: "${blockMess}",
+            sTableToolsPath : "${tabletools}"
         };
         PrintResults.init(parametros);
         handleDatePickers("${pageContext.request.locale.language}");

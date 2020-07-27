@@ -1338,7 +1338,7 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DatosSolicitud> getSolicitudesAprobByToma_Lab_Area(String idToma, String codigoLab, int idArea){
-        String query = " select sdx.idSolicitudEstudio as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudEstudio sdx " +
+        String query = " select sdx.idSolicitudEstudio as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion, sdx.tipoEstudio.nombre as nombre from DaSolicitudEstudio sdx  " +
                 "where sdx.anulado = false and sdx.aprobada = true and " +
                 "sdx.idSolicitudEstudio in (select oe.solicitudEstudio.idSolicitudEstudio from OrdenExamen oe where oe.solicitudEstudio.idSolicitudEstudio = sdx.idSolicitudEstudio and oe.labProcesa.codigo = :codigoLab) " +
                 "and sdx.idTomaMx.idTomaMx = :idToma and sdx.tipoEstudio.area.idArea = :idArea " +
@@ -1349,7 +1349,7 @@ public class TomaMxService {
         q.setParameter("idArea", idArea);
         q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
         List<DatosSolicitud> datos = q.list();
-        query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudDx sdx " +
+        query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion, sdx.codDx.nombre as nombre from DaSolicitudDx sdx " +
                 "where sdx.anulado = false and sdx.aprobada = true and " +
                 "(sdx.labProcesa.codigo = :codigoLab or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab))" +
                 "and sdx.idTomaMx.idTomaMx = :idToma and sdx.codDx.area.idArea = :idArea " +
