@@ -10,6 +10,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
+import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
@@ -693,8 +694,11 @@ public class TomaMxController {
             JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
             if (jsonpObject.get("idPersona")!=null && !jsonpObject.get("idPersona").getAsString().isEmpty()) {
                 idPersona = jsonpObject.get("idPersona").getAsInt();
-                noti.setPersona(personaService.getPersona(Long.valueOf(idPersona)));
+                SisPersona persona = personaService.getPersona(Long.valueOf(idPersona));
+                noti.setPersona(persona);
                 noti.setCodTipoNotificacion(catalogoService.getTipoNotificacion("TPNOTI|PCNT"));
+                noti.setMunicipioResidencia(persona.getMunicipioResidencia());
+                noti.setDireccionResidencia(persona.getDireccionResidencia());
             }
             if (jsonpObject.get("idSolicitante")!=null && !jsonpObject.get("idSolicitante").getAsString().isEmpty()){
                 idSolicitante = jsonpObject.get("idSolicitante").getAsString();

@@ -4,10 +4,12 @@ import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.muestra.DatoSolicitud;
 import ni.gob.minsa.laboratorio.domain.muestra.DatoSolicitudDetalle;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.utilities.reportes.DetalleDatosRecepcion;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -128,6 +130,17 @@ public class DatosSolicitudService {
         String query = "select a from DatoSolicitudDetalle as a inner join a.solicitudDx as r where r.idSolicitudDx = :idSolicitud ";
         Query q = session.createQuery(query);
         q.setParameter("idSolicitud", idSolicitud);
+        return q.list();
+    }
+
+    public List<DetalleDatosRecepcion> getDetalleDatosRecepcionByIdSolicitud(String idSolicitud){
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select a.idDetalle as idDetalle, a.valor as valor, r.idSolicitudDx as solicitudDx, da.idConceptoSol as datoSolicitud, da.nombre as nombre, " +
+                "da.concepto.tipo.valor as tipoConcepto  " +
+                "from DatoSolicitudDetalle as a inner join a.solicitudDx as r inner join a.datoSolicitud as da where r.idSolicitudDx = :idSolicitud ";
+        Query q = session.createQuery(query);
+        q.setParameter("idSolicitud", idSolicitud);
+        q.setResultTransformer(Transformers.aliasToBean(DetalleDatosRecepcion.class));
         return q.list();
     }
 

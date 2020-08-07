@@ -117,6 +117,9 @@ public class ReportesExcelController {
     @Resource(name = "daDatosTBService")
     private DaDatosTBService daDatosTBService;
 
+    @Resource(name = "datosSolicitudService")
+    private DatosSolicitudService datosSolicitudService;
+
     @Autowired
     MessageSource messageSource;
 
@@ -733,6 +736,11 @@ public class ReportesExcelController {
             if (dx!=null) nombreDx = nombreDx + " - "+ dx.getNombre().toUpperCase();
             List<ResultadoVigilancia> dxListBio = reportesService.getDiagnosticosAprobadosByFiltroV2(filtroRep);
             setDatosVirusResp(rvList, dxListBio, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+        }//Biologia Molecular Covid19
+        else if (dx!=null && (dx.getNombre().toLowerCase().contains("molecular") && dx.getNombre().toLowerCase().contains("covid19"))) {
+            tipoReporte = "BM_COVID19";
+            setNombreColumnasBioMolCovid19(columnas);
+            setDatosBioMolCovid19(rvList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
         }else if (dx!=null){
             tipoReporte = dx.getNombre().replace(" ", "_");
             setNombreColumnasDefecto(columnas);
@@ -1277,6 +1285,27 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.egress.diagnosis2.short", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.egress.condition", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.final.case.classification.short", null, null).toUpperCase());
+    }
+
+    private void setNombreColumnasBioMolCovid19(List<String> columnas){
+        columnas.add(messageSource.getMessage("lbl.num", null, null));
+        columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.names", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lastnames", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.age", null, null).toUpperCase().replace(":",""));
+        columnas.add(messageSource.getMessage("lbl.age.um", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.address", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.muni", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.file.number.2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.fis.short", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.ftm", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.result.pcr", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.approve.date.2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.res.final", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.num.cedula", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lugar.viaja", null, null).toUpperCase());
     }
 
     private void setNombreColumnasDefecto(List<String> columnas){
@@ -2008,6 +2037,83 @@ public class ReportesExcelController {
             }else if (!registro[20].toString().toLowerCase().contains("indetermin") && !registro[20].toString().toLowerCase().contains("invalido")) {
                 registro[0]= rowCountPos++;
                 registrosPos.add(registro);
+            }
+        }
+    }
+
+    /**
+     * Metodo para llenar datos de dx Biologia Molecular Covid19 para Reporte de Vigilancia generado en excel
+     * @param dxList Lista con los dx a evaluar
+     * @param registrosPos Registros que iran a la tabla de positivos en el excel
+     * @param registrosNeg Registros que iran a la tabla de negativos en el excel
+     * @param incluirMxInadecuadas True para llenar lista de mx inadecuadas, false en caso contrario
+     * @param registrosMxInadec Si incluirMxInadecuadas = True, Registros con dx con resultado de Mx Inadecuada
+     * @throws Exception
+     */
+    private void setDatosBioMolCovid19(List<ResultadoVigilancia> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec, int numColumnas) throws Exception{
+// create data rows
+        int rowCountPos = 1;
+        int rowCountNeg = 1;
+        int rowCountInadec = 1;
+        for (ResultadoVigilancia solicitudDx : dxList) {
+            String nombres = "";
+            String apellidos = "";
+
+            Object[] registro = new Object[numColumnas];
+            registro[1] = (solicitudDx.getCodigoMx()!=null?solicitudDx.getCodigoMx():solicitudDx.getCodUnicoMx());
+
+            nombres = solicitudDx.getPrimerNombre();
+            if (solicitudDx.getSegundoNombre()!=null)
+                nombres += " "+solicitudDx.getSegundoNombre();
+            registro[2] = nombres;
+
+            apellidos = solicitudDx.getPrimerApellido();
+            if (solicitudDx.getSegundoApellido()!=null)
+                apellidos += " "+solicitudDx.getSegundoApellido();
+            registro[3] = apellidos;
+
+            Integer edad = null;
+            String medidaEdad = "";
+            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getFechaNacimiento(), new Date()).split("/");
+            if (arrEdad[0] != null && !arrEdad[0].equalsIgnoreCase("0")) {
+                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
+            }else if (arrEdad[1] != null && !arrEdad[1].equalsIgnoreCase("0")) {
+                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
+            }else if (arrEdad[2] != null) {
+                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
+            }
+            registro[4] = edad;
+            registro[5] = medidaEdad;
+            String direccion = solicitudDx.getDireccionResidencia();
+            if (solicitudDx.getTelefonoResidencia()!=null || solicitudDx.getTelefonoMovil()!=null ){
+                direccion += ". TEL. ";
+                direccion+= (solicitudDx.getTelefonoResidencia()!=null?solicitudDx.getTelefonoResidencia()+",":"");
+                direccion+= (solicitudDx.getTelefonoMovil()!=null?solicitudDx.getTelefonoMovil():"");
+            }
+            registro[6] = direccion;
+
+
+            registro[7] = solicitudDx.getNombreSilaisResid(); //silais residencia
+            registro[8] = solicitudDx.getNombreMuniResid(); //municipio residencia
+            registro[9] = solicitudDx.getExpediente();
+            String sexo = solicitudDx.getSexo();
+            registro[10] = sexo.substring(sexo.length()-1, sexo.length());
+            registro[11] = DateUtil.DateToString(solicitudDx.getFechaInicioSintomas(),"dd/MM/yyyy");
+            registro[12] = DateUtil.DateToString(solicitudDx.getFechaTomaMx(),"dd/MM/yyyy");
+            validarPCRCovid19(registro, solicitudDx.getIdSolicitud());
+            registro[14] = DateUtil.DateToString(solicitudDx.getFechaAprobacion(),"dd/MM/yyyy");
+            registro[15] = parseFinalResultDetails(solicitudDx.getIdSolicitud());
+            registro[16] = solicitudDx.getIdentificacion();
+            registro[17] = getLugarViaja(solicitudDx.getIdSolicitud());
+            if (registro[15].toString().toLowerCase().contains("positivo")) {
+                registro[0]= rowCountPos++;
+                registrosPos.add(registro);
+            } else if (registro[15].toString().toLowerCase().contains("negativo")) {
+                registro[0]= rowCountNeg++;
+                registrosNeg.add(registro);
+            } else if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuad")){
+                registro[0]= rowCountInadec++;
+                registrosMxInadec.add(registro);
             }
         }
     }
@@ -2762,6 +2868,29 @@ public class ReportesExcelController {
         }
     }
 
+    private void validarPCRCovid19(Object[] dato, String idSolicitudDx){
+
+        List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(idSolicitudDx);
+        for (DatosOrdenExamen examen : examenes) {
+                List<ResultadoExamen> resultados = resultadosService.getDetallesResultadoActivosByExamenV2(examen.getIdOrdenExamen());
+                String detalleResultado = "";
+                for (ResultadoExamen resultado : resultados) {
+                    if (resultado.getTipo().equals("TPDATO|LIST")) {
+                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
+                        detalleResultado = cat_lista.getEtiqueta();
+                    } else if (resultado.getTipo().equals("TPDATO|LOG")) {
+                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
+                    }/*else {
+                        detalleResultado = resultado.getValor();
+                    }*/
+                }
+                if (resultados.size() > 0) {
+                    dato[13] = detalleResultado;
+                }
+
+        }
+    }
+
     private void validarPCRIgMDefecto(Object[] dato, String idSolicitudDx){
 
         List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(idSolicitudDx);
@@ -2910,6 +3039,24 @@ public class ReportesExcelController {
             }
         }
         return resultados;
+    }
+
+    private String getLugarViaja(String idSolicitud){
+        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
+        String lugar="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().toLowerCase().contains("lugar"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    lugar+=cat_lista.getEtiqueta();
+                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    lugar+=valorBoleano;
+                } else {
+                    lugar+=res.getValor().toUpperCase();
+                }
+        }
+        return lugar;
     }
 
     private void parseVIHSerFinalResultDetails(String idSolicitud, Object[] dato, int indiceRes) {
