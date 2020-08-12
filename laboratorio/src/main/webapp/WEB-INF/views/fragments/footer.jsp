@@ -5,6 +5,9 @@
 		<div class="col-xs-12 col-sm-6">
 			<span class="txt-color-white"><spring:message code="title" /></span>
 		</div>
+        <div class="col-xs-12 col-sm-6">
+            <span class="txt-color-white"><spring:message code="version" /></span>
+        </div>
 	</div>
 </div>
 <!-- END PAGE FOOTER -->

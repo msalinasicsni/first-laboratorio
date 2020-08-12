@@ -108,13 +108,16 @@ public class CrearSolicitudDx {
                 if (requeridos.isEmpty()) {
                     //validar si usuario está registrado en el sistema
                     Laboratorio laboratorioProcesa = laboratoriosService.getLaboratorioByCodigo(solicitud.getCodigoLab());
-                    if (laboratorioProcesa == null)
+                    if (laboratorioProcesa == null) {
                         resultado.setError("Laboratorio enviado no se reconoce como laboratorio válido!");
+                        return  createJsonResponse(resultado);
+                    }
 
                     //validar si usuario está registrado en el sistema
                     Usuarios usuarioRegistro = usuarioService.getUsuarioById(Integer.valueOf(solicitud.getIdUsuario()));
                     if (usuarioRegistro == null) {
                         resultado.setError("Usuario enviado no se reconoce como usuario válido!");
+                        return  createJsonResponse(resultado);
                     }
 
                     DaNotificacion notificacion = null;
