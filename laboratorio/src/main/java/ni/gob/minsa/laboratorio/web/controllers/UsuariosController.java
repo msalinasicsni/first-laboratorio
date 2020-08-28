@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
+import com.google.common.base.Predicate;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
@@ -10,6 +11,8 @@ import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.*;
 
 import ni.gob.minsa.laboratorio.service.*;
+import ni.gob.minsa.laboratorio.utilities.dto.UsuarioDTO;
+import ni.gob.minsa.laboratorio.utilities.reportes.FilterLists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,22 +26,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Controlador web de peticiones relacionadas a usuarios
@@ -79,14 +76,68 @@ public class UsuariosController {
     public String obtenerUsuarios(Model model, HttpServletRequest request) throws ParseException {
         logger.debug("Mostrando Usuarios en JSP");
         request.getSession().setAttribute("origen","lista");
-        List<User> usuarios = usuarioService.getUsers();
-        List<AutoridadLaboratorio> autoridadLaboratorios = autoridadesService.getAutoridadesLab();
-        model.addAttribute("usuarios", usuarios);
-        model.addAttribute("authorities", this.usuarioService.getAuthorities());
-        model.addAttribute("autoridadLaboratorios",autoridadLaboratorios);
+        //List<User> usuarios = usuarioService.getUsers();
+        //List<AutoridadLaboratorio> autoridadLaboratorios = autoridadesService.getAutoridadesLab();
+        //model.addAttribute("usuarios", usuarios);
+        //model.addAttribute("authorities", this.usuarioService.getAuthorities());
+        //model.addAttribute("autoridadLaboratorios",autoridadLaboratorios);
         return "usuarios/seeUsers";
     }
 
+    @RequestMapping(value = "getAllUsers", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody List<UsuarioDTO> getAllUsers() throws Exception {
+        logger.info("Obteniendo todos los usarios en JSON");
+        List<UsuarioDTO> usuarios = usuarioService.getAllUsersDTO();
+        List<AutoridadLaboratorio> autoridadLaboratorios = autoridadesService.getAutoridadesLab();
+        List<Authority> roles = this.usuarioService.getAuthorities();
+        for(UsuarioDTO usuarioDTO : usuarios){
+            usuarioDTO.setLaboratorio(getLaboratorios(usuarioDTO.getUsername(), autoridadLaboratorios));
+            usuarioDTO.setRoles(getRoles(usuarioDTO.getUsername(), roles));
+        }
+        return usuarios;
+    }
+
+    private String getLaboratorios(final String username, List<AutoridadLaboratorio> autoridadLaboratorios){
+        String laboratorios="";
+        //Filtrar por username
+        Predicate<AutoridadLaboratorio> byUserName = new Predicate<AutoridadLaboratorio>() {
+            @Override
+            public boolean apply(AutoridadLaboratorio autoridadLaboratorio) {
+                return autoridadLaboratorio.getUser().getUsername().equalsIgnoreCase(username);
+            }
+        };
+
+        Collection<AutoridadLaboratorio> laboratoriosTmp = FilterLists.filter(autoridadLaboratorios, byUserName);
+        for(AutoridadLaboratorio autoridadLaboratorio : laboratoriosTmp){
+            if (laboratorios.isEmpty()){
+                laboratorios = autoridadLaboratorio.getLaboratorio().getNombre();
+            } else {
+                laboratorios += ", " +autoridadLaboratorio.getLaboratorio().getNombre();
+            }
+        }
+        return laboratorios;
+    }
+
+    private String getRoles(final String username, List<Authority> autoridades){
+        String roles="";
+        //Filtrar por username
+        Predicate<Authority> byUserName = new Predicate<Authority>() {
+            @Override
+            public boolean apply(Authority authority) {
+                return authority.getUser().getUsername().equalsIgnoreCase(username);
+            }
+        };
+
+        Collection<Authority> rolesTmp = FilterLists.filter(autoridades, byUserName);
+        for(Authority authority : rolesTmp){
+            if (roles.isEmpty()){
+                roles = authority.getAuthId().getAuthority();
+            } else {
+                roles += ", " + authority.getAuthId().getAuthority();
+            }
+        }
+        return roles;
+    }
     /**
      * Custom handler for displaying an user.
      *

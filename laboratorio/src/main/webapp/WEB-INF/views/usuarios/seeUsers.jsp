@@ -9,6 +9,9 @@
 <html>
 <head>
     <jsp:include page="../fragments/headTag.jsp" />
+        <style>
+            .centrado { text-align: center; }
+        </style>
 </head>
 <body class="">
 <jsp:include page="../fragments/bodyHeader.jsp" />
@@ -90,96 +93,9 @@
                                         <th><spring:message code="users.nc" /></th>
                                         <th><spring:message code="users.roles" /></th>
                                         <th><spring:message code="users.lab" /></th>
-                                        <th style="width: 10%"><spring:message code="lbl.actions" /></th>
+                                        <th style="width: 8%"><spring:message code="lbl.actions" /></th>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <c:forEach items="${usuarios}" var="usuario">
-                                        <tr>
-                                            <spring:url value="/usuarios/admin/{username}"
-                                                        var="usuarioUrl">
-                                                <spring:param name="username" value="${usuario.username}" />
-                                            </spring:url>
-                                            <spring:url value="/usuarios/admin/{username}/edit"
-                                                        var="editUrl">
-                                                <spring:param name="username" value="${usuario.username}" />
-                                            </spring:url>
-                                            <spring:url value="/usuarios/admin/{username}/disable"
-                                                        var="disableUrl">
-                                                <spring:param name="username" value="${usuario.username}" />
-                                            </spring:url>
-                                            <spring:url value="/usuarios/admin/{username}/chgpass"
-                                                        var="chgpassUrl">
-                                                <spring:param name="username" value="${usuario.username}" />
-                                            </spring:url>
-                                            <td><a href="${fn:escapeXml(usuarioUrl)}"><c:out
-                                                    value="${usuario.username}" /></a></td>
-                                            <td><a href="${fn:escapeXml(usuarioUrl)}"><c:out
-                                                    value="${usuario.completeName}" /></a></td>
-                                            <td><c:out value="${usuario.email}" /></td>
-                                            <c:choose>
-                                                <c:when test="${usuario.enabled}">
-                                                    <td align="center">
-                                                        <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
-                                                    </td>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <td align="center">
-                                                        <span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>
-                                                    </td>
-                                                </c:otherwise>
-                                            </c:choose>
-                                            <c:choose>
-                                                <c:when test="${usuario.nivelCentral}">
-                                                    <td align="center">
-                                                        <span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>
-                                                    </td>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <td align="center">
-                                                        <span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>
-                                                    </td>
-                                                </c:otherwise>
-                                            </c:choose>
-                                            <td><c:forEach var="rol" items="${authorities}">
-                                                <c:if test="${rol.user.username == usuario.username}">
-                                                    <c:out value="${rol.authId.authority}" />
-                                                </c:if>
-                                            </c:forEach></td>
-                                            <td>
-                                                <c:forEach var="autLab" items="${autoridadLaboratorios}">
-                                                    <c:if test="${autLab.user.username == usuario.username}">
-                                                        <c:out value="${autLab.laboratorio.nombre}" />
-                                                    </c:if>
-                                                </c:forEach>
-                                            </td>
-                                            <td align="center">
-                                                <div class="">
-                                                    <button title="<spring:message code="act.show" />"
-                                                            onclick="location.href='${fn:escapeXml(usuarioUrl)}'"
-                                                            class="btn btn-xs btn-primary">
-                                                        <i class="fa fa-search"></i>
-                                                    </button>
-                                                    <button title="<spring:message code="act.edit" />"
-                                                            onclick="location.href='${fn:escapeXml(editUrl)}'"
-                                                            class="btn btn-xs btn-primary">
-                                                        <i class="fa fa-edit"></i>
-                                                    </button>
-                                                    <button title="<spring:message code="act.change.pass" />"
-                                                            onclick="location.href='${fn:escapeXml(chgpassUrl)}'"
-                                                            class="btn btn-xs btn-warning">
-                                                        <i class="fa fa-lock"></i>
-                                                    </button>
-                                                    <!--<button
-                                                            onclick="location.href='${fn:escapeXml(disableUrl)}'"
-                                                            class="btn btn-xs btn-warning">
-                                                        <i class="icon-remove"><spring:message code="act.disable" /></i>
-                                                    </button>-->
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                    </tbody>
                                 </table>
                             </div>
                             </div>
@@ -224,10 +140,19 @@
 <spring:url value="/resources/scripts/usuarios/users.js" var="userJs" />
 <script src="${userJs}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
+<c:url var="getAllUsers" value="/usuarios/getAllUsers"/>
+<spring:url value="/usuarios/admin/{username}" var="usuarioUrl"/>
+<spring:url value="/usuarios/admin/{username}/edit" var="editUrl"/>
+<spring:url value="/usuarios/admin/{username}/chgpass" var="chgpassUrl"/>
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
         pageSetUp();
-        var parametros = {blockMess : $("#blockUI_message").val()};
+        var parametros = {blockMess : $("#blockUI_message").val(),
+            getAllUsers: "${getAllUsers}",
+            usuarioUrl: "${usuarioUrl}",
+            editUrl: "${editUrl}",
+            chgpassUrl: "${chgpassUrl}"
+        };
         Users.init(parametros);
         $("li.administracion").addClass("open");
         $("li.users").addClass("active");

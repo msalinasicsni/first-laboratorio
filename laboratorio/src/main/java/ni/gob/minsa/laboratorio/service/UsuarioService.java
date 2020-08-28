@@ -2,10 +2,12 @@ package ni.gob.minsa.laboratorio.service;
 
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.*;
+import ni.gob.minsa.laboratorio.utilities.dto.UsuarioDTO;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -232,5 +234,22 @@ public class UsuarioService {
     public void deleteRole(Authority authority) {
         Session session = sessionFactory.getCurrentSession();
         session.delete(authority);
+    }
+
+    /**
+     * Regresa todos los usuarios
+     *
+     * @return una lista de <code>User</code>(s)
+     */
+
+    @SuppressWarnings("unchecked")
+    public List<UsuarioDTO> getAllUsersDTO() {
+        // Retrieve session from Hibernate
+        Session session = sessionFactory.getCurrentSession();
+        // Create a Hibernate query (HQL)
+        Query query = session.createQuery("select u.username as username, u.enabled as enabled, u.nivelCentral as nivelCentral, u.completeName as descripcion, u.email as email FROM User u");
+        query.setResultTransformer(Transformers.aliasToBean(UsuarioDTO.class));
+        // Retrieve all
+        return  query.list();
     }
 }

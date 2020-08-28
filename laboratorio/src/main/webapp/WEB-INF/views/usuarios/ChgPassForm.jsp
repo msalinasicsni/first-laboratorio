@@ -49,7 +49,7 @@
                     <i class="fa-fw fa fa-users"></i>
                     <spring:message code="users" />
 						<span> <i class="fa fa-angle-right"></i>
-							<spring:message code="person.create" />
+							<spring:message code="act.change.pass" />
 						</span>
                 </h1>
             </div>
@@ -229,6 +229,7 @@
 <spring:url value="/personas/search" var="sPersonUrl"/>
 <c:set var="blockMess"><spring:message code="blockUI.message" /></c:set>
 <c:url var="changePassUrl" value="/usuarios/changePassword"/>
+<spring:url value="/usuarios/list" var="usuariosUrl"/>
 <script type="text/javascript">
     $(document).ready(function() {
         pageSetUp();

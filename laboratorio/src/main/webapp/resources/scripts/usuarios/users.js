@@ -35,6 +35,9 @@ var Users = function () {
                     "t" +
                     "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
                 "autoWidth": true,
+                "aoColumns" : [
+                    {sClass: "aw-left" },{sClass: "aw-left" },{sClass: "aw-left" },{sClass: "centrado" },{sClass: "centrado" },{sClass: "aw-left" },{sClass: "aw-left" },{sClass: "centrado" }
+                ],
                 "preDrawCallback": function () {
                     // Initialize the responsive datatables helper once.
                     if (!responsiveHelper_dt_basic) {
@@ -48,6 +51,8 @@ var Users = function () {
                     responsiveHelper_dt_basic.respond();
                 }
             });
+
+            getAllUsers();
 
             /****************************************************/
             /******************EDITAR USUARIO*********************/
@@ -71,6 +76,44 @@ var Users = function () {
                     updateUser();
                 }
             });
+
+            function getAllUsers() {
+                bloquearUI(parametros.blockMess);
+                $.getJSON(parametros.getAllUsers, {
+                    ajax: 'true'
+                }, function (data) {
+                    table1.fnClearTable();
+                    var len = data.length;
+                    for (var i = 0; i < len; i++) {
+                        var urlVer = parametros.usuarioUrl.replaceAll("{username}", data[i].username);
+                        var urlEditar = parametros.editUrl.replaceAll("{username}", data[i].username);
+                        var urlChanPass = parametros.chgpassUrl.replaceAll("{username}", data[i].username);
+
+                        var aUsername = '<a href="'+urlVer+'">'+data[i].username+'</a>';
+                        var aDescripcion = '<a href="'+urlVer+'">'+data[i].descripcion+'</a>';
+
+                        var btnVer = '<a title="Ver" class="btn btn-xs btn-primary" href="'+urlVer+'"> <i class="fa fa-search"></i></a> '+
+                            ' <a title="Editar" class="btn btn-xs btn-primary" href="'+urlEditar+'"> <i class="fa fa-edit"></i></a> '+
+                            ' <a title="Cambiar Contrase\u00F1a" class="btn btn-xs btn-warning" href="'+urlChanPass+'"> <i class="fa fa-lock"></i></a> ';
+
+                        var habilitado = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
+                        var nivelCentral = '<span class="label label-success"><i class="fa fa-thumbs-up fa-lg"></i></span>';
+                        if (data[i].enabled == false){
+                            habilitado = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
+                        }
+                        if (data[i].nivelCentral == false){
+                            nivelCentral = '<span class="label label-danger"><i class="fa fa-thumbs-down fa-lg"></i></span>';
+                        }
+                        console.log(btnVer);
+                        table1.fnAddData(
+                            [aUsername, aDescripcion, data[i].email, habilitado, nivelCentral, data[i].roles, data[i].laboratorio ,btnVer]);
+                    }
+                    desbloquearUI();
+                }).fail(function(jqXHR) {
+                    desbloquearUI();
+                    validateLogin(jqXHR);
+                });
+            }
 
             function updateUser() {
                 var valueObj = {};
