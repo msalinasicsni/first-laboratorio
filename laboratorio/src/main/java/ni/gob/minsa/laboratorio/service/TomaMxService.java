@@ -1370,4 +1370,20 @@ public class TomaMxService {
         q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
         return q.list();
     }
+
+    /***
+     * Validar si la muestra es para realizar dx molecular covid19 para viajeros
+     * @param codigoMx
+     * @return TRUE si la mx contiene el dx, FALSE en caso contrario
+     */
+    public boolean esMxViajeroCovid(String codigoMx){
+        String query = "select count(dx.idSolicitudDx) from DaSolicitudDx dx inner join dx.idTomaMx mx where mx.codigoLab = :codigoMx " +
+                "and dx.codDx.idDiagnostico = (select cast(p.valor as long) from Parametro p where p.nombre = 'DX_VIAJERO_COVID19')";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("codigoMx", codigoMx);
+        q.uniqueResult();
+        Long total = (Long)q.uniqueResult();
+        return total.intValue()>0;
+    }
 }

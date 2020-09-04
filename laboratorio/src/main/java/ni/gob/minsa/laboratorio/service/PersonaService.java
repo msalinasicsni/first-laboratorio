@@ -114,7 +114,10 @@ public class PersonaService {
             if(pFiltro!=null){
                 if(pFiltro.matches("[0-9]*")){
                     personaList = getPersonasPorNumeroTelefono(pPaginaActual, pRegistrosPorPagina, pFiltro,null);
-                }else if(pFiltro.matches("[a-zA-ZáéíóúÑñÁÉÍÓÚÜü\\s]*")){
+                    if (personaList == null) { //se agrega para buscar por pasaporte, que solo contiene n�meros
+                        personaList = getPersonasPorIdentificacion(pPaginaActual, pRegistrosPorPagina, pFiltro, null);
+                    }
+                }else if(pFiltro.matches("[a-zA-ZáéíóúÑñÁÉÍÓÚÜü\\-\\s]*")){ //se agrega el gui�n (-) en la expresi�n regular para incluir nombres de Asi�ticos.
                     personaList = getPersonasPorNombre(pPaginaActual, pRegistrosPorPagina, pFiltro,null);
                 }else{
                     personaList = getPersonasPorIdentificacion(pPaginaActual, pRegistrosPorPagina, pFiltro,null);

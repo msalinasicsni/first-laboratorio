@@ -181,13 +181,7 @@ public class expose {
     @ResponseBody
     List<Unidades> getPUnitsHospByMuniAndSilais(@RequestParam(value = "codMunicipio", required = true) String codMunicipio,@RequestParam(value = "codSilais", required = true) long codSilais, HttpServletRequest request) throws Exception {
         logger.info("Obteniendo las unidades primarias y Hospitales por municipio y Silais en JSON");
-        long idUsuario = seguridadService.obtenerIdUsuario(request);
-        //Si es usuario a nivel central se cargan todas las unidades asociados al SILAIS y municipio
-        if(seguridadService.esUsuarioNivelCentral(idUsuario, ConstantsSecurity.SYSTEM_CODE)) {
-            return  unidadesService.getPUnitsHospByMuniAndSilais(codMunicipio, HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","), codSilais);
-        }else{ //sino sólo se cargarn las unidades autorizadas para el usuario según SILAIS y municipio
-            return seguridadService.obtenerUnidadesPorUsuarioEntidadMunicipio((int) idUsuario, codSilais, codMunicipio, ConstantsSecurity.SYSTEM_CODE, HealthUnitType.UnidadesPrimHosp.getDiscriminator());
-        }
+        return  unidadesService.getPUnitsHospByMuniAndSilais(codMunicipio, HealthUnitType.UnidadesPrimHosp.getDiscriminator().split(","), codSilais);
     }
 
     @RequestMapping(value = "unidadesPrimariasSilais", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

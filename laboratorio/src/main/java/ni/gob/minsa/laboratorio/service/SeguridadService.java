@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
+import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
@@ -457,4 +458,12 @@ public class SeguridadService {
         else return  false;
     }
 
+    public boolean usuarioAutorizadoCovid19(String username){
+        String query = "from Parametro where nombre='USUARIOS_AUT_COVID19' and valor like :username";
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("username", "%,"+username+",%");
+        Parametro parametro = (Parametro)q.uniqueResult();
+        return parametro!=null;
+
+    }
 }

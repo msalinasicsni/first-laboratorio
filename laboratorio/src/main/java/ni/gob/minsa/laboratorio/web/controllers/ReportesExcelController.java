@@ -161,7 +161,12 @@ public class ReportesExcelController {
             areas.add(catalogosService.getAreaRep("AREAREP|PAIS"));
             areas.add(catalogosService.getAreaRep("AREAREP|SILAIS"));
             areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
-            List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+            List<Catalogo_Dx> catDx = null;
+            if (seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario())) {
+                catDx = associationSamplesRequestService.getDxs();
+            } else {
+                catDx = associationSamplesRequestService.getDxsExceptoCovid19();
+            }
             catDx.add(new Catalogo_Dx(0,"VIRUS RESPIRATORIOS COMPLETO"));
             List<Catalogo_Estudio> catEs = null;
             if (laboratorio!=null && laboratorio.getCodigo().equalsIgnoreCase("CNDR")) {
@@ -185,7 +190,12 @@ public class ReportesExcelController {
     @RequestMapping(value = "consolidatedexams/init", method = RequestMethod.GET)
     public String initReportConsolidatedByExams(Model model,HttpServletRequest request) throws Exception {
         logger.debug("Reporte por examenes(t�cnica)");
-        List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+        List<Catalogo_Dx> catDx = null;
+        if (seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario())) {
+            catDx = associationSamplesRequestService.getDxs();
+        } else {
+            catDx = associationSamplesRequestService.getDxsExceptoCovid19();
+        }
         List<Semanas> semanas = catalogosService.getSemanas();
         List<Anios> anios = catalogosService.getAnios();
         List<Laboratorio> laboratorios = null;
@@ -622,7 +632,7 @@ public class ReportesExcelController {
         String nombreDx = "";
         Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());//seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         List<ResultadoVigilancia> rvList = new ArrayList<>();
-
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
 
         List<Object[]> registrosPos = new ArrayList<Object[]>();
         List<Object[]> registrosNeg = new ArrayList<Object[]>();
@@ -740,7 +750,9 @@ public class ReportesExcelController {
         else if (dx!=null && (dx.getNombre().toLowerCase().contains("molecular") && dx.getNombre().toLowerCase().contains("covid19"))) {
             tipoReporte = "BM_COVID19";
             setNombreColumnasBioMolCovid19(columnas);
-            setDatosBioMolCovid19(rvList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            if (usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                setDatosBioMolCovid19(rvList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
+            }
         }else if (dx!=null){
             tipoReporte = dx.getNombre().replace(" ", "_");
             setNombreColumnasDefecto(columnas);
@@ -783,6 +795,7 @@ public class ReportesExcelController {
         List<Object[]> datos = new ArrayList<Object[]>();
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
         Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
         if (filtroRep.getIdDx()!=null) {
             dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
             if (dx!=null) nombreDx = dx.getNombre().toUpperCase();
@@ -801,7 +814,9 @@ public class ReportesExcelController {
         }
         setNombreColumnasResultadoDX(filtroRep, columnas, nombreDx);
         if (filtroRep.getIdDx()!=null) {
-            datos = reportesService.getDataDxResultReport(filtroRep, nombreDx, columnas.size());
+            if (!nombreDx.toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                datos = reportesService.getDataDxResultReport(filtroRep, nombreDx, columnas.size());
+            }//Fin Covid
         }else if (filtroRep.getIdEstudio()!=null) {
             datos = reportesService.getDataEstResultReport(filtroRep, nombreDx, columnas.size());
         }

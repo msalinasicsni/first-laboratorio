@@ -253,4 +253,16 @@ public class AssociationSamplesRequestService {
         return updateEntities;
     }
 
+    /***
+     * Obtener todos los Dxs excepto Covid19
+     * @return
+     * @throws Exception
+     */
+    public List<Catalogo_Dx> getDxsExceptoCovid19() throws Exception {
+        String query = "from Catalogo_Dx dx where pasivo = false and lower(nombre) not like '%covid19%' order by dx.nombre asc" ;
+        Session session = sessionFactory.getCurrentSession();
+        Query q = session.createQuery(query);
+        return q.list();
+    }
+
 }

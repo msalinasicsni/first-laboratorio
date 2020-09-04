@@ -264,6 +264,7 @@ public class ResultadosController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
         Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
         for(OrdenExamen orden : ordenesExamen){
             Map<String, String> map = new HashMap<String, String>();
             map.put("idOrdenExamen", orden.getIdOrdenExamen());
@@ -274,7 +275,7 @@ public class ResultadosController {
                 if (recepcionMxService.validarMuestraRecepcionadaAreaLab(
                         orden.getSolicitudDx().getIdTomaMx().getIdTomaMx(),
                         labUser.getCodigo(),
-                        orden.getCodExamen().getArea().getIdArea())) {
+                        orden.getCodExamen().getArea().getIdArea()) &&  (!orden.getSolicitudDx().getCodDx().getNombre().toLowerCase().contains("covid") || usuarioAutorizadoCovid19)) { //si es covid validar si usuario tiene autorizado ver ese Dx
                     agregar = true;
                     map.put("idTomaMx", orden.getSolicitudDx().getIdTomaMx().getIdTomaMx());
                     map.put("codigoUnicoMx", orden.getSolicitudDx().getIdTomaMx().getCodigoLab()!=null?orden.getSolicitudDx().getIdTomaMx().getCodigoLab():orden.getSolicitudDx().getIdTomaMx().getCodigoUnicoMx());

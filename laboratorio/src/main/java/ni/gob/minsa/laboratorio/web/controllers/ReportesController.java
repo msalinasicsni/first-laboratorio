@@ -781,102 +781,105 @@ public class ReportesController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
 
-
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
         if (positiveRoutineReqList != null) {
             for (DaSolicitudDx soli : positiveRoutineReqList) {
-                boolean mostrar = false;
+                if (!soli.getCodDx().getNombre().toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
 
-                //search positive results from list
-                //get Response for each request
-                List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
-                for (DetalleResultadoFinal res : finalRes) {
+                    boolean mostrar = false;
 
-                    if (res.getRespuesta() != null) {
-                        if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                            Integer idLista = Integer.valueOf(res.getValor());
-                            Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+                    //search positive results from list
+                    //get Response for each request
+                    List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
+                    for (DetalleResultadoFinal res : finalRes) {
 
-                            if (valor.getValor().trim().toLowerCase().equals("positivo")
-                                    || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
-                                    || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
-                                    || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
-                                    && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
-                                mostrar = true;
+                        if (res.getRespuesta() != null) {
+                            if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                Integer idLista = Integer.valueOf(res.getValor());
+                                Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                                if (valor.getValor().trim().toLowerCase().equals("positivo")
+                                        || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
+                                        || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
+                                        || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
+                                        && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                                    mostrar = true;
+                                }
+
+                            } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                                if (res.getValor().trim().toLowerCase().equals("positivo")
+                                        || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
+                                        || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
+                                        && (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
+                                    mostrar = true;
+                                }
+                            }
+                        } else if (res.getRespuestaExamen() != null) {
+                            if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                Integer idLista = Integer.valueOf(res.getValor());
+                                Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+
+                                if (valor.getValor().trim().toLowerCase().equals("positivo")
+                                        || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
+                                        || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
+                                        || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
+                                        && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
+                                    mostrar = true;
+                                }
+
+                            } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
+                                if (res.getValor().trim().toLowerCase().equals("positivo")
+                                        || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
+                                        || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
+                                        && (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
+                                    mostrar = true;
+                                }
                             }
 
-                        } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().trim().toLowerCase().equals("positivo")
-                                    || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
-                                    || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
-                                    && (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
-                                mostrar = true;
-                            }
                         }
-                    } else if (res.getRespuestaExamen() != null) {
-                        if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                            Integer idLista = Integer.valueOf(res.getValor());
-                            Catalogo_Lista valor = respuestasExamenService.getCatalogoListaConceptoByIdLista(idLista);
+                    }
 
-                            if (valor.getValor().trim().toLowerCase().equals("positivo")
-                                    || (valor.getValor().trim().toLowerCase().contains("reactor") && !valor.getValor().trim().toLowerCase().contains("no reactor"))
-                                    || (valor.getValor().trim().toLowerCase().contains("detectado") && !valor.getValor().trim().toLowerCase().contains("no detectado"))
-                                    || (valor.getValor().trim().toUpperCase().contains("MTB-DET") && !valor.getValor().trim().toUpperCase().contains("MTB-ND"))
-                                    && (!valor.getValor().trim().toLowerCase().contains("negativo") && !valor.getValor().trim().toLowerCase().contains("indetermin") && !valor.getValor().trim().toLowerCase().equals("mx inadecuada"))) {
-                                mostrar = true;
-                            }
+                    if (mostrar) {
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("solicitud", soli.getCodDx().getNombre());
+                        map.put("idSolicitud", soli.getIdSolicitudDx());
+                        map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab() != null ? soli.getIdTomaMx().getCodigoLab() : soli.getIdTomaMx().getCodigoUnicoMx());
+                        map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
 
-                        } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|TXT")) {
-                            if (res.getValor().trim().toLowerCase().equals("positivo")
-                                    || (res.getValor().trim().toLowerCase().contains("reactor") && !res.getValor().trim().toLowerCase().contains("no reactor"))
-                                    || (res.getValor().trim().toLowerCase().contains("detectado") && !res.getValor().trim().toLowerCase().contains("no detectado"))
-                                    && (res.getValor().trim().toUpperCase().contains("MTB-DET") && !res.getValor().trim().toUpperCase().contains("MTB-ND"))) {
-                                mostrar = true;
-                            }
+                        if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                            map.put("codSilais", soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                        } else {
+                            map.put("codSilais", "");
+                        }
+                        if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                            map.put("codUnidadSalud", soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                        } else {
+                            map.put("codUnidadSalud", "");
                         }
 
-                    }
-                }
+                        //Si hay persona
+                        if (soli.getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                            /// se obtiene el nombre de la persona asociada a la ficha
+                            String nombreCompleto = "";
+                            nombreCompleto = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                            map.put("persona", nombreCompleto);
+                        } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                        } else if (soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                        } else {
+                            map.put("persona", " ");
+                        }
 
-                if (mostrar) {
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("solicitud", soli.getCodDx().getNombre());
-                    map.put("idSolicitud", soli.getIdSolicitudDx());
-                    map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab()!=null?soli.getIdTomaMx().getCodigoLab():soli.getIdTomaMx().getCodigoUnicoMx());
-                    map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
-
-                    if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
-                        map.put("codSilais", soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                    } else {
-                        map.put("codSilais", "");
+                        mapResponse.put(indice, map);
+                        indice++;
                     }
-                    if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
-                        map.put("codUnidadSalud", soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-                    } else {
-                        map.put("codUnidadSalud", "");
-                    }
-
-                    //Si hay persona
-                    if (soli.getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                        /// se obtiene el nombre de la persona asociada a la ficha
-                        String nombreCompleto = "";
-                        nombreCompleto = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                        if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                        if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                        map.put("persona", nombreCompleto);
-                    } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante() != null){
-                        map.put("persona",soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-                    } else if (soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null){
-                        map.put("persona",soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
-                    }else {
-                        map.put("persona", " ");
-                    }
-
-                    mapResponse.put(indice, map);
-                    indice++;
-                }
+                }//fin covid
             }
 
         }
@@ -1339,80 +1342,81 @@ public class ReportesController {
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
-
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
 
         if (posNegRoutineReqList != null) {
             for (DaSolicitudDx soli : posNegRoutineReqList) {
-                boolean mostrar = false;
-                String valorResultado = null;
-                String content = null;
+                if (!soli.getCodDx().getNombre().toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                    boolean mostrar = false;
+                    String valorResultado = null;
+                    String content = null;
 
-                //search positive results from list
-                //get Response for each request
-                List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
-                for (DetalleResultadoFinal res : finalRes) {
+                    //search positive results from list
+                    //get Response for each request
+                    List<DetalleResultadoFinal> finalRes = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
+                    for (DetalleResultadoFinal res : finalRes) {
 
-                    if(filtroResu != null){
-                        if(filtroResu.equals("Positivo")){
-                            content = getPositiveResult(res);
-                        }else{
-                            content = getNegativeResult(res);
+                        if (filtroResu != null) {
+                            if (filtroResu.equals("Positivo")) {
+                                content = getPositiveResult(res);
+                            } else {
+                                content = getNegativeResult(res);
+                            }
+
+                        } else {
+                            content = getResult(res);
                         }
 
-                    }else{
-                        content = getResult(res);
+                        String[] arrayContent = content.split(",");
+                        valorResultado = arrayContent[0];
+                        mostrar = Boolean.parseBoolean(arrayContent[1]);
+
+                        if (mostrar) {
+                            Map<String, String> map = new HashMap<String, String>();
+                            map.put("solicitud", soli.getCodDx().getNombre());
+                            map.put("idSolicitud", soli.getIdSolicitudDx());
+                            map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab() != null ? soli.getIdTomaMx().getCodigoLab() : soli.getIdTomaMx().getCodigoUnicoMx());
+                            map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
+                            map.put("resultado", valorResultado);
+
+                            if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                                map.put("codSilais", soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                            } else {
+                                map.put("codSilais", "");
+                            }
+                            if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                                map.put("codUnidadSalud", soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                            } else {
+                                map.put("codUnidadSalud", "");
+                            }
+
+                            //Si hay persona
+                            if (soli.getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                                /// se obtiene el nombre de la persona asociada a la ficha
+                                String nombreCompleto = "";
+                                nombreCompleto = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                                if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                    nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                                if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                    nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                                map.put("persona", nombreCompleto);
+                            } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                                map.put("persona", soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                            } else if (soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                                map.put("persona", soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                            } else {
+                                map.put("persona", " ");
+                            }
+
+                            mapResponse.put(indice, map);
+                            indice++;
+                            break;
+                        }
+
                     }
 
-                    String[] arrayContent = content.split(",");
-                    valorResultado = arrayContent[0];
-                    mostrar = Boolean.parseBoolean(arrayContent[1]);
-
-                    if (mostrar) {
-                        Map<String, String> map = new HashMap<String, String>();
-                        map.put("solicitud", soli.getCodDx().getNombre());
-                        map.put("idSolicitud", soli.getIdSolicitudDx());
-                        map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab()!=null?soli.getIdTomaMx().getCodigoLab():soli.getIdTomaMx().getCodigoUnicoMx());
-                        map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
-                        map.put("resultado", valorResultado);
-
-                        if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
-                            map.put("codSilais", soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                        } else {
-                            map.put("codSilais", "");
-                        }
-                        if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
-                            map.put("codUnidadSalud", soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-                        } else {
-                            map.put("codUnidadSalud", "");
-                        }
-
-                        //Si hay persona
-                        if (soli.getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                            /// se obtiene el nombre de la persona asociada a la ficha
-                            String nombreCompleto = "";
-                            nombreCompleto = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                            map.put("persona", nombreCompleto);
-                        } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante()!=null){
-                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-                        } else if (soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH()!=null){
-                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
-                        } else {
-                            map.put("persona", " ");
-                        }
-
-                        mapResponse.put(indice, map);
-                        indice++;
-                        break;
-                    }
-
-                }
-
-
+                }//Fin covid
             }
 
         }
@@ -2732,53 +2736,54 @@ public class ReportesController {
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice = 0;
 
-
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
         if (reqList != null || studiesList != null) {
             if (reqList != null) {
                 for (DaSolicitudDx soli : reqList) {
+                    if (!soli.getCodDx().getNombre().toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                        Map<String, String> map = new HashMap<String, String>();
+                        map.put("solicitud", soli.getCodDx().getNombre());
+                        map.put("idSolicitud", soli.getIdSolicitudDx());
+                        map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab() != null ? soli.getIdTomaMx().getCodigoLab() : soli.getIdTomaMx().getCodigoUnicoMx());
+                        map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
 
-                    Map<String, String> map = new HashMap<String, String>();
-                    map.put("solicitud", soli.getCodDx().getNombre());
-                    map.put("idSolicitud", soli.getIdSolicitudDx());
-                    map.put("codigoUnicoMx", soli.getIdTomaMx().getCodigoLab()!=null?soli.getIdTomaMx().getCodigoLab():soli.getIdTomaMx().getCodigoUnicoMx());
-                    map.put("fechaAprobacion", DateUtil.DateToString(soli.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
 
+                        if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                            map.put("codSilais", soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                        } else {
+                            map.put("codSilais", "");
+                        }
+                        if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                            map.put("codUnidadSalud", soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                        } else {
+                            map.put("codUnidadSalud", "");
+                        }
 
-                    if (soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
-                        map.put("codSilais", soli.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-                    } else {
-                        map.put("codSilais", "");
+                        //Si hay persona
+                        if (soli.getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                            /// se obtiene el nombre de la persona asociada a la ficha
+                            String nombreCompleto = "";
+                            nombreCompleto = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                            if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                                nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                            map.put("persona", nombreCompleto);
+                        } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                        } else if (soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                            map.put("persona", soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                        } else {
+                            map.put("persona", " ");
+                        }
+                        List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
+                        map.put("resultado", parseResultDetails(resFinal, true));
+                        map.put("procesa", (resFinal.size() > 0 ? resFinal.get(0).getUsuarioRegistro().getUsername() : ""));
+                        map.put("aprueba", (soli.getUsuarioAprobacion() != null ? soli.getUsuarioAprobacion().getUsername() : ""));
+                        mapResponse.put(indice, map);
+                        indice++;
                     }
-                    if (soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
-                        map.put("codUnidadSalud", soli.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-                    } else {
-                        map.put("codUnidadSalud", "");
-                    }
-
-                    //Si hay persona
-                    if (soli.getIdTomaMx().getIdNotificacion().getPersona() != null) {
-                        /// se obtiene el nombre de la persona asociada a la ficha
-                        String nombreCompleto = "";
-                        nombreCompleto = soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                        if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
-                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                        nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                        if (soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
-                            nombreCompleto = nombreCompleto + " " + soli.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                        map.put("persona", nombreCompleto);
-                    } else if (soli.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
-                        map.put("persona", soli.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-                    } else if (soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
-                    	map.put("persona", soli.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
-                    } else {
-                        map.put("persona", " ");
-                    }
-                    List<DetalleResultadoFinal> resFinal = resultadoFinalService.getDetResActivosBySolicitud(soli.getIdSolicitudDx());
-                    map.put("resultado",parseResultDetails(resFinal, true));
-                    map.put("procesa", (resFinal.size()>0?resFinal.get(0).getUsuarioRegistro().getUsername():""));
-                    map.put("aprueba", (soli.getUsuarioAprobacion()!=null?soli.getUsuarioAprobacion().getUsername():""));
-                    mapResponse.put(indice, map);
-                    indice++;
                 }
             }
 
@@ -3416,7 +3421,12 @@ public class ReportesController {
         areas.add(catalogosService.getAreaRep("AREAREP|MUNI"));
         areas.add(catalogosService.getAreaRep("AREAREP|UNI"));
 
-        List<Catalogo_Dx> catDx = associationSamplesRequestService.getDxs();
+        List<Catalogo_Dx> catDx = null;
+        if (seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario())) {
+            catDx = associationSamplesRequestService.getDxs();
+        } else {
+            catDx = associationSamplesRequestService.getDxsExceptoCovid19();
+        }
         List<Catalogo_Estudio> catEs = null;
         if (laboratorio!=null && laboratorio.getCodigo().equalsIgnoreCase("CNDR")) {
             catEs = associationSamplesRequestService.getStudies();

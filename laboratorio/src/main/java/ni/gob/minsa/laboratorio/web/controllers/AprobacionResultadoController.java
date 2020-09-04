@@ -202,109 +202,112 @@ public class AprobacionResultadoController {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-        for(DaSolicitudDx diagnostico : solicitudDxList){
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab()!=null?diagnostico.getIdTomaMx().getCodigoLab():diagnostico.getIdTomaMx().getCodigoUnicoMx());
-            map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
-            map.put("fechaTomaMx",DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(),"dd/MM/yyyy")+
-                    (diagnostico.getIdTomaMx().getHoraTomaMx()!=null?" "+diagnostico.getIdTomaMx().getHoraTomaMx():""));
-            if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion()!=null) {
-                map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
-            }else{
-                map.put("codSilais","");
-            }
-            if (diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion()!=null) {
-                map.put("codUnidadSalud", diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
-            }else{
-                map.put("codUnidadSalud","");
-            }
-            map.put("tipoMuestra", diagnostico.getIdTomaMx().getCodTipoMx().getNombre());
-            map.put("tipoNotificacion", diagnostico.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
-            //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = diagnostico.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
-            if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
-            else
-                map.put("fechaInicioSintomas"," ");
-
-            //Si hay persona
-            if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona()!=null){
-                /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
-                nombreCompleto = diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
-                if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
-                if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-            }else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
-                map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
-            }else if (diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
-                map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
-            }else{
-                map.put("persona"," ");
-            }
-
-            map.put("solicitud", diagnostico.getCodDx().getNombre());
-            map.put("idSolicitud", diagnostico.getIdSolicitudDx());
-            map.put("fechaSolicitud",DateUtil.DateToString(diagnostico.getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
-
-            if(diagnostico.getAprobada()!=null && diagnostico.getAprobada() && diagnostico.getFechaAprobacion()!=null){
-                map.put("fechaAprobacion",DateUtil.DateToString(diagnostico.getFechaAprobacion(),"dd/MM/yyyy hh:mm:ss a"));
-            }else {
-                map.put("fechaAprobacion","");
-            }
-
-            if (incluirResultados){
-                //detalle resultado final solicitud
-                List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
-                //int subIndice=1;
-                //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
-                String resultados="";
-                for(DetalleResultadoFinal res: resultList){
-                    //Map<String, String> mapResp = new HashMap<String, String>();
-                    if (res.getRespuesta()!=null) {
-                        resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
-                        if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            //mapResp.put("valor", cat_lista.getValor());
-                            resultados+=": "+cat_lista.getValor();
-                        }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
-                            resultados+=": "+valorBoleano;
-                        } else {
-                            //mapResp.put("valor", res.getValor());
-                            resultados+=": "+res.getValor();
-                        }
-                        //mapResp.put("respuesta", res.getRespuesta().getNombre());
-
-                    }else if (res.getRespuestaExamen()!=null){
-                        resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
-                        if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                            //mapResp.put("valor", cat_lista.getValor());
-                            resultados+=": "+cat_lista.getValor();
-                        } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                            String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                            //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
-                            resultados+=": "+valorBoleano;
-                        }else {
-                            //mapResp.put("valor", res.getValor());
-                            resultados+=": "+res.getValor();
-                        }
-                        //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
-                    }
-                    //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-                    //mapResponseResp.put(subIndice,mapResp);
-                    //subIndice++;
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
+        for(DaSolicitudDx diagnostico : solicitudDxList) {
+            if (!diagnostico.getCodDx().getNombre().toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("codigoUnicoMx", diagnostico.getIdTomaMx().getCodigoLab() != null ? diagnostico.getIdTomaMx().getCodigoLab() : diagnostico.getIdTomaMx().getCodigoUnicoMx());
+                map.put("idTomaMx", diagnostico.getIdTomaMx().getIdTomaMx());
+                map.put("fechaTomaMx", DateUtil.DateToString(diagnostico.getIdTomaMx().getFechaHTomaMx(), "dd/MM/yyyy") +
+                        (diagnostico.getIdTomaMx().getHoraTomaMx() != null ? " " + diagnostico.getIdTomaMx().getHoraTomaMx() : ""));
+                if (diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
+                    map.put("codSilais", diagnostico.getIdTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                } else {
+                    map.put("codSilais", "");
                 }
-                //map.put("resultados",new Gson().toJson(mapResponseResp));
-                map.put("resultados",resultados);
+                if (diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion() != null) {
+                    map.put("codUnidadSalud", diagnostico.getIdTomaMx().getIdNotificacion().getCodUnidadAtencion().getNombre());
+                } else {
+                    map.put("codUnidadSalud", "");
+                }
+                map.put("tipoMuestra", diagnostico.getIdTomaMx().getCodTipoMx().getNombre());
+                map.put("tipoNotificacion", diagnostico.getIdTomaMx().getIdNotificacion().getCodTipoNotificacion().getValor());
+                //Si hay fecha de inicio de sintomas se muestra
+                Date fechaInicioSintomas = diagnostico.getIdTomaMx().getIdNotificacion().getFechaInicioSintomas();
+                if (fechaInicioSintomas != null)
+                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                else
+                    map.put("fechaInicioSintomas", " ");
+
+                //Si hay persona
+                if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona() != null) {
+                    /// se obtiene el nombre de la persona asociada a la ficha
+                    String nombreCompleto = "";
+                    nombreCompleto = diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getPrimerNombre();
+                    if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombreCompleto = nombreCompleto + " " + diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoNombre();
+                    nombreCompleto = nombreCompleto + " " + diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getPrimerApellido();
+                    if (diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombreCompleto = nombreCompleto + " " + diagnostico.getIdTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
+                    map.put("persona", nombreCompleto);
+                } else if (diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getSolicitante().getNombre());
+                } else if (diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null) {
+                    map.put("persona", diagnostico.getIdTomaMx().getIdNotificacion().getCodigoPacienteVIH());
+                } else {
+                    map.put("persona", " ");
+                }
+
+                map.put("solicitud", diagnostico.getCodDx().getNombre());
+                map.put("idSolicitud", diagnostico.getIdSolicitudDx());
+                map.put("fechaSolicitud", DateUtil.DateToString(diagnostico.getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+
+                if (diagnostico.getAprobada() != null && diagnostico.getAprobada() && diagnostico.getFechaAprobacion() != null) {
+                    map.put("fechaAprobacion", DateUtil.DateToString(diagnostico.getFechaAprobacion(), "dd/MM/yyyy hh:mm:ss a"));
+                } else {
+                    map.put("fechaAprobacion", "");
+                }
+
+                if (incluirResultados) {
+                    //detalle resultado final solicitud
+                    List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResActivosBySolicitud(diagnostico.getIdSolicitudDx());
+                    //int subIndice=1;
+                    //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                    String resultados = "";
+                    for (DetalleResultadoFinal res : resultList) {
+                        //Map<String, String> mapResp = new HashMap<String, String>();
+                        if (res.getRespuesta() != null) {
+                            resultados += (resultados.isEmpty() ? res.getRespuesta().getNombre() : ", " + res.getRespuesta().getNombre());
+                            if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                                //mapResp.put("valor", cat_lista.getValor());
+                                resultados += ": " + cat_lista.getValor();
+                            } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                                String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                                //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                                resultados += ": " + valorBoleano;
+                            } else {
+                                //mapResp.put("valor", res.getValor());
+                                resultados += ": " + res.getValor();
+                            }
+                            //mapResp.put("respuesta", res.getRespuesta().getNombre());
+
+                        } else if (res.getRespuestaExamen() != null) {
+                            resultados += (resultados.isEmpty() ? res.getRespuestaExamen().getNombre() : ", " + res.getRespuestaExamen().getNombre());
+                            if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                                Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                                //mapResp.put("valor", cat_lista.getValor());
+                                resultados += ": " + cat_lista.getValor();
+                            } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                                String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                                //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                                resultados += ": " + valorBoleano;
+                            } else {
+                                //mapResp.put("valor", res.getValor());
+                                resultados += ": " + res.getValor();
+                            }
+                            //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                        }
+                        //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                        //mapResponseResp.put(subIndice,mapResp);
+                        //subIndice++;
+                    }
+                    //map.put("resultados",new Gson().toJson(mapResponseResp));
+                    map.put("resultados", resultados);
+                }
+                mapResponse.put(indice, map);
+                indice++;
             }
-            mapResponse.put(indice, map);
-            indice ++;
         }
 
         for(DaSolicitudEstudio estudio : solicitudEstudioList){
@@ -798,101 +801,103 @@ public class AprobacionResultadoController {
         String jsonResponse="";
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
-
-        for(RechazoResultadoFinalSolicitud rechazo : rechazosList){
-            Map<String, String> map = new HashMap<String, String>();
-            DaTomaMx tomaMx;
-            String idSolicitud="";
-            if (rechazo.getSolicitudDx()!=null){
-                tomaMx = rechazo.getSolicitudDx().getIdTomaMx();
-                map.put("nombreSolicitud", rechazo.getSolicitudDx().getCodDx().getNombre());
-                map.put("fechaSolicitud",DateUtil.DateToString(rechazo.getSolicitudDx().getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
-                idSolicitud = rechazo.getSolicitudDx().getIdSolicitudDx();
-                map.put("codigoUnicoMx", tomaMx.getCodigoLab());
-            }else{
-                tomaMx = rechazo.getSolicitudEstudio().getIdTomaMx();
-                map.put("nombreSolicitud", rechazo.getSolicitudEstudio().getTipoEstudio().getNombre());
-                map.put("fechaSolicitud",DateUtil.DateToString(rechazo.getSolicitudEstudio().getFechaHSolicitud(),"dd/MM/yyyy hh:mm:ss a"));
-                idSolicitud = rechazo.getSolicitudEstudio().getIdSolicitudEstudio();
-                map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
-            }
-            map.put("fechaTomaMx",DateUtil.DateToString(tomaMx.getFechaHTomaMx(),"dd/MM/yyyy")+
-                    (tomaMx.getHoraTomaMx()!=null?" "+tomaMx.getHoraTomaMx():""));
-            map.put("tipoMx", tomaMx.getCodTipoMx().getNombre());
-            map.put("tipoNotificacion", tomaMx.getIdNotificacion().getCodTipoNotificacion().getValor());
-            //Si hay fecha de inicio de sintomas se muestra
-            Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
-            if (fechaInicioSintomas!=null)
-                map.put("fechaInicioSintomas",DateUtil.DateToString(fechaInicioSintomas,"dd/MM/yyyy"));
-            else
-                map.put("fechaInicioSintomas"," ");
-
-            //Si hay persona
-            if (tomaMx.getIdNotificacion().getPersona()!=null){
-                /// se obtiene el nombre de la persona asociada a la ficha
-                String nombreCompleto = "";
-                nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
-                nombreCompleto = nombreCompleto+" "+ tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
-                if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido()!=null)
-                    nombreCompleto = nombreCompleto +" "+ tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
-                map.put("persona",nombreCompleto);
-            }else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
-                map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
-            }else{
-                map.put("persona"," ");
-            }
-
-            map.put("fechaRechazo",DateUtil.DateToString(rechazo.getFechaHRechazo(),"dd/MM/yyyy hh:mm:ss a"));
-
-            //detalle resultado final solicitud
-            List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResPasivosBySolicitud(idSolicitud);
-            //int subIndice=1;
-            //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
-            String resultados="";
-            for(DetalleResultadoFinal res: resultList){
-                //Map<String, String> mapResp = new HashMap<String, String>();
-                if (res.getRespuesta()!=null) {
-                    resultados+=(resultados.isEmpty()?res.getRespuesta().getNombre():", "+res.getRespuesta().getNombre());
-                    if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                        //mapResp.put("valor", cat_lista.getValor());
-                        resultados+=": "+cat_lista.getValor();
-                    }else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                        //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
-                        resultados+=": "+valorBoleano;
-                    } else {
-                        //mapResp.put("valor", res.getValor());
-                        resultados+=": "+res.getValor();
-                    }
-                    //mapResp.put("respuesta", res.getRespuesta().getNombre());
-
-                }else if (res.getRespuestaExamen()!=null){
-                    resultados+=(resultados.isEmpty()?res.getRespuestaExamen().getNombre():", "+res.getRespuestaExamen().getNombre());
-                    if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                        //mapResp.put("valor", cat_lista.getValor());
-                        resultados+=": "+cat_lista.getValor();
-                    } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                        String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                        //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
-                        resultados+=": "+valorBoleano;
-                    }else {
-                        //mapResp.put("valor", res.getValor());
-                        resultados+=": "+res.getValor();
-                    }
-                    //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+        boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
+        for(RechazoResultadoFinalSolicitud rechazo : rechazosList) {
+            if (rechazo.getSolicitudEstudio() != null || !rechazo.getSolicitudDx().getCodDx().getNombre().toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                Map<String, String> map = new HashMap<String, String>();
+                DaTomaMx tomaMx;
+                String idSolicitud = "";
+                if (rechazo.getSolicitudDx() != null) {
+                    tomaMx = rechazo.getSolicitudDx().getIdTomaMx();
+                    map.put("nombreSolicitud", rechazo.getSolicitudDx().getCodDx().getNombre());
+                    map.put("fechaSolicitud", DateUtil.DateToString(rechazo.getSolicitudDx().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    idSolicitud = rechazo.getSolicitudDx().getIdSolicitudDx();
+                    map.put("codigoUnicoMx", tomaMx.getCodigoLab());
+                } else {
+                    tomaMx = rechazo.getSolicitudEstudio().getIdTomaMx();
+                    map.put("nombreSolicitud", rechazo.getSolicitudEstudio().getTipoEstudio().getNombre());
+                    map.put("fechaSolicitud", DateUtil.DateToString(rechazo.getSolicitudEstudio().getFechaHSolicitud(), "dd/MM/yyyy hh:mm:ss a"));
+                    idSolicitud = rechazo.getSolicitudEstudio().getIdSolicitudEstudio();
+                    map.put("codigoUnicoMx", tomaMx.getCodigoUnicoMx());
                 }
-                //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
-                //mapResponseResp.put(subIndice,mapResp);
-                //subIndice++;
+                map.put("fechaTomaMx", DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy") +
+                        (tomaMx.getHoraTomaMx() != null ? " " + tomaMx.getHoraTomaMx() : ""));
+                map.put("tipoMx", tomaMx.getCodTipoMx().getNombre());
+                map.put("tipoNotificacion", tomaMx.getIdNotificacion().getCodTipoNotificacion().getValor());
+                //Si hay fecha de inicio de sintomas se muestra
+                Date fechaInicioSintomas = tomaMx.getIdNotificacion().getFechaInicioSintomas();
+                if (fechaInicioSintomas != null)
+                    map.put("fechaInicioSintomas", DateUtil.DateToString(fechaInicioSintomas, "dd/MM/yyyy"));
+                else
+                    map.put("fechaInicioSintomas", " ");
+
+                //Si hay persona
+                if (tomaMx.getIdNotificacion().getPersona() != null) {
+                    /// se obtiene el nombre de la persona asociada a la ficha
+                    String nombreCompleto = "";
+                    nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
+                    if (tomaMx.getIdNotificacion().getPersona().getSegundoNombre() != null)
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoNombre();
+                    nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getPrimerApellido();
+                    if (tomaMx.getIdNotificacion().getPersona().getSegundoApellido() != null)
+                        nombreCompleto = nombreCompleto + " " + tomaMx.getIdNotificacion().getPersona().getSegundoApellido();
+                    map.put("persona", nombreCompleto);
+                } else if (tomaMx.getIdNotificacion().getSolicitante() != null) {
+                    map.put("persona", tomaMx.getIdNotificacion().getSolicitante().getNombre());
+                } else {
+                    map.put("persona", " ");
+                }
+
+                map.put("fechaRechazo", DateUtil.DateToString(rechazo.getFechaHRechazo(), "dd/MM/yyyy hh:mm:ss a"));
+
+                //detalle resultado final solicitud
+                List<DetalleResultadoFinal> resultList = resultadoFinalService.getDetResPasivosBySolicitud(idSolicitud);
+                //int subIndice=1;
+                //Map<Integer, Object> mapResponseResp = new HashMap<Integer, Object>();
+                String resultados = "";
+                for (DetalleResultadoFinal res : resultList) {
+                    //Map<String, String> mapResp = new HashMap<String, String>();
+                    if (res.getRespuesta() != null) {
+                        resultados += (resultados.isEmpty() ? res.getRespuesta().getNombre() : ", " + res.getRespuesta().getNombre());
+                        if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                            //mapResp.put("valor", cat_lista.getValor());
+                            resultados += ": " + cat_lista.getValor();
+                        } else if (res.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                            //mapResp.put("valor", messageSource.getMessage(valorBoleano, null, null));
+                            resultados += ": " + valorBoleano;
+                        } else {
+                            //mapResp.put("valor", res.getValor());
+                            resultados += ": " + res.getValor();
+                        }
+                        //mapResp.put("respuesta", res.getRespuesta().getNombre());
+
+                    } else if (res.getRespuestaExamen() != null) {
+                        resultados += (resultados.isEmpty() ? res.getRespuestaExamen().getNombre() : ", " + res.getRespuestaExamen().getNombre());
+                        if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
+                            Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                            //mapResp.put("valor", cat_lista.getValor());
+                            resultados += ": " + cat_lista.getValor();
+                        } else if (res.getRespuestaExamen().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
+                            String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                            //mapResp.put("valor", messageSource.getMessage(valorBoleano,null,null));
+                            resultados += ": " + valorBoleano;
+                        } else {
+                            //mapResp.put("valor", res.getValor());
+                            resultados += ": " + res.getValor();
+                        }
+                        //mapResp.put("respuesta", res.getRespuestaExamen().getNombre());
+                    }
+                    //mapResp.put("fechaResultado", DateUtil.DateToString(res.getFechahRegistro(), "dd/MM/yyyy hh:mm:ss a"));
+                    //mapResponseResp.put(subIndice,mapResp);
+                    //subIndice++;
+                }
+                //map.put("resultados",new Gson().toJson(mapResponseResp));
+                map.put("resultados", resultados);
+                mapResponse.put(indice, map);
+                indice++;
             }
-            //map.put("resultados",new Gson().toJson(mapResponseResp));
-            map.put("resultados",resultados);
-            mapResponse.put(indice, map);
-            indice++;
         }
         jsonResponse = new Gson().toJson(mapResponse);
         UnicodeEscaper escaper     = UnicodeEscaper.above(127);
