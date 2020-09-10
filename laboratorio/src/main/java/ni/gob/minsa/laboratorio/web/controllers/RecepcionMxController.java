@@ -2853,11 +2853,11 @@ public class RecepcionMxController {
                                 y = y - 15;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(tomaMx.getCodigoUnidadMx() != null ? tomaMx.getNombreUnidadMx() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 400, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 490, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 y = y - 15;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 135, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 370, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 460, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                 //resultados
                                 List<DatosSolicitud> listDx = tomaMxService.getSolicitudesAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
