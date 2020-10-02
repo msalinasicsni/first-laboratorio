@@ -1312,7 +1312,7 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.address", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.muni", null, null).toUpperCase());
-        columnas.add(messageSource.getMessage("lbl.file.number.2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.invoice.number", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.fis.short", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.ftm", null, null).toUpperCase());
@@ -2110,7 +2110,7 @@ public class ReportesExcelController {
 
             registro[7] = solicitudDx.getNombreSilaisResid(); //silais residencia
             registro[8] = solicitudDx.getNombreMuniResid(); //municipio residencia
-            registro[9] = solicitudDx.getExpediente();
+            registro[9] = getNumeroFactura(solicitudDx.getIdSolicitud());
             String sexo = solicitudDx.getSexo();
             registro[10] = sexo.substring(sexo.length()-1, sexo.length());
             registro[11] = DateUtil.DateToString(solicitudDx.getFechaInicioSintomas(),"dd/MM/yyyy");
@@ -3061,6 +3061,24 @@ public class ReportesExcelController {
         String lugar="";
         for(DetalleDatosRecepcion res: resFinalList){
             if (res.getNombre().toLowerCase().contains("lugar"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    lugar+=cat_lista.getEtiqueta();
+                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    lugar+=valorBoleano;
+                } else {
+                    lugar+=res.getValor().toUpperCase();
+                }
+        }
+        return lugar;
+    }
+
+    private String getNumeroFactura(String idSolicitud){
+        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
+        String lugar="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().toLowerCase().contains("factura"))
                 if (res.getTipoConcepto().equals("TPDATO|LIST")) {
                     Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
                     lugar+=cat_lista.getEtiqueta();

@@ -143,7 +143,7 @@ var ReceptionReport = function () {
                             //   var actionUrl = parametros.sActionUrl+idLoad;
                             //'<a href='+ actionUrl + ' class="btn btn-default btn-xs"><i class="fa fa-mail-forward"></i></a>'
                             table1.fnAddData(
-                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitudes, dataToLoad[i].usuario]);
+                                [dataToLoad[i].codigoUnicoMx , dataToLoad[i].tipoMuestra, dataToLoad[i].fechaRecepcion, dataToLoad[i].calidad, dataToLoad[i].codSilais, dataToLoad[i].codUnidadSalud, dataToLoad[i].persona, dataToLoad[i].solicitudes, dataToLoad[i].factura, dataToLoad[i].usuario]);
 
                             if (i + 1 < len) {
                                 codigos += dataToLoad[i].codigoUnicoMx + ",";

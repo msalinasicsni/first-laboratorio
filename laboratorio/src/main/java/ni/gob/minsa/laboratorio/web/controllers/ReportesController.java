@@ -22,6 +22,7 @@ import ni.gob.minsa.laboratorio.utilities.pdfUtils.BaseTable;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.Cell;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.Row;
+import ni.gob.minsa.laboratorio.utilities.reportes.DetalleDatosRecepcion;
 import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoSolicitud;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -123,6 +124,9 @@ public class ReportesController {
 
     @Resource(name = "parametrosService")
     private ParametrosService parametrosService;
+
+    @Resource(name = "datosSolicitudService")
+    private DatosSolicitudService datosSolicitudService;
 
     @Autowired
     MessageSource messageSource;
@@ -302,7 +306,11 @@ public class ReportesController {
             String dxs = "";
             if (!solicitudDxList.isEmpty()) {
                 int cont = 0;
+                String numFactura = "";
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                    if (solicitudDx.getCodDx().getNombre().toLowerCase().contains("covid")){
+                        numFactura = getNumeroFactura(solicitudDx.getIdSolicitudDx());
+                    }
                     cont++;
                     if (cont == solicitudDxList.size()) {
                         dxs += solicitudDx.getCodDx().getNombre()+(solicitudDx.getControlCalidad()?"("+messageSource.getMessage("lbl.cc", null, null)+")":"");
@@ -312,6 +320,7 @@ public class ReportesController {
 
                 }
                 map.put("solicitudes", dxs);
+                map.put("factura", numFactura);
             }
             if(solicitudE != null){
                 map.put("solicitudes",(dxs.isEmpty()?solicitudE.getTipoEstudio().getNombre():dxs+", "+solicitudE.getTipoEstudio().getNombre()));
@@ -329,6 +338,23 @@ public class ReportesController {
         return escaper.translate(jsonResponse);
     }
 
+    private String getNumeroFactura(String idSolicitud){
+        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
+        String lugar="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().toLowerCase().contains("factura"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    lugar+=cat_lista.getEtiqueta();
+                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    lugar+=valorBoleano;
+                } else {
+                    lugar+=res.getValor().toUpperCase();
+                }
+        }
+        return lugar;
+    }
 
     @RequestMapping(value = "/reception/expToPDF", method = RequestMethod.GET)
     public
