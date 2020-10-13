@@ -23,7 +23,7 @@
 		<commons-fileupload-version>1.2.2</commons-fileupload-version>
 		<commons-io-version>1.4</commons-io-version>
 		<commons-dbcp-version>1.4</commons-dbcp-version>
-		<junit-version>4.7</junit-version>
+		<junit-version>4.13.1</junit-version>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
