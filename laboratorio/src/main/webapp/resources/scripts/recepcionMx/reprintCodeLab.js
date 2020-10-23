@@ -221,17 +221,14 @@ var ReprintCodeLab = function () {
                                 var codigo = texto.substring(texto.lastIndexOf(">") + 1);
                                 var input = texto.substring(texto.lastIndexOf("<"),texto.lastIndexOf(">") + 1);
                                 var area = $(input).val();
-                                if (i + 1 < len) {
-                                    codesLab += codigo+"*"+area + ",";
-                                } else {
-                                    codesLab += codigo+"*"+area;
-                                }
-
+                                codesLab[i] = codigo+"*"+area;
                                 unBlockUI();
                             }
                             //codesLab = reemplazar(codesLab, ".", "*");
-                            imprimir2(codesLab);
-
+                            //ordenar códigos para que salgan ordenadas las etiquetas. 22/10/2020
+                            codesLab.sort();
+                            var codesLabStr = codesLab.join(",");
+                            imprimir2(codesLabStr);
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({

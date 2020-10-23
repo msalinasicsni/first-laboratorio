@@ -594,7 +594,8 @@ public class ReportesService {
                     " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as codigoMuniMx, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as nombreMuniMx, " +
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudDx as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
-                    " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut));
+                    " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
+                    " order by mx.codigoLab"); //order por código para que salga ordenadoel excell
 
         }else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
             queryNotiDx = session.createQuery(" select cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, p.fechaNacimiento as fechaNacimiento, p.sexo.codigo as sexo, " +
@@ -611,7 +612,8 @@ public class ReportesService {
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudDx as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
-                    " and noti.codSilaisAtencion.entidadAdtvaId =:codSilais ");
+                    " and noti.codSilaisAtencion.entidadAdtvaId =:codSilais " +
+                    " order by mx.codigoLab");//order por código para que salga ordenadoel excell
             queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
 
         } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
@@ -629,7 +631,8 @@ public class ReportesService {
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudDx as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
-                    " and noti.codUnidadAtencion.unidadId =:codUnidad ");
+                    " and noti.codUnidadAtencion.unidadId =:codUnidad " +
+                    " order by mx.codigoLab");//order por código para que salga ordenadoel excell
             queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
         }
 
@@ -2082,7 +2085,8 @@ public class ReportesService {
                     " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as codigoMuniMx, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as nombreMuniMx, " +
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoUnicoMx as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudEstudio as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudEstudio dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
-                    " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut));
+                    " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
+                    " order by mx.codigoUnicoMx");//order por código para que salga ordenadoel excell
 
         }else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
             queryNotiDx = session.createQuery(" select cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, p.fechaNacimiento as fechaNacimiento, p.sexo.codigo as sexo, " +
@@ -2099,7 +2103,8 @@ public class ReportesService {
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoUnicoMx as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudEstudio as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudEstudio dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
-                    " and noti.codSilaisAtencion.entidadAdtvaId =:codSilais ");
+                    " and noti.codSilaisAtencion.entidadAdtvaId =:codSilais " +
+                    " order by mx.codigoUnicoMx");//order por código para que salga ordenadoel excell
             queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
 
         } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
@@ -2117,7 +2122,8 @@ public class ReportesService {
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoUnicoMx as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudEstudio as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudEstudio dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
-                    " and noti.codUnidadAtencion.unidadId =:codUnidad ");
+                    " and noti.codUnidadAtencion.unidadId =:codUnidad " +
+                    " order by mx.codigoUnicoMx");//order por código para que salga ordenadoel excell
             queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
         }
 

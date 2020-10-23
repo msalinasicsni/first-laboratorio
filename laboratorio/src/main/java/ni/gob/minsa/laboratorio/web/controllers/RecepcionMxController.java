@@ -2767,6 +2767,7 @@ public class RecepcionMxController {
         try {
 
             String[] codigos = codes.split(",");
+            Arrays.sort(codigos);//order códigos de mx para que salgan ordenados en el pdf. 20/10/2020
             for (String code : codigos) {
                 if (!code.isEmpty()) {
                     //DaTomaMx tomaMx = tomaMxService.getTomaMxByCodLab(code);
