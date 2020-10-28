@@ -2762,7 +2762,7 @@ public class RecepcionMxController {
         PDDocument doc = new PDDocument();
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         String response = null;
-        String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a").format(new Date());
+        String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy").format(new Date()); //solo poner fecha, sin hora. Sonia 28/10/2020
         String userName = seguridadService.obtenerNombreUsuario();
         try {
 
