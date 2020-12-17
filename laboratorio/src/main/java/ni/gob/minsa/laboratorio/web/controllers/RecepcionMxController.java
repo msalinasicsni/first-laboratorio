@@ -2767,7 +2767,7 @@ public class RecepcionMxController {
         try {
 
             String[] codigos = codes.split(",");
-            Arrays.sort(codigos);//order códigos de mx para que salgan ordenados en el pdf. 20/10/2020
+            Arrays.sort(codigos);//order cï¿½digos de mx para que salgan ordenados en el pdf. 20/10/2020
             for (String code : codigos) {
                 if (!code.isEmpty()) {
                     //DaTomaMx tomaMx = tomaMxService.getTomaMxByCodLab(code);
@@ -2836,9 +2836,14 @@ public class RecepcionMxController {
                                 //datos personales
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(code, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.file.number", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                String numExpediente = (tomaMx.getExpediente() != null ? tomaMx.getExpediente() : notificacionService.getNumExpediente(tomaMx.getIdNotificacion()));
-                                GeneralUtils.drawTEXT(numExpediente, y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                if (!esMxViajeroCovid) {
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.file.number", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    String numExpediente = (tomaMx.getExpediente() != null ? tomaMx.getExpediente() : notificacionService.getNumExpediente(tomaMx.getIdNotificacion()));
+                                    GeneralUtils.drawTEXT(numExpediente, y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                } else {
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.identificacion", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getIdentificacion()!=null ? tomaMx.getIdentificacion() : " ", y, 390, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                }
                                 y = y - 15;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(nombres, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);

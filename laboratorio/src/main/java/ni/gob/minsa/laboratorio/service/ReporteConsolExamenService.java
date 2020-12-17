@@ -34,8 +34,8 @@ public class ReporteConsolExamenService {
 
     private static final String sqlLab = " and dx.labProcesa.codigo = :codigoLab ";
     private static final String sqlFIS = " and noti.fechaInicioSintomas between cal.fechaInicial and cal.fechaFinal ";
-    private static final String sqlFPROCExam = " and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal) ";
-    private static final String sqlFPROCResp = " and dr.fechahProcesa between cal.fechaInicial and cal.fechaFinal ";
+    private static final String sqlFPROCExam = " and oe.idOrdenExamen in (select dr.examen.idOrdenExamen from DetalleResultado dr where trunc(dr.fechahProcesa) between cal.fechaInicial and cal.fechaFinal) ";
+    private static final String sqlFPROCResp = " and trunc(dr.fechahProcesa) between cal.fechaInicial and cal.fechaFinal ";
     /**
      * M?todo que retornar la informaci?n para generar reporte y gr?fico de notificaciones por tipo de resultado (positivo, negativo, sin resultado y % positividad)
      * @param filtro indicando el nivel (pais, silais, departamento, municipio, unidad salud), tipo notificaci?n, rango de fechas, factor tasas de poblaci?n
@@ -67,7 +67,7 @@ public class ReporteConsolExamenService {
                 //" and noti.codSilaisAtencion.nombre = 'SILAIS RAAS' "+
                 "order by dx.codDx.idDiagnostico, oe.codExamen.idExamen, noti.codSilaisAtencion.codigo, cal.noSemana");
 
-        //se sacan todas las respuesta(un examen puede tener n respuestas) para cada orden de examen según los filtros indicados
+        //se sacan todas las respuesta(un examen puede tener n respuestas) para cada orden de examen segï¿½n los filtros indicados
         queryRespuestaExamenes = session.createQuery(" select oe.idOrdenExamen, " +
                 "re.idRespuesta, c.idConcepto, c.tipo.codigo, (select cl.valor from Catalogo_Lista cl " +
                 "where cl.idCatalogoLista = cast(dr.valor as integer ) and cl.idConcepto.idConcepto = c.idConcepto and tp.codigo = 'TPDATO|LIST'), dr.valor  " +
@@ -165,7 +165,7 @@ public class ReporteConsolExamenService {
                 //" and noti.codSilaisAtencion.nombre = 'SILAIS RAAS' "+
                 "order by dx.tipoEstudio.idEstudio, oe.codExamen.idExamen, noti.codSilaisAtencion.codigo, cal.noSemana");
 
-        //se sacan todas las respuesta(un examen puede tener n respuestas) para cada orden de examen según los filtros indicados
+        //se sacan todas las respuesta(un examen puede tener n respuestas) para cada orden de examen segï¿½n los filtros indicados
         queryRespuestaExamenes = session.createQuery(" select oe.idOrdenExamen, " +
                 "re.idRespuesta, c.idConcepto, c.tipo.codigo, (select cl.valor from Catalogo_Lista cl " +
                 "where cl.idCatalogoLista = cast(dr.valor as integer ) and cl.idConcepto.idConcepto = c.idConcepto and tp.codigo = 'TPDATO|LIST'), dr.valor  " +

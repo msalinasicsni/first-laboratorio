@@ -303,10 +303,10 @@ public class ReportesController {
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(receivedMx.getTomaMx().getIdTomaMx(), labUser.getCodigo());
             DaSolicitudEstudio solicitudE = tomaMxService.getSoliEstByCodigo(receivedMx.getTomaMx().getCodigoUnicoMx());
 
-            String dxs = "";
+            String dxs = " ";
             if (!solicitudDxList.isEmpty()) {
                 int cont = 0;
-                String numFactura = "";
+                String numFactura = " ";
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     if (solicitudDx.getCodDx().getNombre().toLowerCase().contains("covid")){
                         numFactura = getNumeroFactura(solicitudDx.getIdSolicitudDx());
@@ -324,6 +324,7 @@ public class ReportesController {
             }
             if(solicitudE != null){
                 map.put("solicitudes",(dxs.isEmpty()?solicitudE.getTipoEstudio().getNombre():dxs+", "+solicitudE.getTipoEstudio().getNombre()));
+                map.put("factura", " ");
             }else{
                 map.put("solicitudes", dxs);
             }
