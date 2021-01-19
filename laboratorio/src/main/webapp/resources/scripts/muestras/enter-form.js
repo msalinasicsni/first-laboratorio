@@ -443,6 +443,10 @@ var EnterFormTomaMx = function () {
                         }
                     }
                     $("#dxAgregados").val(valor);
+                    //Si es covid, la fecha de toma debe ser la del día
+                    if ($(this).find('option:selected').text() === "Biologia Molecular Covid19") {
+                        $("#fechaHTomaMx").datepicker("setDate", new Date());
+                    }
                 } else {
                     divDatos.html("");
                     $("#dxAgregados").val("");

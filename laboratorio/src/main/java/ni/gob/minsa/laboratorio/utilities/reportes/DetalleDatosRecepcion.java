@@ -10,6 +10,8 @@ public class DetalleDatosRecepcion {
     String solicitudDx;
     Integer datoSolicitud;
     String tipoConcepto;
+    boolean requerido;
+    String descripcion;
 
     public String getIdDetalle() {
         return idDetalle;
@@ -57,5 +59,21 @@ public class DetalleDatosRecepcion {
 
     public void setTipoConcepto(String tipoConcepto) {
         this.tipoConcepto = tipoConcepto;
+    }
+
+    public boolean isRequerido() {
+        return requerido;
+    }
+
+    public void setRequerido(boolean requerido) {
+        this.requerido = requerido;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 }

@@ -26,10 +26,7 @@ import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
-import ni.gob.minsa.laboratorio.utilities.reportes.DatosOrdenExamen;
-import ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud;
-import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoVigilancia;
-import ni.gob.minsa.laboratorio.utilities.reportes.Solicitud;
+import ni.gob.minsa.laboratorio.utilities.reportes.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -2767,7 +2764,7 @@ public class RecepcionMxController {
         try {
 
             String[] codigos = codes.split(",");
-            Arrays.sort(codigos);//order c�digos de mx para que salgan ordenados en el pdf. 20/10/2020
+            Arrays.sort(codigos);//ordenar codigos de mx para que salgan ordenados en el pdf. 20/10/2020
             for (String code : codigos) {
                 if (!code.isEmpty()) {
                     //DaTomaMx tomaMx = tomaMxService.getTomaMxByCodLab(code);
@@ -2842,7 +2839,7 @@ public class RecepcionMxController {
                                     GeneralUtils.drawTEXT(numExpediente, y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 } else {
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.identificacion", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(tomaMx.getIdentificacion()!=null ? tomaMx.getIdentificacion() : " ", y, 390, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(getIdentificacionViajero(tomaMx.getIdTomaMx(), tomaMx.getIdentificacion()), y, 400, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 }
                                 y = y - 15;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
@@ -2850,20 +2847,33 @@ public class RecepcionMxController {
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lastnames", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(apellidos, y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 y = y - 15;
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 185, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS","") : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
-                                y = y - 15;
+                                if (!esMxViajeroCovid) {
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 185, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS", "") : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    y = y - 15;
+                                }else {
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(edad, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("person.fecnac", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaNacimiento(), "dd/MM/yyyy"), y, 400, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    y = y - 15;
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS ", "") : "", y, 120, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 360, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    y = y - 15;
+                                }
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(tomaMx.getCodigoUnidadMx() != null ? tomaMx.getNombreUnidadMx() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
                                 y = y - 15;
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 135, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 370, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 460, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type.long", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 355, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 465, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                 //resultados
                                 List<DatosSolicitud> listDx = tomaMxService.getSolicitudesAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
@@ -3017,6 +3027,24 @@ public class RecepcionMxController {
         }
     }
 
+    private String getIdentificacionViajero(String idTomaMx, String identificacionPersona){
+        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdMx(idTomaMx);
+        String identificacion="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().contains("ID"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    identificacion+=cat_lista.getEtiqueta();
+                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    identificacion+=valorBoleano;
+                } else {
+                    identificacion+=res.getValor().toUpperCase();
+                }
+        }
+        if (identificacion.isEmpty()) identificacion = identificacionPersona;
+        return identificacion;
+    }
     /**
      * M�todo que se llama al entrar a la opci�n de menu "Recepci�n Mx CC". Se encarga de inicializar las listas para realizar la b�squeda de muestras para CC
      * @return ModelAndView

@@ -133,6 +133,14 @@ public class DatosSolicitudService {
         return q.list();
     }
 
+    public DatoSolicitudDetalle getDatoSolicitudDetalleById(String idDetalle){
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select a from DatoSolicitudDetalle as a where a.idDetalle = :idDetalle ";
+        Query q = session.createQuery(query);
+        q.setParameter("idDetalle", idDetalle);
+        return (DatoSolicitudDetalle)q.uniqueResult();
+    }
+
     public List<DetalleDatosRecepcion> getDetalleDatosRecepcionByIdSolicitud(String idSolicitud){
         Session session = sessionFactory.getCurrentSession();
         String query = "select a.idDetalle as idDetalle, a.valor as valor, r.idSolicitudDx as solicitudDx, da.idConceptoSol as datoSolicitud, da.nombre as nombre, " +
@@ -142,6 +150,28 @@ public class DatosSolicitudService {
         q.setParameter("idSolicitud", idSolicitud);
         q.setResultTransformer(Transformers.aliasToBean(DetalleDatosRecepcion.class));
         return q.list();
+    }
+
+    public List<DetalleDatosRecepcion> getDetalleDatosRecepcionByIdMx(String idTomaMx){
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select a.idDetalle as idDetalle, a.valor as valor, da.nombre as nombre, da.concepto.tipo.codigo as tipoConcepto " +
+                "from DatoSolicitudDetalle as a inner join a.solicitudDx as r inner join a.datoSolicitud as da inner join r.idTomaMx as mx where mx.idTomaMx = :idTomaMx " +
+                "order by da.orden";
+        Query q = session.createQuery(query);
+        q.setParameter("idTomaMx", idTomaMx);
+        q.setResultTransformer(Transformers.aliasToBean(DetalleDatosRecepcion.class));
+        return q.list();
+    }
+
+    public DetalleDatosRecepcion getDetalleDatosRecepcionById(String idDetalle){
+        Session session = sessionFactory.getCurrentSession();
+        String query = "select a.idDetalle as idDetalle, a.valor as valor, r.idSolicitudDx as solicitudDx, da.idConceptoSol as datoSolicitud, da.nombre as nombre, da.requerido as requerido, " +
+                "da.concepto.tipo.codigo as tipoConcepto, da.descripcion as  descripcion " +
+                "from DatoSolicitudDetalle as a inner join a.solicitudDx as r inner join a.datoSolicitud as da where a.idDetalle = :idDetalle ";
+        Query q = session.createQuery(query);
+        q.setParameter("idDetalle", idDetalle);
+        q.setResultTransformer(Transformers.aliasToBean(DetalleDatosRecepcion.class));
+        return (DetalleDatosRecepcion)q.uniqueResult();
     }
 
     public List<DatoSolicitud> getDatosRecepcionActivosDxByIdSolicitudes(String idSolicitudes){

@@ -24,7 +24,7 @@
         .modal .modal-dialog {
             width: 60%;
         }
-        .cancelar {
+        .cancelar .editarDS {
             padding-left: 0;
             padding-right: 10px;
             text-align: center;
@@ -114,6 +114,7 @@
                                     <input id="msg_override_cancel" type="hidden" value="<spring:message code="msg.override.canceled"/>"/>
                                     <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
                                     <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.confirm.override.request"/>"/>
+                                    <input id="msg_detalle_ds_updated" type="hidden" value="<spring:message code="msg.data.successfully.updated"/>"/>
                                     <form id="receiptOrdersLab-form" class="smart-form" autocomplete="off">
                                         <fieldset>
                                         <c:if test="${not empty tomaMx.idNotificacion.persona}">
@@ -369,7 +370,7 @@
                                             <div>
                                                 <header>
                                                     <label class="text-left txt-color-blue" style="font-weight: bold">
-                                                        <spring:message code="lbl.data" />
+                                                        <spring:message code="lbl.data" /> (<spring:message code="act.add.data" />)
                                                     </label>
                                                 </header>
                                                 <br/>
@@ -378,17 +379,20 @@
                                                     <table id="datosrecepcion_list" class="table table-striped table-bordered table-hover" width="100%">
                                                         <thead>
                                                             <tr>
-                                                                <c:forEach items="${datosList}" var="record">
+                                                                <th style="width: 30%" data-hide="phone"><spring:message code="lbl.name"/></th>
+                                                                <th style="width: 50%"data-hide="phone"><spring:message code="lbl.value"/></th>
+                                                                <th style="width: 20%"><spring:message code="act.edit"/></th>
+                                                                <!--<c:forEach items="${datosList}" var="record">
                                                                     <th><c:out value="${record.datoSolicitud.nombre}" /></th>
-                                                                </c:forEach>
+                                                                </c:forEach>-->
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
+                                                        <!--<tr>
                                                                 <c:forEach items="${datosList}" var="record">
                                                                     <td>${record.valor}</td>
                                                                 </c:forEach>
-                                                            </tr>
+                                                            </tr>-->
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -724,6 +728,42 @@
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="modalEditarDS" aria-hidden="true" data-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="alert alert-info">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title">
+                                    <i class="fa-fw fa fa-times"></i>
+                                    <spring:message code="act.edit" /> <spring:message code="act.add.data" />
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="modal-body"> <!--  no-padding -->
+                            <form id="editards-form" class="smart-form" novalidate="novalidate">
+                                <input id="idDetalle" type="hidden" value=""/>
+                                <fieldset>
+                                    <div id="datoSolicitudDv">
+                                    </div>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fa fa-save"></i> <spring:message code="act.ok" />
+                                    </button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                        <i class="fa fa-times"></i> <spring:message code="act.cancel" />
+                                    </button>
+                                </footer>
+                            </form>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
         </div>
 		<!-- END MAIN CONTENT -->
 	</div>
@@ -784,6 +824,9 @@
     <c:url var="sReglasExamenesURL" value="/administracion/examenes/obtenerReglasExamenes"/>
     <c:url var="sGetSolicitudesUrl" value="/editarMx/getSolicitudes"/>
     <c:url var="sDxEstURL" value="/api/v1/getCatDxCatEstPermitidos"/>
+    <c:url var="sDetalleDatosRecepURL" value="/editarMx/getDetalleDatosRecepcion"/>
+    <c:url var="sDetalleDatoRecepURL" value="/editarMx/getDetalleDatoRecepcion"/>
+    <c:url var="sSaveDetalleDatoRecepURL" value="/editarMx/saveDetalleDatoRecepcion"/>
     <script type="text/javascript">
 		$(document).ready(function() {
 			pageSetUp();
@@ -804,7 +847,10 @@
                 sGetSolicitudesUrl : "${sGetSolicitudesUrl}",
                 sAnularSolicitudUrl : "${sAnularSolicitudUrl}",
                 noRules : "${noRules}",
-                sDxEstURL : "${sDxEstURL}"
+                sDxEstURL : "${sDxEstURL}",
+                sDetalleDatosRecepURL : "${sDetalleDatosRecepURL}",
+                sDetalleDatoRecepURL : "${sDetalleDatoRecepURL}",
+                sSaveDetalleDatoRecepURL : "${sSaveDetalleDatoRecepURL}"
             };
 			EditarMxLab.init(parametros);
 	    	$("li.laboratorio").addClass("open");

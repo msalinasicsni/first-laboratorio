@@ -88,6 +88,37 @@ var EditarMxLab = function () {
                 }
             });
 
+            var table4 = $('#datosrecepcion_list').dataTable({
+                "sDom": "<'dt-toolbar'<'col-xs-12 col-sm-6'f><'col-sm-6 col-xs-12 hidden-xs'l>r>" +
+                    "t" +
+                    "<'dt-toolbar-footer'<'col-sm-6 col-xs-12 hidden-xs'i><'col-xs-12 col-sm-6'p>>",
+                "autoWidth": true,
+                "paging": false,
+                "ordering": false,
+                "searching": false,
+                "lengthChange": false,
+                "columns": [
+                    null, null,
+                    {
+                        "className": 'editarDS',
+                        "orderable": false
+                    }
+                ],
+                "preDrawCallback": function () {
+                    // Initialize the responsive datatables helper once.
+                    if (!responsiveHelper_dt_basic) {
+                        responsiveHelper_dt_basic = new ResponsiveDatatablesHelper($('#datosrecepcion_list'), breakpointDefinition);
+                    }
+                },
+                "rowCallback": function (nRow) {
+                    responsiveHelper_dt_basic.createExpandIcon(nRow);
+                },
+                "drawCallback": function (oSettings) {
+                    responsiveHelper_dt_basic.respond();
+                }
+            });
+
+
             <!-- formulario para agregar solicitud -->
             $('#addDx-form').validate({
                 // Rules for form validation
@@ -691,8 +722,288 @@ var EditarMxLab = function () {
                     });
             }
 
+            /*Editar datos de ingreso o datos de recepcion*/
+            function getRecepcionDetailList() {
+                if (parametros.sDetalleDatosRecepURL!=null) {
+                    $.getJSON(parametros.sDetalleDatosRecepURL, {
+                        idTomaMx: $("#idTomaMx").val(),
+                        ajax: 'true'
+                    }, function (response) {
+                        table4.fnClearTable();
+                        var len = Object.keys(response).length;
+                        //var idExamenes = "";
+                        for (var i = 0; i < len; i++) {
+                            table4.fnAddData(
+                                [response[i].nombre, response[i].valor,'<a data-toggle="modal" title="Editar valor" class="btn btn-primary btn-xs editarDS" ' +
+                                    'data-id=' + response[i].idDetalle+ '><i class="fa fa-edit"></i></a>']);
+
+                        }
+                        $(".editarDS").on("click", function () {
+                            var idDetalle = $(this).data('id');
+                            if (idDetalle != null) {
+                                $("#idDetalle").val(idDetalle);
+                                showPopEditDS(idDetalle);
+                            }
+                        });
+
+                        //al paginar se define nuevamente la función de cargar el detalle
+                        $(".dataTables_paginate").on('click', function () {
+                            $(".editarDS").on('click', function () {
+                                var idDetalle = $(this).data('id');
+                                if (idDetalle != null) {
+                                    $("#idDetalle").val(idDetalle);
+                                    showPopEditDS(idDetalle);
+                                }
+                            });
+                        });
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+                }
+            }
+
+            function showPopEditDS(id) {
+                if (id != null) {
+                    var divResultado = $("#datoSolicitudDv");
+                    divResultado.html("");
+                    $.getJSON(parametros.sDetalleDatoRecepURL, {
+                        idDetalle: id,
+                        ajax: 'true'
+                    }, function (dataToLoad) {
+                        var contenidoControl = '';
+                        var idControlRespuesta;
+                        var descripcionRespuesta = '';
+                        if (dataToLoad.nombre != null) {
+                            descripcionRespuesta = dataToLoad.nombre;
+                        }
+                        var seccionDescripcion = '<section class="col col-sm-4 col-md-6 col-lg-6">' +
+                            '<label class="text-left txt-color-blue font-md">' +
+                            '</label>' +
+                            '<div class="note font-sm">' +
+                            '<strong>' + descripcionRespuesta + '</strong>' +
+                            '</div>' +
+                            '</section>';
+                        //se busca si existe valor registrado para la respuesta
+                        var valor = dataToLoad.valor;
+                        switch (dataToLoad.tipoConcepto) {
+                            case 'TPDATO|LOG':
+                                idControlRespuesta = dataToLoad.idDetalle;
+                                contenidoControl = '<div class="row">' +
+                                    '<section class="col col-sm-4 col-md-6 col-lg-6">' +
+                                    '<label class="text-left txt-color-blue font-md">' +
+                                    dataToLoad.nombre +
+                                    '</label>' +
+                                    '<label class="checkbox">';
+                                if (lenDetRes <= 0) {
+                                    contenidoControl = contenidoControl + '<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" >';
+                                } else {
+                                    if (valor == 'true') {
+                                        contenidoControl = contenidoControl + '<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" checked >';
+                                    } else {
+                                        contenidoControl = contenidoControl + '<input type="checkbox" name="' + idControlRespuesta + '" id="' + idControlRespuesta + '" >';
+                                    }
+                                }
+                                contenidoControl = contenidoControl + '<i></i>' +
+                                    '</label>' +
+                                    '</section>' +
+                                    seccionDescripcion +
+                                    '</div>';
+                                divResultado.append(contenidoControl);
+                                break;
+                            /*case 'TPDATO|LIST':
+
+                             idControlRespuesta = dataToLoad[i].idConceptoSol;
+                             contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-6 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                             if (dataToLoad[i].requerido) {
+                             contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                             }
+                             contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
+                             '<div class="input-group">' +
+                             '<span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>';
+
+                             //si la respuesta es requerida
+                             if (dataToLoad[i].requerido) {
+                             contenidoControl = contenidoControl + '<select id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" class="requiredConcept" style="width: 100%;" >';
+                             }
+                             else {
+                             contenidoControl = contenidoControl + '<select id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" class="" style="width: 100%;" >';
+                             }
+                             contenidoControl = contenidoControl + '<option value="">...</option>';
+                             for (var ii = 0; ii < lenListas; ii++) {
+                             if (valoresListas[ii].idConcepto.idConcepto == dataToLoad[i].concepto.idConcepto) {
+                             //console.log(valoresListas[ii].idCatalogoLista +" == "+ valor);
+                             if (valoresListas[ii].idCatalogoLista == valor) {
+                             contenidoControl = contenidoControl + '<option  value="' + valoresListas[ii].idCatalogoLista + '" selected >' + valoresListas[ii].valor + '</option>';
+                             } else {
+                             contenidoControl = contenidoControl + '<option  value="' + valoresListas[ii].idCatalogoLista + '">' + valoresListas[ii].valor + '</option>';
+                             }
+                             }
+                             }
+                             contenidoControl = contenidoControl + '</select></div></section>' +
+                             seccionDescripcion +
+                             '</div>';
+                             divResultado.append(contenidoControl);
+                             $("#" + idControlRespuesta).select2();
+                             break;*/
+                            case 'TPDATO|TXT':
+                                idControlRespuesta = dataToLoad.idDetalle;
+                                contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                if (dataToLoad.requerido) {
+                                    contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                }
+                                contenidoControl = contenidoControl + dataToLoad.nombre + '</label>' +
+                                    '<div class="">' +
+                                    '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>';
+                                if (dataToLoad.requerido) {
+                                    contenidoControl = contenidoControl + '<input class="form-control requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad.nombre + '" >';
+                                } else {
+                                    contenidoControl = contenidoControl + '<input class="form-control" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad.nombre + '" >';
+                                }
+
+                                contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad.nombre + '</b></label>' +
+                                    '</div></section>' +
+                                    seccionDescripcion +
+                                    '</div>';
+                                divResultado.append(contenidoControl);
+                                break;
+                            case 'TPDATO|NMRO':
+                                idControlRespuesta = dataToLoad.idDetalle;
+                                contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                if (dataToLoad.requerido) {
+                                    contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                }
+                                contenidoControl = contenidoControl + dataToLoad.nombre + '</label>' +
+                                    '<div class="">' +
+                                    '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-numeric-asc fa-fw"></i>';
+                                if (dataToLoad.requerido) {
+                                    contenidoControl = contenidoControl + '<input class="form-control decimal requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad.nombre + '" >';
+                                } else {
+                                    contenidoControl = contenidoControl + '<input class="form-control decimal" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad.nombre + '" >';
+                                }
+
+                                contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad.nombre + '</b></label>' +
+                                    '</div></section>' +
+                                    seccionDescripcion +
+                                    '</div>';
+                                divResultado.append(contenidoControl);
+                                $("#" + idControlRespuesta).inputmask("decimal", {
+                                    allowMinus: false,
+                                    radixPoint: ".",
+                                    digits: 2
+                                });
+                                break;
+                            case 'TPDATO|FCH':
+                                idControlRespuesta = dataToLoad.idDetalle;
+                                contenidoControl = '<div class="row"><section class="col col-sm-12 col-md-12 col-lg-6"><label class="text-left txt-color-blue font-md">';
+                                if (dataToLoad.requerido) {
+                                    contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
+                                }
+                                contenidoControl = contenidoControl + dataToLoad.nombre + '</label>' +
+                                    '<div class="">' +
+                                    '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-calendar fa-fw"></i>';
+                                if (dataToLoad.requerido) {
+                                    contenidoControl = contenidoControl + '<input class="form-control date-picker requiredConcept" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad.nombre + '" >';
+                                } else {
+                                    contenidoControl = contenidoControl + '<input class="form-control date-picker" type="text"  id="' + idControlRespuesta + '" name="' + idControlRespuesta + '" value="' + valor + '" placeholder="' + dataToLoad.nombre + '" >';
+                                }
+
+                                contenidoControl = contenidoControl + '<b class="tooltip tooltip-bottom-right"> <i class="fa fa-warning txt-color-pink"></i>' + dataToLoad.nombre + '</b></label>' +
+                                    '</div></section>' +
+                                    seccionDescripcion +
+                                    '</div>';
+                                divResultado.append(contenidoControl);
+                                break;
+                            default:
+                                break;
+
+                        }
+
+                        showModalDetalleDatoSolicitud();
+
+                    }).fail(function (jqXHR) {
+                        setTimeout($.unblockUI, 10);
+                        validateLogin(jqXHR);
+                    });
+
+                }
+            }
+
+            <!-- formulario para anular examen -->
+            $('#editards-form').validate({
+                // Rules for form validation
+                rules: {
+                },
+                // Do not change code below
+                errorPlacement: function (error, element) {
+                    error.insertAfter(element.parent());
+                },
+                submitHandler: function (form) {
+                    guardarDetalleDatoSolicitud($('#idDetalle').val());
+                }
+            });
+
+            function guardarDetalleDatoSolicitud(idDetalle) {
+                var detalleDatoSObj = {};
+                detalleDatoSObj['valor'] = $('#' + idDetalle).val();
+                detalleDatoSObj['idDetalle'] = idDetalle;
+                detalleDatoSObj['mensaje'] = '';
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.sSaveDetalleDatoRecepURL,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(detalleDatoSObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.mensaje.length > 0) {
+                                $.smallBox({
+                                    title: unicodeEscape(data.mensaje),
+                                    content: $("#smallBox_content").val(),
+                                    color: "#C46A69",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            } else {
+                                getRecepcionDetailList();
+                               hideModalDetalleDatoSolicitud();
+                                var msg = $("#msg_detalle_ds_updated").val();
+                                $.smallBox({
+                                    title: msg,
+                                    content: $("#smallBox_content").val(),
+                                    color: "#739E73",
+                                    iconSmall: "fa fa-success",
+                                    timeout: 4000
+                                });
+                            }
+                            desbloquearUI();
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
+                    });
+            }
+
+            function showModalDetalleDatoSolicitud() {
+                $("#modalEditarDS").modal({
+                    show: true
+                });
+            }
+
+            function hideModalDetalleDatoSolicitud() {
+                $('#modalEditarDS').modal('hide');
+            }
             getRequest();
             getOrdersReview();
+            getRecepcionDetailList();
+
+            jQuery.validator.addClassRules("requiredConcept", {
+                required: true
+            });
+
         }
     };
 

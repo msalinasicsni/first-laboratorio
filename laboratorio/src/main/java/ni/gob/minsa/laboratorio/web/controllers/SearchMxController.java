@@ -1067,7 +1067,7 @@ public class SearchMxController {
             }
 
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null) + " ", inY, 15, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaToma, inY, 140, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(fechaToma, inY, 144, stream, 12, PDType1Font.HELVETICA);
 
 
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.reception.datetime", null, null) + " ", inY, 310, stream, 14, PDType1Font.HELVETICA_BOLD);
@@ -1146,7 +1146,7 @@ public class SearchMxController {
 
             GeneralUtils.drawTEXT(orderSample, inY, 15, stream, 14, PDType1Font.HELVETICA_BOLD);
             GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null) + " ", inY, 290, stream, 14, PDType1Font.HELVETICA_BOLD);
-            GeneralUtils.drawTEXT(fechaToma, inY, 420, stream, 12, PDType1Font.HELVETICA);
+            GeneralUtils.drawTEXT(fechaToma, inY, 424, stream, 12, PDType1Font.HELVETICA);
         }
 
     }

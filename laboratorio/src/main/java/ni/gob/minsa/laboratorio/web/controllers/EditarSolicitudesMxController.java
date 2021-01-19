@@ -13,6 +13,7 @@ import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import ni.gob.minsa.laboratorio.utilities.reportes.DetalleDatosRecepcion;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -640,4 +641,65 @@ public class EditarSolicitudesMxController {
         return resultados;
     }
 
+
+    @RequestMapping(value = "getDetalleDatosRecepcion", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    List<DetalleDatosRecepcion> getDetalleDatosRecepcionByIdMx(@RequestParam(value = "idTomaMx") String idTomaMx) throws Exception {
+        logger.info("Obteniendo los examenes por dx en JSON");
+        List<DetalleDatosRecepcion> detalleDatosRecepcion = new ArrayList<DetalleDatosRecepcion>();
+        detalleDatosRecepcion = datosSolicitudService.getDetalleDatosRecepcionByIdMx(idTomaMx);
+        return detalleDatosRecepcion;
+    }
+
+    @RequestMapping(value = "getDetalleDatoRecepcion", method = RequestMethod.GET, produces = "application/json")
+    public
+    @ResponseBody
+    DetalleDatosRecepcion getDetalleDatoRecepcionById(@RequestParam(value = "idDetalle") String idDetalle) throws Exception {
+        logger.info("Obteniendo los examenes por dx en JSON");
+        DetalleDatosRecepcion detalleDatosRecepcion = new DetalleDatosRecepcion();
+        detalleDatosRecepcion = datosSolicitudService.getDetalleDatosRecepcionById(idDetalle);
+        return detalleDatosRecepcion;
+    }
+
+    @RequestMapping(value = "saveDetalleDatoRecepcion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void saveDetalleDatoRecepcion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String valor="";
+        String idDetalle = null;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idDetalle = jsonpObject.get("idDetalle").getAsString();
+            valor = jsonpObject.get("valor").getAsString();
+
+            DatoSolicitudDetalle area = null;
+            //existe dirección
+            if (idDetalle != null){
+                area = datosSolicitudService.getDatoSolicitudDetalleById(idDetalle);
+                area.setValor(valor);
+            } else { //es nueva dirección
+               resultado = messageSource.getMessage("msg.data.not.found",null,null);
+            }
+            //se registra o actualiza dirección
+            datosSolicitudService.saveOrUpdateDetalleDatoRecepcion(area);
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.error.save.data",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+        }finally {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("valor", valor);
+            map.put("idDetalle", idDetalle);
+            map.put("mensaje",resultado);
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
 }

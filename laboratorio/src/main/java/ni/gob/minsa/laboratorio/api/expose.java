@@ -539,17 +539,17 @@ public class expose {
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 185, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx() : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS ","") : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoUnidadMx() != null ? tomaMx.getNombreUnidadMx() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 400, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 490, stream, 11, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type.long", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 355, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 465, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                     //resultados
                                     List<ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud> listDx = tomaMxService.getSolicitudesAprobByToma_Lab_Area(tomaMx.getIdTomaMx(), labProcesa.getCodigo(), area.getIdArea());
