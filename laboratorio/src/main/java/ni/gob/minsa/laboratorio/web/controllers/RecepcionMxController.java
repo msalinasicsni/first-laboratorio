@@ -2,7 +2,6 @@ package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import ni.gob.minsa.laboratorio.domain.comunicacionResultados.SolicitudHL7;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
@@ -21,7 +20,6 @@ import ni.gob.minsa.laboratorio.restServices.CallRestServices;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
-import ni.gob.minsa.laboratorio.utilities.HL7.SimpleMLLPBasedTCPClient;
 import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
@@ -2754,12 +2752,19 @@ public class RecepcionMxController {
     @RequestMapping(value = "resultsPDF", method = RequestMethod.GET)
     public
     @ResponseBody
-    String expToPDF(@RequestParam(value = "codes", required = true) String codes) throws IOException, COSVisitorException, ParseException {
+    String expToPDF(@RequestParam(value = "codes", required = true) String codes, @RequestParam(value = "languaje", required = false) String languaje) throws IOException, COSVisitorException, ParseException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         PDDocument doc = new PDDocument();
+        String formatoFecha = "dd/MM/yyyy";
+        Locale locale = new Locale("es", "NI");
+        if (languaje.equalsIgnoreCase("EN")){
+            locale = Locale.ENGLISH;
+            formatoFecha = "MM/dd/yyyy";
+        }
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         String response = null;
-        String fechaImpresion = new SimpleDateFormat("dd/MM/yyyy").format(new Date()); //solo poner fecha, sin hora. Sonia 28/10/2020
+
+        String fechaImpresion = new SimpleDateFormat(formatoFecha).format(new Date()); //solo poner fecha, sin hora. Sonia 28/10/2020
         String userName = seguridadService.obtenerNombreUsuario();
         try {
 
@@ -2772,9 +2777,8 @@ public class RecepcionMxController {
                     //Prepare the document.
                     if (tomaMx != null) {
                         boolean esMxViajeroCovid = tomaMxService.esMxViajeroCovid(code);
-                        List<Area> areaDxList = tomaMxService.getAreaSoliDxAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
+                        List<Area> areaDxList = tomaMxService.getAreaSolicitudesAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                         Authority esRecepcionista = usuarioService.getAuthority(userName, "ROLE_RECEPCION");
-                        int count = 1;
                         float yPosicionExamen = 0;
                         for (Area area : areaDxList) {
                             if (esRecepcionista != null || seguridadService.usuarioAutorizadoArea(userName, area.getIdArea())) {
@@ -2784,13 +2788,14 @@ public class RecepcionMxController {
                                 String nombreDireccion = "";
                                 Direccion direccion = organizationChartService.getDireccionesByLab(labProcesa.getCodigo(), area.getIdArea());
                                 if (direccion != null) nombreDireccion = direccion.getNombre();
+                                if (esMxViajeroCovid && locale == Locale.ENGLISH) nombreDireccion = messageSource.getMessage("lbl.microbiology", null, locale);
                                 //dibujar encabezado y pie de pagina
                                 GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
 
                                 String pageNumber = String.valueOf(doc.getNumberOfPages());
                                 GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
 
-                                drawInfoLab(stream, page, labProcesa, esMxViajeroCovid);
+                                drawInfoLab(stream, page, labProcesa, esMxViajeroCovid, locale);
 
                                 float y = 648;
                                 //nombre del reporte
@@ -2798,11 +2803,11 @@ public class RecepcionMxController {
                                 xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
                                 GeneralUtils.drawTEXT(nombreDireccion, y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                 y = y - 15;
-                                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, messageSource.getMessage("lbl.lab.result", null, null).toUpperCase());
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lab.result", null, null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, messageSource.getMessage("lbl.lab.result", null, locale).toUpperCase());
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lab.result", null, locale).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                 y = y - 15;
-                                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
-                                GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, (esMxViajeroCovid && locale == Locale.ENGLISH ? messageSource.getMessage("lbl.sars.cov2", null, locale) : area.getNombre().toUpperCase()));
+                                GeneralUtils.drawTEXT((esMxViajeroCovid && locale == Locale.ENGLISH ? messageSource.getMessage("lbl.sars.cov2", null, locale) : area.getNombre().toUpperCase()), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                 y = y - 20;
 
                                 String nombres = "";
@@ -2827,53 +2832,53 @@ public class RecepcionMxController {
                                 }
 
                                 String[] arrEdad = DateUtil.calcularEdad(tomaMx.getFechaNacimiento(), new Date()).split("/");
-                                if (arrEdad[0] != null) edad = arrEdad[0] + " A";
+                                if (arrEdad[0] != null) edad = arrEdad[0] + (locale != Locale.ENGLISH ? " A" : " Y");
                                 if (arrEdad[1] != null) edad = edad + " " + arrEdad[1] + " M";
 
                                 //datos personales
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(code, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.code", null, locale) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(code, y, (locale == Locale.ENGLISH ? 130 : 120), stream, 11, PDType1Font.HELVETICA_BOLD);
                                 if (!esMxViajeroCovid) {
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.file.number", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.file.number", null, locale) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
                                     String numExpediente = (tomaMx.getExpediente() != null ? tomaMx.getExpediente() : notificacionService.getNumExpediente(tomaMx.getIdNotificacion()));
                                     GeneralUtils.drawTEXT(numExpediente, y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 } else {
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.identificacion", null, null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(getIdentificacionViajero(tomaMx.getIdTomaMx(), tomaMx.getIdentificacion()), y, 400, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.identificacion", null, locale) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(getIdentificacionViajero(tomaMx.getIdTomaMx(), tomaMx.getIdentificacion()), y, 380, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 }
                                 y = y - 15;
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(nombres, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lastnames", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(apellidos, y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, locale) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(nombres, y, (locale == Locale.ENGLISH ? 130 : 120), stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lastnames", null, locale) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(apellidos, y, (locale == Locale.ENGLISH ? 380 : 360), stream, 11, PDType1Font.HELVETICA_BOLD);
                                 y = y - 15;
                                 if (!esMxViajeroCovid) {
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 185, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, locale), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(edad, y, (locale == Locale.ENGLISH ? 130 : 120), stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, locale), y, 185, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS", "") : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, locale) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
                                 }else {
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(edad, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("person.fecnac", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaNacimiento(), "dd/MM/yyyy"), y, 400, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.age", null, locale), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(edad, y, (locale == Locale.ENGLISH ? 130 : 120), stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("person.fecnac", null, locale) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaNacimiento(), formatoFecha), y, (locale == Locale.ENGLISH ? 380 : 400), stream, 11, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS ", "") : "", y, 120, stream, 10, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 360, stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.silais1", null, locale), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS ", "") : "", y, (locale == Locale.ENGLISH ? 130 : 120), stream, 10, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.muni", null, locale) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, (locale == Locale.ENGLISH ? 380 : 360), stream, 10, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
                                 }
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, null), y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(tomaMx.getCodigoUnidadMx() != null ? tomaMx.getNombreUnidadMx() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.health.unit1", null, locale), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(tomaMx.getCodigoUnidadMx() != null ? tomaMx.getNombreUnidadMx() : "", y, (locale == Locale.ENGLISH ? 130 : 150), stream, 9, PDType1Font.HELVETICA_BOLD);
                                 y = y - 15;
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type.long", null, null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, null), y, 355, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 465, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type.long", null, locale) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT((esMxViajeroCovid && locale == Locale.ENGLISH ? messageSource.getMessage("lbl.sample.type.nasopharyngeal.swab", null, locale) : tomaMx.getNombreTipoMx()), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, locale), y, (esMxViajeroCovid && locale == Locale.ENGLISH ? 300 : 355), stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), formatoFecha), y, (esMxViajeroCovid && locale == Locale.ENGLISH ? 380 : 465), stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                 //resultados
                                 List<DatosSolicitud> listDx = tomaMxService.getSolicitudesAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
@@ -2883,7 +2888,7 @@ public class RecepcionMxController {
                                 String aprobadoPor = "";
                                 if (recepcionMx.getCalidadMx() != null && recepcionMx.getCalidadMx().getCodigo().equalsIgnoreCase("CALIDMX|IDC")) {
                                     y = y - 20;
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, null), y, 100, stream, 10, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, locale), y, 100, stream, 10, PDType1Font.HELVETICA);
                                 } else {
                                     for (DatosSolicitud dx : listDx) {
                                         aprobadoPor = dx.getUsuarioAprobacion();
@@ -2899,14 +2904,14 @@ public class RecepcionMxController {
                                                 GeneralUtils.drawHeaderAndFooter(stream, doc, 750, 590, 80, 600, 70);
                                                 pageNumber = String.valueOf(doc.getNumberOfPages());
                                                 GeneralUtils.drawTEXT(pageNumber, 15, 550, stream, 10, PDType1Font.HELVETICA_BOLD);
-                                                drawInfoLab(stream, page, labProcesa, esMxViajeroCovid);
+                                                drawInfoLab(stream, page, labProcesa, esMxViajeroCovid, locale);
                                                 y = 640;
                                                 //nombre del reporte
                                                 xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
                                                 GeneralUtils.drawTEXT(nombreDireccion, y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                                 y = y - 15;
-                                                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, messageSource.getMessage("lbl.lab.result", null, null).toUpperCase());
-                                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lab.result", null, null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, messageSource.getMessage("lbl.lab.result", null, locale).toUpperCase());
+                                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.lab.result", null, locale).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                                 y = y - 15;
                                                 xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
                                                 GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
@@ -2925,36 +2930,37 @@ public class RecepcionMxController {
                                                 String detalleResultado = "";
                                                 if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
                                                     Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
-                                                    detalleResultado = cat_lista.getValor();
+                                                    detalleResultado = (locale != Locale.ENGLISH ? cat_lista.getValor() : messageSource.getMessage("lbl."+cat_lista.getValor().toLowerCase().replaceAll(" ", "."), null, locale));
                                                 } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
                                                     detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
                                                 } else {
                                                     detalleResultado = resultado.getValor();
                                                 }
                                                 procesadoPor = resultado.getUsuarioRegistro().getCompleteName();
-                                                fechaProcesamiento = DateUtil.DateToString(resultado.getFechahProcesa(), "dd/MM/yyyy");
+                                                fechaProcesamiento = DateUtil.DateToString(resultado.getFechahProcesa(), formatoFecha);
                                                 GeneralUtils.drawTEXT(resultado.getRespuesta().getNombre() + ": " + detalleResultado, y, 150, stream, 12, PDType1Font.HELVETICA_BOLD);
                                                 y = y - 15;
                                             }
                                             if (resultados.size() > 0) {
-                                                GeneralUtils.drawTEXT(examen.getExamen() + " - " + messageSource.getMessage("lbl.processing.date", null, null) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
+                                                GeneralUtils.drawTEXT(examen.getExamen() + " - " + messageSource.getMessage("lbl.processing.date", null, locale) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
                                                 //y = y - 15;
                                             }
                                         }
                                     }
                                 }
-                                count++;
                                 //fecha impresi?n
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, null) + ": ", 160, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, locale) + ": ", 160, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(fechaImpresion, 160, 190, stream, 10, PDType1Font.HELVETICA);
 
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, null) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, locale) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(procesadoPor, 130, 122, stream, 10, PDType1Font.HELVETICA);
 
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, null) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, locale) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT(aprobadoPor, 130, 370, stream, 10, PDType1Font.HELVETICA);
 
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, null), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, locale), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                if (locale == Locale.ENGLISH)
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.2.results", null, locale), 85, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                 stream.close();
                             }
@@ -2980,25 +2986,25 @@ public class RecepcionMxController {
         return response;
     }
 
-    private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa, boolean esMxViajeroCovid) throws IOException {
+    private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa, boolean esMxViajeroCovid,Locale locale) throws IOException {
         float xCenter;
 
         float inY = 720;
         float m = 18;
         if (esMxViajeroCovid) {
-            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa.2", null, null));
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa.2", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa.2", null, locale));
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa.2", null, locale), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
             inY -= m;
         } else {
-            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, null));
-            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+            xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.minsa", null, locale));
+            GeneralUtils.drawTEXT(messageSource.getMessage("lbl.minsa", null, locale), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
             inY -= m;
         }
         if(labProcesa != null){
 
             if (esMxViajeroCovid){
-                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.cndr", null, null));
-                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.cndr", null, null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+                xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, messageSource.getMessage("lbl.cndr", null, locale));
+                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.cndr", null, locale), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
                 inY -= m;
             } else {
                 if (labProcesa.getNombre() != null) {
@@ -3014,14 +3020,20 @@ public class RecepcionMxController {
                 inY -= m;
             }
 
-            if(labProcesa.getTelefono() != null){
-
-                if(labProcesa.getTelefax() != null){
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono() + " ," + messageSource.getMessage("person.fax", null, null)+": "+ labProcesa.getTelefax());
-                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono() + ", " + messageSource.getMessage("person.fax", null, null)+": "+ labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
-                }else{
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono());
-                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, null)+": "+labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+            if(labProcesa.getTelefono() != null) {
+                if (!esMxViajeroCovid) {
+                    if (labProcesa.getTelefax() != null) {
+                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, locale) + ": " + labProcesa.getTelefono()
+                                + " ," + messageSource.getMessage("person.fax", null, locale) + ": " + labProcesa.getTelefax());
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, locale) + ": " + labProcesa.getTelefono() + ", "
+                                + messageSource.getMessage("person.fax", null, locale) + ": " + labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    } else {
+                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, locale) + ": " + labProcesa.getTelefono());
+                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, locale) + ": " + labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    }
+                } else {
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, locale) + ": 505-" + labProcesa.getTelefono() + " " +messageSource.getMessage("lbl.cndr.ext", null, locale));
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, locale) + ": 505-" + labProcesa.getTelefono() + " " + messageSource.getMessage("lbl.cndr.ext", null, locale), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }
             }
         }

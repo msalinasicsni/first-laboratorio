@@ -16,7 +16,7 @@ public class UtilityProperties {
         InputStream input = null;
 
         try {
-            String filename = "messages.properties";
+            String filename = "messages_es.properties";
             input = UtilityProperties.class.getClassLoader().getResourceAsStream(filename);
             if (input == null) {
                 System.out.println("Sorry, unable to find " + filename);

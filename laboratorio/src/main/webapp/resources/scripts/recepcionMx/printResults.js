@@ -41,6 +41,10 @@ var PrintResults = function () {
                     {
                         "className": 'fPdf',
                         "orderable": false
+                    },
+                    {
+                        "className": 'fPdfEn',
+                        "orderable": false
                     }
                 ],
                 "preDrawCallback": function () {
@@ -59,6 +63,9 @@ var PrintResults = function () {
                     $('.fPdf')
                         .off("click", pdfHandler)
                         .on("click", pdfHandler);
+                    $('.fPdfEn')
+                        .off("click", pdfHandlerEn)
+                        .on("click", pdfHandlerEn);
                 },
                 "oTableTools": {
                     "sSwfPath": parametros.sTableToolsPath,
@@ -145,11 +152,15 @@ var PrintResults = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             //console.log(dataToLoad[i].resultados);
-                            var btnPdf = '<button title="Resultado en Pdf" type="button" class="btn btn-success btn-xs" data-id="' + dataToLoad[i].codigoUnicoMx +
-                                '" > <i class="fa fa-file-pdf-o"></i>';
+                            var btnPdf = '<button title="Resultado en Pdf Espa\u00F1ol" type="button" class="btn btn-default btn-xs" data-id="' + dataToLoad[i].codigoUnicoMx +
+                                '" > <span class="flag-icon flag-icon-squared flag-icon-ni"></span> <i class="fa fa-file-pdf-o"></i>';
+                            var btnPdfEn = ' ';
+                            if (dataToLoad[i].solicitudes.indexOf("Covid19") !== -1 )
+                                btnPdfEn = '<button title="Resultado en Pdf Ingl\u00E9s" type="button" class="btn btn-default btn-xs" data-id="' + dataToLoad[i].codigoUnicoMx +
+                                    '" > <span class="flag-icon flag-icon-squared flag-icon-us"></span> <i class="fa fa-file-pdf-o"></i>';
                             table1.fnAddData(
                                 [dataToLoad[i].codigoUnicoMx,dataToLoad[i].fechaTomaMx, dataToLoad[i].tipoMuestra, dataToLoad[i].tipoNotificacion,
-                                    dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].solicitudes, btnPdf ]);
+                                    dataToLoad[i].codSilais, dataToLoad[i].persona, dataToLoad[i].solicitudes, btnPdf, btnPdfEn ]);
                         }
                     } else {
                         $.smallBox({
@@ -171,18 +182,25 @@ var PrintResults = function () {
             function pdfHandler() {
                 var id = $(this.innerHTML).data('id');
                 if (id != null) {
-                    exportPDF(id);
+                    exportPDF(id, 'ES');
                 }
             }
 
-            function exportPDF(codes) {
+            function pdfHandlerEn() {
+                var id = $(this.innerHTML).data('id');
+                if (id != null) {
+                    exportPDF(id, 'EN');
+                }
+            }
+
+            function exportPDF(codes, languaje) {
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
                         url: parametros.pdfUrl,
                         type: 'GET',
                         dataType: 'text',
-                        data: {codes: codes},
+                        data: {codes: codes, languaje: languaje},
                         contentType: 'application/json',
                         mimeType: 'application/json',
                         success: function (data) {
@@ -236,7 +254,7 @@ var PrintResults = function () {
                                 //desbloquearUI();
                             }
                             //codesLab = reemplazar(codesLab, ".", "*");
-                            exportPDF(codesLab);
+                            exportPDF(codesLab, 'ES');
 
                         }
                         if (ButtonPressed === opcNo) {

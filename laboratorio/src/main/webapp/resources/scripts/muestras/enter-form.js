@@ -446,6 +446,8 @@ var EnterFormTomaMx = function () {
                     //Si es covid, la fecha de toma debe ser la del día
                     if ($(this).find('option:selected').text() === "Biologia Molecular Covid19") {
                         $("#fechaHTomaMx").datepicker("setDate", new Date());
+                        $('#esCovid19').val("true");
+                        $('#codSilaisAtencion').val($("#silaisCovid19").val()).change();
                     }
                 } else {
                     divDatos.html("");
@@ -682,6 +684,59 @@ var EnterFormTomaMx = function () {
                     validateLogin(jqXHR);
                 });
             }
+
+
+            $('#codSilaisAtencion').change(
+                function() {
+                    bloquearUI(parametros.blockMess);
+                    $.getJSON(parametros.municipiosUrl, {
+                        idSilais : $('#codSilaisAtencion').val(),
+                        ajax : 'true'
+                    }, function(data) {
+                        $("#codMunicipio").select2('data',null);
+                        $("#codUnidadAtencion").select2('data',null);
+                        $("#codMunicipio").empty();
+                        $("#codUnidadAtencion").empty();
+                        var html='<option value=""></option>';
+                        var len = data.length;
+                        for ( var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].codigoNacional + '">'
+                                + data[i].nombre + '</option>';
+                        }
+                        html += '</option>';
+                        $('#codMunicipio').html(html);
+                        if ($('#esCovid19').val() === 'true'){
+                            $('#codMunicipio').val($("#muniCovid19").val()).change();
+                        }
+                    });
+                    setTimeout($.unblockUI, 500);
+                });
+
+            $('#codMunicipio').change(
+                function() {
+                    bloquearUI(parametros.blockMess);
+                    $.getJSON(parametros.unidadesUrl, {
+                        codMunicipio : $('#codMunicipio').val(),
+                        codSilais: $('#codSilaisAtencion').val(),
+                        ajax : 'true'
+                    }, function(data) {
+                        $("#codUnidadAtencion").select2('data',null);
+                        $("#codUnidadAtencion").empty();
+                        var html='<option value=""></option>';
+                        var len = data.length;
+                        for ( var i = 0; i < len; i++) {
+                            html += '<option value="' + data[i].codigo + '">'
+                                + data[i].nombre + '</option>';
+                        }
+                        html += '</option>';
+                        $('#codUnidadAtencion').html(html);
+                        if ($('#esCovid19').val() === 'true'){
+                            $('#codUnidadAtencion').val($("#unidadCovid19").val()).change();
+                        }
+                        $('#esCovid19').val("false");//reiniciar la variable
+                    });
+                    setTimeout($.unblockUI, 500);
+                });
 
             jQuery.validator.addClassRules("requiredConcept", {
                 required: true

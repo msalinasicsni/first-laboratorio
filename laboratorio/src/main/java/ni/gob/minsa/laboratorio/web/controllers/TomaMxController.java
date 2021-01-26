@@ -179,6 +179,16 @@ public class TomaMxController {
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            Parametro sectorCovid19 = parametrosService.getParametroByName("SECTOR_DX_VIAJERO_COVID19");
+            String silaisCovid19 = "";
+            String muniCovid19 = "";
+            String unidadCovid19 = "";
+            if (sectorCovid19 != null) {
+                String[] valores = sectorCovid19.getValor().split(",");
+                silaisCovid19 = valores[0];
+                muniCovid19 = valores[1];
+                unidadCovid19 = valores[2];
+            }
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -190,6 +200,9 @@ public class TomaMxController {
             mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",true);
             mav.addObject("mostrarPopUpMx",(labUser!=null?labUser.getPopUpCodigoMx():false));
+            mav.addObject("silaisCovid19", silaisCovid19);
+            mav.addObject("muniCovid19", muniCovid19);
+            mav.addObject("unidadCovid19", unidadCovid19);
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {
@@ -235,6 +248,16 @@ public class TomaMxController {
 
             List<Respuesta> catResp =catalogoService.getRespuesta();
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+            Parametro sectorCovid19 = parametrosService.getParametroByName("SECTOR_DX_VIAJERO_COVID19");
+            String silaisCovid19 = "";
+            String muniCovid19 = "";
+            String unidadCovid19 = "";
+            if (sectorCovid19 != null) {
+                String[] valores = sectorCovid19.getValor().split(",");
+                silaisCovid19 = valores[0];
+                muniCovid19 = valores[1];
+                unidadCovid19 = valores[2];
+            }
 
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
@@ -246,6 +269,9 @@ public class TomaMxController {
             mav.addObject("catResp", catResp);
             mav.addObject("esNuevaNoti",false);
             mav.addObject("mostrarPopUpMx",labUser.getPopUpCodigoMx());
+            mav.addObject("silaisCovid19", silaisCovid19);
+            mav.addObject("muniCovid19", muniCovid19);
+            mav.addObject("unidadCovid19", unidadCovid19);
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {

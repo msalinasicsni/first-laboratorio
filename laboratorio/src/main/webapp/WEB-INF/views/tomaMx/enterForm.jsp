@@ -76,6 +76,10 @@
 								<!-- widget content -->
 								<div class="widget-body no-padding">
                                 <input value="${esNuevaNoti}" hidden="hidden" type="text" id="esNuevaNoti" name="esNuevaNoti"/>
+                                <input value="false" hidden="hidden" type="text" id="esCovid19" name="esCovid19"/>
+                                <input value="${silaisCovid19}" hidden="hidden" type="text" id="silaisCovid19" name="silaisCovid19"/>
+                                <input value="${muniCovid19}" hidden="hidden" type="text" id="muniCovid19" name="muniCovid19"/>
+                                <input value="${unidadCovid19}" hidden="hidden" type="text" id="unidadCovid19" name="unidadCovid19"/>
                                 <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
                                 <input id="msg_action_canceled" type="hidden" value="<spring:message code="msg.sampling.cancel"/>"/>
                                 <input id="msg_sin_SILAIS" type="hidden" value="<spring:message code="msg.sample.no.SILAIS"/>"/>
@@ -531,8 +535,8 @@
 	<spring:url value="/resources/scripts/utilidades/handleDatePickers.js" var="handleDatePickers" />
 	<script src="${handleDatePickers}"></script>
     <!-- BEGIN PAGE LEVEL SCRIPTS -->
-    <spring:url value="/resources/scripts/utilidades/seleccionUnidad.js" var="selecUnidad" />
-    <script src="${selecUnidad}"></script>
+    <!--<spring:url value="/resources/scripts/utilidades/seleccionUnidad.js" var="selecUnidad" />
+    <script src="${selecUnidad}"></script>-->
     <!-- bootstrap datetimepicker -->
     <spring:url value="/resources/js/plugin/bootstrap-datetimepicker-4/moment-with-locales.js" var="moment" />
     <script src="${moment}"></script>
@@ -584,7 +588,7 @@
             $('#embarazada').change();
             handleInputMasks();
             handleDatePickers("${pageContext.request.locale.language}");
-            SeleccionUnidad.init(parametros);
+            //SeleccionUnidad.init(parametros);
             $("li.recepcion").addClass("open");
             $("li.patient").addClass("active");
             if("top"!=localStorage.getItem("sm-setmenu")){

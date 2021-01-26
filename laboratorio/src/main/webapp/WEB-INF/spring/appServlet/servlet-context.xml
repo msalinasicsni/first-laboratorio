@@ -26,7 +26,9 @@
 			</beans:list>
 		</beans:property>
 	</beans:bean>
-	
+    <beans:bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <beans:property name="defaultLocale" value="es_NI" /> <!--change this-->
+    </beans:bean>
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 	in the /WEB-INF/views directory -->
 	<beans:bean

@@ -10,6 +10,7 @@
     <jsp:include page="../fragments/headTag.jsp" />
     <spring:url value="/resources/img/plus.png" var="plus"/>
     <spring:url value="/resources/img/minus.png" var="minus"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/2.3.1/css/flag-icon.min.css" rel="stylesheet"/>
 
     <style>
         textarea {
@@ -189,7 +190,8 @@
                     <th data-hide="phone"><i class="fa fa-fw fa-list text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.silais"/></th>
                     <th data-class="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                     <th data-class="phone"><i class="fa fa-fw fa-file-text-o  text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.requests"/> <spring:message code="lbl.with.result"/></th>
-                    <th></th>
+                    <th><span class="label label-default"><span class="flag-icon flag-icon-squared flag-icon-ni"></span> ES</span></th>
+                    <th><span class="label label-default"><span class="flag-icon flag-icon-us"></span> EN</span></th>
                 </tr>
                 </thead>
             </table>
