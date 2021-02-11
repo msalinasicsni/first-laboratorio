@@ -65,7 +65,12 @@ public class ReportesService {
         Criteria crit = session.createCriteria(RecepcionMx.class, "recepcion");
         crit.createAlias("recepcion.tomaMx", "toma");
         crit.createAlias("toma.idNotificacion", "notifi");
-
+        crit.add(Restrictions.and(
+                        Restrictions.eq("notifi.pasivo", false))
+        );
+        crit.add(Restrictions.and(
+                        Restrictions.eq("toma.anulada", false))
+        );
 
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));

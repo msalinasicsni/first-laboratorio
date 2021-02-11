@@ -267,7 +267,7 @@ public class ReportesController {
             }
 
             if (receivedMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion() != null) {
-                map.put("codSilais", receivedMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre());
+                map.put("codSilais", receivedMx.getTomaMx().getIdNotificacion().getCodSilaisAtencion().getNombre().replaceAll("SILAIS", ""));
             } else {
                 map.put("codSilais", "");
             }
@@ -279,6 +279,8 @@ public class ReportesController {
             map.put("tipoMuestra", receivedMx.getTomaMx().getCodTipoMx().getNombre());
 
 
+            String identificacion = " ";
+            String fechaNacimiento = " ";
             //Si hay persona
             if (receivedMx.getTomaMx().getIdNotificacion().getPersona() != null) {
                 /// se obtiene el nombre de la persona asociada a la ficha
@@ -290,6 +292,10 @@ public class ReportesController {
                 if (receivedMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido() != null)
                     nombreCompleto = nombreCompleto + " " + receivedMx.getTomaMx().getIdNotificacion().getPersona().getSegundoApellido();
                 map.put("persona", nombreCompleto);
+                if (receivedMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento() != null)
+                fechaNacimiento = DateUtil.DateToString(receivedMx.getTomaMx().getIdNotificacion().getPersona().getFechaNacimiento(), "dd/MM/yyyy");
+                if (receivedMx.getTomaMx().getIdNotificacion().getPersona().getIdentificacion() != null)
+                    identificacion = receivedMx.getTomaMx().getIdNotificacion().getPersona().getIdentificacion();
             } else if (receivedMx.getTomaMx().getIdNotificacion().getSolicitante() != null){
                 map.put("persona",receivedMx.getTomaMx().getIdNotificacion().getSolicitante().getNombre());
             } else if (receivedMx.getTomaMx().getIdNotificacion().getCodigoPacienteVIH() != null){
@@ -297,6 +303,7 @@ public class ReportesController {
             } else {
                 map.put("persona", " ");
             }
+            map.put("fechaNacimiento", fechaNacimiento);
 
             //se arma estructura de diagn�sticos o estudios
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
@@ -309,7 +316,8 @@ public class ReportesController {
                 String numFactura = " ";
                 for (DaSolicitudDx solicitudDx : solicitudDxList) {
                     if (solicitudDx.getCodDx().getNombre().toLowerCase().contains("covid")){
-                        numFactura = getNumeroFactura(solicitudDx.getIdSolicitudDx());
+                        numFactura = datosSolicitudService.getNumeroFactura(solicitudDx.getIdSolicitudDx());
+                        identificacion = datosSolicitudService.getIdentificacionViajero(solicitudDx.getIdTomaMx().getIdTomaMx(), identificacion);
                     }
                     cont++;
                     if (cont == solicitudDxList.size()) {
@@ -317,7 +325,6 @@ public class ReportesController {
                     } else {
                         dxs += solicitudDx.getCodDx().getNombre()+(solicitudDx.getControlCalidad()?"("+messageSource.getMessage("lbl.cc", null, null)+")":"") + "," + " ";
                     }
-
                 }
                 map.put("solicitudes", dxs);
                 map.put("factura", numFactura);
@@ -328,7 +335,7 @@ public class ReportesController {
             }else{
                 map.put("solicitudes", dxs);
             }
-
+            map.put("identificacion", identificacion);
             map.put("usuario", receivedMx.getUsuarioRecepcion().getCompleteName());
             mapResponse.put(indice, map);
             indice++;
@@ -337,24 +344,6 @@ public class ReportesController {
         //escapar caracteres especiales, escape de los caracteres con valor num�rico mayor a 127
         UnicodeEscaper escaper = UnicodeEscaper.above(127);
         return escaper.translate(jsonResponse);
-    }
-
-    private String getNumeroFactura(String idSolicitud){
-        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
-        String lugar="";
-        for(DetalleDatosRecepcion res: resFinalList){
-            if (res.getNombre().toLowerCase().contains("factura"))
-                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
-                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                    lugar+=cat_lista.getEtiqueta();
-                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
-                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                    lugar+=valorBoleano;
-                } else {
-                    lugar+=res.getValor().toUpperCase();
-                }
-        }
-        return lugar;
     }
 
     @RequestMapping(value = "/reception/expToPDF", method = RequestMethod.GET)

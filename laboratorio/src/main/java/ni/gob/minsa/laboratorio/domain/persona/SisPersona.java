@@ -500,8 +500,28 @@ public class SisPersona  implements java.io.Serializable {
         
         return resultado;
     }
-           
-    
+
+    @Override
+    public String toString() {
+        return "SisPersona{"+ personaId +"}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SisPersona persona = (SisPersona) o;
+
+        if (personaId != persona.personaId) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (personaId ^ (personaId >>> 32));
+    }
 }
 
 

@@ -239,7 +239,7 @@ public class DaNotificacion implements Serializable, Auditable {
 
     @Override
     public boolean isFieldAuditable(String fieldname) {
-        if (fieldname.matches("usuarioRegistro") || fieldname.matches("fechaRegistro") || fieldname.matches("solicitante") || fieldname.matches("persona"))
+        if (fieldname.matches("usuarioRegistro") || fieldname.matches("fechaRegistro") || fieldname.matches("solicitante"))
             return false;
         else
             return true;

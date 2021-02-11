@@ -2844,7 +2844,7 @@ public class RecepcionMxController {
                                     GeneralUtils.drawTEXT(numExpediente, y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 } else {
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.identificacion", null, locale) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
-                                    GeneralUtils.drawTEXT(getIdentificacionViajero(tomaMx.getIdTomaMx(), tomaMx.getIdentificacion()), y, 380, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(datosSolicitudService.getIdentificacionViajero(tomaMx.getIdTomaMx(), tomaMx.getIdentificacion()), y, 380, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 }
                                 y = y - 15;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.names", null, locale) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
@@ -2886,6 +2886,8 @@ public class RecepcionMxController {
                                 RecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMx(tomaMx.getCodUnicoMx(), labProcesa.getCodigo());
                                 String procesadoPor = "";
                                 String aprobadoPor = "";
+                                String codMinsaProcesa = "";
+                                String codMinsaAprueba = "";
                                 if (recepcionMx.getCalidadMx() != null && recepcionMx.getCalidadMx().getCodigo().equalsIgnoreCase("CALIDMX|IDC")) {
                                     y = y - 20;
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, locale), y, 100, stream, 10, PDType1Font.HELVETICA);
@@ -2953,10 +2955,20 @@ public class RecepcionMxController {
                                 GeneralUtils.drawTEXT(fechaImpresion, 160, 190, stream, 10, PDType1Font.HELVETICA);
 
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, locale) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
+                                if (procesadoPor.replaceAll(" ","").toLowerCase().contains("cod.minsa")){
+                                    codMinsaProcesa = procesadoPor.substring(procesadoPor.lastIndexOf("-")+1, procesadoPor.length());
+                                    procesadoPor = procesadoPor.substring(0, procesadoPor.lastIndexOf("-"));
+                                }
                                 GeneralUtils.drawTEXT(procesadoPor, 130, 122, stream, 10, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(codMinsaProcesa, 118, 122, stream, 10, PDType1Font.HELVETICA);
 
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, locale) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
+                                if (aprobadoPor.replaceAll(" ","").toLowerCase().contains("cod.minsa")){
+                                    codMinsaAprueba = aprobadoPor.substring(aprobadoPor.lastIndexOf("-")+1, aprobadoPor.length());
+                                    aprobadoPor = aprobadoPor.substring(0, aprobadoPor.lastIndexOf("-"));
+                                }
                                 GeneralUtils.drawTEXT(aprobadoPor, 130, 370, stream, 10, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(codMinsaAprueba, 118, 370, stream, 10, PDType1Font.HELVETICA);
 
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, locale), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
                                 if (locale == Locale.ENGLISH)
@@ -3032,31 +3044,13 @@ public class RecepcionMxController {
                         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, locale) + ": " + labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                     }
                 } else {
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, locale) + ": 505-" + labProcesa.getTelefono() + " " +messageSource.getMessage("lbl.cndr.ext", null, locale));
-                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, locale) + ": 505-" + labProcesa.getTelefono() + " " + messageSource.getMessage("lbl.cndr.ext", null, locale), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, messageSource.getMessage("lbl.telephone", null, locale) + ": 505-" + labProcesa.getTelefono());
+                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.telephone", null, locale) + ": 505-" + labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }
             }
         }
     }
 
-    private String getIdentificacionViajero(String idTomaMx, String identificacionPersona){
-        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdMx(idTomaMx);
-        String identificacion="";
-        for(DetalleDatosRecepcion res: resFinalList){
-            if (res.getNombre().contains("ID"))
-                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
-                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                    identificacion+=cat_lista.getEtiqueta();
-                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
-                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                    identificacion+=valorBoleano;
-                } else {
-                    identificacion+=res.getValor().toUpperCase();
-                }
-        }
-        if (identificacion.isEmpty()) identificacion = identificacionPersona;
-        return identificacion;
-    }
     /**
      * M�todo que se llama al entrar a la opci�n de menu "Recepci�n Mx CC". Se encarga de inicializar las listas para realizar la b�squeda de muestras para CC
      * @return ModelAndView

@@ -65,6 +65,9 @@
                    <li class="check-in">
                         <a href="#" title="<spring:message code="lbl.check-in" />"><i class="fa fa-lg fa-fw fa-list-ul"></i> <span class="menu-item-parent"><spring:message code="lbl.check-in" /></span></a>
                         <ul>
+                            <!--<li class="travellers">
+                                <a href="<spring:url value="/preregistro/viajeros/init" htmlEscape="true "/>" title="<spring:message code="menu.receipt.travellers" />"><i class="fa fa-lg fa-fw fa-plane"></i> <spring:message code="menu.receipt.travellers" /></a>
+                            </li>-->
                             <li class="patient">
                                 <a href="<spring:url value="/tomaMx/search" htmlEscape="true "/>" title="<spring:message code="menu.receipt.patient" />"><i class="fa fa-lg fa-fw fa-eyedropper"></i> <spring:message code="menu.receipt.patient" /></a>
                             </li>

@@ -22,6 +22,7 @@ import ni.gob.minsa.laboratorio.utilities.Email.Attachment;
 import ni.gob.minsa.laboratorio.utilities.Email.EmailUtil;
 import ni.gob.minsa.laboratorio.utilities.Email.SessionData;
 import ni.gob.minsa.laboratorio.utilities.FiltrosReporte;
+import ni.gob.minsa.laboratorio.utilities.dto.DatosCovidViajeroDTO;
 import ni.gob.minsa.laboratorio.utilities.excelUtils.ExcelBuilder;
 import ni.gob.minsa.laboratorio.utilities.reportes.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -2106,11 +2107,10 @@ public class ReportesExcelController {
                 direccion+= (solicitudDx.getTelefonoMovil()!=null?solicitudDx.getTelefonoMovil():"");
             }
             registro[6] = direccion;
-
-
             registro[7] = solicitudDx.getNombreSilaisResid(); //silais residencia
             registro[8] = solicitudDx.getNombreMuniResid(); //municipio residencia
-            registro[9] = getNumeroFactura(solicitudDx.getIdSolicitud());
+            DatosCovidViajeroDTO datosCovid = datosSolicitudService.getDatosCovidViajero(solicitudDx.getIdSolicitud(), solicitudDx.getIdentificacion());
+            registro[9] = datosCovid.getNumeroFactura();
             String sexo = solicitudDx.getSexo();
             registro[10] = sexo.substring(sexo.length()-1, sexo.length());
             registro[11] = DateUtil.DateToString(solicitudDx.getFechaInicioSintomas(),"dd/MM/yyyy");
@@ -2118,8 +2118,8 @@ public class ReportesExcelController {
             validarPCRCovid19(registro, solicitudDx.getIdSolicitud());
             registro[14] = DateUtil.DateToString(solicitudDx.getFechaAprobacion(),"dd/MM/yyyy");
             registro[15] = parseFinalResultDetails(solicitudDx.getIdSolicitud());
-            registro[16] = solicitudDx.getIdentificacion();
-            registro[17] = getLugarViaja(solicitudDx.getIdSolicitud());
+            registro[16] = datosCovid.getIdentificacion();
+            registro[17] = datosCovid.getLugarDondeViaja();
             if (registro[15].toString().toLowerCase().contains("positivo")) {
                 registro[0]= rowCountPos++;
                 registrosPos.add(registro);
@@ -3054,42 +3054,6 @@ public class ReportesExcelController {
             }
         }
         return resultados;
-    }
-
-    private String getLugarViaja(String idSolicitud){
-        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
-        String lugar="";
-        for(DetalleDatosRecepcion res: resFinalList){
-            if (res.getNombre().toLowerCase().contains("lugar"))
-                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
-                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                    lugar+=cat_lista.getEtiqueta();
-                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
-                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                    lugar+=valorBoleano;
-                } else {
-                    lugar+=res.getValor().toUpperCase();
-                }
-        }
-        return lugar;
-    }
-
-    private String getNumeroFactura(String idSolicitud){
-        List<DetalleDatosRecepcion> resFinalList = datosSolicitudService.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
-        String lugar="";
-        for(DetalleDatosRecepcion res: resFinalList){
-            if (res.getNombre().toLowerCase().contains("factura"))
-                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
-                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
-                    lugar+=cat_lista.getEtiqueta();
-                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
-                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
-                    lugar+=valorBoleano;
-                } else {
-                    lugar+=res.getValor().toUpperCase();
-                }
-        }
-        return lugar;
     }
 
     private void parseVIHSerFinalResultDetails(String idSolicitud, Object[] dato, int indiceRes) {

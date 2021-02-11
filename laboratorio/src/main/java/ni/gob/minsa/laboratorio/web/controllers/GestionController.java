@@ -9,6 +9,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.*;
 import ni.gob.minsa.laboratorio.domain.muestra.traslado.TrasladoMx;
 import ni.gob.minsa.laboratorio.domain.notificacion.DaNotificacion;
 import ni.gob.minsa.laboratorio.domain.notificacion.TipoNotificacion;
+import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultado;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
@@ -102,6 +103,9 @@ public class GestionController {
 
     @Resource(name = "catalogosService")
     public CatalogoService catalogoService;
+
+    @Resource(name = "personaService")
+    public PersonaService personaService;
 
     @Autowired
     MessageSource messageSource;
@@ -657,6 +661,52 @@ public class GestionController {
             response.getOutputStream().close();
         }
     }
+
+    @RequestMapping(value = "changePersonNoti", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected void changePersonNoti(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String json;
+        String resultado = "";
+        String idNotificacion="";
+        String idPersona="";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
+            json = br.readLine();
+            //Recuperando Json enviado desde el cliente
+            JsonObject jsonpObject = new Gson().fromJson(json, JsonObject.class);
+            idNotificacion = jsonpObject.get("idNotificacion").getAsString();
+            idPersona = jsonpObject.get("idPersona").getAsString();
+            DaNotificacion notificacion = daNotificacionService.getNotifById(idNotificacion);
+            if (notificacion!=null){
+                SisPersona persona = personaService.getPersona(Long.valueOf(idPersona));
+                if (persona!=null) {
+                    notificacion.setPersona(persona);
+                    notificacion.setMunicipioResidencia(persona.getMunicipioResidencia());
+                    notificacion.setDireccionResidencia(persona.getDireccionResidencia());
+                    daNotificacionService.updateNotificacion(notificacion);
+                }else{
+                    resultado =  messageSource.getMessage("msg.person.notfound",null,null);
+                }
+            }else{
+                resultado =  messageSource.getMessage("msg.notification.notfound",null,null);
+            }
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(),ex);
+            ex.printStackTrace();
+            resultado =  messageSource.getMessage("msg.change.person.error",null,null);
+            resultado=resultado+". \n "+ex.getMessage();
+        }finally {
+            UnicodeEscaper escaper     = UnicodeEscaper.above(127);
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("idNotificacion",idNotificacion);
+            map.put("idPersona",idPersona);
+            map.put("mensaje",escaper.translate(resultado));
+            String jsonResponse = new Gson().toJson(map);
+            response.getOutputStream().write(jsonResponse.getBytes());
+            response.getOutputStream().close();
+        }
+    }
+
     /**
      * Convierte una lista de notificaciones a formato JSON
      * @param notificacions lista de nofiticaciones
@@ -702,8 +752,12 @@ public class GestionController {
                 } else {
                     map.put("municipio", "--");
                 }
+                map.put("identificacion", notificacion.getPersona().getIdentificacion());
+                map.put("fechaNacimiento", DateUtil.DateToString(notificacion.getPersona().getFechaNacimiento(), "dd/MM/yyyy"));
             } else {
                 map.put("persona", " ");
+                map.put("identificacion", " ");
+                map.put("fechaNacimiento", " ");
                 map.put("edad", " ");
                 map.put("sexo", " ");
                 map.put("embarazada", "--");

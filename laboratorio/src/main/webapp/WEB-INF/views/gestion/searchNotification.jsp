@@ -110,6 +110,12 @@
                     <input id="text_opt_select" type="hidden" value="<spring:message code="lbl.select"/>"/>
                     <input id="msg_override_success" type="hidden" value="<spring:message code="msg.noti.successfully.override"/>"/>
                     <input id="msg_update_success" type="hidden" value="<spring:message code="msg.noti.successfully.updated"/>"/>
+                    <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
+                    <input id="msg_confirm_content" type="hidden" value="<spring:message code="msg.confirm.change.person"/>"/>
+                    <input id="confirm_msg_opc_yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
+                    <input id="confirm_msg_opc_no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                    <input id="msg_action_canceled" type="hidden" value="<spring:message code="msg.action.canceled"/>"/>
+                    <input id="msg_change_successful" type="hidden" value="<spring:message code="msg.person.successfully.changed"/>"/>
                     <form id="searchOrders-form" class="smart-form" autocomplete="off">
                         <fieldset>
                             <div class="row">
@@ -265,6 +271,7 @@
                             <th style="width: 5%" valign="center"><spring:message code="lbl.request.large"/></th>
                             <th style="width: 5%" valign="center"><spring:message code="act.redefine"/></th>
                             <th style="width: 5%" valign="center"><spring:message code="lbl.override"/></th>
+                            <th style="width: 5%" valign="center"><spring:message code="lbl.person"/></th>
                         </tr>
                         </thead>
                     </table>
@@ -420,6 +427,65 @@
         </div>
         <!-- end modal -->
 
+        <div class="modal fade" id="modalPerson"  role="dialog" tabindex="-1" data-aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-info">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title"> <spring:message code="act.change" /> <spring:message code="lbl.person" /></h4>
+                        <h4 class="modal-title"><label class="text-left txt-color-blue font-md" id="lblPersonaActual"></label></h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="search-form" class="smart-form" autocomplete="off">
+                            <input type=hidden id="idNotificacion"/>
+                            <fieldset>
+                                <section>
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="person.search" />
+                                    </label>
+                                    <label class="input"> <i class="icon-append fa fa-check"></i>
+                                        <input type="text" id="filtro" name="filtro" placeholder="<spring:message code="person.search.parameters"/>">
+                                        <b class="tooltip tooltip-bottom-right"><spring:message code="person.search.parameters"/></b> </label>
+                                </section>
+                            </fieldset>
+                            <footer>
+                                <button type="submit" id="search-person" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
+                            </footer>
+                        </form>
+                        <div class="widget-body no-padding">
+                            <table id="persons_result" class="table table-striped table-bordered table-hover" width="100%">
+                                <thead>
+                                <tr>
+                                    <th data-class="expand"><i class="fa fa-fw fa-key text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.id"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.name1"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.name2"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.lastname1"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.lastname2"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.fecnac"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-calendar txt-color-blue hidden-md hidden-sm hidden-xs"></i> <spring:message code="lbl.age2"/></th>
+                                    <th data-hide="phone"><i class="fa fa-fw fa-map-marker text-muted hidden-md hidden-sm hidden-xs"></i> <spring:message code="person.mun.res"/></th>
+                                    <th style="width: 5%" valign="center"><i class="fa fa-check"></i></th>
+                                </tr>
+                                </thead>
+                            </table>
+                            <form id="paginate-form" class="smart-form" autocomplete="off">
+                                <footer>
+                                    <button type="button" title="<spring:message code="lbl.next"/>" id="next" class="btn btn-primary"><i class="fa fa-fast-forward"></i></button>
+                                    <button type="button" title="<spring:message code="lbl.prev"/>" id="prev" class="btn btn-primary"><i class="fa fa-fast-backward"></i></button>
+                                </footer>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- end modal -->
+
     </article>
     <!-- WIDGET END -->
 </div>
@@ -485,6 +551,12 @@
 <script src="${handleInputMask}"></script>
 <spring:url value="/resources/scripts/utilidades/generarReporte.js" var="generarReporte"/>
 <script src="${generarReporte}"></script>
+<spring:url value="/resources/scripts/personas/person-change.js" var="personChange" />
+<script src="${personChange}"></script>
+<spring:url value="/resources/scripts/utilidades/calcularEdad.js" var="edadJS" />
+<script src="${edadJS}"></script>
+<spring:url value="/resources/scripts/utilidades/unicodeEscaper.js" var="unicodeEscaper" />
+<script src="${unicodeEscaper}"></script>
 <!-- END PAGE LEVEL SCRIPTS -->
 <c:set var="blockMess"><spring:message code="blockUI.message"/></c:set>
 <c:url var="ordersUrl" value="/gestion/searchMx"/>
@@ -493,7 +565,9 @@
 <spring:url var="unidadesUrl"   value="/api/v1/unidadesPrimHosp"  />
 <c:url var="notificacionesUrl" value="/gestion/getNotifications"/>
 <c:url var="overrideUrl" value="/gestion/overridenoti"/>
+<c:url var="changePersonUrl" value="/gestion/changePersonNoti"/>
 <c:url var="updateUrl" value="/tomaMx/updatenoti"/>
+<spring:url value="/personas/persons" var="sPersonUrl"/>
 <script type="text/javascript">
     $(document).ready(function () {
         pageSetUp();
@@ -504,9 +578,12 @@
             sOverrideUrl: "${overrideUrl}",
             municipiosUrl : "${municipiosUrl}",
             unidadesUrl : "${unidadesUrl}",
-            updateUrl : "${updateUrl}"
+            updateUrl : "${updateUrl}",
+            sPersonUrl: "${sPersonUrl}",
+            changePersonUrl : "${changePersonUrl}"
         };
         BuscarNotificacion.init(parametros);
+        ChangePerson.init(parametros);
 
         handleDatePickers("${pageContext.request.locale.language}");
         handleInputMasks();

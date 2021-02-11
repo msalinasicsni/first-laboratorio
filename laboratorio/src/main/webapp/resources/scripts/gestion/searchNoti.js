@@ -34,6 +34,10 @@ var BuscarNotificacion = function () {
                     {
                         "className": 'override',
                         "orderable": false
+                    },
+                    {
+                        "className": 'change-person',
+                        "orderable": false
                     }
                 ],
                 "preDrawCallback": function () {
@@ -56,6 +60,9 @@ var BuscarNotificacion = function () {
                     $('.override')
                         .off("click", overrideHandler)
                         .on("click", overrideHandler);
+                    $('.change-person')
+                        .off("click", changePersonHandler)
+                        .on("click", changePersonHandler);
                 }
             });
 
@@ -103,6 +110,17 @@ var BuscarNotificacion = function () {
 
             function hideModalRedefine() {
                 $('#d_redefine').modal('hide');
+            }
+
+            function changePersonHandler() {
+                $('#idNotificacion').val('');
+                var id = $(this.innerHTML).data('id');
+                if (id != null) {
+                    var codigos = id.split(",");
+                    $('#idNotificacion').val(codigos[0]);
+                    $('#lblPersonaActual').text(codigos[2] + " - " + codigos[1] + " - " + codigos[3]);
+                    $('#modalPerson').modal('show');
+                }
             }
 
             <!-- formulario para anular muestra -->
@@ -209,6 +227,7 @@ var BuscarNotificacion = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var btnRedefine = '<button title="Mover" type="button" class="btn btn-primary btn-xs" disabled> <i class="fa fa-repeat"></i></button>';
+                            var btnChangePerson = '<button title="Cambiar persona" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion + "," + dataToLoad[i].persona+ "," + dataToLoad[i].identificacion+ "," + dataToLoad[i].fechaNacimiento+'"> <i class="fa fa-user"></i></button>';
                             if (dataToLoad[i].tipoNoti==='PACIENTE'){
                                 btnRedefine = '<button title="Mover" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion+ "," + dataToLoad[i].codSilais+ "," +
                                     dataToLoad[i].codMunicipio+ "," + dataToLoad[i].codUnidad+ "," + dataToLoad[i].fechaInicioSintomas+"," + dataToLoad[i].persona+'"> <i class="fa fa-repeat"></i></button>';
@@ -217,7 +236,8 @@ var BuscarNotificacion = function () {
                                 [dataToLoad[i].persona, dataToLoad[i].edad, dataToLoad[i].sexo,dataToLoad[i].silais, dataToLoad[i].unidad,dataToLoad[i].tipoNoti,
                                     dataToLoad[i].fechaRegistro, dataToLoad[i].fechaInicioSintomas, " <input type='hidden' value='" + dataToLoad[i].solicitudes + "'/>",
                                     btnRedefine,
-                                        '<button title="Anular" type="button" class="btn btn-danger btn-xs" data-id="' + dataToLoad[i].idNotificacion + '"> <i class="fa fa-times fa-fw"></i></button>']);
+                                        '<button title="Anular" type="button" class="btn btn-danger btn-xs" data-id="' + dataToLoad[i].idNotificacion + '"> <i class="fa fa-times fa-fw"></i></button>',
+                                btnChangePerson]);
                         }
                     }else{
                         $.smallBox({

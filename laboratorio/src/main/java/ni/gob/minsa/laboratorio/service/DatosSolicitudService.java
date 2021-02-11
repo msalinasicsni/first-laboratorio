@@ -4,6 +4,7 @@ import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.muestra.DatoSolicitud;
 import ni.gob.minsa.laboratorio.domain.muestra.DatoSolicitudDetalle;
 import ni.gob.minsa.laboratorio.domain.resultados.DetalleResultadoFinal;
+import ni.gob.minsa.laboratorio.utilities.dto.DatosCovidViajeroDTO;
 import ni.gob.minsa.laboratorio.utilities.reportes.DetalleDatosRecepcion;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -12,6 +13,8 @@ import org.hibernate.Transaction;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,10 @@ public class DatosSolicitudService {
 
     @Resource(name="sessionFactory")
     private SessionFactory sessionFactory;
+
+    @Autowired
+    @Qualifier(value = "resultadoFinalService")
+    private ResultadoFinalService resultadoFinalService;
 
     public DatosSolicitudService() {
     }
@@ -181,5 +188,82 @@ public class DatosSolicitudService {
 
         Query q = session.createQuery(query);
         return q.list();
+    }
+
+    public String getNumeroFactura(String idSolicitud){
+        List<DetalleDatosRecepcion> resFinalList = this.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
+        String numFactura="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().toLowerCase().contains("factura"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    numFactura+=cat_lista.getEtiqueta();
+                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    numFactura+=valorBoleano;
+                } else {
+                    numFactura+=res.getValor().toUpperCase();
+                }
+        }
+        return numFactura;
+    }
+
+    public String getIdentificacionViajero(String idTomaMx, String identificacionPersona){
+        List<DetalleDatosRecepcion> resFinalList = this.getDetalleDatosRecepcionByIdMx(idTomaMx);
+        String identificacion="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().contains("ID"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    identificacion+=cat_lista.getEtiqueta();
+                }else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
+                    identificacion+=valorBoleano;
+                } else {
+                    identificacion+=res.getValor().toUpperCase();
+                }
+        }
+        if (identificacion.isEmpty()) identificacion = identificacionPersona;
+        return identificacion;
+    }
+
+    public DatosCovidViajeroDTO getDatosCovidViajero(String idSolicitud, String identificacionPersona) {
+        DatosCovidViajeroDTO datos = new DatosCovidViajeroDTO();
+        List<DetalleDatosRecepcion> resFinalList = this.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().toLowerCase().contains("lugar")) {
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    datos.setLugarDondeViaja(cat_lista.getEtiqueta());
+                } else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                    datos.setLugarDondeViaja(valorBoleano);
+                } else {
+                    datos.setLugarDondeViaja(res.getValor().toUpperCase());
+                }
+            }else if (res.getNombre().toLowerCase().contains("factura")) {
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    datos.setNumeroFactura(cat_lista.getEtiqueta());
+                } else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                    datos.setNumeroFactura(valorBoleano);
+                } else {
+                    datos.setNumeroFactura(res.getValor().toUpperCase());
+                }
+            } else if (res.getNombre().contains("ID")) {
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    datos.setIdentificacion(cat_lista.getEtiqueta());
+                } else if (res.getTipoConcepto().equals("TPDATO|LOG")) {
+                    String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
+                    datos.setIdentificacion(valorBoleano);
+                } else {
+                    datos.setIdentificacion(res.getValor().toUpperCase());
+                }
+            }
+        }
+        if (datos.getIdentificacion() == null || datos.getIdentificacion().isEmpty()) datos.setIdentificacion(identificacionPersona);
+        return datos;
     }
 }
