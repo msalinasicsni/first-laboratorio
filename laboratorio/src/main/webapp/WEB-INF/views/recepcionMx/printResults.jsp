@@ -191,13 +191,14 @@
                     <th data-class="phone"><i class="fa fa-fw fa-user text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.receipt.person.applicant.name"/></th>
                     <th data-class="phone"><i class="fa fa-fw fa-file-text-o  text-muted hidden-md hidden-sm hidden-xs"></i><spring:message code="lbl.requests"/> <spring:message code="lbl.with.result"/></th>
                     <th><span class="label label-default"><span class="flag-icon flag-icon-squared flag-icon-ni"></span> ES</span></th>
-                    <th><span class="label label-default"><span class="flag-icon flag-icon-us"></span> EN</span></th>
+                    <th><span class="label label-default"><span class="flag-icon flag-icon-squared flag-icon-us"></span> EN</span></th>
                 </tr>
                 </thead>
             </table>
                 <form id="sendOrders-form" class="smart-form" autocomplete="off">
                     <footer>
-                        <button type="button" id="btnExport" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o"></i> <spring:message code="act.export.selected" /></button>
+                        <button type="button" id="btnExportEn" class="btn btn-success btn-lg pull-right header-btn"><span class="flag-icon flag-icon-squared flag-icon-us"></span> EN <i class="fa fa-file-pdf-o"></i></button>
+                        <button type="button" id="btnExport" class="btn btn-success btn-lg pull-right header-btn"><span class="flag-icon flag-icon-squared flag-icon-ni"></span> ES <i class="fa fa-file-pdf-o"></i></button>
                     </footer>
                 </form>
             </div>

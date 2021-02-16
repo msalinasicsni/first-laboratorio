@@ -106,7 +106,11 @@ var PrintResults = function () {
             });
 
             $('#btnExport').click(function () {
-                exportSelected();
+                exportSelected('ES');
+            });
+
+            $('#btnExportEn').click(function () {
+                exportSelected('EN');
             });
 
             function getResultadosAprobados(showAll) {
@@ -229,9 +233,12 @@ var PrintResults = function () {
 
             }
 
-            function exportSelected() {
+            function exportSelected(languaje) {
                 var oTT = TableTools.fnGetInstance('list_result');
                 var aSelectedTrs = oTT.fnGetSelected();
+                console.log('fnGetSelected');
+                console.log(aSelectedTrs);
+
                 var len = aSelectedTrs.length;
                 var opcSi = $("#yes").val();
                 var opcNo = $("#no").val();
@@ -254,7 +261,7 @@ var PrintResults = function () {
                                 //desbloquearUI();
                             }
                             //codesLab = reemplazar(codesLab, ".", "*");
-                            exportPDF(codesLab, 'ES');
+                            exportPDF(codesLab, languaje);
 
                         }
                         if (ButtonPressed === opcNo) {
