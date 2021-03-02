@@ -40,6 +40,7 @@ public class DaTomaMx implements Serializable, Auditable {
     private EntidadesAdtvas codSilaisAtencion;
     private Unidades codUnidadAtencion;
     private String horaTomaMx;
+    private String codigoValidacion;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -252,6 +253,27 @@ public class DaTomaMx implements Serializable, Auditable {
     public void setHoraTomaMx(String horaTomaMx) {
         this.horaTomaMx = horaTomaMx;
     }
+
+    @Basic
+    @Column(name = "CODIGO_VALIDACION", nullable = true, length = 50)
+    public String getCodigoValidacion() {
+        return codigoValidacion;
+    }
+
+    public void setCodigoValidacion(String codigoValidacion) {
+        this.codigoValidacion = codigoValidacion;
+    }
+
+    /*
+    @Basic
+    @Column(name = "ID_PREREGISTRO", nullable = true)
+    public Integer getIdPreregistro() {
+        return idPreregistro;
+    }
+
+    public void setIdPreregistro(Integer idPreregistro) {
+        this.idPreregistro = idPreregistro;
+    }*/
 
     @Override
     public boolean isFieldAuditable(String fieldname) {

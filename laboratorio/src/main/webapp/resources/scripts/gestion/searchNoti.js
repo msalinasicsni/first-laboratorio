@@ -38,6 +38,10 @@ var BuscarNotificacion = function () {
                     {
                         "className": 'change-person',
                         "orderable": false
+                    },
+                    {
+                        "className": 'edit-person',
+                        "orderable": false
                     }
                 ],
                 "preDrawCallback": function () {
@@ -63,6 +67,9 @@ var BuscarNotificacion = function () {
                     $('.change-person')
                         .off("click", changePersonHandler)
                         .on("click", changePersonHandler);
+                    $('.edit-person')
+                        .off("click", editPersonHandler)
+                        .on("click", editPersonHandler);
                 }
             });
 
@@ -120,6 +127,15 @@ var BuscarNotificacion = function () {
                     $('#idNotificacion').val(codigos[0]);
                     $('#lblPersonaActual').text(codigos[2] + " - " + codigos[1] + " - " + codigos[3]);
                     $('#modalPerson').modal('show');
+                }
+            }
+
+            function editPersonHandler() {
+                var id = $(this.innerHTML).data('id');
+                if (id != null) {
+                    var codigos = id.split(",");
+                    //window.location.href = parametros.sUpdatePersonUrl+id;// misma ventana
+                    window.open(parametros.sUpdatePersonUrl+codigos[1]+'?idNotificacion='+codigos[0],'_blank');  //nueva pestaña
                 }
             }
 
@@ -227,7 +243,8 @@ var BuscarNotificacion = function () {
                     if (len > 0) {
                         for (var i = 0; i < len; i++) {
                             var btnRedefine = '<button title="Mover" type="button" class="btn btn-primary btn-xs" disabled> <i class="fa fa-repeat"></i></button>';
-                            var btnChangePerson = '<button title="Cambiar persona" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion + "," + dataToLoad[i].persona+ "," + dataToLoad[i].identificacion+ "," + dataToLoad[i].fechaNacimiento+'"> <i class="fa fa-user"></i></button>';
+                            var btnChangePerson = '<button title="Cambiar persona" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion + "," + dataToLoad[i].persona+ "," + dataToLoad[i].identificacion+ "," + dataToLoad[i].fechaNacimiento+'"> <i class="fa fa-repeat"></i><i class="fa fa-user"></i></button>';
+                            var btnEditPerson = '<button title="Editar persona" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion + "," + dataToLoad[i].idPersona+'"> <i class="fa fa-pencil"></i><i class="fa fa-user"></i></button>';
                             if (dataToLoad[i].tipoNoti==='PACIENTE'){
                                 btnRedefine = '<button title="Mover" type="button" class="btn btn-primary btn-xs" data-id="' + dataToLoad[i].idNotificacion+ "," + dataToLoad[i].codSilais+ "," +
                                     dataToLoad[i].codMunicipio+ "," + dataToLoad[i].codUnidad+ "," + dataToLoad[i].fechaInicioSintomas+"," + dataToLoad[i].persona+'"> <i class="fa fa-repeat"></i></button>';
@@ -237,7 +254,7 @@ var BuscarNotificacion = function () {
                                     dataToLoad[i].fechaRegistro, dataToLoad[i].fechaInicioSintomas, " <input type='hidden' value='" + dataToLoad[i].solicitudes + "'/>",
                                     btnRedefine,
                                         '<button title="Anular" type="button" class="btn btn-danger btn-xs" data-id="' + dataToLoad[i].idNotificacion + '"> <i class="fa fa-times fa-fw"></i></button>',
-                                btnChangePerson]);
+                                btnChangePerson, btnEditPerson]);
                         }
                     }else{
                         $.smallBox({

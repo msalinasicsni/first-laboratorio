@@ -76,10 +76,15 @@
 								<!-- widget content -->
 								<div class="widget-body no-padding">
                                 <input value="${esNuevaNoti}" hidden="hidden" type="text" id="esNuevaNoti" name="esNuevaNoti"/>
+                                <input value="${esPreregistro}" hidden="hidden" type="text" id="esPreregistro" name="esPreregistro"/>
                                 <input value="false" hidden="hidden" type="text" id="esCovid19" name="esCovid19"/>
                                 <input value="${silaisCovid19}" hidden="hidden" type="text" id="silaisCovid19" name="silaisCovid19"/>
                                 <input value="${muniCovid19}" hidden="hidden" type="text" id="muniCovid19" name="muniCovid19"/>
                                 <input value="${unidadCovid19}" hidden="hidden" type="text" id="unidadCovid19" name="unidadCovid19"/>
+                                <input value="${idDxCovid19}" hidden="hidden" type="text" id="idDxCovid19" name="idDxCovid19"/>
+                                <input value="${idMxCovid19}" hidden="hidden" type="text" id="idMxCovid19" name="idMxCovid19"/>
+                                <input value="${factura}" hidden="hidden" type="text" id="factura" name="factura"/>
+                                <input value="${documentoViaje}" hidden="hidden" type="text" id="documentoViaje" name="documentoViaje"/>
                                 <input id="msg_confirm_title" type="hidden" value="<spring:message code="msg.confirm.title"/>"/>
                                 <input id="msg_action_canceled" type="hidden" value="<spring:message code="msg.sampling.cancel"/>"/>
                                 <input id="msg_sin_SILAIS" type="hidden" value="<spring:message code="msg.sample.no.SILAIS"/>"/>
@@ -401,7 +406,14 @@
                                                 <select name="codTipoMx" id="codTipoMx" data-placeholder="<spring:message code="msj.select.type.sample"/>" class="select2" >
                                                     <option value=""><spring:message code="lbl.select" />...</option>
                                                     <c:forEach items="${catTipoMx}" var="catTipoMx">
-                                                        <option value="${catTipoMx.tipoMx.idTipoMx}">${catTipoMx.tipoMx.nombre}</option>
+                                                        <c:choose>
+                                                            <c:when test="${catTipoMx.tipoMx.idTipoMx == idMxCovid19}">
+                                                                <option selected value="${catTipoMx.tipoMx.idTipoMx}">${catTipoMx.tipoMx.nombre}</option>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <option value="${catTipoMx.tipoMx.idTipoMx}">${catTipoMx.tipoMx.nombre}</option>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </c:forEach>
                                                 </select>
                                             </div>
@@ -565,6 +577,7 @@
     <c:url var="todoDatosUrl" value="/administracion/datosSolicitud/getDatosRecepcionActivos"/>
     <c:url var="tipoMxUrl" value="/tomaMx/getTipoMxByTipoNoti"/>
     <spring:url value="/tomaMx/validateTomaMx" var="validateUrl"/>
+    <spring:url value="/preregistro/viajeros/init" var="searchPreregistroUrl"/>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -582,7 +595,8 @@
                 unidadesUrl : "${unidadesUrl}",
                 tipoMxUrl : "${tipoMxUrl}",
                 language : "${pageContext.request.locale.language}",
-                validateUrl: "${validateUrl}"
+                validateUrl: "${validateUrl}",
+                searchPreregistroUrl : "${searchPreregistroUrl}"
             };
             EnterFormTomaMx.init(parametros);
             $('#embarazada').change();

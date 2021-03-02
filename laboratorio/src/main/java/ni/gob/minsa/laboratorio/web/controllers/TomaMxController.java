@@ -14,9 +14,13 @@ import ni.gob.minsa.laboratorio.domain.persona.SisPersona;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.vigilanciaSindFebril.DaSindFebril;
+import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.CallServiciosEnLineaServices;
+import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.ListaPreRegistroRequest;
+import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.entidades.PreRegistro;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.GuidGenerator;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -149,7 +153,7 @@ public class TomaMxController {
      * @return a ModelMap with the model attributes for the respective view
      */
     @RequestMapping("createInicial/{idNotificacion}")
-    public ModelAndView createTomaMxInicial(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
+    public ModelAndView createTomaMxInicial(@PathVariable("idNotificacion") String idNotificacion, HttpServletRequest request) throws Exception {
         ModelAndView mav = new ModelAndView();
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
@@ -183,13 +187,35 @@ public class TomaMxController {
             String silaisCovid19 = "";
             String muniCovid19 = "";
             String unidadCovid19 = "";
+            int idDxCovid19 = 0;
+            int idMxCovid19 = 0;
+            String factura = "";
+            String documentoViaje = "";
             if (sectorCovid19 != null) {
                 String[] valores = sectorCovid19.getValor().split(",");
                 silaisCovid19 = valores[0];
                 muniCovid19 = valores[1];
                 unidadCovid19 = valores[2];
             }
-
+            if (noti.getIdPreregistro() != null) {
+                Parametro paramaDxCovid19 = parametrosService.getParametroByName("DX_VIAJERO_COVID19");
+                Parametro paramMxCovid19 = parametrosService.getParametroByName("MX_VIAJERO_COVID19");
+                Parametro apiUrlParam = parametrosService.getParametroByName("BASE_URL_API_SE");
+                idDxCovid19 = Integer.valueOf(paramaDxCovid19.getValor());
+                idMxCovid19 = Integer.valueOf(paramMxCovid19.getValor());
+                ListaPreRegistroRequest listaPreRegistroRequest = new ListaPreRegistroRequest(noti.getIdPreregistro());
+                PreRegistro preRegistro = null;
+                try {
+                    String token = seguridadService.getTokenServiciosLinea(request);
+                    preRegistro = CallServiciosEnLineaServices.obtenerPreRegistro(apiUrlParam.getValor(), listaPreRegistroRequest, token);
+                    if (preRegistro != null && preRegistro.getDetallepago() != null)
+                    factura = preRegistro.getDetallepago().getReferencia();
+                    if (preRegistro != null && preRegistro.getDocumentoviaje() != null)
+                        documentoViaje = preRegistro.getDocumentoviaje().getNumerodocumento();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);
             mav.addObject("catTipoMx", catTipoMx);
@@ -203,6 +229,11 @@ public class TomaMxController {
             mav.addObject("silaisCovid19", silaisCovid19);
             mav.addObject("muniCovid19", muniCovid19);
             mav.addObject("unidadCovid19", unidadCovid19);
+            mav.addObject("idDxCovid19", idDxCovid19);
+            mav.addObject("idMxCovid19", idMxCovid19);
+            mav.addObject("esPreregistro", noti.getIdPreregistro()!=null);
+            mav.addObject("factura", factura);
+            mav.addObject("documentoViaje", documentoViaje);
             //mav.addAllObjects(mapModel);
             mav.setViewName("tomaMx/enterForm");
         } else {
@@ -219,7 +250,7 @@ public class TomaMxController {
      * @return a ModelMap with the model attributes for the respective view
      */
     @RequestMapping("create/{idNotificacion}")
-    public ModelAndView createTomaMx(@PathVariable("idNotificacion") String idNotificacion) throws Exception {
+    public ModelAndView createTomaMx(@PathVariable("idNotificacion") String idNotificacion, HttpServletRequest request) throws Exception {
         ModelAndView mav = new ModelAndView();
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
@@ -545,6 +576,7 @@ public class TomaMxController {
             tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(),1));
             codigoGenerado = tomaMx.getCodigoLab();
             tomaMx.setEnvio(envioOrden);
+            tomaMx.setCodigoValidacion(GuidGenerator.next()); //servicios en linea. 17/02/2021
             try {
                 if (tomaMxService.existeTomaMx(idNotificacion, fechaHTomaMx, dx)) {
                     throw new Exception(messageSource.getMessage("msg.existe.toma", null, null));

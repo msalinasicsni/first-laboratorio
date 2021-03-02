@@ -1,13 +1,16 @@
 package ni.gob.minsa.laboratorio.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.estructura.Unidades;
 import ni.gob.minsa.laboratorio.domain.examen.Area;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
-import ni.gob.minsa.laboratorio.domain.portal.Usuarios;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
+import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.AuthenticationResponse;
+import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.CallServiciosEnLineaServices;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.UtilityProperties;
 import org.hibernate.Query;
@@ -35,6 +38,9 @@ import java.util.List;
 public class SeguridadService {
     @Resource(name = "sessionFactory")
     private SessionFactory sessionFactory;
+
+    @Resource(name = "parametrosService")
+    private ParametrosService parametrosService;
 
     UtilityProperties utilityProperties = new UtilityProperties();
 
@@ -466,4 +472,36 @@ public class SeguridadService {
         return parametro!=null;
 
     }
+
+    /******SERVICIOS EN LINEA MINSA********/
+
+    public String authenticateServiciosLinea(HttpServletRequest request) throws Exception{
+        String wdctk = null;
+        Parametro apiUrlParam = parametrosService.getParametroByName("BASE_URL_API_SE");
+        AuthenticationResponse response = CallServiciosEnLineaServices.authenticate(apiUrlParam.getValor());
+        if (response.getStatus() != null && response.getStatus().equalsIgnoreCase("UNAUTHORIZED")) {
+            //reintentar por expiracion
+            response = CallServiciosEnLineaServices.authenticate(apiUrlParam.getValor());
+        }
+        if (response.getData()!=null){
+            JsonObject jsonpObject = new Gson().fromJson(response.getData(), JsonObject.class);
+            if (jsonpObject.get("wdctk") != null) {
+                wdctk = jsonpObject.get("wdctk").getAsString();
+                request.getSession().setAttribute("wdctk", wdctk);
+            }
+        }
+        return wdctk;
+    }
+
+    public String getTokenServiciosLinea(HttpServletRequest request) throws Exception{
+        String token;
+        if (request.getSession().getAttribute("wdctk") == null) {
+            token = authenticateServiciosLinea(request);
+        } else {
+            token = request.getSession().getAttribute("wdctk").toString();
+        }
+        return token;
+    }
+
+
 }

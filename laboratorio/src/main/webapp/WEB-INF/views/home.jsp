@@ -317,7 +317,7 @@
 
             }
 
-            getOrders();
+            //getOrders();
 
             /* pie chart */
             var colores = ["#0066FF","#FF0000","#009900","#FF6600","#FF3399","#008B8B","#663399","#FFD700","#0000FF","#DC143C","#32CD32","#FF8C00","#C71585","#20B2AA","#6A5ACD","#9ACD32"];

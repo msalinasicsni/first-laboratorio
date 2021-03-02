@@ -35,10 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +75,9 @@ public class PersonaController {
     @Autowired
     @Qualifier(value = "ocupacionService")
     private OcupacionService ocupacionService;
+
+    @Resource(name = "serviciosEnLineaService")
+    public ServiciosEnLineaService serviciosEnLineaService;
 
     @Autowired
     MessageSource messageSource;
@@ -129,24 +129,14 @@ public class PersonaController {
         mav.setViewName("personas/search");
         mav.addObject("persona",persona);
         int edad = DateUtil.calcularEdadAnios(persona.getFechaNacimiento());
-        mav.addObject("edad", edad + " años");
+        mav.addObject("edad", edad + " aï¿½os");
         return mav;
     }
     @RequestMapping(value = "create", method = RequestMethod.GET)
     public ModelAndView initCreateForm(Model model, HttpServletRequest request) throws Exception, ParseException {
         logger.debug("Crear una Persona");
-        String urlValidacion="";
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
+
             mav.setViewName("personas/create");
             List <Divisionpolitica> departamentos = divisionPoliticaService.getAllDepartamentos();
             List <Paises> paisesList = paisesService.getPaises();
@@ -167,19 +157,16 @@ public class PersonaController {
             mav.addObject("ocupacion",ocupacionList);
             mav.addObject("tipoIdentificacion",identificacionList);
             mav.addObject("tipoAsegurado",tipoAseguradoList);
-        }else{
-            mav.setViewName(urlValidacion);
-        }
         return mav;
     }
 
     @RequestMapping(value = "update/{idPerson}", method = RequestMethod.GET)
-    public ModelAndView initEditForm(@PathVariable("idPerson") long idPerson, HttpServletRequest request) throws Exception, ParseException {
+    public ModelAndView initEditForm(@PathVariable("idPerson") long idPerson, @RequestParam(value = "idNotificacion", required = false) String idNotificacion, HttpServletRequest request) throws Exception, ParseException {
         logger.debug("Crear una Persona");
         String urlValidacion="";
         try {
             urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validación del login fue exitosa
+            //si la url esta vacia significa que la validaciï¿½n del login fue exitosa
             if (urlValidacion.isEmpty())
                 urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, true);
         }catch (Exception e){
@@ -216,8 +203,10 @@ public class PersonaController {
             List<Divisionpolitica> municipiosResi = null;
             if (persona !=null && persona.getMuniResiCodigoNac()!=null) {
                 Divisionpolitica departamentoResi = divisionPoliticaService.getDepartamentoByMunicipi(persona.getMuniResiCodigoNac());
-                depaResi = departamentoResi.getCodigoNacional();
-                municipiosResi = divisionPoliticaService.getMunicipiosFromDepartamento(depaResi);
+                if (departamentoResi != null) {
+                    depaResi = departamentoResi.getCodigoNacional();
+                    municipiosResi = divisionPoliticaService.getMunicipiosFromDepartamento(depaResi);
+                }
             }
             List<Comunidades> comunidadesesRes = null;
             if (persona !=null && persona.getComuResiCodigo()!=null && persona.getMuniResiCodigoNac()!=null){
@@ -238,6 +227,7 @@ public class PersonaController {
             mav.addObject("ocupacion",ocupacionList);
             mav.addObject("tipoIdentificacion",identificacionList);
             mav.addObject("tipoAsegurado",tipoAseguradoList);
+            mav.addObject("idNotificacion", idNotificacion);
         }else{
             mav.setViewName(urlValidacion);
         }
@@ -270,7 +260,13 @@ public class PersonaController {
                 resultado = infoResultado.getMensaje();
             logger.info("FIN GUARDAR PERSONSA");
             personaService.commitTransaccion();
-
+            //actualziar resultado de servicios en linea si es necesario
+            String idNotificacion = "";
+            if (jsonpObject.get("idNotificacion")!=null && !jsonpObject.get("idNotificacion").getAsString().isEmpty()) {
+                idNotificacion = jsonpObject.get("idNotificacion").getAsString();
+                SisPersona sisPersona = personaService.ensamblarObjetoSisPersona(persona);
+                serviciosEnLineaService.updatePersonaResultadosViajeroNotificacion(idNotificacion, sisPersona);
+            }
         } catch (Exception ex) {
             logger.error("Error guardar persona",ex);
             ex.printStackTrace();
@@ -284,13 +280,12 @@ public class PersonaController {
                 //resultado = messageSource.getMessage("msg.person.error.unhandled",null,null);
                 //resultado=resultado+". \n "+(e.getMessage()!=null?e.getMessage():"");
             }
-
         }finally {
             try {
                 personaService.remover();
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error("Cerrar conexión error",e);
+                logger.error("Cerrar conexiï¿½n error",e);
                 //resultado = messageSource.getMessage("msg.person.error.unhandled",null,null);
                 //resultado=resultado+". \n "+(e.getMessage()!=null?e.getMessage():"");
             }

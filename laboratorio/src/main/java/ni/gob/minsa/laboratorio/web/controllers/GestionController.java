@@ -107,24 +107,11 @@ public class GestionController {
     @Resource(name = "personaService")
     public PersonaService personaService;
 
+    @Resource(name = "serviciosEnLineaService")
+    public ServiciosEnLineaService serviciosEnLineaService;
+
     @Autowired
     MessageSource messageSource;
-
-    String nombreSoli = null;
-    String nombrePersona = null;
-    String nombreSilais = null;
-    String nombreUS = null;
-    Integer edad = null;
-    String sexo = null;
-    String fechaRecepcion = null;
-    String fechaToma = null;
-    String fis = null;
-    String fechaResultado = null;
-    String fechaAprobacion = null;
-    List<DetalleResultadoFinal> detalleResultado = null;
-    String fechaImpresion = null;
-    String orderSample = null;
-
 
     /**
      * M�todo que se llama al entrar a la opci�n de menu "Gestión/Muestras". Se encarga de inicializar las listas para realizar la búsqueda de Mx
@@ -541,6 +528,8 @@ public class GestionController {
                 if (notificacion!=null){
                     tomaMx.setIdNotificacion(notificacion);
                     tomaMxService.updateTomaMx(tomaMx);
+                    //actualziar resultado de servicios en linea si es necesario
+                    serviciosEnLineaService.updatePersonaResultadosViajeroNotificacion(idNotificacion, notificacion.getPersona());
                 }else{
                     resultado =  messageSource.getMessage("msg.notification.notfound",null,null);
                 }
@@ -683,6 +672,8 @@ public class GestionController {
                     notificacion.setMunicipioResidencia(persona.getMunicipioResidencia());
                     notificacion.setDireccionResidencia(persona.getDireccionResidencia());
                     daNotificacionService.updateNotificacion(notificacion);
+                    //actualziar resultado de servicios en linea si es necesario
+                    serviciosEnLineaService.updatePersonaResultadosViajeroNotificacion(idNotificacion, persona);
                 }else{
                     resultado =  messageSource.getMessage("msg.person.notfound",null,null);
                 }
@@ -733,6 +724,7 @@ public class GestionController {
             map.put("codMunicipio", (notificacion.getCodUnidadAtencion() != null ? String.valueOf(notificacion.getCodUnidadAtencion().getMunicipio().getCodigoNacional()) : "ND"));
             //Si hay persona
             if (notificacion.getPersona() != null) {
+                map.put("idPersona", String.valueOf(notificacion.getPersona().getPersonaId()));
                 /// se obtiene el nombre de la persona asociada a la ficha
                 String nombreCompleto = "";
                 nombreCompleto = notificacion.getPersona().getPrimerNombre();

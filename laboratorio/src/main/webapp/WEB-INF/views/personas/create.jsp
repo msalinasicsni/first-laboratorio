@@ -84,6 +84,7 @@
                                 <input id="smallBox_content" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                 <input id="smallBox_content4s" type="hidden" value="<spring:message code="smallBox.content.4s"/>"/>
                                 <input id="idPersona" type="hidden" value="${persona.personaId}"/>
+                                <input id="idNotificacion" type="hidden" value="${idNotificacion}"/>
 									<form id="create-form" class="smart-form" autocomplete="off">
 										<fieldset>
                                             <div class="row">

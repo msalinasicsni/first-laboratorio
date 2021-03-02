@@ -1,13 +1,23 @@
 package ni.gob.minsa.laboratorio.utilities.pdfUtils;
 
+import com.sun.javafx.iio.jpeg.JPEGImageLoaderFactory;
 import ni.gob.minsa.laboratorio.domain.parametros.Imagen;
 import ni.gob.minsa.laboratorio.service.ImagenesService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDPixelMap;
 import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
+import org.apache.pdfbox.pdmodel.interactive.action.type.PDActionURI;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationLink;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDBorderStyleDictionary;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.impl.code128.Code128Bean;
+import org.krysalis.barcode4j.impl.code39.Code39Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
+import org.krysalis.barcode4j.output.java2d.Java2DCanvasProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -15,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -84,5 +95,59 @@ public class GeneralUtils {
         GeneralUtils.drawObject(stream, doc, footerImage, 5, 20, wFooter, hFooter);
     }
 
+    public static void addBarcode128(PDPageContentStream stream, PDDocument document, String text, float x, float y) {
+        try {
+            int dpi = 400;
+            BitmapCanvasProvider canvas = new BitmapCanvasProvider(dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+            Code128Bean code128Bean = new Code128Bean();
+            code128Bean.setFontSize(4);
+            code128Bean.setBarHeight(10);
+            code128Bean.generateBarcode(canvas, text.trim());
+            canvas.finish();
+            BufferedImage bImage = canvas.getBufferedImage();
+            drawObject(stream, document, bImage, x, y, 200, 40);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public static void addBarcode39(PDPageContentStream stream, PDDocument document, String text, float x, float y) {
+        try {
+            int dpi = 300;
+            BitmapCanvasProvider canvas = new BitmapCanvasProvider(dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+            Code39Bean code39Bean = new Code39Bean();
+            code39Bean.generateBarcode(canvas, text.trim());
+            canvas.finish();
+            BufferedImage bImage = canvas.getBufferedImage();
+            drawObject(stream, document, bImage, x, y, 190, 50);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addLink(PDDocument document, PDPage page, String texto, float startY, float startX, float fontSize, PDFont font) {
+        PDAnnotationLink txtLink = new PDAnnotationLink();
+        try {
+            float textWidth = font.getStringWidth(texto) / 1000 * fontSize;
+
+            float startLinkY = startY + fontSize;
+
+            PDRectangle position = new PDRectangle();
+            position.setLowerLeftX(startX);
+            position.setLowerLeftY(startLinkY);
+            position.setUpperRightX(startX + textWidth);
+            position.setUpperRightY(startY);
+            txtLink.setRectangle(position);
+            txtLink.setPrinted(false);
+            txtLink.setInvisible(true);
+            PDActionURI action = new PDActionURI();
+            action.setURI(texto);
+            txtLink.setAction(action);
+
+            page.getAnnotations().add(txtLink);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

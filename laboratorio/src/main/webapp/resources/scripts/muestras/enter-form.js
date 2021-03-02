@@ -73,7 +73,11 @@ var EnterFormTomaMx = function () {
                     }
 
                     $('#dx').html(html);
-                    $('#dx').val('').change();
+                    if ($('#esPreregistro').val() === 'true'){
+                        $('#dx').val($("#idDxCovid19").val()).change();
+                    }else {
+                        $('#dx').val('').change();
+                    }
                 }).fail(function (jqXHR) {
                     setTimeout($.unblockUI, 10);
                     validateLogin(jqXHR);
@@ -374,7 +378,11 @@ var EnterFormTomaMx = function () {
                                     wnd.document.write(textoHtml);
                                 }
                                 setTimeout(function () {
-                                    window.location.href = parametros.searchUrl;
+                                    if ($('#esPreregistro').val() === 'true'){
+                                        window.location.href = parametros.searchPreregistroUrl;
+                                    } else {
+                                        window.location.href = parametros.searchUrl;
+                                    }
                                 }, 4000);
                             }
 
@@ -455,6 +463,10 @@ var EnterFormTomaMx = function () {
                 }
                 desbloquearUI();
             });
+
+            if ($('#esPreregistro').val() === 'true'){
+                $('#codTipoMx').val($("#idMxCovid19").val()).change();
+            }
 
             function fillDatosRecepcionDx(idDx, divDatos) {
                 bloquearUI(parametros.blockMess);
@@ -594,6 +606,15 @@ var EnterFormTomaMx = function () {
                                         if (dataToLoad[i].requerido) {
                                             contenidoControl = contenidoControl + '<i class="fa fa-fw fa-asterisk txt-color-red font-sm"></i>';
                                         }
+
+                                        if(dataToLoad[i].nombre.indexOf('factura') != -1){
+                                            valor = $("#factura").val();
+                                        } else if(dataToLoad[i].nombre.indexOf('ID') != -1){
+                                            valor = $("#documentoViaje").val();
+                                        } else {
+                                            valor = '';
+                                        }
+
                                         contenidoControl = contenidoControl + dataToLoad[i].nombre + '</label>' +
                                             '<div class="">' +
                                             '<label class="input"><i class="icon-prepend fa fa-pencil fa-fw"></i><i class="icon-append fa fa-sort-alpha-asc fa-fw"></i>';

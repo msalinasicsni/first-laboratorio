@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -1338,7 +1339,7 @@ public class TomaMxService {
                 " coalesce((select ea.codigo from EntidadesAdtvas ea where ea.codigo = mx.codSilaisAtencion.codigo ), null) as codigoSilaisMx, coalesce((select ea.nombre from EntidadesAdtvas ea where ea.codigo = mx.codSilaisAtencion.codigo ), null) as nombreSilaisMx, " +
                 " coalesce((select u.codigo from Unidades u where u.codigo = mx.codUnidadAtencion.codigo), null) as codigoUnidadMx, coalesce((select u.nombre from Unidades u where u.codigo = mx.codUnidadAtencion.codigo), null) as nombreUnidadMx, " +
                 " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as codigoMuniMx, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as nombreMuniMx, " +
-                " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, noti.codigoPacienteVIH as codigoVIH  " +
+                " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, noti.codigoPacienteVIH as codigoVIH, mx.codigoValidacion as codigoValidacion  " +
                 " from DaTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
                 " where noti.pasivo = false and mx.anulada = false and mx.codigoLab = :codigomx or mx.codigoUnicoMx = :codigomx ");
         queryMx.setParameter("codigomx", codigomx);
@@ -1395,5 +1396,18 @@ public class TomaMxService {
         q.uniqueResult();
         Long total = (Long)q.uniqueResult();
         return total.intValue()>0;
+    }
+
+    public List<String> getCodigosMxViajerosByIdNoti(String idNotificacion){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -4);
+        String query = "select mx.codigoLab from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti where noti.idNotificacion = :idNotificacion " +
+                "and dx.codDx.idDiagnostico = (select cast(p.valor as long) from Parametro p where p.nombre = 'DX_VIAJERO_COVID19') " +
+                "and mx.fechaRegistro > :fechaMinima";
+
+        Query q = sessionFactory.getCurrentSession().createQuery(query);
+        q.setParameter("idNotificacion", idNotificacion);
+        q.setParameter("fechaMinima", calendar.getTime());
+        return q.list();
     }
 }

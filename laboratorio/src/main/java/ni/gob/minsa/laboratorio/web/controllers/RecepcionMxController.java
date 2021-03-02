@@ -20,6 +20,7 @@ import ni.gob.minsa.laboratorio.restServices.CallRestServices;
 import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
+import ni.gob.minsa.laboratorio.utilities.GuidGenerator;
 import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
@@ -699,6 +700,7 @@ public class RecepcionMxController {
             if (!idRecepcion.isEmpty()) {
                //se tiene que actualizar la tomaMx
                 tomaMx.setEstadoMx(estadoMx);
+                tomaMx.setCodigoValidacion(GuidGenerator.next()); //servicios en linea. 17/02/2021
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
                     codigoLabMx = esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab();
@@ -1400,6 +1402,7 @@ public class RecepcionMxController {
                 if (!idRecepcion.isEmpty()) {
                     //se tiene que actualizar la tomaMx
                     tomaMx.setEstadoMx(estadoMx);
+                    tomaMx.setCodigoValidacion(GuidGenerator.next()); //servicios en linea. 17/02/2021
                     try {
                         tomaMxService.updateTomaMx(tomaMx);
                         cantMxProc++;
@@ -2763,7 +2766,7 @@ public class RecepcionMxController {
         }
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         String response = null;
-
+        Parametro urlServiciosEnLinea = parametrosService.getParametroByName("URL_VALIDACION_SE");
         String fechaImpresion = new SimpleDateFormat(formatoFecha).format(new Date()); //solo poner fecha, sin hora. Sonia 28/10/2020
         String userName = seguridadService.obtenerNombreUsuario();
         try {
@@ -2950,40 +2953,50 @@ public class RecepcionMxController {
                                         }
                                     }
                                 }
-                                //fecha impresi?n
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, locale) + ": ", 160, 60, stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(fechaImpresion, 160, 190, stream, 10, PDType1Font.HELVETICA);
 
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, locale) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
+                                //fecha impresi?n
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.date.delivery.results", null, locale) + ": ", (esMxViajeroCovid? 210 : 160), 60, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(fechaImpresion, (esMxViajeroCovid? 210 : 160), 190, stream, 10, PDType1Font.HELVETICA);
+
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.bioanalyst", null, locale) + ": ", (esMxViajeroCovid? 180 : 130), 60, stream, 11, PDType1Font.HELVETICA);
                                 if (procesadoPor.replaceAll(" ","").toLowerCase().contains("cod.minsa")){
                                     codMinsaProcesa = procesadoPor.substring(procesadoPor.lastIndexOf("-")+1, procesadoPor.length());
                                     procesadoPor = procesadoPor.substring(0, procesadoPor.lastIndexOf("-"));
                                 }
-                                GeneralUtils.drawTEXT(procesadoPor, 130, 122, stream, 10, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(codMinsaProcesa, 118, 122, stream, 10, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(procesadoPor, (esMxViajeroCovid? 180 : 130), 122, stream, 10, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(codMinsaProcesa, (esMxViajeroCovid? 168 : 118), 122, stream, 10, PDType1Font.HELVETICA);
 
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, locale) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validated.by", null, locale) + ": ", (esMxViajeroCovid? 180 : 130), 300, stream, 11, PDType1Font.HELVETICA);
                                 if (aprobadoPor.replaceAll(" ","").toLowerCase().contains("cod.minsa")){
                                     codMinsaAprueba = aprobadoPor.substring(aprobadoPor.lastIndexOf("-")+1, aprobadoPor.length());
                                     aprobadoPor = aprobadoPor.substring(0, aprobadoPor.lastIndexOf("-"));
                                 }
-                                GeneralUtils.drawTEXT(aprobadoPor, 130, 370, stream, 10, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(codMinsaAprueba, 118, 370, stream, 10, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(aprobadoPor, (esMxViajeroCovid? 180 : 130), 370, stream, 10, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(codMinsaAprueba, (esMxViajeroCovid? 168 : 118), 370, stream, 10, PDType1Font.HELVETICA);
 
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, locale), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                if (locale == Locale.ENGLISH)
-                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.2.results", null, locale), 85, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
-
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.results", null, locale), (esMxViajeroCovid? 140 : 100), 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                if (locale == Locale.ENGLISH) {
+                                    GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.2.results", null, locale), (esMxViajeroCovid ? 126 : 90), 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    if (esMxViajeroCovid) {
+                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.3.results", null, locale), 112, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validation.code", null, locale)+ " "+tomaMx.getCodigoValidacion(), 98, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.drawTEXT((urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 84, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.addLink(doc, page, (urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 84, 60, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.addBarcode128(stream, doc, tomaMx.getCodigoValidacion(), 370, 90);
+                                    }
+                                } else {
+                                    if (esMxViajeroCovid) {
+                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.footer.note.3.results", null, locale), 126, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validation.code", null, locale)+ " "+tomaMx.getCodigoValidacion(), 112, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.drawTEXT((urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 98, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.addLink(doc, page, (urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 98, 60, 11, PDType1Font.HELVETICA_BOLD);
+                                        GeneralUtils.addBarcode128(stream, doc, tomaMx.getCodigoValidacion(), 370, 90);
+                                    }
+                                }
                                 stream.close();
                             }
                         }
                     }
-
-  /*                  doc.save(output);
-                    doc.close();
-                    // generate the file
-                    response = Base64.encodeBase64String(output.toByteArray());
-*/
                 }
             }
             doc.save(output);
@@ -2997,6 +3010,8 @@ public class RecepcionMxController {
 
         return response;
     }
+
+
 
     private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa, boolean esMxViajeroCovid,Locale locale) throws IOException {
         float xCenter;

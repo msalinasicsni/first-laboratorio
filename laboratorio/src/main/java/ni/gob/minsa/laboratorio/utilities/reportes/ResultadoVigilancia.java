@@ -16,6 +16,7 @@ public class ResultadoVigilancia {
     private String codUnicoMx;
     private String codigoVIH;
     private String expediente;
+    private String codigoValidacion;
 
     private String codigoExpUnico;
     private Date fechaNacimiento;
@@ -425,5 +426,13 @@ public class ResultadoVigilancia {
 
     public void setIdentificacion(String identificacion) {
         this.identificacion = identificacion;
+    }
+
+    public String getCodigoValidacion() {
+        return codigoValidacion;
+    }
+
+    public void setCodigoValidacion(String codigoValidacion) {
+        this.codigoValidacion = codigoValidacion;
     }
 }

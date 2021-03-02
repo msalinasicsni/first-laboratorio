@@ -236,4 +236,15 @@ public class DaNotificacionService {
         }
         return crit.list();
     }
+
+    /**SERVICIOES EN LINEA*/
+    public Long getNotifByIdPreregistro(Long idPreregistro) {
+
+        Session session = sessionFactory.getCurrentSession();
+
+        Query query = session.createQuery("select count(noti.idNotificacion) FROM DaNotificacion noti where noti.idPreregistro = :idPreregistro");
+        query.setParameter("idPreregistro", idPreregistro);
+        return (Long) query.uniqueResult();
+
+    }
 }

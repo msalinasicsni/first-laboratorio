@@ -46,6 +46,7 @@ public class DaNotificacion implements Serializable, Auditable {
     private String codigoPacienteVIH;
     private String codExpediente;
     private boolean completa;
+    private Long idPreregistro;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -236,6 +237,15 @@ public class DaNotificacion implements Serializable, Auditable {
     public boolean isCompleta() { return completa; }
 
     public void setCompleta(boolean completa) {  this.completa = completa; }
+
+    @Column(name = "ID_PREREGISTRO", nullable = true, insertable = true, updatable = true)
+    public Long getIdPreregistro() {
+        return idPreregistro;
+    }
+
+    public void setIdPreregistro(Long idPreregistro) {
+        this.idPreregistro = idPreregistro;
+    }
 
     @Override
     public boolean isFieldAuditable(String fieldname) {

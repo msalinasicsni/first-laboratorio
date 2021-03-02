@@ -272,6 +272,7 @@
                             <th style="width: 5%" valign="center"><spring:message code="act.redefine"/></th>
                             <th style="width: 5%" valign="center"><spring:message code="lbl.override"/></th>
                             <th style="width: 5%" valign="center"><spring:message code="lbl.person"/></th>
+                            <th style="width: 5%" valign="center"><spring:message code="lbl.person"/></th>
                         </tr>
                         </thead>
                     </table>
@@ -568,6 +569,7 @@
 <c:url var="changePersonUrl" value="/gestion/changePersonNoti"/>
 <c:url var="updateUrl" value="/tomaMx/updatenoti"/>
 <spring:url value="/personas/persons" var="sPersonUrl"/>
+<spring:url value="/personas/update/" var="sUpdatePersonUrl"/>
 <script type="text/javascript">
     $(document).ready(function () {
         pageSetUp();
@@ -580,7 +582,8 @@
             unidadesUrl : "${unidadesUrl}",
             updateUrl : "${updateUrl}",
             sPersonUrl: "${sPersonUrl}",
-            changePersonUrl : "${changePersonUrl}"
+            changePersonUrl : "${changePersonUrl}",
+            sUpdatePersonUrl : "${sUpdatePersonUrl}"
         };
         BuscarNotificacion.init(parametros);
         ChangePerson.init(parametros);

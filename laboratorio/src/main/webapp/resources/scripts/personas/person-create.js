@@ -31,7 +31,7 @@ var CreatePerson = function () {
 
             function agregarPersona() {
                 var persona = {
-                    idPersona: $("#idPersona").val(), // se pasa el id del maestro que se esta editando,
+                    idPersona: $("#idPersona").val(), // se pasa el id de la persona que se esta editando,
                     primerNombre: $("#primerNombre").val(),
                     segundoNombre: $("#segundoNombre").val(),
                     primerApellido: $("#primerApellido").val(),
@@ -55,10 +55,12 @@ var CreatePerson = function () {
                     codComunidadRes: $('#codComuniReside option:selected').val()
                 };
                 var esEdicion = ($("#idPersona").val() != null && $("#idPersona").val().trim().length > 0);
+                var esEdicionConNoti = ($("#idNotificacion").val() != null && $("#idNotificacion").val().trim().length > 0);
                 var personaObj = {};
                 personaObj['idPersona'] = '';
                 personaObj['mensaje'] = '';
                 personaObj['persona'] = persona;
+                personaObj['idNotificacion'] = $("#idNotificacion").val(); // se pasa el id de la notificacion (Servicios en Linea)
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
@@ -91,7 +93,12 @@ var CreatePerson = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 2000
                                 });
-                                window.location.href = parametros.sPersonUrl + '/' + data.idPersona;
+
+                                if (esEdicionConNoti) {
+                                    window.close();
+                                } else {
+                                    window.location.href = parametros.sPersonUrl + '/' + data.idPersona;
+                                }
                             }
                             desbloquearUI();
                         },
