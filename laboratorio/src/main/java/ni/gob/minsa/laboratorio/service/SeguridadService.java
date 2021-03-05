@@ -9,7 +9,7 @@ import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
 import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import ni.gob.minsa.laboratorio.domain.poblacion.Divisionpolitica;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
-import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.AuthenticationResponse;
+import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.ServiciosEnLineaResponse;
 import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.CallServiciosEnLineaServices;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.UtilityProperties;
@@ -478,7 +478,7 @@ public class SeguridadService {
     public String authenticateServiciosLinea(HttpServletRequest request) throws Exception{
         String wdctk = null;
         Parametro apiUrlParam = parametrosService.getParametroByName("BASE_URL_API_SE");
-        AuthenticationResponse response = CallServiciosEnLineaServices.authenticate(apiUrlParam.getValor());
+        ServiciosEnLineaResponse response = CallServiciosEnLineaServices.authenticate(apiUrlParam.getValor());
         if (response.getStatus() != null && response.getStatus().equalsIgnoreCase("UNAUTHORIZED")) {
             //reintentar por expiracion
             response = CallServiciosEnLineaServices.authenticate(apiUrlParam.getValor());

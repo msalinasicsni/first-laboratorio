@@ -239,7 +239,7 @@ var EnterFormTomaMx = function () {
             }
 
             function save() {
-
+                bloquearUI(parametros.blockMess);
                 var objetoTomaMx = {};
                 objetoTomaMx['idNotificacion'] = $("#idNotificacion").val();
                 objetoTomaMx['codSilais'] = $('#codSilaisAtencion').find('option:selected').val();
@@ -280,7 +280,6 @@ var EnterFormTomaMx = function () {
                 objetoTomaMx['mensaje'] = '';
                 var valores = $('#dx').val();
                 var strValores = '';
-                bloquearUI(parametros.blockMess);
                 var objDetalle = {};
                 var cantRespuestas = 0;
                 for (var i = 0; i < valores.length; i++) {

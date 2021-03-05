@@ -3,7 +3,7 @@ package ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea;
 /**
  * Created by miguel on 18/2/2021.
  */
-public class AuthenticationResponse {
+public class ServiciosEnLineaResponse {
     private String status;
     private String message;
     private String data;

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.entidades.PreRegistro;
-import ni.gob.minsa.laboratorio.service.ServiciosEnLineaService;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -13,14 +12,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CallServiciosEnLineaServices {
-    public static AuthenticationResponse authenticate(String apiUrl) throws Exception {
+    public static ServiciosEnLineaResponse authenticate(String apiUrl) throws Exception {
 
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        ServiciosEnLineaResponse authenticationResponse = new ServiciosEnLineaResponse();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
@@ -103,5 +101,35 @@ public class CallServiciosEnLineaServices {
             }
         }
         return preRegistros.size() > 0 ? preRegistros.get(0) : null;
+    }
+
+    public static ServiciosEnLineaResponse actualizarPreregistro(String apiUrl, PreRegistro preRegistro, String token) throws Exception{
+        ServiciosEnLineaResponse updateResponse = new ServiciosEnLineaResponse();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(apiUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ServiciosEnLineaServices servicios = retrofit.create(ServiciosEnLineaServices.class);
+
+        Call<ResponseBody> call = servicios.actualizarPreregistro(preRegistro, ServiciosEnLineaServices.TOKEN_PREFIX+ " "+token);
+        Response<ResponseBody> response = call.execute();
+        System.out.println("Respuesta es exitosa desde "+apiUrl);
+        System.out.println(response.isSuccessful());
+        if (response.body()!=null) {
+            String strResponse = response.body().string();
+            JsonObject jsonpObject = new Gson().fromJson(strResponse, JsonObject.class);
+            if (jsonpObject.get("data") != null) {
+                updateResponse.setData(jsonpObject.get("data").toString());
+            }
+            if (jsonpObject.get("status") != null) {
+                updateResponse.setStatus(jsonpObject.get("status").getAsString());
+            }
+            if (jsonpObject.get("message") != null) {
+                updateResponse.setMessage(jsonpObject.get("message").getAsString());
+            }
+        }
+        return updateResponse;
     }
 }

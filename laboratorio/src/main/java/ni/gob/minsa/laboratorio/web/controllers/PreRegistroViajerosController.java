@@ -135,15 +135,15 @@ public class PreRegistroViajerosController {
     @RequestMapping(value = "aprobarPreRegistro", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/json")
     protected void aprobarPreRegistro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<SisPersona> personas = null;
-        String identificacion = "";
         DaNotificacion noti = new DaNotificacion();
         SisPersona persona = null;
-        Long idPersona = null;
         String idNotificacion = "";
         String resultado = "";
         Long idPreregistro =0L;
         String json = "";
         String token = null;
+        String factura = "";
+        String documentoViaje = "";
         try{
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -160,7 +160,6 @@ public class PreRegistroViajerosController {
                 e.printStackTrace();
             }
             if (preRegistro != null) {
-
                 Long preRegistroConfirmado = daNotificacionService.getNotifByIdPreregistro(preRegistro.getId());
                 if (preRegistroConfirmado > 0) {
                     resultado = messageSource.getMessage("msg.preregistration.already.confirme", null, null);
@@ -194,6 +193,13 @@ public class PreRegistroViajerosController {
                 noti.setIdPreregistro(idPreregistro);
                 daNotificacionService.addNotification(noti);
                 idNotificacion = noti.getIdNotificacion();
+                if (preRegistro.getDetallepago() != null)
+                    factura = preRegistro.getDetallepago().getReferencia();
+                if (preRegistro.getDocumentoviaje() != null)
+                    documentoViaje = preRegistro.getDocumentoviaje().getNumerodocumento();
+                /*indicar que preregistro ya fue confirmado*/
+                preRegistro.getEstadoregistro().setCodigo("CONFREG");
+                CallServiciosEnLineaServices.actualizarPreregistro(apiUrlParam.getValor(), preRegistro, seguridadService.getTokenServiciosLinea(request));
             }
         }catch(HibernateException he){
             logger.error("HibernateException", he);
@@ -206,6 +212,8 @@ public class PreRegistroViajerosController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idNotificacion",idNotificacion);
             map.put("idPreregistro",String.valueOf(idPreregistro));
+            map.put("factura",factura);
+            map.put("documentoViaje",documentoViaje);
             map.put("mensaje",resultado);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(escaper.translate(jsonResponse).getBytes());
@@ -277,115 +285,14 @@ public class PreRegistroViajerosController {
         persona.setDireccionResi(preRegistro.getPersona().getResidencia().getDireccionhabitual());
         persona.setSexoCodigo(preRegistro.getPersona().getSexo().getCodigo());
         persona.setPaisNacCodigoAlfados(preRegistro.getPersona().getPaisorigen().getCodigo());
-        persona.setMuniResiCodigoNac(preRegistro.getPersona().getResidencia().getDivisionpolitica().getMunicipio().getCodigo());
-        return persona;
-    }
-
-    private Persona jsonToSisPersona(String strJsonPersona) throws Exception{
-        JsonObject jObjectPerson = new Gson().fromJson(strJsonPersona, JsonObject.class);
-        Persona persona = new Persona();
-        Long idPersona = 0L; //-1 indica que es nuevo registro
-        if (jObjectPerson.get("idPersona")!=null && !jObjectPerson.get("idPersona").getAsString().isEmpty())
-            idPersona = jObjectPerson.get("idPersona").getAsLong();
-
-        String primerNombre = jObjectPerson.get("primerNombre").getAsString();
-        String segundoNombre = jObjectPerson.get("segundoNombre").getAsString();
-        String primerApellido = jObjectPerson.get("primerApellido").getAsString();
-        String segundoApellido = jObjectPerson.get("segundoApellido").getAsString();
-        String fechaNac = jObjectPerson.get("fechaNac").getAsString();
-        String numAsegurado = jObjectPerson.get("numAsegurado").getAsString();
-        String numIdent = jObjectPerson.get("numIdent").getAsString();
-        String direccion = jObjectPerson.get("direccion").getAsString();
-        String telReside = jObjectPerson.get("telReside").getAsString();
-        String telMovil = jObjectPerson.get("telMovil").getAsString();
-
-        String codSexo = jObjectPerson.get("codSexo").getAsString();
-        String codEstadoCivil = jObjectPerson.get("codEstadoCivil").getAsString();
-        String codTipIdent = jObjectPerson.get("codTipIdent").getAsString();
-        String codEtnia = jObjectPerson.get("codEtnia").getAsString();
-        String codEscolaridad = jObjectPerson.get("codEscolaridad").getAsString();
-        String codOcupacion = jObjectPerson.get("codOcupacion").getAsString();
-        String codTipoAseg = jObjectPerson.get("codTipoAseg").getAsString();
-        String codPaisNac = jObjectPerson.get("codPaisNac").getAsString();
-        String codMuniNac = jObjectPerson.get("codMuniNac").getAsString();
-        String codMuniRes = jObjectPerson.get("codMuniRes").getAsString();
-        String codComunidadRes = jObjectPerson.get("codComunidadRes").getAsString();
-
-        persona.setPersonaId(idPersona);
-        persona.setPrimerNombre( URLDecoder.decode(primerNombre, "utf-8"));
-        persona.setSegundoNombre(URLDecoder.decode(segundoNombre, "utf-8"));
-        persona.setPrimerApellido(URLDecoder.decode(primerApellido, "utf-8"));
-        persona.setSegundoApellido(URLDecoder.decode(segundoApellido, "utf-8"));
-        persona.setFechaNacimiento(DateUtil.StringToDate(fechaNac, "dd/MM/yyyy"));
-        persona.setIdentNumero(numIdent.trim().isEmpty() ? null : numIdent);
-        persona.setAseguradoNumero(numAsegurado.trim().isEmpty() ? null : numAsegurado);
-        persona.setDireccionResi(direccion.trim().isEmpty() ? null : URLDecoder.decode(direccion, "utf-8"));
-        persona.setTelefonoResi(telReside.trim().isEmpty() ? null : telReside);
-        persona.setTelefonoMovil(telMovil.trim().isEmpty() ? null : telMovil.trim());
-        persona.setSexoCodigo(codSexo.trim().isEmpty() ? null : codSexo);
-        persona.setEtniaCodigo(codEtnia.trim().isEmpty() ? null : codEtnia);
-        persona.setEscolaridadCodigo(codEscolaridad.trim().isEmpty() ? null : codEscolaridad);
-        persona.setEstadoCivilCodigo(codEstadoCivil.trim().isEmpty() ? null : codEstadoCivil);
-        persona.setIdentCodigo(codTipIdent.trim().isEmpty() ? null : codTipIdent);
-        persona.setTipoAsegCodigo(codTipoAseg.trim().isEmpty() ? null : codTipoAseg);
-        persona.setOcupacionCodigo((codOcupacion!=null && !codOcupacion.isEmpty())? codOcupacion : null);
-        persona.setPaisNacCodigoAlfados(codPaisNac.trim().isEmpty() ? null : codPaisNac);
-        persona.setMuniNacCodigoNac(codMuniNac.trim().isEmpty() ? null : codMuniNac);
-        persona.setMuniResiCodigoNac(codMuniRes.trim().isEmpty() ? null : codMuniRes);
-        persona.setComuResiCodigo(codComunidadRes.trim().isEmpty() ? null : codComunidadRes);
-
-        return persona;
-    }
-
-    private boolean saveDxRequest(String idTomaMx, String dx, String strRespuestas, Integer cantRespuestas) throws Exception {
-        try {
-            DaSolicitudDx soli = new DaSolicitudDx();
-            String[] arrayDx = dx.split(",");
-            Laboratorio laboratorio = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
-            for (String anArrayDx : arrayDx) {
-                soli.setCodDx(tomaMxService.getDxById(anArrayDx));
-                soli.setFechaHSolicitud(new Timestamp(new Date().getTime()));
-                Parametro pUsuarioRegistro = parametrosService.getParametroByName("USU_REGISTRO_NOTI_CAESP");
-                if (pUsuarioRegistro != null) {
-                    long idUsuario = Long.valueOf(pUsuarioRegistro.getValor());
-                    soli.setUsarioRegistro(usuarioService.getUsuarioById((int) idUsuario));
-                }
-                soli.setIdTomaMx(tomaMxService.getTomaMxById(idTomaMx));
-                soli.setAprobada(false);
-                soli.setLabProcesa(laboratorio);
-                soli.setControlCalidad(false);
-                soli.setInicial(true);//es lo que viene en la ficha
-                tomaMxService.addSolicitudDx(soli);
-
-                JsonObject jObjectRespuestas = new Gson().fromJson(strRespuestas, JsonObject.class);
-                for (int i = 0; i < cantRespuestas; i++) {
-                    String respuesta = jObjectRespuestas.get(String.valueOf(i)).toString();
-                    JsonObject jsRespuestaObject = new Gson().fromJson(respuesta, JsonObject.class);
-
-                    Integer idRespuesta = jsRespuestaObject.get("idRespuesta").getAsInt();
-                    Integer idConcepto = jsRespuestaObject.get("idConcepto").getAsInt();
-
-                    DatoSolicitud conceptoTmp = datosSolicitudService.getDatoRecepcionSolicitudById(idRespuesta);
-                    //si la respuesta pertenece al dx de la solicitud, se registra
-                    if (conceptoTmp.getDiagnostico().getIdDiagnostico().equals(soli.getCodDx().getIdDiagnostico())) {
-                        String valor = jsRespuestaObject.get("valor").getAsString();
-                        if (valor != null) {
-                            DatoSolicitudDetalle datoSolicitudDetalle = new DatoSolicitudDetalle();
-                            datoSolicitudDetalle.setFechahRegistro(new Timestamp(new Date().getTime()));
-                            datoSolicitudDetalle.setValor(valor.isEmpty() ? " " : valor);
-                            datoSolicitudDetalle.setDatoSolicitud(conceptoTmp);
-                            datoSolicitudDetalle.setSolicitudDx(soli);
-                            datoSolicitudDetalle.setUsuarioRegistro(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
-                            datosSolicitudService.saveOrUpdateDetalleDatoRecepcion(datoSolicitudDetalle);
-                        }
-                    }
-                }
-            }
-            return true;
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return false;
+        if (preRegistro.getPersona().getResidencia().getDivisionpolitica()!=null
+                && preRegistro.getPersona().getResidencia().getDivisionpolitica().getDepartamento() != null
+                && preRegistro.getPersona().getResidencia().getDivisionpolitica().getMunicipio() != null) {
+            String codigoNacMuniResidencia= preRegistro.getPersona().getResidencia().getDivisionpolitica().getDepartamento().getCodigo()+preRegistro.getPersona().getResidencia().getDivisionpolitica().getMunicipio().getCodigo();
+            persona.setMuniResiCodigoNac(codigoNacMuniResidencia);
         }
+
+        return persona;
     }
 
 }

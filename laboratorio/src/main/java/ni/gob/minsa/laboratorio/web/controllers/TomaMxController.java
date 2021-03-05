@@ -153,7 +153,9 @@ public class TomaMxController {
      * @return a ModelMap with the model attributes for the respective view
      */
     @RequestMapping("createInicial/{idNotificacion}")
-    public ModelAndView createTomaMxInicial(@PathVariable("idNotificacion") String idNotificacion, HttpServletRequest request) throws Exception {
+    public ModelAndView createTomaMxInicial(@PathVariable("idNotificacion") String idNotificacion,
+                                            @RequestParam(value = "p1", required = false) String factura,
+                                            @RequestParam(value = "p2", required = false) String documentoViaje, HttpServletRequest request) throws Exception {
         ModelAndView mav = new ModelAndView();
         //registros anteriores de toma Mx
         DaTomaMx tomaMx = new DaTomaMx();
@@ -189,8 +191,6 @@ public class TomaMxController {
             String unidadCovid19 = "";
             int idDxCovid19 = 0;
             int idMxCovid19 = 0;
-            String factura = "";
-            String documentoViaje = "";
             if (sectorCovid19 != null) {
                 String[] valores = sectorCovid19.getValor().split(",");
                 silaisCovid19 = valores[0];
@@ -200,21 +200,8 @@ public class TomaMxController {
             if (noti.getIdPreregistro() != null) {
                 Parametro paramaDxCovid19 = parametrosService.getParametroByName("DX_VIAJERO_COVID19");
                 Parametro paramMxCovid19 = parametrosService.getParametroByName("MX_VIAJERO_COVID19");
-                Parametro apiUrlParam = parametrosService.getParametroByName("BASE_URL_API_SE");
                 idDxCovid19 = Integer.valueOf(paramaDxCovid19.getValor());
                 idMxCovid19 = Integer.valueOf(paramMxCovid19.getValor());
-                ListaPreRegistroRequest listaPreRegistroRequest = new ListaPreRegistroRequest(noti.getIdPreregistro());
-                PreRegistro preRegistro = null;
-                try {
-                    String token = seguridadService.getTokenServiciosLinea(request);
-                    preRegistro = CallServiciosEnLineaServices.obtenerPreRegistro(apiUrlParam.getValor(), listaPreRegistroRequest, token);
-                    if (preRegistro != null && preRegistro.getDetallepago() != null)
-                    factura = preRegistro.getDetallepago().getReferencia();
-                    if (preRegistro != null && preRegistro.getDocumentoviaje() != null)
-                        documentoViaje = preRegistro.getDocumentoviaje().getNumerodocumento();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
             }
             mav.addObject("noti", noti);
             mav.addObject("tomaMx", tomaMx);

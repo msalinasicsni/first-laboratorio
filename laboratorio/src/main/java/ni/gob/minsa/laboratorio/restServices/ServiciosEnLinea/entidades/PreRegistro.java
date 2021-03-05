@@ -13,13 +13,15 @@ public class PreRegistro implements Serializable {
     private String fecharegistro;
     private DetallePago detallepago;
     private DocumentoViaje documentoviaje;
+    private EstadoRegistro estadoregistro;
 
-    public PreRegistro(long id, Persona persona, String fecharegistro, DetallePago detallepago, DocumentoViaje documentoviaje) {
+    public PreRegistro(long id, Persona persona, String fecharegistro, DetallePago detallepago, DocumentoViaje documentoviaje, EstadoRegistro estadoregistro) {
         this.id = id;
         this.persona = persona;
         this.fecharegistro = fecharegistro;
         this.detallepago = detallepago;
         this.documentoviaje = documentoviaje;
+        this.estadoregistro = estadoregistro;
     }
 
     public long getId() {
@@ -60,6 +62,14 @@ public class PreRegistro implements Serializable {
 
     public void setDocumentoviaje(DocumentoViaje documentoviaje) {
         this.documentoviaje = documentoviaje;
+    }
+
+    public EstadoRegistro getEstadoregistro() {
+        return estadoregistro;
+    }
+
+    public void setEstadoregistro(EstadoRegistro estadoregistro) {
+        this.estadoregistro = estadoregistro;
     }
 
     public class Persona implements Serializable{
@@ -503,11 +513,28 @@ public class PreRegistro implements Serializable {
         }
     }
 
-    public class TipoDocumento  implements Serializable{
+    public class TipoDocumento implements Serializable{
         private static final long serialVersionUID = 1L;
         private String codigo;
 
         public TipoDocumento(String codigo) {
+            this.codigo = codigo;
+        }
+
+        public String getCodigo() {
+            return codigo;
+        }
+
+        public void setCodigo(String codigo) {
+            this.codigo = codigo;
+        }
+    }
+
+    public class EstadoRegistro implements Serializable{
+        private static final long serialVersionUID = 1L;
+        private String codigo;
+
+        private EstadoRegistro(String codigo) {
             this.codigo = codigo;
         }
 

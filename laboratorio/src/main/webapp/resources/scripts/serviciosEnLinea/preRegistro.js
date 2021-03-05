@@ -166,6 +166,8 @@ var PreRegistro = function () {
                 valueObj['mensaje'] = '';
                 valueObj['idPreregistro'] = id;
                 valueObj['idNotificacion'] = '';
+                valueObj['factura'] = '';
+                valueObj['documentoViaje'] = '';
                 blockUI();
                 $.ajax(
                     {
@@ -193,7 +195,7 @@ var PreRegistro = function () {
                                     timeout: 3000
                                 });
                                 setTimeout(function () {
-                                    window.location.href = parametros.sNotificiacionUrl+data.idNotificacion;
+                                    window.location.href = parametros.sNotificiacionUrl+data.idNotificacion+"?p1="+data.factura+"&p2="+data.documentoViaje;
                                 }, 3000);
                             }
                             unBlockUI()
