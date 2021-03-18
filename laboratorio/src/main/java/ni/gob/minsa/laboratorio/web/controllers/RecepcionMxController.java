@@ -23,6 +23,7 @@ import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.GuidGenerator;
 import ni.gob.minsa.laboratorio.utilities.HL7.TestOrder;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
+import ni.gob.minsa.laboratorio.utilities.dto.DatosCovidViajeroDTO;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
 import ni.gob.minsa.laboratorio.utilities.reportes.*;
@@ -2525,6 +2526,8 @@ public class RecepcionMxController {
         String codigoVIH = null;
         Date fechaInicioProc = null;
         Date fechaFinProc = null;
+        String idioma = null;
+        String modalidad = null;
 
         if (jObjectFiltro.get("nombreApellido") != null && !jObjectFiltro.get("nombreApellido").getAsString().isEmpty())
             nombreApellido = jObjectFiltro.get("nombreApellido").getAsString();
@@ -2558,6 +2561,10 @@ public class RecepcionMxController {
             fechaInicioProc = DateUtil.StringToDate(jObjectFiltro.get("fecInicioProc").getAsString()+" 00:00:00");
         if (jObjectFiltro.get("fecFinProc") != null && !jObjectFiltro.get("fecFinProc").getAsString().isEmpty())
             fechaFinProc =DateUtil. StringToDate(jObjectFiltro.get("fecFinProc").getAsString()+" 23:59:59");
+        if (jObjectFiltro.get("idioma") != null && !jObjectFiltro.get("idioma").getAsString().isEmpty())
+            idioma = jObjectFiltro.get("idioma").getAsString();
+        if (jObjectFiltro.get("modalidad") != null && !jObjectFiltro.get("modalidad").getAsString().isEmpty())
+            modalidad = jObjectFiltro.get("modalidad").getAsString();
 
         filtroMx.setCodSilais(codSilais);
         filtroMx.setCodUnidadSalud(codUnidadSalud);
@@ -2583,6 +2590,8 @@ public class RecepcionMxController {
         filtroMx.setCodigoVIH(codigoVIH);
         filtroMx.setFechaInicioProcesamiento(fechaInicioProc);
         filtroMx.setFechaFinProcesamiento(fechaFinProc);
+        filtroMx.setIdioma(idioma);
+        filtroMx.setModalidad(modalidad);
 
         return filtroMx;
     }
@@ -2616,22 +2625,11 @@ public class RecepcionMxController {
     @RequestMapping(value = "printResults", method = RequestMethod.GET)
     public ModelAndView initPrintResultsForm(HttpServletRequest request) throws Exception {
         logger.debug("inicia formulario para imprimir resultados aprobados y liberados para los pacientes");
-        String urlValidacion;
-        try {
-            urlValidacion = seguridadService.validarLogin(request);
-            //si la url esta vacia significa que la validaci�n del login fue exitosa
-            if (urlValidacion.isEmpty())
-                urlValidacion = seguridadService.validarAutorizacionUsuario(request, ConstantsSecurity.SYSTEM_CODE, false);
-        }catch (Exception e){
-            e.printStackTrace();
-            urlValidacion = "404";
-        }
+            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         ModelAndView mav = new ModelAndView();
-        if (urlValidacion.isEmpty()) {
-            mav.setViewName("recepcionMx/printResults");
-        }else
-            mav.setViewName(urlValidacion);
-
+        boolean permitirFiltroViajero = labUser != null && labUser.getCodigo().equalsIgnoreCase("CNDR");
+        mav.addObject("permitirFiltroViajero", permitirFiltroViajero);
+        mav.setViewName("recepcionMx/printResults");
         return mav;
     }
 
@@ -2645,7 +2643,7 @@ public class RecepcionMxController {
         filtroMx.setCodEstado("ESTDMX|RCLAB");
 
         List<DaTomaMx> tomaMxList = tomaMxService.getTomaMxByFiltro(filtroMx);
-        return tomaMxPrintToJson(tomaMxList);
+        return tomaMxPrintToJson(tomaMxList, filtroMx);
     }
 
     /**
@@ -2653,7 +2651,7 @@ public class RecepcionMxController {
      * @param tomaMxList lista con las tomaMx a convertir
      * @return String
      */
-    private String tomaMxPrintToJson(List<DaTomaMx> tomaMxList) throws Exception{
+    private String tomaMxPrintToJson(List<DaTomaMx> tomaMxList, FiltroMx filtroMx) throws Exception{
         String jsonResponse;
         Map<Integer, Object> mapResponse = new HashMap<Integer, Object>();
         Integer indice=0;
@@ -2685,10 +2683,24 @@ public class RecepcionMxController {
                         }
                         if (mostrar && solicitudDx.getNombre().toLowerCase().contains("covid")) { //si es covid validar si usuario tiene autorizado ver ese Dx
                             mostrar = usuarioAutorizadoCovid19;
+                            if (usuarioAutorizadoCovid19) {
+                                boolean filtrarIdioma = filtroMx.getIdioma() != null && !filtroMx.getIdioma().isEmpty();
+                                boolean filtrarModalidad = filtroMx.getModalidad() != null && !filtroMx.getModalidad().isEmpty();
+                                if (filtrarIdioma || filtrarModalidad) {
+                                    DatosCovidViajeroDTO datosCovidViajeroDTO = datosSolicitudService.getDatosCovidViajero(solicitudDx.getIdSolicitudDx(), null);
+                                    if (mostrar && filtrarIdioma) {
+                                        mostrar = ((filtroMx.getIdioma().equalsIgnoreCase("ES") && (datosCovidViajeroDTO.getIdioma() != null && datosCovidViajeroDTO.getIdioma().toLowerCase().contains("esp")))
+                                                || (filtroMx.getIdioma().equalsIgnoreCase("EN") && (datosCovidViajeroDTO.getIdioma() != null && datosCovidViajeroDTO.getIdioma().toLowerCase().contains("ing"))));
+
+                                    }
+                                    if (mostrar && filtrarModalidad) {
+                                        mostrar = ((filtroMx.getModalidad().equalsIgnoreCase("RF") && (datosCovidViajeroDTO.getModalidad() != null && datosCovidViajeroDTO.getModalidad().toLowerCase().contains("ico")))
+                                                || (filtroMx.getModalidad().equalsIgnoreCase("RE") && (datosCovidViajeroDTO.getModalidad() != null && datosCovidViajeroDTO.getModalidad().toLowerCase().contains("nea"))));
+                                    }
+                                }
+                            }
                         }
-
                     }
-
                 }
                 map.put("solicitudes", dxs);
             }
@@ -2760,10 +2772,6 @@ public class RecepcionMxController {
         PDDocument doc = new PDDocument();
         String formatoFecha = "dd/MM/yyyy";
         Locale locale = new Locale("es", "NI");
-        if (languaje.equalsIgnoreCase("EN")){
-            locale = Locale.ENGLISH;
-            formatoFecha = "MM/dd/yyyy";
-        }
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         String response = null;
         Parametro urlServiciosEnLinea = parametrosService.getParametroByName("URL_VALIDACION_SE");
@@ -2780,6 +2788,18 @@ public class RecepcionMxController {
                     //Prepare the document.
                     if (tomaMx != null) {
                         boolean esMxViajeroCovid = tomaMxService.esMxViajeroCovid(code);
+                        if (esMxViajeroCovid) {
+                            if (languaje == null || languaje.isEmpty() || codigos.length > 1) //es distinto de null cuando se indica explicitamente el idioma desde las banderitas de cada registro O es mas de una mx, validar el idioma de cada una
+                                languaje = datosSolicitudService.getIdiomaResultadoViajero(tomaMx.getIdTomaMx());
+                            if (languaje.equalsIgnoreCase("EN")){
+                                locale = Locale.ENGLISH;
+                                formatoFecha = "MM/dd/yyyy";
+                            } else {
+                                formatoFecha = "dd/MM/yyyy";
+                                locale = new Locale("es");
+                            }
+                        }
+
                         List<Area> areaDxList = tomaMxService.getAreaSolicitudesAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                         Authority esRecepcionista = usuarioService.getAuthority(userName, "ROLE_RECEPCION");
                         float yPosicionExamen = 0;

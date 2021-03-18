@@ -42,6 +42,9 @@ public class FiltroMx {
     private String tipoNotificacion;
     private Boolean incluirAnuladas = false;
     private String codigoVIH;
+    //Viajeros Covid19
+    private String idioma;
+    private String modalidad;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -294,4 +297,20 @@ public class FiltroMx {
 	public void setCodigoVIH(String codigoVIH) {
 		this.codigoVIH = codigoVIH;
 	}
+
+    public String getIdioma() {
+        return idioma;
+    }
+
+    public void setIdioma(String idioma) {
+        this.idioma = idioma;
+    }
+
+    public String getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(String modalidad) {
+        this.modalidad = modalidad;
+    }
 }

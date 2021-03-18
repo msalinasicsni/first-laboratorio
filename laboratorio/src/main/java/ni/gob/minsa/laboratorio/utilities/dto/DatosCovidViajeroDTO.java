@@ -8,6 +8,8 @@ public class DatosCovidViajeroDTO {
     String lugarDondeViaja;
     String numeroFactura;
     String identificacion;
+    String idioma;
+    String modalidad;
 
     public String getLugarDondeViaja() {
         return lugarDondeViaja;
@@ -31,5 +33,21 @@ public class DatosCovidViajeroDTO {
 
     public void setIdentificacion(String identificacion) {
         this.identificacion = identificacion;
+    }
+
+    public String getIdioma() {
+        return idioma;
+    }
+
+    public void setIdioma(String idioma) {
+        this.idioma = idioma;
+    }
+
+    public String getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(String modalidad) {
+        this.modalidad = modalidad;
     }
 }

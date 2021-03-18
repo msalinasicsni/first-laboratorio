@@ -11,6 +11,7 @@ public class Solicitud {
     String tipo;
     boolean aprobada;
     Integer idArea;
+    String idSolicitudDx;
 
     public Integer getIdSolicitud() {
         return idSolicitud;
@@ -50,5 +51,13 @@ public class Solicitud {
 
     public void setIdArea(Integer idArea) {
         this.idArea = idArea;
+    }
+
+    public String getIdSolicitudDx() {
+        return idSolicitudDx;
+    }
+
+    public void setIdSolicitudDx(String idSolicitudDx) {
+        this.idSolicitudDx = idSolicitudDx;
     }
 }

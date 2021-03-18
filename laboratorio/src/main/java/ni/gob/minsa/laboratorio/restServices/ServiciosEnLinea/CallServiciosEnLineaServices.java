@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import ni.gob.minsa.laboratorio.restServices.ServiciosEnLinea.entidades.PreRegistro;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -17,11 +19,13 @@ import java.util.List;
 public class CallServiciosEnLineaServices {
     public static ServiciosEnLineaResponse authenticate(String apiUrl) throws Exception {
 
+        //OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
         AuthenticationRequest authenticationRequest = new AuthenticationRequest();
-        ServiciosEnLineaResponse authenticationResponse = new ServiciosEnLineaResponse();
+        final ServiciosEnLineaResponse authenticationResponse = new ServiciosEnLineaResponse();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
+                //.client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -48,9 +52,10 @@ public class CallServiciosEnLineaServices {
     }
 
     public static List<PreRegistro> obtenerListaPreRegistro(String apiUrl, ListaPreRegistroRequest listaPreRegistroRequest, String token) throws Exception {
-
+        //OkHttpClient okHttpClient = UnsafeOkHttpClient.getUnsafeOkHttpClient();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(apiUrl)
+                //.client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

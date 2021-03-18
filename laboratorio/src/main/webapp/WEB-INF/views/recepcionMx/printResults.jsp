@@ -103,6 +103,8 @@
                 <input id="msg_print_canceled" type="hidden" value="<spring:message code="msg.print.result.canceled"/>"/>
                 <input id="yes" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.yes"/>"/>
                 <input id="no" type="hidden" value="<spring:message code="lbl.confirm.msg.opc.no"/>"/>
+                <input id="idioma_res" type="hidden" value="ES"/>
+                <input id="modo_res" type="hidden" value="RF"/>
 
                 <form id="searchResults-form" class="smart-form" autocomplete="off">
                     <fieldset>
@@ -149,6 +151,36 @@
                                 </label>
                             </section>
                         </div>
+                        <c:if test="${permitirFiltroViajero}" >
+                            <div class="row">
+                                <section class="col col-sm-6 col-md-4 col-lg-3">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.idiom" /> </label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                        <select id="idioma" name="idioma"
+                                                class="select2">
+                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                            <option value="ES" selected><spring:message code="lbl.spanish" /></option>
+                                            <option value="EN"><spring:message code="lbl.english" /></option>
+                                        </select>
+                                    </div>
+                                </section>
+                                <section class="col col-sm-6 col-md-4 col-lg-3">
+                                    <label class="text-left txt-color-blue font-md">
+                                        <spring:message code="lbl.result.mode" /> </label>
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-location-arrow fa-fw"></i></span>
+                                        <select id="modalidad" name="modalidad"
+                                                class="select2">
+                                            <option value=""><spring:message code="lbl.select" />...</option>
+                                            <option value="RF" selected><spring:message code="lbl.physical.result" /></option>
+                                            <option value="RE"><spring:message code="lbl.online.result" /></option>
+                                        </select>
+                                    </div>
+                                </section>
+                            </div>
+                        </c:if>
                     </fieldset>
                     <footer>
                         <button type="submit" id="search-orders" class="btn btn-info"><i class="fa fa-search"></i> <spring:message code="act.search" /></button>
@@ -197,8 +229,7 @@
             </table>
                 <form id="sendOrders-form" class="smart-form" autocomplete="off">
                     <footer>
-                        <button type="button" id="btnExportEn" class="btn btn-success btn-lg pull-right header-btn"><span class="flag-icon flag-icon-squared flag-icon-us"></span> EN <i class="fa fa-file-pdf-o"></i></button>
-                        <button type="button" id="btnExport" class="btn btn-success btn-lg pull-right header-btn"><span class="flag-icon flag-icon-squared flag-icon-ni"></span> ES <i class="fa fa-file-pdf-o"></i></button>
+                        <button type="button" id="btnExport" class="btn btn-success btn-lg pull-right header-btn"><i class="fa fa-file-pdf-o"></i> <spring:message code="act.export.selected" /></button>
                     </footer>
                 </form>
             </div>

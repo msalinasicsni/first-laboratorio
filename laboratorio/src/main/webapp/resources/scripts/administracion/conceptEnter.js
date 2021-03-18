@@ -196,6 +196,7 @@ var Concepts  = function () {
                         $('#idC').val(codigo);
                         $('#valor').val('');
                         $('#etiqueta').val('');
+                        $('#idCatalogoLista').val('');
                         getValues(codigo);
                         showModalValues();
                     }

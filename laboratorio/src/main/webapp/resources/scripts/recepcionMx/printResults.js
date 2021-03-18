@@ -106,11 +106,7 @@ var PrintResults = function () {
             });
 
             $('#btnExport').click(function () {
-                exportSelected('ES');
-            });
-
-            $('#btnExportEn').click(function () {
-                exportSelected('EN');
+                exportSelected();
             });
 
             function getResultadosAprobados(showAll) {
@@ -129,6 +125,8 @@ var PrintResults = function () {
                     filtros['solicitudAprobada'] = 'true';
                     filtros['fecInicioProc'] = '';
                     filtros['fecFinProc'] = '';
+                    filtros['idioma'] = '';
+                    filtros['modalidad'] = '';
                 } else {
                     filtros['nombreApellido'] = $('#txtfiltroNombre').val();
                     filtros['fechaInicioTomaMx'] = $('#fecInicioTomaMx').val();
@@ -144,7 +142,8 @@ var PrintResults = function () {
                     filtros['solicitudAprobada'] = 'true';
                     filtros['fecInicioProc'] = $('#fecInicioProc').val();
                     filtros['fecFinProc'] = $('#fecFinProc').val();
-
+                    filtros['idioma'] = $('#idioma').find('option:selected').val();
+                    filtros['modalidad'] = $('#modalidad').find('option:selected').val();
                 }
                 bloquearUI(parametros.blockMess);
                 $.getJSON(parametros.sSearchUrl, {
@@ -233,7 +232,7 @@ var PrintResults = function () {
 
             }
 
-            function exportSelected(languaje) {
+            function exportSelected() {
                 var oTT = TableTools.fnGetInstance('list_result');
                 var aSelectedTrs = oTT.fnGetSelected();
                 console.log('fnGetSelected');
@@ -261,7 +260,7 @@ var PrintResults = function () {
                                 //desbloquearUI();
                             }
                             //codesLab = reemplazar(codesLab, ".", "*");
-                            exportPDF(codesLab, languaje);
+                            exportPDF(codesLab, "");
 
                         }
                         if (ButtonPressed === opcNo) {

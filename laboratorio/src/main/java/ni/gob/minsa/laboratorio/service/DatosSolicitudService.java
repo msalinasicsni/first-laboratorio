@@ -151,7 +151,7 @@ public class DatosSolicitudService {
     public List<DetalleDatosRecepcion> getDetalleDatosRecepcionByIdSolicitud(String idSolicitud){
         Session session = sessionFactory.getCurrentSession();
         String query = "select a.idDetalle as idDetalle, a.valor as valor, r.idSolicitudDx as solicitudDx, da.idConceptoSol as datoSolicitud, da.nombre as nombre, " +
-                "da.concepto.tipo.valor as tipoConcepto  " +
+                "da.concepto.tipo.codigo as tipoConcepto  " +
                 "from DatoSolicitudDetalle as a inner join a.solicitudDx as r inner join a.datoSolicitud as da where r.idSolicitudDx = :idSolicitud ";
         Query q = session.createQuery(query);
         q.setParameter("idSolicitud", idSolicitud);
@@ -261,9 +261,41 @@ public class DatosSolicitudService {
                 } else {
                     datos.setIdentificacion(res.getValor().toUpperCase());
                 }
+            } else if (res.getNombre().toLowerCase().contains("idioma")) {
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    datos.setIdioma(cat_lista.getEtiqueta());
+                }else {
+                    datos.setIdioma(res.getValor().toUpperCase());
+                }
+            } else if (res.getNombre().toLowerCase().contains("modalidad")) {
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    datos.setModalidad(cat_lista.getEtiqueta());
+                }else {
+                    datos.setModalidad(res.getValor().toUpperCase());
+                }
             }
         }
         if (datos.getIdentificacion() == null || datos.getIdentificacion().isEmpty()) datos.setIdentificacion(identificacionPersona);
         return datos;
+    }
+
+    public String getIdiomaResultadoViajero(String idTomaMx){
+        List<DetalleDatosRecepcion> resFinalList = this.getDetalleDatosRecepcionByIdMx(idTomaMx);
+        String idioma="";
+        for(DetalleDatosRecepcion res: resFinalList){
+            if (res.getNombre().toLowerCase().contains("idioma"))
+                if (res.getTipoConcepto().equals("TPDATO|LIST")) {
+                    Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(res.getValor());
+                    idioma = cat_lista.getEtiqueta();
+                }else {
+                    idioma = res.getValor().toUpperCase();
+                }
+        }
+        if (idioma.toLowerCase().contains("esp")) idioma = "ES";
+        else if (idioma.toLowerCase().contains("ing")) idioma = "EN";
+        else idioma = "ES"; //por defecto Español
+        return idioma;
     }
 }

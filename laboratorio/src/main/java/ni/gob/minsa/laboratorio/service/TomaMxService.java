@@ -395,7 +395,7 @@ public class TomaMxService {
     }
 
     public List<Solicitud> getSolicitudesDxByIdTomaV2(String idTomaMx, String codigoLab){
-        String query = "select distinct sdx.codDx.idDiagnostico as idSolicitud, sdx.codDx.nombre as nombre, sdx.aprobada as aprobada, sdx.codDx.area.idArea as idArea " +
+        String query = "select distinct sdx.codDx.idDiagnostico as idSolicitud, sdx.idSolicitudDx as idSolicitudDx, sdx.codDx.nombre as nombre, sdx.aprobada as aprobada, sdx.codDx.area.idArea as idArea " +
                 "from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
                 "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
                 "and (sdx.labProcesa.codigo = :codigoLab" +
