@@ -21,7 +21,7 @@
 		<javax.servlet.jsp-version>2.1</javax.servlet.jsp-version>
 		<javax.servlet-jstl-version>1.2</javax.servlet-jstl-version>
 		<commons-fileupload-version>1.2.2</commons-fileupload-version>
-		<commons-io-version>1.4</commons-io-version>
+		<commons-io-version>2.7</commons-io-version>
 		<commons-dbcp-version>1.4</commons-dbcp-version>
 		<junit-version>4.7</junit-version>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
