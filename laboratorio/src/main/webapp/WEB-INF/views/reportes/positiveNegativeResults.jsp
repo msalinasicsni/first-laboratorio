@@ -236,7 +236,7 @@
                                             class="select2">
                                         <option value=""><spring:message code="lbl.select" />...</option>
                                         <option value="Positivo"><spring:message code="lbl.positive" /></option>
-                                        <option value="Rutina"><spring:message code="lbl.negative" /></option>
+                                        <option value="Negativo"><spring:message code="lbl.negative" /></option>
                                     </select>
                                 </div>
                             </section>

@@ -143,6 +143,9 @@
                     <li class="approvedResults">
                         <a href="<spring:url value="/aprobacion/approved" htmlEscape="true "/>" title="<spring:message code="menu.approved.results" />"><i class="fa fa-lg fa-fw fa-check-square-o"></i> <spring:message code="menu.approved.results" /></a>
                     </li>
+                    <li class="publishResults">
+                        <a href="<spring:url value="/publicar/viajeros/init" htmlEscape="true "/>" title="<spring:message code="menu.publish.results" />"><i class="fa fa-lg fa-fw fa-send-o"></i> <spring:message code="menu.publish.results" /></a>
+                    </li>
                 </ul>
             </li>
             <li class="gestion">

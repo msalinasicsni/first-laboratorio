@@ -53,9 +53,6 @@ public class AprobacionResultadoController {
     @Resource(name = "catalogosService")
     private CatalogoService catalogoService;
 
-    @Resource(name = "usuarioService")
-    private UsuarioService usuarioService;
-
     @Resource(name = "entidadAdmonService")
     private EntidadAdmonService entidadAdmonService;
 
@@ -73,12 +70,6 @@ public class AprobacionResultadoController {
 
     @Resource(name= "resultadosService")
     private ResultadosService resultadosService;
-
-    @Resource(name = "datosSolicitudService")
-    private DatosSolicitudService datosSolicitudService;
-
-    @Resource(name = "serviciosEnLineaService")
-    private ServiciosEnLineaService serviciosEnLineaService;
 
     @Autowired
     MessageSource messageSource;
@@ -561,8 +552,6 @@ public class AprobacionResultadoController {
                     solicitudDx.setFechaAprobacion(fechaHoraAprobacion);
                     solicitudDx.setUsuarioAprobacion(usuario);
                     tomaMxService.updateSolicitudDx(solicitudDx);
-                    //Enviar resultado viajero covid a esquema de servicios en linea si aplica
-                    saveResultadoViajero(solicitudDx);
                 }
                 if (solicitudEstudio!=null){
                     solicitudEstudio.setAprobada(true);
@@ -618,8 +607,6 @@ public class AprobacionResultadoController {
                         solicitudDx.setFechaAprobacion(new Date());
                         solicitudDx.setUsuarioAprobacion(usuario);
                         tomaMxService.updateSolicitudDx(solicitudDx);
-                        //Enviar resultado viajero covid a esquema de servicios en linea si aplica
-                        saveResultadoViajero(solicitudDx);
                     }
                     if (solicitudEstudio != null) {
                         solicitudEstudio.setAprobada(true);
@@ -970,70 +957,4 @@ public class AprobacionResultadoController {
         }
     }
 
-    /****
-     * Metodo para determinar si la solicitud es de diagnostico viajero covid19.
-     * Si es viajero se registra resultado en tabla de serviciosenlinea.se_resultado_viajero para que el solicitante lo pueda imprimir en linea
-     * @param solicitudDx solicitud que se esta aprobando
-     */
-    private void saveResultadoViajero(DaSolicitudDx solicitudDx){
-        boolean esMxViajeroCovid = tomaMxService.esMxViajeroCovid(solicitudDx.getIdTomaMx().getCodigoLab());
-        if (esMxViajeroCovid){
-            String nombres = "";
-            String apellidos = "";
-            String nombreExamen = "";
-            String detalleResultado = "";
-            Date fechaProcesamiento = null;
-            String procesadoPor = "";
-            ResultadoViajero viajero = new ResultadoViajero();
-
-            DaTomaMx tomaMx = solicitudDx.getIdTomaMx();
-            SisPersona persona = tomaMx.getIdNotificacion().getPersona();
-            if (persona.getPrimerNombre() != null) {
-                nombres = persona.getPrimerNombre();
-                if (persona.getSegundoNombre() != null)
-                    nombres = nombres + " " + persona.getSegundoNombre();
-
-                apellidos = persona.getPrimerApellido();
-                if (persona.getSegundoApellido() != null)
-                    apellidos = apellidos + " " + persona.getSegundoApellido();
-            }
-            List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(solicitudDx.getIdSolicitudDx());
-            for (DatosOrdenExamen examen : examenes) {
-                nombreExamen = examen.getExamen();
-                List<DetalleResultado> resultados = resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen());
-                for (DetalleResultado resultado : resultados) {
-                    if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
-                        Catalogo_Lista cat_lista = resultadoFinalService.getCatalogoLista(resultado.getValor());
-                        detalleResultado = cat_lista.getValor();
-                    } else if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LOG")) {
-                        detalleResultado = (Boolean.valueOf(resultado.getValor()) ? "lbl.yes" : "lbl.no");
-                    } else {
-                        detalleResultado = resultado.getValor();
-                    }
-                    procesadoPor = resultado.getUsuarioRegistro().getCompleteName();
-                    fechaProcesamiento = new Date(resultado.getFechahProcesa().getTime());
-                }
-            }
-
-            viajero.setCodigoMx(solicitudDx.getIdTomaMx().getCodigoLab());
-            viajero.setIdentificacion(persona.getIdentificacion());
-            viajero.setDocumentoViaje(datosSolicitudService.getIdentificacionViajero(solicitudDx.getIdTomaMx().getIdTomaMx(), persona.getIdentificacion()));
-            viajero.setNombres(nombres);
-            viajero.setApellidos(apellidos);
-            viajero.setFechaNacimiento(persona.getFechaNacimiento());
-            viajero.setSilais((tomaMx.getCodSilaisAtencion()!=null ? tomaMx.getCodSilaisAtencion().getNombre().replaceAll("SILAIS ", "") : ""));
-            viajero.setMunicipio((tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getMunicipio().getNombre() : ""));
-            viajero.setUnidadSalud((tomaMx.getCodUnidadAtencion()!=null ? tomaMx.getCodUnidadAtencion().getNombre() : ""));
-            viajero.setTipoMuestra(tomaMx.getCodTipoMx().getNombre());
-            viajero.setFechaTomaMuestra(tomaMx.getFechaHTomaMx());
-            viajero.setExamen(nombreExamen);
-            viajero.setResultado(detalleResultado);
-            viajero.setFechaProcesamiento(fechaProcesamiento);
-            viajero.setProcesadoPor(procesadoPor);
-            viajero.setAprobadoPor(solicitudDx.getUsuarioAprobacion().getCompleteName());
-            viajero.setCodigoValidacion(tomaMx.getCodigoValidacion());
-
-            serviciosEnLineaService.saveOrUpdateResultadoViajero(viajero);
-        }
-    }
 }

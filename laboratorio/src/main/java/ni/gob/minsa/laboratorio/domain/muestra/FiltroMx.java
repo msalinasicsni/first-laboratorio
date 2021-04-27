@@ -45,6 +45,7 @@ public class FiltroMx {
     //Viajeros Covid19
     private String idioma;
     private String modalidad;
+    private Integer idDx;
 
     public String getNombreApellido() {
         return nombreApellido;
@@ -312,5 +313,13 @@ public class FiltroMx {
 
     public void setModalidad(String modalidad) {
         this.modalidad = modalidad;
+    }
+
+    public Integer getIdDx() {
+        return idDx;
+    }
+
+    public void setIdDx(Integer idDx) {
+        this.idDx = idDx;
     }
 }

@@ -11,7 +11,10 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadDepartamento;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadDireccion;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
+import ni.gob.minsa.laboratorio.utilities.FiltrosReporte;
+import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoSolicitud;
+import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoVigilancia;
 import org.apache.commons.codec.language.Soundex;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -43,6 +46,11 @@ public class ResultadoFinalService {
 
     public ResultadoFinalService() {
     }
+
+    private static final String sqlRutina = " and dx.codDx.idDiagnostico = :idDx ";
+    private static final String sqlFechasAproRut =  " and dx.fechaAprobacion between :fechaInicio and :fechaFin ";
+    private static final String sqlLab = " and dx.labProcesa.codigo = :codigoLab ";
+    private static final String sqlCodigoMx = " and mx.codigoLab = :codigoMx ";
 
     @SuppressWarnings("unchecked")
     public List<DaSolicitudDx> getDxByFiltro(FiltroMx filtro){
@@ -648,11 +656,15 @@ public class ResultadoFinalService {
      * @return Catalogo_lista
      */
     public Catalogo_Lista getCatalogoLista(String id){
-        String query = "from Catalogo_Lista as c where c.idCatalogoLista= :id";
-        Session session = sessionFactory.getCurrentSession();
-        Query q = session.createQuery(query);
-        q.setString("id", id);
-        return  (Catalogo_Lista)q.uniqueResult();
+        if (StringUtil.isNumeric(id)) {
+            String query = "from Catalogo_Lista as c where c.idCatalogoLista= :id";
+            Session session = sessionFactory.getCurrentSession();
+            Query q = session.createQuery(query);
+            q.setString("id", id);
+            return (Catalogo_Lista) q.uniqueResult();
+        } else {
+            return new Catalogo_Lista();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1206,6 +1218,34 @@ public class ResultadoFinalService {
         crit.add(Restrictions.and(Restrictions.eq("estudio.aprobada", true)));
         crit.add(Restrictions.eq("estudio.anulado", false));
         return crit.list();
+    }
+
+    public List<ResultadoVigilancia> getDiagnosticosAprobadosByFiltro(FiltroMx filtro) {
+        Session session = sessionFactory.getCurrentSession();
+        Query queryNotiDx = null;
+        queryNotiDx = session.createQuery(" select cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, p.fechaNacimiento as fechaNacimiento, p.sexo.codigo as sexo, " +
+                " p.direccionResidencia as direccionResidencia, p.telefonoResidencia as telefonoResidencia, p.telefonoMovil as telefonoMovil, coalesce((select co.nombre from  Comunidades co where co.codigo=p.comunidadResidencia.codigo), null) as comunidadResidencia, p.identificacion as identificacion, noti.codExpediente as expediente, " +
+                " noti.idNotificacion as idNotificacion, noti.fechaInicioSintomas as fechaInicioSintomas, noti.codTipoNotificacion.valor as nombreTipoNoti, " +
+                " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, " +
+                " dx.idSolicitudDx as idSolicitud, dx.fechaHSolicitud as fechaSolicitud, dx.codDx.nombre as nombreSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
+                " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
+                " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false " + sqlLab + sqlRutina + ((filtro.getFechaInicioAprob() != null && filtro.getFechaFinAprob() != null) ? sqlFechasAproRut : "") +
+                        (filtro.getCodigoUnicoMx() != null ? sqlCodigoMx : "")+
+                " order by mx.codigoLab");
+
+
+        queryNotiDx.setParameter("codigoLab", filtro.getCodLaboratio());
+        queryNotiDx.setParameter("idDx", filtro.getIdDx());
+        if (filtro.getFechaInicioAprob() != null && filtro.getFechaFinAprob() != null) {
+            queryNotiDx.setParameter("fechaInicio", filtro.getFechaInicioAprob());
+            queryNotiDx.setParameter("fechaFin", filtro.getFechaFinAprob());
+        }
+        if (filtro.getCodigoUnicoMx() != null) {
+            queryNotiDx.setParameter("codigoMx", filtro.getCodigoUnicoMx());
+        }
+
+        queryNotiDx.setResultTransformer(Transformers.aliasToBean(ResultadoVigilancia.class));
+        return queryNotiDx.list();
     }
 
 }

@@ -322,7 +322,22 @@ public class TomaMxService {
                                 .createAlias("idTomaMx", "toma")
                                 .setProjection(Property.forName("toma.idTomaMx"))));
                 crit.add(conditGroup);
-            }else{
+            } else  if (filtro.getFechaInicioAprob()!=null && filtro.getFechaFinAprob()!=null){
+                Junction conditGroup = Restrictions.disjunction();
+                conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
+                        .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                        .add(Restrictions.eq("anulado",false))
+                        .add(Restrictions.between("fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob()))
+                        .createAlias("idTomaMx", "toma")
+                        .setProjection(Property.forName("toma.idTomaMx"))))
+                        .add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudDx.class)
+                                .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))
+                                .add(Restrictions.eq("anulado",false))
+                                .add(Restrictions.between("fechaAprobacion", filtro.getFechaInicioAprob(),filtro.getFechaFinAprob()))
+                                .createAlias("idTomaMx", "toma")
+                                .setProjection(Property.forName("toma.idTomaMx"))));
+                crit.add(conditGroup);
+            } else{
                 Junction conditGroup = Restrictions.disjunction();
                 conditGroup.add(Subqueries.propertyIn("idTomaMx", DetachedCriteria.forClass(DaSolicitudEstudio.class)
                         .add(Restrictions.eq("aprobada", filtro.getSolicitudAprobada()))

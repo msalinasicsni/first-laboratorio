@@ -77,7 +77,7 @@ var PrintResults = function () {
                 }
             });
 
-            <!-- formulario de búsqueda de resultados finales -->
+            <!-- formulario de bï¿½squeda de resultados finales -->
             $('#searchResults-form').validate({
                 // Rules for form validation
                 rules: {
@@ -87,11 +87,11 @@ var PrintResults = function () {
                     fecInicioTomaMx: {required: function () {
                         return $('#fecFinTomaMx').val().length > 0;
                     }},
-                    fecFinProc: {required: function () {
-                            return $('#fecInicioProc').val().length > 0;
+                    fechaFinAprob: {required: function () {
+                            return $('#fechaInicioAprob').val().length > 0;
                         }},
-                    fecInicioProc: {required: function () {
-                            return $('#fecFinProc').val().length > 0;
+                    fechaInicioAprob: {required: function () {
+                            return $('#fechaFinAprob').val().length > 0;
                         }}
                 },
                 // Do not change code below
@@ -123,8 +123,8 @@ var PrintResults = function () {
                     filtros['nombreSolicitud'] = '';
                     filtros['conResultado'] = 'Si';
                     filtros['solicitudAprobada'] = 'true';
-                    filtros['fecInicioProc'] = '';
-                    filtros['fecFinProc'] = '';
+                    filtros['fechaInicioAprob'] = '';
+                    filtros['fechaFinAprob'] = '';
                     filtros['idioma'] = '';
                     filtros['modalidad'] = '';
                 } else {
@@ -140,8 +140,8 @@ var PrintResults = function () {
                     filtros['nombreSolicitud'] = $('#nombreSoli').val();
                     filtros['conResultado'] = 'Si';
                     filtros['solicitudAprobada'] = 'true';
-                    filtros['fecInicioProc'] = $('#fecInicioProc').val();
-                    filtros['fecFinProc'] = $('#fecFinProc').val();
+                    filtros['fechaInicioAprob'] = $('#fechaInicioAprob').val();
+                    filtros['fechaFinAprob'] = $('#fechaFinAprob').val();
                     filtros['idioma'] = $('#idioma').find('option:selected').val();
                     filtros['modalidad'] = $('#modalidad').find('option:selected').val();
                 }
@@ -196,7 +196,7 @@ var PrintResults = function () {
                 }
             }
 
-            function exportPDF(codes, languaje) {
+            /*function exportPDF(codes, languaje) {
                 bloquearUI(parametros.blockMess);
                 $.ajax(
                     {
@@ -228,8 +228,42 @@ var PrintResults = function () {
                             validateLogin(jqXHR);
                         }
                     });
+            }*/
 
-
+            function exportPDF(codes, languaje) {
+                var valueObj = {};
+                valueObj['codes'] = codes;
+                valueObj['languaje'] = languaje;
+                valueObj['strB64Response'] = '';
+                bloquearUI(parametros.blockMess);
+                $.ajax(
+                    {
+                        url: parametros.pdfUrl,
+                        type: 'POST',
+                        dataType: 'json',
+                        data: JSON.stringify(valueObj),
+                        contentType: 'application/json',
+                        mimeType: 'application/json',
+                        success: function (data) {
+                            if (data.strB64Response.length != 0) {
+                                var blob = blobData(data.strB64Response, 'application/pdf');
+                                var blobUrl = showBlob(blob);
+                            } else {
+                                $.smallBox({
+                                    title: $("#msg_no_results_found").val(),
+                                    content: "<i class='fa fa-clock-o'></i> <i>" + $("#smallBox_content").val() + "</i>",
+                                    color: "#C79121",
+                                    iconSmall: "fa fa-warning",
+                                    timeout: 4000
+                                });
+                            }
+                            desbloquearUI()
+                        },
+                        error: function (jqXHR) {
+                            desbloquearUI();
+                            validateLogin(jqXHR);
+                        }
+                    });
             }
 
             function exportSelected() {

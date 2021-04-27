@@ -52,9 +52,6 @@ public class PreRegistroViajerosController {
     @Qualifier(value = "seguridadService")
     private SeguridadService seguridadService;
 
-    @Resource(name="tomaMxService")
-    private TomaMxService tomaMxService;
-
     @Resource(name="usuarioService")
     public UsuarioService usuarioService;
 
@@ -165,8 +162,10 @@ public class PreRegistroViajerosController {
                     resultado = messageSource.getMessage("msg.preregistration.already.confirme", null, null);
                     return;
                 }
-
-                personas = personaService.getPersonasPorIdentificacion(0, 50, preRegistro.getPersona().getIdentificacion().getNumeroIdentificacion(), null);
+                //Solo verificar persona si el número de identificacion es igual al número de documento de viaje. Andrea, 07/04/2021
+                if (preRegistro.getPersona().getIdentificacion().getNumeroIdentificacion().trim().equalsIgnoreCase(preRegistro.getDocumentoviaje().getNumerodocumento().trim())) {
+                    personas = personaService.getPersonasPorIdentificacion(0, 50, preRegistro.getPersona().getIdentificacion().getNumeroIdentificacion(), null);
+                }
                 if (personas != null && personas.size() > 0) {
                     persona = personas.get(0);
                 } else {

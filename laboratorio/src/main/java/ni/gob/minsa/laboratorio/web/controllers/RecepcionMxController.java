@@ -1,6 +1,7 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.concepto.Catalogo_Lista;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
@@ -39,7 +40,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -2526,6 +2530,8 @@ public class RecepcionMxController {
         String codigoVIH = null;
         Date fechaInicioProc = null;
         Date fechaFinProc = null;
+        Date fechaInicioAprob = null;
+        Date fechaFinAprob = null;
         String idioma = null;
         String modalidad = null;
 
@@ -2557,10 +2563,34 @@ public class RecepcionMxController {
             controlCalidad = jObjectFiltro.get("controlCalidad").getAsBoolean();
         if (jObjectFiltro.get("codigoVIH") != null && !jObjectFiltro.get("codigoVIH").getAsString().isEmpty())
         	codigoVIH = jObjectFiltro.get("codigoVIH").getAsString();
-        if (jObjectFiltro.get("fecInicioProc") != null && !jObjectFiltro.get("fecInicioProc").getAsString().isEmpty())
-            fechaInicioProc = DateUtil.StringToDate(jObjectFiltro.get("fecInicioProc").getAsString()+" 00:00:00");
-        if (jObjectFiltro.get("fecFinProc") != null && !jObjectFiltro.get("fecFinProc").getAsString().isEmpty())
-            fechaFinProc =DateUtil. StringToDate(jObjectFiltro.get("fecFinProc").getAsString()+" 23:59:59");
+        if (jObjectFiltro.get("fecInicioProc") != null && !jObjectFiltro.get("fecInicioProc").getAsString().isEmpty()) {
+            String strFechaInicioProc = jObjectFiltro.get("fecInicioProc").getAsString();
+            if (strFechaInicioProc.length() <= 10) //no trae hora
+                fechaInicioProc = DateUtil.StringToDate(strFechaInicioProc + " 00:00:00");
+            else
+                fechaInicioProc = DateUtil.StringToDate(strFechaInicioProc);
+        }
+        if (jObjectFiltro.get("fecFinProc") != null && !jObjectFiltro.get("fecFinProc").getAsString().isEmpty()) {
+            String strFecFinProc = jObjectFiltro.get("fecFinProc").getAsString();
+            if (strFecFinProc.length() <= 10) //no trae hora
+                fechaFinProc = DateUtil.StringToDate(strFecFinProc + " 23:59:59");
+            else
+                fechaFinProc = DateUtil.StringToDate(strFecFinProc);
+        }
+        if (jObjectFiltro.get("fechaInicioAprob") != null && !jObjectFiltro.get("fechaInicioAprob").getAsString().isEmpty()) {
+            String strFechaInicioAprob = jObjectFiltro.get("fechaInicioAprob").getAsString();
+            if (strFechaInicioAprob.length() <= 10) //no trae hora
+                fechaInicioAprob = DateUtil.StringToDate(strFechaInicioAprob + " 00:00:00");
+            else
+                fechaInicioAprob = DateUtil.StringToDate(strFechaInicioAprob);
+        }
+        if (jObjectFiltro.get("fechaFinAprob") != null && !jObjectFiltro.get("fechaFinAprob").getAsString().isEmpty()) {
+            String strFechaFinAprob = jObjectFiltro.get("fechaFinAprob").getAsString();
+            if (strFechaFinAprob.length() <= 10) //no trae hora
+                fechaFinAprob = DateUtil.StringToDate(strFechaFinAprob + " 23:59:59");
+            else
+                fechaFinAprob = DateUtil.StringToDate(strFechaFinAprob);
+        }
         if (jObjectFiltro.get("idioma") != null && !jObjectFiltro.get("idioma").getAsString().isEmpty())
             idioma = jObjectFiltro.get("idioma").getAsString();
         if (jObjectFiltro.get("modalidad") != null && !jObjectFiltro.get("modalidad").getAsString().isEmpty())
@@ -2592,6 +2622,8 @@ public class RecepcionMxController {
         filtroMx.setFechaFinProcesamiento(fechaFinProc);
         filtroMx.setIdioma(idioma);
         filtroMx.setModalidad(modalidad);
+        filtroMx.setFechaInicioAprob(fechaInicioAprob);
+        filtroMx.setFechaFinAprob(fechaFinAprob);
 
         return filtroMx;
     }
@@ -2764,22 +2796,23 @@ public class RecepcionMxController {
         return escaper.translate(jsonResponse);
     }
 
-    @RequestMapping(value = "resultsPDF", method = RequestMethod.GET)
+    @RequestMapping(value = "resultsPDF", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public
     @ResponseBody
-    String expToPDF(@RequestParam(value = "codes", required = true) String codes, @RequestParam(value = "languaje", required = false) String languaje) throws IOException, COSVisitorException, ParseException {
+    ResponseEntity<String> expToPDF(@RequestBody ExcelVigilanciaRequest filtros) throws IOException, COSVisitorException, ParseException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
+        String languaje = filtros.getLanguaje();
         PDDocument doc = new PDDocument();
         String formatoFecha = "dd/MM/yyyy";
         Locale locale = new Locale("es", "NI");
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         String response = null;
         Parametro urlServiciosEnLinea = parametrosService.getParametroByName("URL_VALIDACION_SE");
-        String fechaImpresion = new SimpleDateFormat(formatoFecha).format(new Date()); //solo poner fecha, sin hora. Sonia 28/10/2020
         String userName = seguridadService.obtenerNombreUsuario();
         try {
 
-            String[] codigos = codes.split(",");
+            String[] codigos = filtros.getCodes().split(",");
             Arrays.sort(codigos);//ordenar codigos de mx para que salgan ordenados en el pdf. 20/10/2020
             for (String code : codigos) {
                 if (!code.isEmpty()) {
@@ -2799,7 +2832,7 @@ public class RecepcionMxController {
                                 locale = new Locale("es");
                             }
                         }
-
+                        String fechaImpresion = DateUtil.DateToString(new Date(), formatoFecha); //solo poner fecha, sin hora. Sonia 28/10/2020
                         List<Area> areaDxList = tomaMxService.getAreaSolicitudesAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                         Authority esRecepcionista = usuarioService.getAuthority(userName, "ROLE_RECEPCION");
                         float yPosicionExamen = 0;
@@ -3002,7 +3035,7 @@ public class RecepcionMxController {
                                         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validation.code", null, locale)+ " "+tomaMx.getCodigoValidacion(), 98, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
                                         GeneralUtils.drawTEXT((urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 84, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
                                         GeneralUtils.addLink(doc, page, (urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 84, 60, 11, PDType1Font.HELVETICA_BOLD);
-                                        GeneralUtils.addBarcode128(stream, doc, tomaMx.getCodigoValidacion(), 370, 90);
+                                        GeneralUtils.addBarcode128(stream, doc, (tomaMx.getCodigoValidacion() != null ? tomaMx.getCodigoValidacion() : ""), 370, 90);
                                     }
                                 } else {
                                     if (esMxViajeroCovid) {
@@ -3010,7 +3043,7 @@ public class RecepcionMxController {
                                         GeneralUtils.drawTEXT(messageSource.getMessage("lbl.validation.code", null, locale)+ " "+tomaMx.getCodigoValidacion(), 112, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
                                         GeneralUtils.drawTEXT((urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 98, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
                                         GeneralUtils.addLink(doc, page, (urlServiciosEnLinea != null && urlServiciosEnLinea.getValor()!=null? urlServiciosEnLinea.getValor() : ""), 98, 60, 11, PDType1Font.HELVETICA_BOLD);
-                                        GeneralUtils.addBarcode128(stream, doc, tomaMx.getCodigoValidacion(), 370, 90);
+                                        GeneralUtils.addBarcode128(stream, doc, (tomaMx.getCodigoValidacion() != null ? tomaMx.getCodigoValidacion() : ""), 370, 90);
                                     }
                                 }
                                 stream.close();
@@ -3023,14 +3056,25 @@ public class RecepcionMxController {
             doc.close();
             // generate the file
             response = Base64.encodeBase64String(output.toByteArray());
+            filtros.setStrB64Response(response);
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        return response;
+        return createJsonResponse(filtros);
+
+//        return response;
     }
 
+    private ResponseEntity<String> createJsonResponse( Object o )
+    {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
+        String json = gson.toJson( o );
+        return new ResponseEntity<String>( json, headers, HttpStatus.CREATED );
+    }
 
 
     private void drawInfoLab(PDPageContentStream stream, PDPage page, Laboratorio labProcesa, boolean esMxViajeroCovid,Locale locale) throws IOException {

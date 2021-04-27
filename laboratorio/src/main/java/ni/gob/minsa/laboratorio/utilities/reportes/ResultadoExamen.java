@@ -14,6 +14,7 @@ public class ResultadoExamen {
     private String tipo;
     private Date fechahProcesa;
     private String valor;
+    private String usuarioProcesa;
 
     public String getIdDetalle() {
         return idDetalle;
@@ -53,5 +54,13 @@ public class ResultadoExamen {
 
     public void setValor(String valor) {
         this.valor = valor;
+    }
+
+    public String getUsuarioProcesa() {
+        return usuarioProcesa;
+    }
+
+    public void setUsuarioProcesa(String usuarioProcesa) {
+        this.usuarioProcesa = usuarioProcesa;
     }
 }

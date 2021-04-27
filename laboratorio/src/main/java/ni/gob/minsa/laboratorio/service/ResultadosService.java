@@ -119,7 +119,7 @@ public class ResultadosService {
     }
 
     public List<ResultadoExamen> getDetallesResultadoActivosByExamenV2(String idOrdenExamen){
-        String query = "select a.idDetalle as idDetalle, a.respuesta.nombre as respuesta, a.respuesta.concepto.tipo.codigo as tipo, a.fechahProcesa as fechahProcesa, a.valor as valor " +
+        String query = "select a.idDetalle as idDetalle, a.respuesta.nombre as respuesta, a.respuesta.concepto.tipo.codigo as tipo, a.fechahProcesa as fechahProcesa, a.valor as valor, a.usuarioRegistro.completeName as usuarioProcesa " +
                 "from DetalleResultado as a inner join a.examen as r where a.pasivo = false and r.idOrdenExamen = :idOrdenExamen order by a.respuesta.orden asc";
 
         Session session = sessionFactory.getCurrentSession();

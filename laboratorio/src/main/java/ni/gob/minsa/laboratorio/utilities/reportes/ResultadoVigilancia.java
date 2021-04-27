@@ -10,6 +10,7 @@ public class ResultadoVigilancia {
 
     private String idNotificacion;
     private String codigoTipoNoti;
+    private String nombreTipoNoti;
     private String idTomaMx;
     private String idSolicitud;
     private String codigoMx;
@@ -47,6 +48,8 @@ public class ResultadoVigilancia {
     private String nombreMuniMx;
     private Date fechaInicioSintomas;
     private Date fechaTomaMx;
+    private String nombreSolicitud;
+    private Date fechaSolicitud;
     private Date fechaAprobacion;
     private String resultadoFinal;
     private String resultadoFinalSecun;
@@ -434,5 +437,29 @@ public class ResultadoVigilancia {
 
     public void setCodigoValidacion(String codigoValidacion) {
         this.codigoValidacion = codigoValidacion;
+    }
+
+    public String getNombreTipoNoti() {
+        return nombreTipoNoti;
+    }
+
+    public void setNombreTipoNoti(String nombreTipoNoti) {
+        this.nombreTipoNoti = nombreTipoNoti;
+    }
+
+    public String getNombreSolicitud() {
+        return nombreSolicitud;
+    }
+
+    public void setNombreSolicitud(String nombreSolicitud) {
+        this.nombreSolicitud = nombreSolicitud;
+    }
+
+    public Date getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(Date fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
     }
 }
