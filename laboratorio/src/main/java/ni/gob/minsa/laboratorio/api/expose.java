@@ -17,7 +17,7 @@ import ni.gob.minsa.laboratorio.service.*;
 import ni.gob.minsa.laboratorio.utilities.ConstantsSecurity;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
-import ni.gob.minsa.laboratorio.utilities.messageSource.MessageSourceUtil;
+import ni.gob.minsa.laboratorio.utilities.messageSource.MessageSourceUtilLocale;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
 import ni.gob.minsa.laboratorio.utilities.reportes.*;
 import org.apache.commons.codec.binary.Base64;
@@ -405,7 +405,7 @@ public class expose {
         ds.setResultado(new ArrayList<ValorResultado>());//por defecto vacio, solo se pondra resultado si esta aprobado
         if (ds.getAprobada()!= null){
             if (ds.getAprobada().equals(true)) {
-                ds.setEstadoSolicitud(MessageSourceUtil.getMessage(messageSourceCx, "lbl.approval.result", null));
+                ds.setEstadoSolicitud(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.approval.result", null));
                 for (ResultadoSolicitud res : detRes) {
                     ValorResultado resultado = new ValorResultado();
                     if (res.getRespuesta() != null) {
@@ -437,16 +437,16 @@ public class expose {
                 }
             } else {
                 if (!detRes.isEmpty()) {
-                    ds.setEstadoSolicitud(MessageSourceUtil.getMessage(messageSourceCx, "lbl.result.pending.approval", null));
+                    ds.setEstadoSolicitud(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.result.pending.approval", null));
                 } else {
-                    ds.setEstadoSolicitud(MessageSourceUtil.getMessage(messageSourceCx, "lbl.without.result", null));
+                    ds.setEstadoSolicitud(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.without.result", null));
                 }
             }
         }else{
             if (!detRes.isEmpty()) {
-                ds.setEstadoSolicitud(MessageSourceUtil.getMessage(messageSourceCx, "lbl.result.pending.approval", null));
+                ds.setEstadoSolicitud(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.result.pending.approval", null));
             } else {
-                ds.setEstadoSolicitud(MessageSourceUtil.getMessage(messageSourceCx, "lbl.without.result", null));
+                ds.setEstadoSolicitud(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.without.result", null));
             }
         }
     }
@@ -493,8 +493,8 @@ public class expose {
                                     xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
                                     GeneralUtils.drawTEXT(nombreDireccion, y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                     y = y - 15;
-                                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, MessageSourceUtil.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase());
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase());
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                     y = y - 15;
                                     xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
                                     GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
@@ -526,30 +526,30 @@ public class expose {
                                     if (arrEdad[1] != null) edad = edad + " " + arrEdad[1] + " M";
 
                                     //datos personales
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.code", null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.code", null) + ": ", y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(codigomx, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.file.number", null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.file.number", null) + ": ", y, 300, stream, 11, PDType1Font.HELVETICA);
                                     String numExpediente = (tomaMx.getExpediente() != null ? tomaMx.getExpediente() : notificacionService.getNumExpediente(tomaMx.getIdNotificacion()));
                                     GeneralUtils.drawTEXT(numExpediente, y, 420, stream, 11, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.names", null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.names", null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(nombres, y, 120, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.lastnames", null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.lastnames", null) + ":", y, 300, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(apellidos, y, 360, stream, 11, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.age", null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.age", null), y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(edad, y, 100, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.silais1", null), y, 185, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.silais1", null), y, 185, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoSilaisMx() != null ? tomaMx.getNombreSilaisMx().replaceAll("SILAIS ","") : "", y, 235, stream, 10, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.muni", null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.muni", null) + ":", y, 370, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoMuniMx() != null ? tomaMx.getNombreMuniMx() : "", y, 430, stream, 10, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.health.unit1", null), y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.health.unit1", null), y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getCodigoUnidadMx() != null ? tomaMx.getNombreUnidadMx() : "", y, 150, stream, 9, PDType1Font.HELVETICA_BOLD);
                                     y = y - 15;
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.sample.type.long", null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.sample.type.long", null) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(tomaMx.getNombreTipoMx(), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.sampling.datetime1", null), y, 355, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.sampling.datetime1", null), y, 355, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), "dd/MM/yyyy"), y, 465, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                     //resultados
@@ -560,7 +560,7 @@ public class expose {
                                     String aprobadoPor = "";
                                     if (recepcionMx.getCalidadMx() != null && recepcionMx.getCalidadMx().equalsIgnoreCase("CALIDMX|IDC")) {
                                         y = y - 20;
-                                        GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.sample.inadequate2", null), y, 100, stream, 10, PDType1Font.HELVETICA);
+                                        GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.sample.inadequate2", null), y, 100, stream, 10, PDType1Font.HELVETICA);
                                     } else {
                                         for (ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud dx : listDx) {
                                             if (!dx.getNombre().toLowerCase().contains("covid19")) {//Datos de Covid19, solo en sistema Laboratorio. Andrea 22/07/2020
@@ -583,8 +583,8 @@ public class expose {
                                                         xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 12, nombreDireccion);
                                                         GeneralUtils.drawTEXT(nombreDireccion, y, xCenter, stream, 12, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                                         y = y - 15;
-                                                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, MessageSourceUtil.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase());
-                                                        GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
+                                                        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase());
+                                                        GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.lab.result", null).toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
                                                         y = y - 15;
                                                         xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD_OBLIQUE, 11, area.getNombre().toUpperCase());
                                                         GeneralUtils.drawTEXT(area.getNombre().toUpperCase(), y, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD_OBLIQUE);
@@ -615,7 +615,7 @@ public class expose {
                                                         y = y - 15;
                                                     }
                                                     if (resultados.size() > 0) {
-                                                        GeneralUtils.drawTEXT(examen.getExamen() + " - " + MessageSourceUtil.getMessage(messageSourceCx, "lbl.processing.date", null) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
+                                                        GeneralUtils.drawTEXT(examen.getExamen() + " - " + MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.processing.date", null) + ": " + fechaProcesamiento, yPosicionExamen, 100, stream, 10, PDType1Font.HELVETICA);
                                                         //y = y - 15;
                                                     }
                                                 }
@@ -623,16 +623,16 @@ public class expose {
                                         }
                                     }
                                     //fecha impresi?n
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.date.delivery.results", null) + ": ", 160, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.date.delivery.results", null) + ": ", 160, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(fechaImpresion, 160, 190, stream, 10, PDType1Font.HELVETICA);
 
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.bioanalyst", null) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.bioanalyst", null) + ": ", 130, 60, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(procesadoPor, 130, 122, stream, 10, PDType1Font.HELVETICA);
 
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.validated.by", null) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.validated.by", null) + ": ", 130, 300, stream, 11, PDType1Font.HELVETICA);
                                     GeneralUtils.drawTEXT(aprobadoPor, 130, 370, stream, 10, PDType1Font.HELVETICA);
 
-                                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.footer.note.results", null), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
+                                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.footer.note.results", null), 100, 60, stream, 11, PDType1Font.HELVETICA_BOLD);
 
                                     stream.close();
                                 }
@@ -659,8 +659,8 @@ public class expose {
         float inY = 720;
         float m = 18;
 
-        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, MessageSourceUtil.getMessage(messageSourceCx, "lbl.minsa", null));
-        GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.minsa", null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
+        xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 14, MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.minsa", null));
+        GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.minsa", null), inY, xCenter, stream, 14, PDType1Font.HELVETICA_BOLD);
         inY -= m;
 
         if(labProcesa != null){
@@ -680,11 +680,11 @@ public class expose {
             if(labProcesa.getTelefono() != null){
 
                 if(labProcesa.getTelefax() != null){
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, MessageSourceUtil.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono() + " ," + MessageSourceUtil.getMessage(messageSourceCx, "person.fax", null)+": "+ labProcesa.getTelefax());
-                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono() + ", " + MessageSourceUtil.getMessage(messageSourceCx, "person.fax", null)+": "+ labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono() + " ," + MessageSourceUtilLocale.getMessage(messageSourceCx, "person.fax", null)+": "+ labProcesa.getTelefax());
+                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono() + ", " + MessageSourceUtilLocale.getMessage(messageSourceCx, "person.fax", null)+": "+ labProcesa.getTelefax(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }else{
-                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, MessageSourceUtil.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono());
-                    GeneralUtils.drawTEXT(MessageSourceUtil.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
+                    xCenter = GeneralUtils.centerTextPositionX(page, PDType1Font.HELVETICA_BOLD, 11, MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono());
+                    GeneralUtils.drawTEXT(MessageSourceUtilLocale.getMessage(messageSourceCx, "lbl.telephone", null)+": "+labProcesa.getTelefono(), inY, xCenter, stream, 11, PDType1Font.HELVETICA_BOLD);
                 }
             }
         }
