@@ -23,6 +23,7 @@ import ni.gob.minsa.laboratorio.utilities.pdfUtils.Cell;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.GeneralUtils;
 import ni.gob.minsa.laboratorio.utilities.pdfUtils.Row;
 import ni.gob.minsa.laboratorio.utilities.reportes.DetalleDatosRecepcion;
+import ni.gob.minsa.laboratorio.utilities.reportes.RecepcionViajeros;
 import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoSolicitud;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
@@ -3664,7 +3665,8 @@ public class ReportesController {
         filtroRep.setCodDepartamento(codDepartamento);
         filtroRep.setCodMunicipio(codMunicipio);
         filtroRep.setCodArea(codArea);
-        filtroRep.setAnioInicial(DateUtil.DateToString(fechaInicio, "yyyy"));
+        if (fechaInicio != null)
+            filtroRep.setAnioInicial(DateUtil.DateToString(fechaInicio, "yyyy"));
         filtroRep.setPorSilais(porSilais);
         filtroRep.setCodZona(codZona);
         if (idSolicitud!=null && idSolicitud.contains("R")){
@@ -3678,4 +3680,33 @@ public class ReportesController {
         return filtroRep;
     }
 
+    /*******************************************************************/
+    /************************ REPORTE POR RECEPCION VAIJEROS ***********************/
+    /*******************************************************************/
+
+    @RequestMapping(value = "receptionTravelers/init", method = RequestMethod.GET)
+    public String initReceptionTravelers(Model model,HttpServletRequest request) throws Exception {
+        logger.debug("Reporte recepción viajero");
+        usuario = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
+        if (seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario())) {
+            model.addAttribute("fechaActual", DateUtil.DateToString(new Date(), "dd/MM/yyyy"));
+            return "reportes/receptionTravelers";
+        }
+        else
+            return "403";
+    }
+
+    /**
+     * Método para obtener data para Reporte recepciones viajeros
+     * @param filtro JSon con los datos de los filtros a aplicar en la búsqueda
+     * @return Object
+     * @throws Exception
+     */
+    @RequestMapping(value = "receptionTravelers/search", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody
+    List<RecepcionViajeros> fetchReceptionTravelers(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
+        logger.info("Obteniendo los datos para recepcion viajeros ");
+        FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+        return reportesService.getRecepcionesViajeros(filtroRep);
+    }
 }

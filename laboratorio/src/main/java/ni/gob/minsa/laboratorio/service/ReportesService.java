@@ -12,6 +12,7 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.FiltrosReporte;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import ni.gob.minsa.laboratorio.utilities.reportes.RecepcionViajeros;
 import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoVigilancia;
 import ni.gob.minsa.laboratorio.utilities.reportes.TiemposProcesamiento;
 import org.hibernate.Criteria;
@@ -2375,4 +2376,28 @@ public class ReportesService {
         return resFinal;
     }
 
+
+    /***
+     * Obtiene la cantidad de registros recepcionados en recepcion general o por preregistro en linea para dx covid viajeros por dia
+     * @param filtro fecha inicio y fecha de fin
+     * @return List<RecepcionViajeros>
+     */
+    public List<RecepcionViajeros> getRecepcionesViajeros(FiltrosReporte filtro){
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("select to_char(trunc(rmx.fechaHoraRecepcion), 'DD/MM/YYYY') as fechaRecepcion, COUNT(rmx.idRecepcion) as total, SUM (CASE WHEN noti.idPreregistro IS NULL THEN 0 ELSE 1 END) as enLinea," +
+                " SUM (CASE WHEN noti.idPreregistro IS NULL THEN 1 ELSE 0 END) as enRecepcion " +
+                "from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, RecepcionMx rmx " +
+                "where noti.idNotificacion = mx.idNotificacion and mx.idTomaMx = dx.idTomaMx and mx.codigoUnicoMx = rmx.tomaMx.codigoUnicoMx " +
+                "and dx.codDx.idDiagnostico = (select cast(p.valor as long) from Parametro p where p.nombre = 'DX_VIAJERO_COVID19') " +
+                "and noti.pasivo = false and mx.anulada = false and dx.anulado = false " +
+                (filtro.getFechaInicio()!= null && filtro.getFechaFin()!=null ? "and rmx.fechaHoraRecepcion between :fechaInicio and :fechaFin " : "") +
+                "GROUP BY trunc(rmx.fechaHoraRecepcion) ORDER BY trunc(rmx.fechaHoraRecepcion)");
+        if (filtro.getFechaInicio()!= null && filtro.getFechaFin()!=null) {
+            query.setParameter("fechaInicio", filtro.getFechaInicio());
+            query.setParameter("fechaFin", filtro.getFechaFin());
+        }
+
+        query.setResultTransformer(Transformers.aliasToBean(RecepcionViajeros.class));
+        return query.list();
+    }
 }
