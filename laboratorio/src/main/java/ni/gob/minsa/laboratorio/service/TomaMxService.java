@@ -410,12 +410,13 @@ public class TomaMxService {
     }
 
     public List<Solicitud> getSolicitudesDxByIdTomaV2(String idTomaMx, String codigoLab){
-        String query = "select distinct sdx.codDx.idDiagnostico as idSolicitud, sdx.idSolicitudDx as idSolicitudDx, sdx.codDx.nombre as nombre, sdx.aprobada as aprobada, sdx.codDx.area.idArea as idArea " +
+        String query = "select distinct sdx.codDx.idDiagnostico as idSolicitud, sdx.idSolicitudDx as idSolicitudDx, sdx.codDx.nombre as nombre, sdx.aprobada as aprobada, sdx.codDx.area.idArea as idArea, sdx.fechaHSolicitud as fechaSolicitud " +
                 "from DaSolicitudDx sdx inner join sdx.idTomaMx mx " +
                 "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
                 "and (sdx.labProcesa.codigo = :codigoLab" +
                 " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
-                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) ";
+                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )" +
+                " or mx.idTomaMx = (select r.tomaMx.idTomaMx from RecepcionMx r where r.tomaMx.idTomaMx = :idTomaMx and r.trasladoViajero = true )) ";
 
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
@@ -834,7 +835,9 @@ public class TomaMxService {
         List<DatosSolicitud> datos = q.list();
         query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudDx sdx, AutoridadLaboratorio al " +
                 "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and " +
-                "(sdx.labProcesa.codigo = al.laboratorio.codigo or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo))" +
+                "(sdx.labProcesa.codigo = al.laboratorio.codigo " +
+                "or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo)" +
+                "or sdx.idTomaMx.idTomaMx = (select r.tomaMx.idTomaMx from RecepcionMx r where r.tomaMx.idTomaMx = :idToma and r.trasladoViajero = true ))" +
                 "and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.codDx.area.idArea = :idArea " +
                 "ORDER BY sdx.fechaHSolicitud";
         q = sessionFactory.getCurrentSession().createQuery(query);
@@ -850,7 +853,9 @@ public class TomaMxService {
     public List<Area> getAreaSolicitudesAprobByTomaAndUser(String idToma, String userName){
         String query = "select a from Area as a where a.idArea in (select sdx.codDx.area.idArea from DaSolicitudDx as sdx, AutoridadLaboratorio as al " +
                 "where al.pasivo = false and sdx.anulado = false and " +
-                "(sdx.labProcesa.codigo = al.laboratorio.codigo or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo))" +
+                "(sdx.labProcesa.codigo = al.laboratorio.codigo " +
+                "or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo) " +
+                " or sdx.idTomaMx.idTomaMx = (select r.tomaMx.idTomaMx from RecepcionMx r where r.tomaMx.idTomaMx = :idToma and r.trasladoViajero = true ))" +
                 " and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.aprobada = true " +
                 "group by sdx.codDx.area.idArea)";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
@@ -1025,7 +1030,10 @@ public class TomaMxService {
 
     public List<DaSolicitudDx> getSoliDxPrioridadByTomaAndLab(String idTomaMx, String lab){
         String query = "select sdx from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx and " +
-                "(sdx.labProcesa.codigo =:lab or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :lab )) ORDER BY dx.prioridad asc, sdx.fechaHSolicitud asc ";
+                "(sdx.labProcesa.codigo =:lab " +
+                "or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :lab ) " +
+                "or sdx.idTomaMx.idTomaMx = (select r.tomaMx.idTomaMx from RecepcionMx r where r.tomaMx.idTomaMx = :idTomaMx and r.trasladoViajero = true ) " +
+                ") ORDER BY dx.prioridad asc, sdx.fechaHSolicitud asc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setParameter("lab",lab);

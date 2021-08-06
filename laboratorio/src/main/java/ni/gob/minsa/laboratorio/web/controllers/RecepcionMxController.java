@@ -230,7 +230,7 @@ public class RecepcionMxController {
             DaTomaMx tomaMx = tomaMxService.getTomaMxById(strIdOrden);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
+            //List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<Unidades> unidades = null;
             Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
             List<DaSolicitudDx> solicitudDxList = tomaMxService.getSolicitudesDxByIdToma(tomaMx.getIdTomaMx(),labUser.getCodigo());
@@ -265,7 +265,7 @@ public class RecepcionMxController {
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
             mav.addObject("tipoMuestra", tipoMxList);
-            mav.addObject("laboratorios",laboratorioList);
+            //mav.addObject("laboratorios",laboratorioList);
             mav.addObject("fechaInicioSintomas",fechaInicioSintomas);
             mav.addObject("inadecuada",html);
             mav.addObject("dxList",solicitudDxList);
@@ -307,7 +307,7 @@ public class RecepcionMxController {
             RecepcionMx recepcionMx = recepcionMxService.getRecepcionMx(strIdRecepcion);
             List<EntidadesAdtvas> entidadesAdtvases =  entidadAdmonService.getAllEntidadesAdtvas();
             List<TipoMx> tipoMxList = catalogosService.getTipoMuestra();
-            List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
+            //List<Laboratorio> laboratorioList = laboratoriosService.getLaboratoriosInternos();
             List<CalidadMx> calidadMx= catalogosService.getCalidadesMx();
             List<CondicionMx> condicionesMx = catalogosService.getCondicionesMx();
             //List<TipoTubo> tipoTubos = catalogosService.getTipoTubos();
@@ -514,7 +514,7 @@ public class RecepcionMxController {
             mav.addObject("entidades",entidadesAdtvases);
             mav.addObject("unidades",unidades);
             mav.addObject("tipoMuestra", tipoMxList);
-            mav.addObject("laboratorios",laboratorioList);
+            //mav.addObject("laboratorios",laboratorioList);
             mav.addObject("calidadMx",calidadMx);
             mav.addObject("condicionesMx",condicionesMx);
             mav.addObject("causasRechazo",causaRechazoMxList);
@@ -2657,9 +2657,10 @@ public class RecepcionMxController {
     @RequestMapping(value = "printResults", method = RequestMethod.GET)
     public ModelAndView initPrintResultsForm(HttpServletRequest request) throws Exception {
         logger.debug("inicia formulario para imprimir resultados aprobados y liberados para los pacientes");
-            Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        Laboratorio labUser = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         ModelAndView mav = new ModelAndView();
-        boolean permitirFiltroViajero = labUser != null && labUser.getCodigo().equalsIgnoreCase("CNDR");
+        Parametro parametro = parametrosService.getParametroByName("CODIGOS_LAB_VIAJEROS");
+        boolean permitirFiltroViajero = parametro != null && labUser != null && parametro.getValor().contains(labUser.getCodigo());
         mav.addObject("permitirFiltroViajero", permitirFiltroViajero);
         mav.setViewName("recepcionMx/printResults");
         return mav;

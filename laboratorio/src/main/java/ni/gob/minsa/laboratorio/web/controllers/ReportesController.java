@@ -329,12 +329,13 @@ public class ReportesController {
                 }
                 map.put("solicitudes", dxs);
                 map.put("factura", numFactura);
-            }
-            if(solicitudE != null){
+
+            } else if(solicitudE != null){
                 map.put("solicitudes",(dxs.isEmpty()?solicitudE.getTipoEstudio().getNombre():dxs+", "+solicitudE.getTipoEstudio().getNombre()));
                 map.put("factura", " ");
             }else{
                 map.put("solicitudes", dxs);
+                map.put("factura", " ");
             }
             map.put("identificacion", identificacion);
             map.put("usuario", receivedMx.getUsuarioRecepcion().getCompleteName());

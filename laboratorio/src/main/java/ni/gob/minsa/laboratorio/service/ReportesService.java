@@ -73,6 +73,24 @@ public class ReportesService {
                         Restrictions.eq("toma.anulada", false))
         );
 
+        crit.add(Restrictions.or(
+                        Restrictions.isNull("trasladoViajero"))
+                .add(Restrictions.or(Restrictions.eq("trasladoViajero", false))) //que no sea recepcion generada por traslado viajero
+        );
+
+        /*Junction conditGroup = Restrictions.disjunction();
+        conditGroup.add(Subqueries.propertyIn("notifi.persona.personaId", DetachedCriteria.forClass(SisPersona.class,"person")
+                .add(Restrictions.or(Restrictions.ilike("person.primerNombre", "%" + partes[i] + "%"))
+                        .add(Restrictions.or(Restrictions.ilike("person.primerApellido", "%" + partes[i] + "%"))
+                                .add(Restrictions.or(Restrictions.ilike("person.segundoNombre", "%" + partes[i] + "%"))
+                                        .add(Restrictions.or(Restrictions.ilike("person.segundoApellido", "%" + partes[i] + "%"))
+                                                .add(Restrictions.or(Restrictions.ilike("person.sndNombre", "%" + partesSnd[i] + "%")))))))
+                .setProjection(Property.forName("personaId"))))
+                .add(Subqueries.propertyIn("notifi.solicitante.idSolicitante", DetachedCriteria.forClass(Solicitante.class,"solicitante")
+                        .add(Restrictions.ilike("solicitante.nombre", "%" + partes[i] + "%"))
+                        .setProjection(Property.forName("idSolicitante"))));
+        crit.add(conditGroup);*/
+
         if(filtro.getNombreSolicitud()!= null){
             filtro.setNombreSolicitud(URLDecoder.decode(filtro.getNombreSolicitud(), "utf-8"));
         }
@@ -475,7 +493,7 @@ public class ReportesService {
         Session session = sessionFactory.getCurrentSession();
         String sQuery = "select coalesce(count(r.idRecepcion),0) as total, sa.entidadAdtvaId, sa.nombre " +
                 "from RecepcionMx as r inner join r.tomaMx as mx left join mx.codSilaisAtencion as sa " +
-                "where r.fechaHoraRecepcion between :fechaInicio and :fechaFin ";
+                "where r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) ";
                 if (!nivelCentral){
                     sQuery += "and r.labRecepcion.codigo = :laboratorio ";
                 }
@@ -505,7 +523,7 @@ public class ReportesService {
                 "coalesce((select count(distinct r.idRecepcion) " +
                 "from RecepcionMx as r inner join r.tomaMx as mx inner join mx.idNotificacion as noti " +
                 "where r.labRecepcion.codigo = :laboratorio and noti.codUnidadAtencion.municipio.divisionpoliticaId = divi.divisionpoliticaId " +
-                "and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                "and r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) " +
                 "group by noti.codUnidadAtencion.municipio.divisionpoliticaId), 0), divi.codigoNacional, divi.nombre " +
                 "from Divisionpolitica as divi, Unidades as uni " +
                 "where divi.pasivo = '0' and uni.pasivo='0' " +
@@ -528,15 +546,16 @@ public class ReportesService {
         String sQuery = "select count(r.idRecepcion) as total, dx.idDiagnostico, dx.nombre " +
                 "from RecepcionMx as r, DaSolicitudDx as sdx inner join sdx.idTomaMx as mx " +
                 "inner join sdx.codDx as dx " +
-                "where r.tomaMx.idTomaMx = mx.idTomaMx and sdx.anulado = false and sdx.inicial = true and sdx.labProcesa.codigo = :laboratorio " +
-                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                "where r.tomaMx.idTomaMx = mx.idTomaMx and sdx.anulado = false and sdx.inicial = true " +
+                "and r.labRecepcion.codigo = sdx.labProcesa.codigo and sdx.labProcesa.codigo = :laboratorio " +
+                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) " +
                 "group by dx.idDiagnostico, dx.nombre";
 
         String sQuery2 = "select count(r.idRecepcion) as total, es.idEstudio, es.nombre " +
                 "from RecepcionMx as r, DaSolicitudEstudio as sde inner join sde.idTomaMx as mx " +
                 "inner join sde.tipoEstudio as es " +
                 "where r.tomaMx.idTomaMx = mx.idTomaMx and sde.anulado = false and mx.envio.laboratorioDestino.codigo = :laboratorio " +
-                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
+                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) " +
                 "group by es.idEstudio, es.nombre";
 
 

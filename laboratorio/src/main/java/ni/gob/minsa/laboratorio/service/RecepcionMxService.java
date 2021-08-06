@@ -531,4 +531,56 @@ public class RecepcionMxService {
         Object oExiste  = q.uniqueResult();
         return oExiste!=null;
     }
+
+    /*******VIAJEROS****/
+    public List<DatosRecepcionMx> getRecepcionesByFiltros(FiltroMx filtro){
+        try {
+            String query = "select a.idRecepcion as idRecepcion, a.fechaHoraRecepcion as fechaHoraRecepcion, a.fechaRecibido as fechaRecibido, a.horaRecibido as horaRecibido, " +
+                    "coalesce((select c.valor from CalidadMx c where c.codigo = a.calidadMx.codigo ), '--') as calidadMx, " +
+                    "cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, " +
+                    "coalesce((select r.valor from Respuesta r where r.codigo = noti.urgente.codigo), '--') as urgente, "+
+                    "t.idTomaMx as tomaMx, t.fechaHTomaMx as fechaTomaMx, t.codigoLab as codigoMx, t.codTipoMx.nombre as nombreTipoMx, " +
+                    "coalesce((select ea.nombre from EntidadesAdtvas ea where ea.codigo = t.codSilaisAtencion.codigo ), '--') as nombreSilaisMx, " +
+                    "coalesce((select u.nombre from Unidades u where u.codigo = t.codUnidadAtencion.codigo), '--') as nombreUnidadMx " +
+                    "from RecepcionMx as a inner join a.tomaMx as t inner join t.idNotificacion noti inner join noti.persona p " +
+                    "where a.labRecepcion.codigo = :codigoLab and noti.pasivo = false " +
+                    "and t.idTomaMx in (select dx.idTomaMx.idTomaMx from DaSolicitudDx dx where dx.codDx.id = :idDx and dx.anulado = false and dx.controlCalidad = false)" +
+                    "and t.anulada = false and t.estadoMx.codigo = :estadoMx "+
+                    (filtro.getFechaInicioRecep() != null && filtro.getFechaFinRecep() != null ? " and a.fechaHoraRecepcion between :fechaInicio and :fechaFin " : "") +
+                    (filtro.getCodigoUnicoMx() != null ? "and (t.codigoUnicoMx= :codigoMx or t.codigoLab = :codigoMx) " : "");
+
+            Session session = sessionFactory.getCurrentSession();
+            Query q = session.createQuery(query);
+            q.setParameter("codigoLab", filtro.getCodLaboratio());
+            q.setParameter("idDx", filtro.getIdDx());
+            q.setParameter("estadoMx", filtro.getCodEstado());
+            if (filtro.getFechaInicioRecep() != null && filtro.getFechaFinRecep() != null) {
+                q.setParameter("fechaInicio", filtro.getFechaInicioRecep());
+                q.setParameter("fechaFin", filtro.getFechaFinRecep());
+            }
+            if (filtro.getCodigoUnicoMx() != null) {
+                q.setParameter("codigoMx", filtro.getCodigoUnicoMx());
+            }
+            q.setResultTransformer(Transformers.aliasToBean(DatosRecepcionMx.class));
+            return  q.list();
+        }catch (Exception ex){
+            throw  ex;
+        }
+
+    }
+
+    public void deleteRecepcionMx(RecepcionMx dto) throws Exception{
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
+            }
+            else
+                throw new Exception("Objeto RecepcionMx es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
+
 }

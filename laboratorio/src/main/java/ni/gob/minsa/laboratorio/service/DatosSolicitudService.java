@@ -192,7 +192,7 @@ public class DatosSolicitudService {
 
     public String getNumeroFactura(String idSolicitud){
         List<DetalleDatosRecepcion> resFinalList = this.getDetalleDatosRecepcionByIdSolicitud(idSolicitud);
-        String numFactura="";
+        String numFactura=" ";
         for(DetalleDatosRecepcion res: resFinalList){
             if (res.getNombre().toLowerCase().contains("factura"))
                 if (res.getTipoConcepto().equals("TPDATO|LIST")) {

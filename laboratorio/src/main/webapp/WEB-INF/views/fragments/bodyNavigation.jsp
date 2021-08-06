@@ -85,6 +85,9 @@
                     <li class="sendReceipt">
                         <a href="<spring:url value="/sendMxReceipt/init" htmlEscape="true "/>" title="<spring:message code="menu.send.receipt.orders" />"><i class="fa fa-lg fa-fw fa-shopping-cart "></i> <spring:message code="menu.send.receipt.orders" /></a>
                     </li>
+                    <li class="moveTravelers">
+                        <a href="<spring:url value="/sendMxReceipt/travelers" htmlEscape="true "/>" title="<spring:message code="menu.move.travelers" />"><i class="fa fa-lg fa-fw fa-send"></i> <spring:message code="menu.move.travelers" /></a>
+                    </li>
                     <li class="searchMx">
                         <a href="<spring:url value="/searchMx/init" htmlEscape="true "/>" title="<spring:message code="menu.search.mx" />"><i class="fa fa-lg fa-fw fa-search"></i> <spring:message code="menu.search.mx" /></a>
                     </li>

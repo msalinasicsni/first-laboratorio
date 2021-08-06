@@ -4,6 +4,8 @@ package ni.gob.minsa.laboratorio.utilities.reportes;
  * Created by Miguel Salinas on 07/05/2019.
  * V1.0
  */
+import java.util.Date;
+
 public class Solicitud {
 
     Integer idSolicitud;
@@ -12,6 +14,7 @@ public class Solicitud {
     boolean aprobada;
     Integer idArea;
     String idSolicitudDx;
+    Date fechaSolicitud;
 
     public Integer getIdSolicitud() {
         return idSolicitud;
@@ -59,5 +62,13 @@ public class Solicitud {
 
     public void setIdSolicitudDx(String idSolicitudDx) {
         this.idSolicitudDx = idSolicitudDx;
+    }
+
+    public Date getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(Date fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
     }
 }

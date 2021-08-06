@@ -3,6 +3,7 @@ package ni.gob.minsa.laboratorio.service;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
 import ni.gob.minsa.laboratorio.domain.examen.*;
 import ni.gob.minsa.laboratorio.domain.muestra.Laboratorio;
+import ni.gob.minsa.laboratorio.domain.parametros.Parametro;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -192,5 +193,18 @@ public class LaboratoriosService {
         Query q = session.createQuery(query);
         q.setParameter("idEntidadAdtvaLab",idEntidadAdtvaLab);
         return (EntidadAdtvaLaboratorio)q.uniqueResult();
+    }
+
+    public List<Laboratorio> getLaboratoriosViajeros(String codLabUser){
+        String strQParam = "select valor from Parametro where nombre='CODIGOS_LAB_VIAJEROS'";
+        Query qP = sessionFactory.getCurrentSession().createQuery(strQParam);
+        String codigosLab = (String)qP.uniqueResult();
+
+        if (codigosLab.contains(codLabUser)) {
+            String query = "from Laboratorio where codigo in (" + codigosLab + ") and codigo != :codLabUser order by nombre";
+            Query q = sessionFactory.getCurrentSession().createQuery(query);
+            q.setParameter("codLabUser", codLabUser);
+            return q.list();
+        }else return null;
     }
 }

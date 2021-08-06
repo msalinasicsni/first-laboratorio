@@ -415,4 +415,32 @@ public class TrasladosService {
         else
             return null;
     }
+
+    public void deleteTrasladoMx(TrasladoMx dto) throws Exception{
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
+            }
+            else
+                throw new Exception("Objeto TrasladoMx es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw  ex;
+        }
+    }
+
+    public void deleteHistoricoEnvioMx(HistoricoEnvioMx dto) throws Exception{
+        try {
+            if (dto != null) {
+                Session session = sessionFactory.getCurrentSession();
+                session.delete(dto);
+            }
+            else
+                throw new Exception("Objeto HistoricoEnvioMx es NULL");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw  ex;
+        }
+    }
 }

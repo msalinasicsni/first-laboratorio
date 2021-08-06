@@ -11,7 +11,6 @@ import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadDepartamento;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadDireccion;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.AutoridadLaboratorio;
 import ni.gob.minsa.laboratorio.domain.solicitante.Solicitante;
-import ni.gob.minsa.laboratorio.utilities.FiltrosReporte;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoSolicitud;
 import ni.gob.minsa.laboratorio.utilities.reportes.ResultadoVigilancia;

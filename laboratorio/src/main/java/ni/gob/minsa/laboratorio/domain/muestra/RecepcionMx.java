@@ -36,6 +36,8 @@ public class RecepcionMx implements Serializable, Auditable {
     CondicionMx condicionMx;
     Date fechaRecibido;
     String horaRecibido;
+    //marcar si la recepción es originada por una traslado de recepción viajero
+    Boolean trasladoViajero;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -180,6 +182,15 @@ public class RecepcionMx implements Serializable, Auditable {
     public String getHoraRecibido() { return horaRecibido; }
 
     public void setHoraRecibido(String horaRecibido) { this.horaRecibido = horaRecibido; }
+
+    @Column(name = "TRAS_VIAJERO", nullable = true, insertable = true, updatable = true)
+    public Boolean getTrasladoViajero() {
+        return trasladoViajero;
+    }
+
+    public void setTrasladoViajero(Boolean trasladoViajero) {
+        this.trasladoViajero = trasladoViajero;
+    }
 
     @Override
     public boolean isFieldAuditable(String fieldname) {
