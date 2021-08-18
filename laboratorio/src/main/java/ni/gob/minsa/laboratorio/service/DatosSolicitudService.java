@@ -220,7 +220,7 @@ public class DatosSolicitudService {
                     String valorBoleano = (Boolean.valueOf(res.getValor())?"lbl.yes":"lbl.no");
                     identificacion+=valorBoleano;
                 } else {
-                    identificacion+=res.getValor().toUpperCase();
+                    identificacion+=res.getValor().trim().toUpperCase();
                 }
         }
         if (identificacion.isEmpty()) identificacion = identificacionPersona;
@@ -259,7 +259,7 @@ public class DatosSolicitudService {
                     String valorBoleano = (Boolean.valueOf(res.getValor()) ? "lbl.yes" : "lbl.no");
                     datos.setIdentificacion(valorBoleano);
                 } else {
-                    datos.setIdentificacion(res.getValor().toUpperCase());
+                    datos.setIdentificacion(res.getValor().trim().toUpperCase());
                 }
             } else if (res.getNombre().toLowerCase().contains("idioma")) {
                 if (res.getTipoConcepto().equals("TPDATO|LIST")) {

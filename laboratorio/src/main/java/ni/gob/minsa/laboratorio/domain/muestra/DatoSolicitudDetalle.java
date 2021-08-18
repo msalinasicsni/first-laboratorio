@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.domain.muestra;
 
+import ni.gob.minsa.laboratorio.domain.audit.Auditable;
 import ni.gob.minsa.laboratorio.domain.seguridadlocal.User;
 import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.GenericGenerator;
@@ -15,7 +16,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "dato_solicitud_detalle", schema = "laboratorio")
-public class DatoSolicitudDetalle implements Serializable{
+public class DatoSolicitudDetalle implements Serializable, Auditable {
 
     String idDetalle;
     String valor;
@@ -85,5 +86,37 @@ public class DatoSolicitudDetalle implements Serializable{
 
     public void setUsuarioRegistro(User usuarioRegistro) {
         this.usuarioRegistro = usuarioRegistro;
+    }
+
+    @Override
+    public boolean isFieldAuditable(String fieldname) {
+        if (fieldname.matches("fechahRegistro") || fieldname.matches("usuarioRegistro"))
+            return false;
+        else
+            return true;
+    }
+
+    @Override
+    public String toString() {
+        return "DatoSolicitudDetalle{" +
+                "idDetalle='" + idDetalle + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DatoSolicitudDetalle that = (DatoSolicitudDetalle) o;
+
+        if (idDetalle != null ? !idDetalle.equals(that.idDetalle) : that.idDetalle != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idDetalle != null ? idDetalle.hashCode() : 0;
     }
 }

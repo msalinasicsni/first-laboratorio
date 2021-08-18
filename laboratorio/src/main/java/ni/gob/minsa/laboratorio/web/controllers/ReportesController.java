@@ -3708,6 +3708,8 @@ public class ReportesController {
     List<RecepcionViajeros> fetchReceptionTravelers(@RequestParam(value = "strFilter", required = true) String filtro) throws Exception{
         logger.info("Obteniendo los datos para recepcion viajeros ");
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
+        Laboratorio laboratorioUsuario = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
+        filtroRep.setCodLaboratio(laboratorioUsuario.getCodigo());
         return reportesService.getRecepcionesViajeros(filtroRep);
     }
 }

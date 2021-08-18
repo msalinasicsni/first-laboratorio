@@ -400,7 +400,9 @@ public class TomaMxService {
                 "where sdx.anulado = false and mx.idTomaMx = :idTomaMx " +
                 "and (sdx.labProcesa.codigo = :codigoLab" +
                 " or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx " +
-                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab )) " +
+                "                   from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = :codigoLab ) " +
+                "or mx.idTomaMx = (select r.tomaMx.idTomaMx from RecepcionMx r where r.tomaMx.idTomaMx = :idTomaMx and r.trasladoViajero = true )" +
+                ") " +
                 "ORDER BY sdx.fechaHSolicitud ";
 
         Query q = sessionFactory.getCurrentSession().createQuery(query);

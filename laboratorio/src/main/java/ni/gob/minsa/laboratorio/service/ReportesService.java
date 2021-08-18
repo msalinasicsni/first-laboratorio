@@ -493,7 +493,7 @@ public class ReportesService {
         Session session = sessionFactory.getCurrentSession();
         String sQuery = "select coalesce(count(r.idRecepcion),0) as total, sa.entidadAdtvaId, sa.nombre " +
                 "from RecepcionMx as r inner join r.tomaMx as mx left join mx.codSilaisAtencion as sa " +
-                "where r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) ";
+                "where r.fechaHoraRecepcion between :fechaInicio and :fechaFin ";
                 if (!nivelCentral){
                     sQuery += "and r.labRecepcion.codigo = :laboratorio ";
                 }
@@ -523,7 +523,7 @@ public class ReportesService {
                 "coalesce((select count(distinct r.idRecepcion) " +
                 "from RecepcionMx as r inner join r.tomaMx as mx inner join mx.idNotificacion as noti " +
                 "where r.labRecepcion.codigo = :laboratorio and noti.codUnidadAtencion.municipio.divisionpoliticaId = divi.divisionpoliticaId " +
-                "and r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) " +
+                "and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
                 "group by noti.codUnidadAtencion.municipio.divisionpoliticaId), 0), divi.codigoNacional, divi.nombre " +
                 "from Divisionpolitica as divi, Unidades as uni " +
                 "where divi.pasivo = '0' and uni.pasivo='0' " +
@@ -547,15 +547,15 @@ public class ReportesService {
                 "from RecepcionMx as r, DaSolicitudDx as sdx inner join sdx.idTomaMx as mx " +
                 "inner join sdx.codDx as dx " +
                 "where r.tomaMx.idTomaMx = mx.idTomaMx and sdx.anulado = false and sdx.inicial = true " +
-                "and r.labRecepcion.codigo = sdx.labProcesa.codigo and sdx.labProcesa.codigo = :laboratorio " +
-                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) " +
+               "and r.labRecepcion.codigo = :laboratorio  " +
+               " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
                 "group by dx.idDiagnostico, dx.nombre";
 
         String sQuery2 = "select count(r.idRecepcion) as total, es.idEstudio, es.nombre " +
                 "from RecepcionMx as r, DaSolicitudEstudio as sde inner join sde.idTomaMx as mx " +
                 "inner join sde.tipoEstudio as es " +
-                "where r.tomaMx.idTomaMx = mx.idTomaMx and sde.anulado = false and mx.envio.laboratorioDestino.codigo = :laboratorio " +
-                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin and (r.trasladoViajero is null or r.trasladoViajero = false) " +
+                "where r.tomaMx.idTomaMx = mx.idTomaMx and sde.anulado = false and r.labRecepcion.codigo = :laboratorio " +
+                " and r.fechaHoraRecepcion between :fechaInicio and :fechaFin " +
                 "group by es.idEstudio, es.nombre";
 
 
@@ -620,7 +620,7 @@ public class ReportesService {
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudDx as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
-                    " order by mx.codigoLab"); //order por código para que salga ordenadoel excell
+                    " order by mx.codigoLab"); //order por cï¿½digo para que salga ordenadoel excell
 
         }else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
             queryNotiDx = session.createQuery(" select cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, p.fechaNacimiento as fechaNacimiento, p.sexo.codigo as sexo, " +
@@ -638,7 +638,7 @@ public class ReportesService {
                     " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
                     " and noti.codSilaisAtencion.entidadAdtvaId =:codSilais " +
-                    " order by mx.codigoLab");//order por código para que salga ordenadoel excell
+                    " order by mx.codigoLab");//order por cï¿½digo para que salga ordenadoel excell
             queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
 
         } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
@@ -657,7 +657,7 @@ public class ReportesService {
                     " from DaSolicitudDx dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true and dx.controlCalidad = false "+ sqlLab + sqlRutina + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
                     " and noti.codUnidadAtencion.unidadId =:codUnidad " +
-                    " order by mx.codigoLab");//order por código para que salga ordenadoel excell
+                    " order by mx.codigoLab");//order por cï¿½digo para que salga ordenadoel excell
             queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
         }
 
@@ -2111,7 +2111,7 @@ public class ReportesService {
                     " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoUnicoMx as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, dx.idSolicitudEstudio as idSolicitud, dx.fechaAprobacion as fechaAprobacion, noti.codigoPacienteVIH as codigoVIH  " +
                     " from DaSolicitudEstudio dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
-                    " order by mx.codigoUnicoMx");//order por código para que salga ordenadoel excell
+                    " order by mx.codigoUnicoMx");//order por cï¿½digo para que salga ordenadoel excell
 
         }else if (filtro.getCodArea().equals("AREAREP|SILAIS")) {
             queryNotiDx = session.createQuery(" select cast(p.personaId as string) as codigoExpUnico, p.primerNombre as primerNombre, p.segundoNombre as segundoNombre, p.primerApellido as primerApellido, p.segundoApellido as segundoApellido, p.fechaNacimiento as fechaNacimiento, p.sexo.codigo as sexo, " +
@@ -2129,7 +2129,7 @@ public class ReportesService {
                     " from DaSolicitudEstudio dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
                     " and noti.codSilaisAtencion.entidadAdtvaId =:codSilais " +
-                    " order by mx.codigoUnicoMx");//order por código para que salga ordenadoel excell
+                    " order by mx.codigoUnicoMx");//order por cï¿½digo para que salga ordenadoel excell
             queryNotiDx.setParameter("codSilais", filtro.getCodSilais());
 
         } else if (filtro.getCodArea().equals("AREAREP|UNI")) {
@@ -2148,7 +2148,7 @@ public class ReportesService {
                     " from DaSolicitudEstudio dx inner join dx.idTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p " +
                     " where noti.pasivo = false and dx.anulado = false and mx.anulada = false and dx.aprobada = true " + (filtro.getEstudios()!=null? String.format(sqlEstudios, filtro.getEstudios()) : sqlEstudio) + (filtro.getConsolidarPor().equalsIgnoreCase("FIS")? sqlFIS : sqlFechasAproRut) +
                     " and noti.codUnidadAtencion.unidadId =:codUnidad " +
-                    " order by mx.codigoUnicoMx");//order por código para que salga ordenadoel excell
+                    " order by mx.codigoUnicoMx");//order por cï¿½digo para que salga ordenadoel excell
             queryNotiDx.setParameter("codUnidad", filtro.getCodUnidad());
         }
 
@@ -2408,13 +2408,18 @@ public class ReportesService {
                 "from DaNotificacion noti, DaTomaMx mx, DaSolicitudDx dx, RecepcionMx rmx " +
                 "where noti.idNotificacion = mx.idNotificacion and mx.idTomaMx = dx.idTomaMx and mx.codigoUnicoMx = rmx.tomaMx.codigoUnicoMx " +
                 "and dx.codDx.idDiagnostico = (select cast(p.valor as long) from Parametro p where p.nombre = 'DX_VIAJERO_COVID19') " +
-                "and noti.pasivo = false and mx.anulada = false and dx.anulado = false " +
+                "and noti.pasivo = false and mx.anulada = false and dx.anulado = false and (rmx.trasladoViajero is null or rmx.trasladoViajero = false ) " +
                 (filtro.getFechaInicio()!= null && filtro.getFechaFin()!=null ? "and rmx.fechaHoraRecepcion between :fechaInicio and :fechaFin " : "") +
+                (filtro.getCodLaboratio() != null ? "and rmx.labRecepcion.codigo = :codLaboratio " : "") +
                 "GROUP BY trunc(rmx.fechaHoraRecepcion) ORDER BY trunc(rmx.fechaHoraRecepcion)");
         if (filtro.getFechaInicio()!= null && filtro.getFechaFin()!=null) {
             query.setParameter("fechaInicio", filtro.getFechaInicio());
             query.setParameter("fechaFin", filtro.getFechaFin());
         }
+        if (filtro.getCodLaboratio() != null) {
+            query.setParameter("codLaboratio", filtro.getCodLaboratio());
+        }
+
 
         query.setResultTransformer(Transformers.aliasToBean(RecepcionViajeros.class));
         return query.list();
