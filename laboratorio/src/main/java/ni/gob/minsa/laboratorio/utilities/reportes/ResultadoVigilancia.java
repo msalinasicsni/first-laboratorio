@@ -63,6 +63,8 @@ public class ResultadoVigilancia {
     private Integer semanasEmbarazo;
     private String urgente;
 
+    private Date fechaRegistro;
+
     public String getIdNotificacion() {
         return idNotificacion;
     }
@@ -461,5 +463,13 @@ public class ResultadoVigilancia {
 
     public void setFechaSolicitud(Date fechaSolicitud) {
         this.fechaSolicitud = fechaSolicitud;
+    }
+
+    public Date getFechaRegistro() {
+        return fechaRegistro;
+    }
+
+    public void setFechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
 }

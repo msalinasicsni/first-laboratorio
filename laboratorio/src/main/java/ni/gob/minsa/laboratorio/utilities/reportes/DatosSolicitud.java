@@ -12,7 +12,7 @@ public class DatosSolicitud {
     private String fechaSolicitud;
     private String estadoSolicitud;
     private Boolean aprobada;
-    private String fechaAprobacion;
+    private Date fechaAprobacion;
     private List<ValorResultado> resultado;
     private String usuarioAprobacion;
 
@@ -80,11 +80,11 @@ public class DatosSolicitud {
         this.aprobada = aprobada;
     }
 
-    public String getFechaAprobacion() {
+    public Date getFechaAprobacion() {
         return fechaAprobacion;
     }
 
-    public void setFechaAprobacion(String fechaAprobacion) {
+    public void setFechaAprobacion(Date fechaAprobacion) {
         this.fechaAprobacion = fechaAprobacion;
     }
 

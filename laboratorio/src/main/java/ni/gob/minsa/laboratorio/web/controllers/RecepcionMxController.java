@@ -2806,6 +2806,7 @@ public class RecepcionMxController {
         String languaje = filtros.getLanguaje();
         PDDocument doc = new PDDocument();
         String formatoFecha = "dd/MM/yyyy";
+        String formatoFechaHora = "dd/MM/yyyy hh:mm:ss a";
         Locale locale = new Locale("es", "NI");
         Laboratorio labProcesa = seguridadService.getLaboratorioUsuario(seguridadService.obtenerNombreUsuario());
         String response = null;
@@ -2828,12 +2829,14 @@ public class RecepcionMxController {
                             if (languaje.equalsIgnoreCase("EN")){
                                 locale = Locale.ENGLISH;
                                 formatoFecha = "MM/dd/yyyy";
+                                formatoFechaHora = "MM/dd/yyyy hh:mm:ss a";
                             } else {
                                 formatoFecha = "dd/MM/yyyy";
+                                formatoFechaHora = "dd/MM/yyyy hh:mm:ss a";
                                 locale = new Locale("es");
                             }
                         }
-                        String fechaImpresion = DateUtil.DateToString(new Date(), formatoFecha); //solo poner fecha, sin hora. Sonia 28/10/2020
+                        String fechaImpresion = DateUtil.DateToString(new Date(), formatoFechaHora); //volver a poner la hora. Andrea 18/11/2021 //solo poner fecha, sin hora. Sonia 28/10/2020
                         List<Area> areaDxList = tomaMxService.getAreaSolicitudesAprobByTomaAndUser(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario());
                         Authority esRecepcionista = usuarioService.getAuthority(userName, "ROLE_RECEPCION");
                         float yPosicionExamen = 0;
@@ -2934,8 +2937,8 @@ public class RecepcionMxController {
                                 y = y - 15;
                                 GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.type.long", null, locale) + ":", y, 60, stream, 11, PDType1Font.HELVETICA);
                                 GeneralUtils.drawTEXT((esMxViajeroCovid && locale == Locale.ENGLISH ? messageSource.getMessage("lbl.sample.type.nasopharyngeal.swab", null, locale) : tomaMx.getNombreTipoMx()), y, 150, stream, 11, PDType1Font.HELVETICA_BOLD);
-                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, locale), y, (esMxViajeroCovid && locale == Locale.ENGLISH ? 300 : 355), stream, 11, PDType1Font.HELVETICA);
-                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), formatoFecha), y, (esMxViajeroCovid && locale == Locale.ENGLISH ? 380 : 465), stream, 11, PDType1Font.HELVETICA_BOLD);
+                                GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sampling.datetime1", null, locale), y, (esMxViajeroCovid && locale == Locale.ENGLISH ? 300 : 300), stream, 11, PDType1Font.HELVETICA);
+                                GeneralUtils.drawTEXT(DateUtil.DateToString(tomaMx.getFechaTomaMx(), formatoFecha)+ " " + DateUtil.DateToString(tomaMx.getFechaRegistro(), "hh:mm:ss a"), y, (esMxViajeroCovid && locale == Locale.ENGLISH ? 380 : 410), stream, (esMxViajeroCovid && locale != Locale.ENGLISH ? 10 : 11), PDType1Font.HELVETICA_BOLD);
 
                                 //resultados
                                 List<DatosSolicitud> listDx = tomaMxService.getSolicitudesAprobByToma_User_Area(tomaMx.getIdTomaMx(), seguridadService.obtenerNombreUsuario(), area.getIdArea());
@@ -2945,12 +2948,14 @@ public class RecepcionMxController {
                                 String aprobadoPor = "";
                                 String codMinsaProcesa = "";
                                 String codMinsaAprueba = "";
+                                String fechaProcesamiento = "";
                                 if (recepcionMx.getCalidadMx() != null && recepcionMx.getCalidadMx().getCodigo().equalsIgnoreCase("CALIDMX|IDC")) {
                                     y = y - 20;
                                     GeneralUtils.drawTEXT(messageSource.getMessage("lbl.sample.inadequate2", null, locale), y, 100, stream, 10, PDType1Font.HELVETICA);
                                 } else {
                                     for (DatosSolicitud dx : listDx) {
                                         aprobadoPor = dx.getUsuarioAprobacion();
+                                        fechaProcesamiento = DateUtil.DateToString(dx.getFechaAprobacion(), formatoFechaHora); //poner fecha y hora de aprobación. Andrea 18/11/2021
                                         y = y - 20;
                                         List<DatosOrdenExamen> examenes = ordenExamenMxService.getOrdenesExamenByIdSolicitudV2(dx.getIdSolicitud());
                                         for (DatosOrdenExamen examen : examenes) {
@@ -2984,7 +2989,7 @@ public class RecepcionMxController {
                                                 y = y - 15;
                                             }
 
-                                            String fechaProcesamiento = "";
+
                                             for (DetalleResultado resultado : resultados) {
                                                 String detalleResultado = "";
                                                 if (resultado.getRespuesta().getConcepto().getTipo().getCodigo().equals("TPDATO|LIST")) {
@@ -2996,7 +3001,7 @@ public class RecepcionMxController {
                                                     detalleResultado = resultado.getValor();
                                                 }
                                                 procesadoPor = resultado.getUsuarioRegistro().getCompleteName();
-                                                fechaProcesamiento = DateUtil.DateToString(resultado.getFechahProcesa(), formatoFecha);
+                                                //fechaProcesamiento = DateUtil.DateToString(resultado.getFechahProcesa(), formatoFecha); //poner fecha y hora de aprobación. Andrea 18/11/2021
                                                 GeneralUtils.drawTEXT(resultado.getRespuesta().getNombre() + ": " + detalleResultado, y, 150, stream, 12, PDType1Font.HELVETICA_BOLD);
                                                 y = y - 15;
                                             }

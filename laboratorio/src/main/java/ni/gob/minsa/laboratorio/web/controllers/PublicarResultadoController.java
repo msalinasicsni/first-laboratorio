@@ -278,10 +278,11 @@ public class PublicarResultadoController {
                 viajero.setMunicipio((tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getMunicipio().getNombre() : ""));
                 viajero.setUnidadSalud((tomaMx.getCodUnidadAtencion() != null ? tomaMx.getCodUnidadAtencion().getNombre() : ""));
                 viajero.setTipoMuestra(tomaMx.getCodTipoMx().getNombre());
-                viajero.setFechaTomaMuestra(tomaMx.getFechaHTomaMx());
+                String fechaTomaStr = DateUtil.DateToString(tomaMx.getFechaHTomaMx(), "dd/MM/yyyy")+ " " + DateUtil.DateToString(tomaMx.getFechaRegistro(), "HH:mm:ss");
+                viajero.setFechaTomaMuestra(DateUtil.StringToDate(fechaTomaStr, "dd/MM/yyyy HH:mm:ss"));
                 viajero.setExamen(nombreExamen);
                 viajero.setResultado(detalleResultado);
-                viajero.setFechaProcesamiento(fechaProcesamiento);
+                viajero.setFechaProcesamiento(solicitudDx.getFechaAprobacion());//enviar fecha de aprobación
                 viajero.setProcesadoPor(procesadoPor);
                 viajero.setAprobadoPor(solicitudDx.getUsuarioAprobacion().getCompleteName());
                 viajero.setCodigoValidacion(tomaMx.getCodigoValidacion());

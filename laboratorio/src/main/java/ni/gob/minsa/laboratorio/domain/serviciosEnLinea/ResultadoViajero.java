@@ -134,7 +134,7 @@ public class ResultadoViajero {
         this.tipoMuestra = tipoMuestra;
     }
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "FECHA_TOMA_MUESTRA", nullable = false)
     public Date getFechaTomaMuestra() {
         return fechaTomaMuestra;

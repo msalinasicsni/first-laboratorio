@@ -824,7 +824,8 @@ public class TomaMxService {
 
     @SuppressWarnings("unchecked")
     public List<DatosSolicitud> getSolicitudesAprobByToma_User_Area(String idToma, String userName, int idArea){
-        String query = " select sdx.idSolicitudEstudio as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudEstudio sdx, AutoridadLaboratorio al " +
+        String query = " select sdx.idSolicitudEstudio as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion, sdx.fechaAprobacion as fechaAprobacion " +
+                "from DaSolicitudEstudio sdx, AutoridadLaboratorio al " +
                 "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and " +
                 "sdx.idSolicitudEstudio in (select oe.solicitudEstudio.idSolicitudEstudio from OrdenExamen oe where oe.solicitudEstudio.idSolicitudEstudio = sdx.idSolicitudEstudio and oe.labProcesa.codigo = al.laboratorio.codigo) " +
                 "and al.user.username =:userName and sdx.idTomaMx.idTomaMx = :idToma and sdx.tipoEstudio.area.idArea = :idArea " +
@@ -835,7 +836,8 @@ public class TomaMxService {
         q.setParameter("idArea", idArea);
         q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));
         List<DatosSolicitud> datos = q.list();
-        query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion from DaSolicitudDx sdx, AutoridadLaboratorio al " +
+        query = " select sdx.idSolicitudDx as idSolicitud, sdx.usuarioAprobacion.completeName as usuarioAprobacion, sdx.fechaAprobacion as fechaAprobacion " +
+                "from DaSolicitudDx sdx, AutoridadLaboratorio al " +
                 "where al.pasivo = false and sdx.anulado = false and sdx.aprobada = true and " +
                 "(sdx.labProcesa.codigo = al.laboratorio.codigo " +
                 "or sdx.idSolicitudDx in (select oe.solicitudDx.idSolicitudDx from OrdenExamen oe where oe.solicitudDx.idSolicitudDx = sdx.idSolicitudDx and oe.labProcesa.codigo = al.laboratorio.codigo)" +
@@ -1364,7 +1366,7 @@ public class TomaMxService {
                 " coalesce((select ea.codigo from EntidadesAdtvas ea where ea.codigo = mx.codSilaisAtencion.codigo ), null) as codigoSilaisMx, coalesce((select ea.nombre from EntidadesAdtvas ea where ea.codigo = mx.codSilaisAtencion.codigo ), null) as nombreSilaisMx, " +
                 " coalesce((select u.codigo from Unidades u where u.codigo = mx.codUnidadAtencion.codigo), null) as codigoUnidadMx, coalesce((select u.nombre from Unidades u where u.codigo = mx.codUnidadAtencion.codigo), null) as nombreUnidadMx, " +
                 " coalesce((select u.codigoNacional from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as codigoMuniMx, coalesce((select u.nombre from Divisionpolitica u where u.codigoNacional = mx.codUnidadAtencion.municipio.codigoNacional), null) as nombreMuniMx, " +
-                " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, noti.codigoPacienteVIH as codigoVIH, mx.codigoValidacion as codigoValidacion  " +
+                " mx.idTomaMx as idTomaMx, mx.fechaHTomaMx as fechaTomaMx, mx.fechaRegistro as fechaRegistro, mx.codigoLab as codigoMx, mx.codigoUnicoMx as codUnicoMx, mx.codTipoMx.idTipoMx as idTipoMx, mx.codTipoMx.nombre as nombreTipoMx, noti.codigoPacienteVIH as codigoVIH, mx.codigoValidacion as codigoValidacion  " +
                 " from DaTomaMx mx inner join mx.idNotificacion noti inner join noti.persona p  " +
                 " where noti.pasivo = false and mx.anulada = false and mx.codigoLab = :codigomx or mx.codigoUnicoMx = :codigomx ");
         queryMx.setParameter("codigomx", codigomx);
