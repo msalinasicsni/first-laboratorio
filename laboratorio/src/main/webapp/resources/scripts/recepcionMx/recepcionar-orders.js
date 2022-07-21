@@ -508,6 +508,7 @@ var ReceiptOrders = function () {
                 var len = aSelectedTrs.length;
                 var opcSi = $("#confirm_msg_opc_yes").val();
                 var opcNo = $("#confirm_msg_opc_no").val();
+                var copias = 2;
                 if (len > 0) {
                     $.SmartMessageBox({
                         title: $("#msg_confirm_title").val(),
@@ -559,6 +560,7 @@ var ReceiptOrders = function () {
                                                 timeout: 4000
                                             });
                                             //codUnicosFormat = reemplazar(data.codigosUnicosMx, ".", "*");
+                                            if (data.esSarsCov2.length > 0) copias = 4; //4 copias del codigo para Sars-Cov-2 vigilancia. 07/2022
                                             codUnicosFormat = data.codigosUnicosMx;
                                             mostrarPopUpCodigos(data.codigosUnicosMx, data.nombresCodigosLabMx, data.fechasNacimiento);
                                             getMxs(false);
@@ -570,7 +572,7 @@ var ReceiptOrders = function () {
                                         validateLogin(jqXHR);
                                     }
                                 });
-                            imprimir2(codUnicosFormat);
+                            imprimir2(codUnicosFormat, copias);
                         }
                         if (ButtonPressed === opcNo) {
                             $.smallBox({
@@ -705,9 +707,11 @@ var ReceiptOrders = function () {
             function guardarRecepcion() {
                 bloquearUI(parametros.blockMess);
                 var codUnicoFormat = '';
+                var copias = 2;
                 var recepcionObj = {};
                 recepcionObj['idRecepcion'] = '';
                 recepcionObj['mensaje'] = '';
+                recepcionObj['esSarsCov2'] = '';
                 recepcionObj['idTomaMx'] = $("#idTomaMx").val();
                 recepcionObj['verificaCantTb'] = $('input[name="rdCantTubos"]:checked', '#receiptOrders-form').val();
                 recepcionObj['verificaTipoMx'] = $('input[name="rdTipoMx"]:checked', '#receiptOrders-form').val();
@@ -743,6 +747,7 @@ var ReceiptOrders = function () {
                                     iconSmall: "fa fa-success",
                                     timeout: 4000
                                 });
+                                if (data.esSarsCov2.length > 0) copias = 4; //4 copias del codigo para Sars-Cov-2 vigilancia. 07/2022
                                 //codUnicoFormat = reemplazar(data.codigoUnicoMx, ".", "*");
                                 codUnicoFormat = data.codigoUnicoMx+"*"+data.area;
                                 mostrarPopUpCodigos(codUnicoFormat, $("#primerNombre").val() + ' ' + $("#segundoNombre").val() + ' ' + $("#primerApellido").val() + ' ' + $("#segundoApellido").val(), $("#fechaNac").val());
@@ -758,13 +763,14 @@ var ReceiptOrders = function () {
                             validateLogin(jqXHR);
                         }
                     });
-                imprimir2(codUnicoFormat);
+                imprimir2(codUnicoFormat, copias);
             }
 
-            function imprimir2(strBarCodes){
+            function imprimir2(strBarCodes, numCopias){
+                console.log(numCopias);
                 $.getJSON("http://localhost:13001/print", {
                     barcodes: unicodeEscape(strBarCodes),
-                    copias: 2,//2 de cada estiquer
+                    copias: numCopias,//2 de cada estiquer, 4 para sars-cov-2
                     ajax:'false'
                 }, function (data) {
                     console.log(data);

@@ -410,7 +410,8 @@ public class TrasladoMxController {
                                         for (String idExamen : arrayExamenes) {
                                             ordenExamenList = ordenExamenMxService.getOrdExamenNoAnulByIdMxIdDxIdExamen(idTomaMx, Integer.valueOf(idRutina), Integer.valueOf(idExamen), seguridadService.obtenerNombreUsuario());
                                             if (ordenExamenList.size() > 0) {
-                                                if (resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
+                                                if ( solicitudDx.getCodDx().getNombre().toLowerCase().contains("sars-cov-2") || //si es Biologia Molecular SARS-CoV-2(vigilancia) permitir traslado aunque tenga resultado, ya que por defecto se agregara el negativo en la recepcion en laboratorio
+                                                        resultadosService.getDetallesResultadoActivosByExamen(ordenExamenList.get(0).getIdOrdenExamen()).size() <= 0) {
                                                     //solicitudDx.setSegundoLabProcesa2(labDestino);
                                                     //tomaMxService.updateSolicitudDx(solicitudDx);
                                                     OrdenExamen ordenProcesar = ordenExamenList.get(0);

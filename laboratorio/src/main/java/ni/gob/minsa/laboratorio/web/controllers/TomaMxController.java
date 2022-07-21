@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
+import com.google.common.base.Predicate;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import ni.gob.minsa.laboratorio.domain.estructura.EntidadesAdtvas;
@@ -23,6 +24,7 @@ import ni.gob.minsa.laboratorio.utilities.DateUtil;
 import ni.gob.minsa.laboratorio.utilities.GuidGenerator;
 import ni.gob.minsa.laboratorio.utilities.StringUtil;
 import ni.gob.minsa.laboratorio.utilities.enumeration.HealthUnitType;
+import ni.gob.minsa.laboratorio.utilities.reportes.FilterLists;
 import org.apache.commons.lang3.text.translate.UnicodeEscaper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -438,6 +440,7 @@ public class TomaMxController {
         Integer semanasEmbarazo=null;
         String areaEntrega = "";
         String codExpediente = "";
+        String sarsCov2 = "";
         try {
             logger.debug("Guardando datos de Toma de Muestra");
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
@@ -601,6 +604,17 @@ public class TomaMxController {
                         if (solicitudEstudioList.size() > 0)
                             areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                     }
+                    //saber si es sars-cov-2
+                    Predicate<DaSolicitudDx> byName = new Predicate<DaSolicitudDx>() {
+                        @Override
+                        public boolean apply(DaSolicitudDx solicitud) {
+                            return solicitud.getCodDx().getNombre().toLowerCase().contains("sars-cov-2");
+                        }
+                    };
+                    //si se encuentra el dx poner valor para imprimir 4 copias
+                    Collection<DaSolicitudDx> dxSarsCoV2 = FilterLists.filter(solicitudDxList, byName);
+                    if (dxSarsCoV2.size() > 0) sarsCov2 = "sars"; else sarsCov2 = "";
+
                     //Como la muestra queda en estado recepcionada, entonces es necesario registrar la recepci�n de la misma
                     RecepcionMx recepcionMx = new RecepcionMx();
                     recepcionMx.setUsuarioRecepcion(seguridadService.getUsuario(seguridadService.obtenerNombreUsuario()));
@@ -651,6 +665,7 @@ public class TomaMxController {
             map.put("codigoLab", codigoGenerado);
             map.put("areaPrc",escaper.translate(areaEntrega));
             map.put("codExpediente", codExpediente);
+            map.put("esSarsCov2", sarsCov2);
             String jsonResponse = new Gson().toJson(map);
             response.getOutputStream().write(jsonResponse.getBytes());
             response.getOutputStream().close();

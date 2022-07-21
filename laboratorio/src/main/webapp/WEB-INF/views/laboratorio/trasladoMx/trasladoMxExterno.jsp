@@ -103,6 +103,7 @@
                                     <input id="text_request" type="hidden" value="<spring:message code="lbl.send.request"/>"/>
                                     <input id="text_request_date" type="hidden" value="<spring:message code="lbl.send.request.date"/>"/>
                                     <input id="text_request_type" type="hidden" value="<spring:message code="lbl.send.request.type"/>"/>
+                                    <input id="label_tests" type="hidden" value="<spring:message code="lbl.tests"/>"/>
 
                                     <form id="searchMx-form" class="smart-form" autocomplete="off">
                                         <fieldset>

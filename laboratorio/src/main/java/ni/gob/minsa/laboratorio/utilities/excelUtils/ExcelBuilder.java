@@ -222,7 +222,7 @@ public class ExcelBuilder extends AbstractExcelView {
         List<String> columnas = (List<String>) model.get("columnas");
         List<Object[]> datos = (List<Object[]>) model.get("datos");
         String tipoReporte =  model.get("reporte").toString();
-
+        boolean serotipoDengue = (boolean) model.get("serotipo_dengue");
         // create style for title cells
         CellStyle titleStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -296,7 +296,7 @@ public class ExcelBuilder extends AbstractExcelView {
             sheet.addMergedRegion(new CellRangeAddress(aRow.getRowNum(), aRow.getRowNum(), 0, columnas.size() - 1));
             aRow.createCell(0).setCellValue(model.get("sinDatos").toString());
             aRow.getCell(0).setCellStyle(noDataCellStyle);
-        }else{
+        }else {
             //estilo para celdas de totales en la última fila
             Font font2 = workbook.createFont();
             font2.setFontName("Arial");
@@ -311,23 +311,42 @@ public class ExcelBuilder extends AbstractExcelView {
             totalCellStyle.setBorderRight(BorderStyle.THIN);
             totalCellStyle.setFont(font2);
             //totalColumnas restar 2 para omitir la primer columna que tiene la entidad y la última que tiene el %P
-            setRowTotalsDat(sheet, contentCellStyle, totalCellStyle, rowCount++, columnas.size()-2, 5, datos.size()+4);
+            if (!serotipoDengue) {
+                setRowTotalsDat(sheet, contentCellStyle, totalCellStyle, rowCount++, columnas.size() - 2, 5, datos.size() + 4);
+            } else {
+                setRowTotalsDat(sheet, contentCellStyle, totalCellStyle, rowCount++, columnas.size() - 1, 5, datos.size() + 4);
+            }
         }
-        //validar positividad
-        for(int i=4; i < rowCount-1; i++){
-            HSSFRow aRow = sheet.getRow(i);
-            //validar valores positivos
-            for (int j=2; j < columnas.size()-5; j++){
-                HSSFCell aCell = aRow.getCell(j);
+        //el reporte de serotipo dengue no lleva positividad
+        if (!serotipoDengue) {
+            //validar positividad
+            for (int i = 4; i < rowCount - 1; i++) {
+                HSSFRow aRow = sheet.getRow(i);
+                //validar valores positivos
+                for (int j = 2; j < columnas.size() - 5; j++) {
+                    HSSFCell aCell = aRow.getCell(j);
+                    Double valor = aCell.getNumericCellValue();
+                    if (valor > 0) {
+                        aCell.setCellStyle(alertCellStyle);
+                    }
+                }
+                HSSFCell aCell = aRow.getCell(columnas.size() - 1); //en la última que esta la positividad
                 Double valor = aCell.getNumericCellValue();
-                if (valor>0){
+                if (valor > 0) {
                     aCell.setCellStyle(alertCellStyle);
                 }
             }
-            HSSFCell aCell = aRow.getCell(columnas.size()-1); //en la última que esta la positividad
-            Double valor = aCell.getNumericCellValue();
-            if (valor>0){
-                aCell.setCellStyle(alertCellStyle);
+        } else {
+            for (int i = 4; i < rowCount - 1; i++) {
+                HSSFRow aRow = sheet.getRow(i);
+                //validar valores positivos
+                for (int j = 2; j < columnas.size(); j++) {
+                    HSSFCell aCell = aRow.getCell(j);
+                    Double valor = aCell.getNumericCellValue();
+                    if (valor > 0) {
+                        aCell.setCellStyle(alertCellStyle);
+                    }
+                }
             }
         }
         //ajustar el ancho de la celda al tamanio del texto

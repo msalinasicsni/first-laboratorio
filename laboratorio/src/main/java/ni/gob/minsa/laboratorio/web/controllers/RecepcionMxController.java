@@ -1,5 +1,6 @@
 package ni.gob.minsa.laboratorio.web.controllers;
 
+import com.google.common.base.Predicate;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -55,7 +56,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -578,6 +578,7 @@ public class RecepcionMxController {
         boolean mxInadecuada = false;
         boolean esControlCalidad = false;
         String areaEntrega = "";
+        String sarsCov2 = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -658,6 +659,18 @@ public class RecepcionMxController {
                             areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                     }
                 }
+                //saber si es sars-cov-2
+                Predicate<DaSolicitudDx> byName = new Predicate<DaSolicitudDx>() {
+                    @Override
+                    public boolean apply(DaSolicitudDx solicitud) {
+                        return solicitud.getCodDx().getNombre().toLowerCase().contains("sars-cov-2");
+                    }
+                };
+                //si se encuentra el dx poner valor para imprimir 4 copias
+                boolean tieneBioMol = false;
+                Collection<DaSolicitudDx> dxSarsCoV2 = FilterLists.filter(solicitudDxList, byName);
+                if (dxSarsCoV2.size() > 0) sarsCov2 = "sars-cov-2"; else sarsCov2 = "";
+
                 //si muestra es inadecuada.. entonces resultado final de solicitudes asociadas a la mx es mx inadecuada
                 if (mxInadecuada){
                     User usuApro = seguridadService.getUsuario(seguridadService.obtenerNombreUsuario());
@@ -726,6 +739,7 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("idRecepcion",idRecepcion);
             map.put("mensaje",resultado);
+            map.put("esSarsCov2", sarsCov2);
             map.put("idTomaMx", idTomaMx);
             map.put("verificaCantTb", verificaCantTb);
             map.put("verificaTipoMx", verificaTipoMx);
@@ -945,7 +959,8 @@ public class RecepcionMxController {
                                             }
                                         }
                                     }
-                                } else if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("molecular covid19")) {
+                                } else if (!solicitudDx.getAprobada() && //Biologia Molecular Covid19 (viajeros) o Biologia Molecular SARS-CoV-2(vigilancia). 14/07/2022
+                                        (solicitudDx.getCodDx().getNombre().toLowerCase().contains("molecular covid19") || solicitudDx.getCodDx().getNombre().toLowerCase().contains("sars-cov-2"))) {
                                     List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
                                     boolean soloUnExamen = ordenesExamen.size()==1;
                                     for (OrdenExamen examen : ordenesExamen) {
@@ -1345,6 +1360,7 @@ public class RecepcionMxController {
         Integer cantMuestras = 0;
         Integer cantMxProc = 0;
         boolean esControlCalidad = false;
+        String sarsCov2 = "";
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(),"UTF8"));
             json = br.readLine();
@@ -1422,6 +1438,18 @@ public class RecepcionMxController {
                             if (solicitudEstudioList.size()> 0)
                                 areaEntrega = solicitudEstudioList.get(0).getTipoEstudio().getArea().getNombre();
                         }
+
+                        //saber si es sars-cov-2
+                        Predicate<DaSolicitudDx> byName = new Predicate<DaSolicitudDx>() {
+                            @Override
+                            public boolean apply(DaSolicitudDx solicitud) {
+                                return solicitud.getCodDx().getNombre().toLowerCase().contains("sars-cov-2");
+                            }
+                        };
+                        //si se encuentra el dx poner valor para imprimir 4 copias
+                        Collection<DaSolicitudDx> dxSarsCoV2 = FilterLists.filter(solicitudDxList, byName);
+                        if (dxSarsCoV2.size() > 0) sarsCov2 = "sars"; else sarsCov2 = sarsCov2+"";
+
                         String nombreCompleto="";
                         if(tomaMx.getIdNotificacion().getPersona()!=null) {
 	                        nombreCompleto = tomaMx.getIdNotificacion().getPersona().getPrimerNombre();
@@ -1468,6 +1496,7 @@ public class RecepcionMxController {
             Map<String, String> map = new HashMap<String, String>();
             map.put("strMuestras",strMuestras);
             map.put("mensaje",resultado);
+            map.put("esSarsCov2", sarsCov2);
             map.put("cantMuestras", cantMuestras.toString());
             map.put("cantMxProc", cantMxProc.toString());
             map.put("codigosUnicosMx",escaper.translate(codigosLabMx));
@@ -1746,7 +1775,8 @@ public class RecepcionMxController {
                                                 }
                                             }
                                         }
-                                    } else if (!solicitudDx.getAprobada() && solicitudDx.getNombre().toLowerCase().contains("molecular covid19")) {
+                                    } else if (!solicitudDx.getAprobada() && //Biologia Molecular Covid19 (viajeros) o Biologia Molecular SARS-CoV-2(vigilancia). 14/07/2022
+                                            (solicitudDx.getNombre().toLowerCase().contains("molecular covid19") || solicitudDx.getNombre().toLowerCase().contains("sars-cov-2"))) {
                                         List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitud());
                                         boolean soloUnExamen = ordenesExamen.size()==1;
                                         for (OrdenExamen examen : ordenesExamen) {

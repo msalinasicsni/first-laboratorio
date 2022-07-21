@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "catalogo_dx", schema = "laboratorio")
-public class Catalogo_Dx implements Serializable, Auditable {
+public class Catalogo_Dx implements Serializable, Auditable, Comparable<Catalogo_Dx> {
 
     private static final long serialVersionUID = 7177495708144097064L;
     private Integer idDiagnostico;
@@ -126,5 +126,10 @@ public class Catalogo_Dx implements Serializable, Auditable {
     @Override
     public int hashCode() {
         return idDiagnostico.hashCode();
+    }
+
+    @Override
+    public int compareTo(Catalogo_Dx o) {
+        return nombre.compareTo(o.getNombre());
     }
 }

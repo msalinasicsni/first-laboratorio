@@ -368,10 +368,10 @@ public class expose {
     @RequestMapping(value = "getDxsVIHTBPersona/{idPersona}", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona) throws Exception {
+    List<DatosSolicitudApi> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona) throws Exception {
         logger.info("Obteniendo los dx TB y VIH por persona en JSON");
-        List<ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud> datosSolicitudes = solicitudService.getSolicitudesVIHTB(true, true, idPersona);
-        for(ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud ds: datosSolicitudes){
+        List<DatosSolicitudApi> datosSolicitudes = solicitudService.getSolicitudesVIHTB(true, true, idPersona);
+        for(DatosSolicitudApi ds: datosSolicitudes){
             completarDatosSolicitud(ds);
         }
         return datosSolicitudes;
@@ -380,11 +380,11 @@ public class expose {
     @RequestMapping(value = "getDxsPersonNoti/{idPersona}/{tipoNoti}", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    List<ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona,
+    List<DatosSolicitudApi> getDxsVIHTBPersona(@PathVariable(value = "idPersona") String idPersona,
                                             @PathVariable(value = "tipoNoti") String tipoNoti) throws Exception {
         logger.info("Obteniendo los dx TB y VIH por persona en JSON");
-        List<ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud> datosSolicitudes = solicitudService.getSolicitudesByIdPersonTipoNoti(idPersona, tipoNoti);
-        for(ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud ds: datosSolicitudes){
+        List<DatosSolicitudApi> datosSolicitudes = solicitudService.getSolicitudesByIdPersonTipoNoti(idPersona, tipoNoti);
+        for(DatosSolicitudApi ds: datosSolicitudes){
             completarDatosSolicitud(ds);
         }
         return datosSolicitudes;
@@ -393,14 +393,14 @@ public class expose {
     @RequestMapping(value = "getDxIdSolicitud/{idSolicitud}", method = RequestMethod.GET, produces = "application/json")
     public
     @ResponseBody
-    ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud getDxIdSolicitud(@PathVariable(value = "idSolicitud") String idSolicitud) throws Exception {
+    DatosSolicitudApi getDxIdSolicitud(@PathVariable(value = "idSolicitud") String idSolicitud) throws Exception {
         logger.info("Obteniendo dx por idSolicitud en JSON");
-        ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud ds = solicitudService.getSolicitudesByIdSolicitud(idSolicitud);
+        DatosSolicitudApi ds = solicitudService.getSolicitudesByIdSolicitud(idSolicitud);
         completarDatosSolicitud(ds);
         return ds;
     }
 
-    private void completarDatosSolicitud(ni.gob.minsa.laboratorio.utilities.reportes.DatosSolicitud ds){
+    private void completarDatosSolicitud(DatosSolicitudApi ds){
         List<ResultadoSolicitud> detRes = resultadoFinalService.getDetResActivosBySolicitudV2(ds.getIdSolicitud());
         ds.setResultado(new ArrayList<ValorResultado>());//por defecto vacio, solo se pondra resultado si esta aprobado
         if (ds.getAprobada()!= null){

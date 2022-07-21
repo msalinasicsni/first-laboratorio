@@ -754,6 +754,10 @@ public class ReportesExcelController {
             if (usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
                 setDatosBioMolCovid19(rvList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size());
             }
+        } else if (dx!=null && (dx.getNombre().toLowerCase().contains("molecular") && dx.getNombre().toLowerCase().contains("sars-cov-2"))) {
+            tipoReporte = "BM_SARS-CoV-2";
+            setNombreColumnasBioMolCovid19Vigilancia(columnas);
+            setDatosBioMolCovid19Vigilancia(rvList, registrosPos, registrosNeg, filtroRep.isIncluirMxInadecuadas(), registrosMxInadec, columnas.size(), labUser.getCodigo());
         }else if (dx!=null){
             tipoReporte = dx.getNombre().replace(" ", "_");
             setNombreColumnasDefecto(columnas);
@@ -797,9 +801,11 @@ public class ReportesExcelController {
         FiltrosReporte filtroRep = jsonToFiltroReportes(filtro);
         Laboratorio labUser = laboratoriosService.getLaboratorioByCodigo(filtroRep.getCodLaboratio());
         boolean usuarioAutorizadoCovid19 = seguridadService.usuarioAutorizadoCovid19(seguridadService.obtenerNombreUsuario());
-        if (filtroRep.getIdDx()!=null) {
+        if (filtroRep.isSerotipoDengue()) {  // si es DENGUE SEROTIPO
+            nombreDx = "Dengue Serotipos";
+        } else if (filtroRep.getIdDx()!=null) {
             dx = tomaMxService.getDxById(filtroRep.getIdDx().toString());
-            if (dx!=null) nombreDx = dx.getNombre().toUpperCase();
+            nombreDx = dx.getNombre().toUpperCase();
         }else if (filtroRep.getIdEstudio()!=null) {
             est = tomaMxService.getEstudioById(filtroRep.getIdEstudio());
             nombreDx = est.getNombre().toUpperCase();
@@ -814,14 +820,40 @@ public class ReportesExcelController {
             nivel = messageSource.getMessage("lbl.health.unit", null, null).toUpperCase();
         }
         setNombreColumnasResultadoDX(filtroRep, columnas, nombreDx);
-        if (filtroRep.getIdDx()!=null) {
-            if (!nombreDx.toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
-                datos = reportesService.getDataDxResultReport(filtroRep, nombreDx, columnas.size());
-            }//Fin Covid
-        }else if (filtroRep.getIdEstudio()!=null) {
-            datos = reportesService.getDataEstResultReport(filtroRep, nombreDx, columnas.size());
-        }
+        if (filtroRep.isSerotipoDengue()) {
+            datos = reportesService.getDataDxResultReport(filtroRep, nombreDx, columnas.size());
+            for (final Object[] filaDx : datos) {
+                List<Object[]> datosEst = reportesService.getDataEstResultReport(filtroRep, nombreDx, columnas.size());
+                //para cada entidad, filtrar los estudios para sumarlo al dx
+                Predicate<Object[]> byEntidad = new Predicate<Object[]>() {
+                    @Override
+                    public boolean apply(Object[] fila) {
+                        return fila[0].toString().equalsIgnoreCase(filaDx[0].toString());
+                    }
+                };
+                //si se encuentra la entidad en la lista de estudios
+                Collection<Object[]> filasEst = FilterLists.filter(datosEst, byEntidad);
+                if (filasEst.size()>0) {
+                    for(Object[] filaEst : filasEst){
+                        filaDx[1] = (int) filaDx[1] + (int) filaEst[1]; // Positivo
+                        filaDx[2] = (int) filaDx[2] + (int) filaEst[2];
+                        filaDx[3] = (int) filaDx[3] + (int) filaEst[3];
+                        filaDx[4] = (int) filaDx[4] + (int) filaEst[4];
+                        filaDx[5] = (int) filaDx[5] + (int) filaEst[5];
+                        filaDx[6] = (int) filaDx[6] + (int) filaEst[6];
+                    }
+                }
+            }
 
+        } else {
+            if (filtroRep.getIdDx() != null) {
+                if (!nombreDx.toLowerCase().contains("covid") || usuarioAutorizadoCovid19) { //si es covid validar si usuario tiene autorizado ver ese Dx
+                    datos = reportesService.getDataDxResultReport(filtroRep, nombreDx, columnas.size());
+                }//Fin Covid
+            } else if (filtroRep.getIdEstudio() != null) {
+                datos = reportesService.getDataEstResultReport(filtroRep, nombreDx, columnas.size());
+            }
+        }
         excelView.addObject("titulo", messageSource.getMessage("lbl.minsa", null, null) + " - " + (labUser!=null?labUser.getNombre():messageSource.getMessage("lbl.all.laboratories", null, null)));
         excelView.addObject("subtitulo", String.format(messageSource.getMessage("lbl.resultDx.subtitle", null, null), nivel) + " / " + nombreDx);
         excelView.addObject("rangoFechas", String.format(messageSource.getMessage("lbl.excel.filter.2", null, null),
@@ -829,6 +861,7 @@ public class ReportesExcelController {
                 DateUtil.DateToString(filtroRep.getFechaFin(), "dd/MM/yyyy")));
         excelView.addObject("columnas", columnas);
         excelView.addObject("reporte","RESULTDX");
+        excelView.addObject("serotipo_dengue", filtroRep.isSerotipoDengue());
         excelView.addObject("datos", datos);
         excelView.addObject("sinDatos", messageSource.getMessage("lbl.nothing.to.show", null, null));
         return excelView;
@@ -1324,6 +1357,26 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.lugar.viaja", null, null).toUpperCase());
     }
 
+    private void setNombreColumnasBioMolCovid19Vigilancia(List<String> columnas){
+        columnas.add(messageSource.getMessage("lbl.num", null, null));
+        columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.names", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.lastnames", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.age", null, null).toUpperCase().replace(":",""));
+        columnas.add(messageSource.getMessage("lbl.age.um", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.address", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.silais", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.muni", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.health.unit.excel", null, null));
+        columnas.add(messageSource.getMessage("person.sexo", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.fis.short", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.ftm", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.result.pcr", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.approve.date.2", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.res.final", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.num.cedula", null, null).toUpperCase());
+    }
+
     private void setNombreColumnasDefecto(List<String> columnas){
         columnas.add(messageSource.getMessage("lbl.num", null, null));
         columnas.add(messageSource.getMessage("lbl.lab.code.mx", null, null).toUpperCase());
@@ -1353,41 +1406,51 @@ public class ReportesExcelController {
             columnas.add(messageSource.getMessage("lbl.health.unit", null, null).toUpperCase());
         }
         columnas.add(messageSource.getMessage("lbl.total", null, null).toUpperCase());
-        if (nombreDx.toLowerCase().contains("dengue") || nombreDx.toLowerCase().contains("chikun") || nombreDx.toLowerCase().contains("zika")
-                || (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("molec"))) {
-            columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
-        } else if (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("serolog")){
-            columnas.add(messageSource.getMessage("lbl.reactor", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.no.reactor", null, null).toUpperCase());
-        } else if (nombreDx.toLowerCase().contains("ifi virus respiratorio")){
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.a", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.b", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.rsv", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.adv", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.piv1", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.piv2", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.piv3", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.ifi.flu.mpv", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
-        } else if (nombreDx.toLowerCase().contains("molecular virus respiratorio") || nombreDx.toLowerCase().contains("influenza")) {
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.a.H1N1", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.a.H1N1PDM", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.a.H3N2", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.a.NS", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.pcr.flu.b.2", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
-        } else if (nombreDx.toLowerCase().contains("mycobacterium") && (nombreDx.toLowerCase().contains("tuberculosis") || nombreDx.contains("tb"))) {
-            columnas.add(messageSource.getMessage("lbl.mtb.det", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.mtb.nd", null, null).toUpperCase());
-        } else{
-            columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
-            columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+
+        if (filtroRep.isSerotipoDengue()) {//reporte dengue serotipo. 07-2022
+            columnas.add(messageSource.getMessage("lbl.dengue.1", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.dengue.2", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.dengue.3", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.dengue.4", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.sin.serotipo", null, null).toUpperCase());
+
+        } else {
+            if (nombreDx.toLowerCase().contains("dengue") || nombreDx.toLowerCase().contains("chikun") || nombreDx.toLowerCase().contains("zika")
+                    || (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("molec"))) {
+                columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+            } else if (nombreDx.toLowerCase().contains("leptospi") && nombreDx.toLowerCase().contains("serolog")) {
+                columnas.add(messageSource.getMessage("lbl.reactor", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.no.reactor", null, null).toUpperCase());
+            } else if (nombreDx.toLowerCase().contains("ifi virus respiratorio")) {
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.a", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.b", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.rsv", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.adv", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.piv1", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.piv2", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.piv3", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.ifi.flu.mpv", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+            } else if (nombreDx.toLowerCase().contains("molecular virus respiratorio") || nombreDx.toLowerCase().contains("influenza")) {
+                columnas.add(messageSource.getMessage("lbl.pcr.flu.a.H1N1", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.pcr.flu.a.H1N1PDM", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.pcr.flu.a.H3N2", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.pcr.flu.a.NS", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.pcr.flu.b.2", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+            } else if (nombreDx.toLowerCase().contains("mycobacterium") && (nombreDx.toLowerCase().contains("tuberculosis") || nombreDx.contains("tb"))) {
+                columnas.add(messageSource.getMessage("lbl.mtb.det", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.mtb.nd", null, null).toUpperCase());
+            } else {
+                columnas.add(messageSource.getMessage("lbl.positives", null, null).toUpperCase());
+                columnas.add(messageSource.getMessage("lbl.negatives", null, null).toUpperCase());
+            }
+            columnas.add(messageSource.getMessage("lbl.without.result", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.sample.inadequate2", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.sample.no.proc", null, null).toUpperCase());
+            columnas.add(messageSource.getMessage("lbl.pos.percentage", null, null).toUpperCase());
         }
-        columnas.add(messageSource.getMessage("lbl.without.result", null, null).toUpperCase());
-        columnas.add(messageSource.getMessage("lbl.sample.inadequate2", null, null).toUpperCase());
-        columnas.add(messageSource.getMessage("lbl.sample.no.proc", null, null).toUpperCase());
-        columnas.add(messageSource.getMessage("lbl.pos.percentage", null, null).toUpperCase());
     }
 
     private void setNombreColumnasTiemposProc(List<String> columnas) throws Exception{
@@ -2128,6 +2191,85 @@ public class ReportesExcelController {
                 registrosNeg.add(registro);
             } else if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuad")){
                 registro[0]= rowCountInadec++;
+                registrosMxInadec.add(registro);
+            }
+        }
+    }
+
+    /**
+     * Metodo para llenar datos de dx Biologia Molecular SARS-CoV-2(vigilancia) para Reporte de Vigilancia generado en excel
+     * @param dxList Lista con los dx a evaluar
+     * @param registrosPos Registros que iran a la tabla de positivos en el excel
+     * @param registrosNeg Registros que iran a la tabla de negativos en el excel
+     * @param incluirMxInadecuadas True para llenar lista de mx inadecuadas, false en caso contrario
+     * @param registrosMxInadec Si incluirMxInadecuadas = True, Registros con dx con resultado de Mx Inadecuada
+     * @throws Exception
+     */
+    private void setDatosBioMolCovid19Vigilancia(List<ResultadoVigilancia> dxList, List<Object[]> registrosPos, List<Object[]> registrosNeg, boolean incluirMxInadecuadas, List<Object[]> registrosMxInadec, int numColumnas, String codigoLab) throws Exception{
+// create data rows
+        int rowCountPos = 1;
+        int rowCountNeg = 1;
+        int rowCountInadec = 1;
+        for (ResultadoVigilancia solicitudDx : dxList) {
+            String nombres = "";
+            String apellidos = "";
+
+            Object[] registro = new Object[numColumnas];
+            registro[1] = (solicitudDx.getCodigoMx()!=null?solicitudDx.getCodigoMx():solicitudDx.getCodUnicoMx());
+
+            nombres = solicitudDx.getPrimerNombre();
+            if (solicitudDx.getSegundoNombre()!=null)
+                nombres += " "+solicitudDx.getSegundoNombre();
+            registro[2] = nombres;
+
+            apellidos = solicitudDx.getPrimerApellido();
+            if (solicitudDx.getSegundoApellido()!=null)
+                apellidos += " "+solicitudDx.getSegundoApellido();
+            registro[3] = apellidos;
+
+            Integer edad = null;
+            String medidaEdad = "";
+            String[] arrEdad = DateUtil.calcularEdad(solicitudDx.getFechaNacimiento(), new Date()).split("/");
+            if (arrEdad[0] != null && !arrEdad[0].equalsIgnoreCase("0")) {
+                edad = Integer.valueOf(arrEdad[0]); medidaEdad = "A";
+            }else if (arrEdad[1] != null && !arrEdad[1].equalsIgnoreCase("0")) {
+                edad = Integer.valueOf(arrEdad[1]); medidaEdad = "M";
+            }else if (arrEdad[2] != null) {
+                edad = Integer.valueOf(arrEdad[2]); medidaEdad = "D";
+            }
+            registro[4] = edad;
+            registro[5] = medidaEdad;
+            String direccion = solicitudDx.getDireccionResidencia();
+            if (solicitudDx.getTelefonoResidencia()!=null || solicitudDx.getTelefonoMovil()!=null ){
+                direccion += ". TEL. ";
+                direccion+= (solicitudDx.getTelefonoResidencia()!=null?solicitudDx.getTelefonoResidencia()+",":"");
+                direccion+= (solicitudDx.getTelefonoMovil()!=null?solicitudDx.getTelefonoMovil():"");
+            }
+            registro[6] = direccion;
+            registro[7] = solicitudDx.getNombreSilaisResid(); //silais residencia
+            registro[8] = solicitudDx.getNombreMuniResid(); //municipio residencia
+            registro[9] = (solicitudDx.getCodigoUnidadNoti()!=null?solicitudDx.getNombreUnidadNoti()://unidad en la notif
+                    (solicitudDx.getCodigoUnidadMx()!=null?solicitudDx.getNombreUnidadMx():""));//unidad en la toma mx
+            String sexo = solicitudDx.getSexo();
+            registro[10] = sexo.substring(sexo.length()-1, sexo.length());
+            registro[11] = DateUtil.DateToString(solicitudDx.getFechaInicioSintomas(),"dd/MM/yyyy");
+            registro[12] = DateUtil.DateToString(solicitudDx.getFechaTomaMx(),"dd/MM/yyyy");
+            validarPCRCovid19(registro, solicitudDx.getIdSolicitud());
+            registro[14] = DateUtil.DateToString(solicitudDx.getFechaAprobacion(),"dd/MM/yyyy");
+            registro[15] = parseFinalResultDetails(solicitudDx.getIdSolicitud());
+            registro[16] = solicitudDx.getIdentificacion();
+            if (registro[15].toString().toLowerCase().contains("positivo")) {
+                registro[0]= rowCountPos++;
+                registrosPos.add(registro);
+            } else if (registro[15].toString().toLowerCase().contains("negativo")) {
+                registro[0]= rowCountNeg++;
+                registrosNeg.add(registro);
+            } else if (incluirMxInadecuadas && registro[15].toString().toLowerCase().contains("inadecuad")){
+                registro[0]= rowCountInadec++;
+                DatosRecepcionMx recepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMxV2(solicitudDx.getCodUnicoMx(), codigoLab);
+                if (recepcionMx != null) {
+                    registro[15] = registro[15].toString().concat("-".concat(recepcionMx.getCausaRechazo()));
+                }
                 registrosMxInadec.add(registro);
             }
         }
@@ -3209,6 +3351,9 @@ public class ReportesExcelController {
         filtroRep.setCodZona(codZona);
         if (idSolicitud!=null && idSolicitud.contains("R")){
             filtroRep.setIdDx(Integer.valueOf(idSolicitud.substring(0,idSolicitud.indexOf("-"))));
+            if (filtroRep.getIdDx()==0){ //es serotipo dengue
+                filtroRep.setSerotipoDengue(true);
+            }
         } else if (idSolicitud!=null && idSolicitud.contains("E")){
             filtroRep.setIdEstudio(Integer.valueOf(idSolicitud.substring(0, idSolicitud.indexOf("-"))));
         }
@@ -3221,6 +3366,12 @@ public class ReportesExcelController {
         filtroRep.setConsolidarPor(consolidarPor);
         filtroRep.setNivelCentral(usuario.getNivelCentral());
         filtroRep.setEstudios(estudios);
+        if (filtroRep.isSerotipoDengue()) {
+            Parametro parametroTmp = parametrosService.getParametroByName("DX_DENGUE");
+            if (parametroTmp != null) filtroRep.setIdDx(Integer.valueOf(parametroTmp.getValor()));
+            parametroTmp = parametrosService.getParametroByName("ESTUDIOS_DENGUE");
+            if (parametroTmp != null) filtroRep.setEstudios(parametroTmp.getValor());
+        }
         return filtroRep;
     }
 }

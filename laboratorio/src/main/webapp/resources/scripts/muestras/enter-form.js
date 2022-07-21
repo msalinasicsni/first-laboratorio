@@ -102,7 +102,7 @@ var EnterFormTomaMx = function () {
                         if ($(params).val().length > 0) {
                             var fecha2 = $(params).val().split("/");
                             return new Date(fecha1[2], fecha1[1] - 1, fecha1[0]) >= new Date(fecha2[2], fecha2[1] - 1, fecha2[0]);
-                        }else { //si el otro campo de fecha esta vacío y no es requerido
+                        }else { //si el otro campo de fecha esta vacï¿½o y no es requerido
                             return true;
                         }
                     }
@@ -241,6 +241,7 @@ var EnterFormTomaMx = function () {
             function save() {
                 bloquearUI(parametros.blockMess);
                 var objetoTomaMx = {};
+                var copias = 2;
                 objetoTomaMx['idNotificacion'] = $("#idNotificacion").val();
                 objetoTomaMx['codSilais'] = $('#codSilaisAtencion').find('option:selected').val();
                 objetoTomaMx['codUnidadSalud'] = $('#codUnidadAtencion').find('option:selected').val();
@@ -357,7 +358,8 @@ var EnterFormTomaMx = function () {
                                     timeout: 4000
                                 });
                             } else {
-                                imprimir2(data.codigoLab+"*"+data.areaPrc);
+                                if (data.esSarsCov2.length > 0) copias = 4; //4 copias del codigo para Sars-Cov-2 vigilancia. 07/2022
+                                imprimir2(data.codigoLab+"*"+data.areaPrc, copias);
                                 $.smallBox({
                                     title: $('#msjSuccessful').val(),
                                     content: $('#disappear').val(),
@@ -400,10 +402,10 @@ var EnterFormTomaMx = function () {
 
             }
 
-            function imprimir2(strBarCodes){
+            function imprimir2(strBarCodes, numCopias){
                 $.getJSON("http://localhost:13001/print", {
                     barcodes: unicodeEscape(strBarCodes),
-                    copias: 2,
+                    copias: numCopias,//2 de cada estiquer, 4 para sars-cov-2
                     ajax:'false'
                 }, function (data) {
                     console.log(data);
@@ -432,7 +434,7 @@ var EnterFormTomaMx = function () {
                             fillDatosRecepcionDx(valor[i], divDatos);
                         }
                     }
-                    //validar si se deseleccionó un dx y existen datos agregados de él en la página, si es asi se deben eliminar
+                    //validar si se deseleccionï¿½ un dx y existen datos agregados de ï¿½l en la pï¿½gina, si es asi se deben eliminar
                     var dxAgregados = $("#dxAgregados").val();
                     if (dxAgregados != "") {
                         var arrayDxAgregados = dxAgregados.split(',');
@@ -450,7 +452,7 @@ var EnterFormTomaMx = function () {
                         }
                     }
                     $("#dxAgregados").val(valor);
-                    //Si es covid, la fecha de toma debe ser la del día
+                    //Si es covid, la fecha de toma debe ser la del dï¿½a
                     if ($(this).find('option:selected').text() === "Biologia Molecular Covid19") {
                         $("#fechaHTomaMx").datepicker("setDate", new Date());
                         $('#esCovid19').val("true");

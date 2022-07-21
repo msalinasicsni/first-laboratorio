@@ -32,6 +32,8 @@ public class FiltrosReporte {
     String consolidarPor;
     Integer idEstudio;
     String estudios;
+    boolean serotipoDengue;
+
 
     public String getCodArea() {
         return codArea;
@@ -215,5 +217,13 @@ public class FiltrosReporte {
 
     public void setEstudios(String estudios) {
         this.estudios = estudios;
+    }
+
+    public boolean isSerotipoDengue() {
+        return serotipoDengue;
+    }
+
+    public void setSerotipoDengue(boolean serotipoDengue) {
+        this.serotipoDengue = serotipoDengue;
     }
 }
