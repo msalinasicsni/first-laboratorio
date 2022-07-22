@@ -42,7 +42,7 @@ public class RecepcionMx implements Serializable, Auditable {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
-    @Column(name = "ID_RECEPCION", nullable = false, insertable = true, updatable = true, length = 36)
+    @Column(name = "ID_RECEPCION", nullable = false, insertable = true, updatable = false, length = 36)
     public String getIdRecepcion() {
         return idRecepcion;
     }
@@ -52,7 +52,7 @@ public class RecepcionMx implements Serializable, Auditable {
     }
 
     @Basic
-    @Column(name = "FECHAHORA_RECEPCION", nullable = false, insertable = true, updatable = false)
+    @Column(name = "FECHAHORA_RECEPCION", nullable = false, insertable = true, updatable = true)
     public Timestamp getFechaHoraRecepcion() {
         return fechaHoraRecepcion;
     }
@@ -194,7 +194,7 @@ public class RecepcionMx implements Serializable, Auditable {
 
     @Override
     public boolean isFieldAuditable(String fieldname) {
-        if (fieldname.matches("tomaMx") || fieldname.matches("fechaHoraRecepcion") || fieldname.matches("tipoRecepcionMx") || fieldname.matches("usuarioRecepcion"))
+        if (fieldname.matches("tomaMx") || fieldname.matches("tipoRecepcionMx"))
             return false;
         else
             return true;

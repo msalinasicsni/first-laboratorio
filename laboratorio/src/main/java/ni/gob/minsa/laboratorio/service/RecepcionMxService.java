@@ -128,7 +128,7 @@ public class RecepcionMxService {
 
     public DatosRecepcionMx getRecepcionMxByCodUnicoMxV2(String codigoUnicoMx, String codLaboratorio){
         try {
-            String query = "select a.fechaHoraRecepcion as fechaHoraRecepcion, a.fechaRecibido as fechaRecibido, a.horaRecibido as horaRecibido, " +
+            String query = "select a.idRecepcion as idRecepcion, a.fechaHoraRecepcion as fechaHoraRecepcion, a.fechaRecibido as fechaRecibido, a.horaRecibido as horaRecibido, " +
                     "coalesce((select c.valor from CalidadMx c where c.codigo = a.calidadMx.codigo ), null) as calidadMx,   " +
                     "coalesce((select c.valor from CausaRechazoMx c where c.codigo = a.causaRechazo.codigo ), null) as causaRechazo   " +
                     "from RecepcionMx as a inner join a.tomaMx as t where (t.codigoUnicoMx= :codigoUnicoMx or t.codigoLab = :codigoUnicoMx) " +

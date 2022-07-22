@@ -608,6 +608,12 @@ public class RecepcionMxController {
             boolean esEstudio = solicitudEstudioList.size()>0;
             tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio?"TPRECPMX|VRT":"TPRECPMX|EST"));
             RecepcionMx recepcionMx = new RecepcionMx();
+            DatosRecepcionMx datosRecepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMxV2(tomaMx.getCodigoUnicoMx(), labUsuario.getCodigo());
+            //En algunas ocasiones se encuentra con una recepcion existente pero sin la mx actualizada a recepcionada, entonces lo que vamos a hacer es actualizar la existente, para que no de el error
+            //ORA-00001: unique constraint (LABORATORIO.RECEPCION_MX_CODUNICO_LAB) violated
+            if (datosRecepcionMx != null && tomaMx.getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|ENV")) {
+                recepcionMx.setIdRecepcion(datosRecepcionMx.getIdRecepcion());
+            }
             if(fechaRecibido != null && !fechaRecibido.isEmpty()){
                 recepcionMx.setFechaRecibido(DateUtil.StringToDate(fechaRecibido,"dd/MM/yyyy" ));
             }
@@ -637,8 +643,11 @@ public class RecepcionMxController {
                 if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
                     tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
                 }
-                idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
-
+                if (recepcionMx.getIdRecepcion() != null)
+                    recepcionMxService.updateRecepcionMx(recepcionMx);
+                else
+                    recepcionMxService.addRecepcionMx(recepcionMx);
+                idRecepcion = recepcionMx.getIdRecepcion();
                 if (trasladoActivo!=null) {
                     if (trasladoActivo.isTrasladoExterno() || trasladoActivo.isControlCalidad()){ //control de calidad, por tanto llega a recepci�n general
                         if (trasladoActivo.getLaboratorioDestino().getCodigo().equals(recepcionMx.getLabRecepcion().getCodigo())){
@@ -711,6 +720,7 @@ public class RecepcionMxController {
                     }
                 }
             }catch (Exception ex){
+                if (recepcionMx.getIdRecepcion() != null) recepcionMxService.deleteRecepcionMx(recepcionMx);
                 resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
                 ex.printStackTrace();
@@ -723,6 +733,7 @@ public class RecepcionMxController {
                     tomaMxService.updateTomaMx(tomaMx);
                     codigoLabMx = esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab();
                 }catch (Exception ex){
+                    recepcionMxService.deleteRecepcionMx(recepcionMx);
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
                     ex.printStackTrace();
@@ -1387,7 +1398,12 @@ public class RecepcionMxController {
                 boolean esEstudio = solicitudEstudioList.size() > 0;
                 tipoRecepcionMx = catalogosService.getTipoRecepcionMx((!esEstudio ? "TPRECPMX|VRT" : "TPRECPMX|EST"));
                 RecepcionMx recepcionMx = new RecepcionMx();
-
+                DatosRecepcionMx datosRecepcionMx = recepcionMxService.getRecepcionMxByCodUnicoMxV2(tomaMx.getCodigoUnicoMx(), labUsuario.getCodigo());
+                //En algunas ocasiones se encuentra con una recepcion existente pero sin la mx actualizada a recepcionada, entonces lo que vamos a hacer es actualizar la existente, para que no de el error
+                //ORA-00001: unique constraint (LABORATORIO.RECEPCION_MX_CODUNICO_LAB) violated
+                if (datosRecepcionMx != null && tomaMx.getEstadoMx().getCodigo().equalsIgnoreCase("ESTDMX|ENV")) {
+                    recepcionMx.setIdRecepcion(datosRecepcionMx.getIdRecepcion());
+                }
                 recepcionMx.setUsuarioRecepcion(usuario);
                 recepcionMx.setLabRecepcion(labUsuario);
                 recepcionMx.setFechaHoraRecepcion(new Timestamp(new Date().getTime()));
@@ -1403,7 +1419,12 @@ public class RecepcionMxController {
                     if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
                         tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
                     }
-                    idRecepcion = recepcionMxService.addRecepcionMx(recepcionMx);
+                    if (recepcionMx.getIdRecepcion() != null)
+                        recepcionMxService.updateRecepcionMx(recepcionMx);
+                    else
+                        recepcionMxService.addRecepcionMx(recepcionMx);
+
+                    idRecepcion = recepcionMx.getIdRecepcion();
                     //si tiene traslado activo marcarlo como recepcionado
                     if (trasladoActivo!=null) {
                         if (trasladoActivo.isTrasladoExterno()){ //control de calidad, por tanto llega a recepci�n general
@@ -1416,6 +1437,7 @@ public class RecepcionMxController {
                         }
                     }
                 } catch (Exception ex) {
+                    if (recepcionMx.getIdRecepcion() != null) recepcionMxService.deleteRecepcionMx(recepcionMx);
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
                     resultado = resultado + ". \n " + ex.getMessage();
                     ex.printStackTrace();
@@ -1478,6 +1500,7 @@ public class RecepcionMxController {
                             fechasNacimiento += "," + fechaNac;
                         }
                     } catch (Exception ex) {
+                        recepcionMxService.deleteRecepcionMx(recepcionMx);
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
                         ex.printStackTrace();
