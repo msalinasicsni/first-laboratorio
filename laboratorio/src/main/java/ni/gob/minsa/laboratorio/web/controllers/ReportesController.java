@@ -3445,9 +3445,6 @@ public class ReportesController {
         } else {
             catDx = associationSamplesRequestService.getDxsExceptoCovid19();
         }
-        //SIN SEROTIPO
-        catDx.add(new Catalogo_Dx(0, "Dengue Serotipos"));
-        Collections.sort(catDx);
         List<Catalogo_Estudio> catEs = null;
         if (laboratorio!=null && laboratorio.getCodigo().equalsIgnoreCase("CNDR")) {
             catEs = associationSamplesRequestService.getStudies();

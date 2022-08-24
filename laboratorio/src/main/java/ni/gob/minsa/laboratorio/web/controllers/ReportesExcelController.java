@@ -197,6 +197,10 @@ public class ReportesExcelController {
         } else {
             catDx = associationSamplesRequestService.getDxsExceptoCovid19();
         }
+        //DENGUE SEROTIPO
+        catDx.add(new Catalogo_Dx(0, "Dengue Serotipos"));
+        Collections.sort(catDx);
+
         List<Semanas> semanas = catalogosService.getSemanas();
         List<Anios> anios = catalogosService.getAnios();
         List<Laboratorio> laboratorios = null;
@@ -517,13 +521,21 @@ public class ReportesExcelController {
         List<List<Object[]>> datos = new ArrayList<List<Object[]>>();
         List<List<Object[]>> consolidados = new ArrayList<List<Object[]>>();
         List<String> dxsList = new ArrayList<String>();
+        int columnasSemana = (!filtroRep.isSerotipoDengue() ? 2 : 7);
+        int columnasMes = (!filtroRep.isSerotipoDengue() ? 2 : 7);
         for (final Solicitud dx : catalogoDxList) {
             dxsList.add(dx.getNombre());
             List<Object[]> consolidadoList = new ArrayList<Object[]>();
             List<Object[]> datosList = new ArrayList<Object[]>();
             //sacar todos los examenes(t�cnica) activos por cada dx
             List<CatalogoExamenes> examenesList = new ArrayList<CatalogoExamenes>();
-            if (dx.getTipo().equalsIgnoreCase("R")) examenesList = examenesService.getExamenesByIdDx(dx.getIdSolicitud());
+            if (dx.getTipo().equalsIgnoreCase("R")) {
+                if (!filtroRep.isSerotipoDengue()) {
+                    examenesList = examenesService.getExamenesByIdDx(dx.getIdSolicitud());
+                } else {
+                    examenesList = examenesService.getExamenesByFiltro("PCR DENGUE");
+                }
+            }
             else examenesList = examenesService.getExamenesByIdEst(dx.getIdSolicitud());
 
             for(final CatalogoExamenes examen : examenesList) {
@@ -541,14 +553,14 @@ public class ReportesExcelController {
                 //aplicar filtro por dx y examen
                 Collection<ConsolidadoExamen> registrosdx = FilterLists.filter(registros, byDxAndExam);
                 for (final EntidadesAdtvas SILAIS : entidades) {
-                    //representa una fila para la tabla de datos. El tama�o es: (semanas.size() * 2), porque cada semana de datos lleva total y positivos; y (+ 1), por que se agrega el nombre del SILAIS al inicio
-                    Object[] registro = new Object[(semanas.size() * 2) + 1];
+                    //representa una fila para la tabla de datos. El tama�o es: (semanas.size() * 2), porque cada semana de datos lleva total y positivos (si es serotipodengue lleva total, positivos, den1, den2, den3, den4, sinserotipo); y (+ 1), por que se agrega el nombre del SILAIS al inicio
+                    Object[] registro = new Object[(semanas.size() * columnasSemana) + 1];
                     //representa una fila para la tabla de consolidados
-                    Object[] registroMes = new Object[(meses.size() * 2) + 1];
+                    Object[] registroMes = new Object[(meses.size() * columnasMes) + 1];
                     registro[0] = SILAIS.getNombre().replaceAll("SILAIS","").trim();
                     registroMes[0] = SILAIS.getNombre().replaceAll("SILAIS","").trim();
-                    int indice = 1;
-                    int indiceMes = 1;
+                    int indice = 0;
+                    int indiceMes = 0;
                     //se arma estructura para hoja de datos
                     for (final String semana : semanas) {
                         //Del subconjunto por dx y examen, se filtran todos los registros por semana y SILAIS
@@ -561,7 +573,7 @@ public class ReportesExcelController {
                         //aplicar filtro por semana y SILAIS
                         Collection<ConsolidadoExamen> examenes = FilterLists.filter(registrosdx, totalBySilaisSemana);
                         //el total es el tama�o del subconjunto resultado del filtro
-                        registro[indice] = examenes.size();
+                        registro[++indice] = examenes.size();
 
                         //total positivos
                         //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado positivo
@@ -574,9 +586,65 @@ public class ReportesExcelController {
                         //se aplica filtro de registros con resultado positivo
                         Collection<ConsolidadoExamen> positivos = FilterLists.filter(examenes, posBySilaisSemana);
                         //el total de positivos es el tama�o del subconjunto resultado del filtro
-                        registro[indice + 1] = positivos.size();
+                        registro[++indice] = positivos.size();
 
-                        indice += 2;
+                        if (filtroRep.isSerotipoDengue()) {
+                            //total Den1
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den1
+                            Predicate<ConsolidadoExamen> den1BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den1");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den1 = FilterLists.filter(examenes, den1BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registro[++indice] = den1.size();
+
+                            //total Den2
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den2
+                            Predicate<ConsolidadoExamen> den2BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den2");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den2 = FilterLists.filter(examenes, den2BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registro[++indice] = den2.size();
+
+                            //total Den3
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den3
+                            Predicate<ConsolidadoExamen> den3BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den3");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den3 = FilterLists.filter(examenes, den3BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registro[++indice] = den3.size();
+
+                            //total Den4
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den4
+                            Predicate<ConsolidadoExamen> den4BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den4");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den4 = FilterLists.filter(examenes, den4BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registro[++indice] = den4.size();
+                            //total sinserotipo
+                            registro[++indice] = positivos.size() - (den1.size() + den2.size() + den3.size() + den4.size());
+
+                        }
+                        //indice += 2;
                     }
 
                     //se arma estructura para hoja de consolidado
@@ -590,7 +658,7 @@ public class ReportesExcelController {
                         };
                         //se aplica filtro por mes y SILAIS
                         Collection<ConsolidadoExamen> examenes = FilterLists.filter(registrosdx, totalBySilaisSemana);
-                        registroMes[indiceMes] = examenes.size();
+                        registroMes[++indiceMes] = examenes.size();
 
                         //total positivos
                         //Del subconjunto por dx, examen, mes y SILAIS, se filtran todos los registros con resultado positivo
@@ -601,9 +669,65 @@ public class ReportesExcelController {
                             }
                         };
                         Collection<ConsolidadoExamen> positivos = FilterLists.filter(examenes, posBySilaisSemana);
-                        registroMes[indiceMes + 1] = positivos.size();
+                        registroMes[++indiceMes] = positivos.size();
 
-                        indiceMes += 2;
+                        if (filtroRep.isSerotipoDengue()) {
+                            //total Den1
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den1
+                            Predicate<ConsolidadoExamen> den1BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den1");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den1 = FilterLists.filter(examenes, den1BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registroMes[++indiceMes] = den1.size();
+
+                            //total Den2
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den2
+                            Predicate<ConsolidadoExamen> den2BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den2");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den2 = FilterLists.filter(examenes, den2BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registroMes[++indiceMes] = den2.size();
+
+                            //total Den3
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den3
+                            Predicate<ConsolidadoExamen> den3BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den3");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den3 = FilterLists.filter(examenes, den3BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registroMes[++indiceMes] = den3.size();
+
+                            //total Den4
+                            //Del subconjunto por dx, examen, semana y SILAIS, se filtran todos los registros con resultado den4
+                            Predicate<ConsolidadoExamen> den4BySilaisSemana = new Predicate<ConsolidadoExamen>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamen consolidadoExamen) {
+                                    return consolidadoExamen.getSerotipo().equals("den4");
+                                }
+                            };
+                            //se aplica filtro de registros con resultado positivo
+                            Collection<ConsolidadoExamen> den4 = FilterLists.filter(examenes, den4BySilaisSemana);
+                            //el total de positivos es el tamanio del subconjunto resultado del filtro
+                            registroMes[++indiceMes] = den4.size();
+                            //total sinserotipo
+                            registroMes[++indiceMes] = positivos.size() - (den1.size() + den2.size() + den3.size() + den4.size());
+
+                        }
+                        //indiceMes += 2;
                     }
                     datosList.add(registro);
                     consolidadoList.add(registroMes);
@@ -619,6 +743,7 @@ public class ReportesExcelController {
         excelView.addObject("dxs", dxsList);
         excelView.addObject("anio", Integer.valueOf(filtroRep.getAnioInicial()));
         excelView.addObject("registrosPorTabla", registrosPorTabla);
+        excelView.addObject("esSerotipoDengue", filtroRep.isSerotipoDengue());
         excelView.addObject("reporte","DXEXAMS");
         return excelView;
     }
@@ -3351,27 +3476,29 @@ public class ReportesExcelController {
         filtroRep.setCodZona(codZona);
         if (idSolicitud!=null && idSolicitud.contains("R")){
             filtroRep.setIdDx(Integer.valueOf(idSolicitud.substring(0,idSolicitud.indexOf("-"))));
-            if (filtroRep.getIdDx()==0){ //es serotipo dengue
+            /*if (filtroRep.getIdDx()==0){ //es serotipo dengue
                 filtroRep.setSerotipoDengue(true);
-            }
+            }*/
         } else if (idSolicitud!=null && idSolicitud.contains("E")){
             filtroRep.setIdEstudio(Integer.valueOf(idSolicitud.substring(0, idSolicitud.indexOf("-"))));
         }
         filtroRep.setIncluirMxInadecuadas(mxInadecuadas);
         filtroRep.setCodLaboratio(codLabo);
-        filtroRep.setDiagnosticos(diagnosticos);
+        if (diagnosticos != null && diagnosticos.equalsIgnoreCase("0")) {
+            filtroRep.setSerotipoDengue(true);
+            Parametro parametroTmp = parametrosService.getParametroByName("DX_DENGUE");
+            if (parametroTmp != null) filtroRep.setDiagnosticos(parametroTmp.getValor());
+            parametroTmp = parametrosService.getParametroByName("ESTUDIOS_DENGUE");
+            if (parametroTmp != null) filtroRep.setEstudios(parametroTmp.getValor());
+        } else {
+            filtroRep.setDiagnosticos(diagnosticos);
+        }
         filtroRep.setSemInicial(semInicial);
         filtroRep.setSemFinal(semFinal);
         filtroRep.setAnioInicial(anio);
         filtroRep.setConsolidarPor(consolidarPor);
         filtroRep.setNivelCentral(usuario.getNivelCentral());
         filtroRep.setEstudios(estudios);
-        if (filtroRep.isSerotipoDengue()) {
-            Parametro parametroTmp = parametrosService.getParametroByName("DX_DENGUE");
-            if (parametroTmp != null) filtroRep.setIdDx(Integer.valueOf(parametroTmp.getValor()));
-            parametroTmp = parametrosService.getParametroByName("ESTUDIOS_DENGUE");
-            if (parametroTmp != null) filtroRep.setEstudios(parametroTmp.getValor());
-        }
         return filtroRep;
     }
 }

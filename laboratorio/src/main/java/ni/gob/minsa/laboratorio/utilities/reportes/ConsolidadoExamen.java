@@ -15,6 +15,7 @@ public class ConsolidadoExamen {
     Integer noMes;
     String idOrdenExamen;
     String resultado;
+    String serotipo;
 
     public ConsolidadoExamen(){
 
@@ -89,6 +90,14 @@ public class ConsolidadoExamen {
         this.resultado = resultado;
     }
 
+    public String getSerotipo() {
+        return serotipo;
+    }
+
+    public void setSerotipo(String serotipo) {
+        this.serotipo = serotipo;
+    }
+
     @Override
     public String toString() {
 
@@ -100,6 +109,7 @@ public class ConsolidadoExamen {
                 .add("noMes", noMes)
                 .add("idOrdenExamen", idOrdenExamen)
                 .add("resultado", resultado)
+                .add("serotipo", serotipo)
                 .toString();
     }
 }

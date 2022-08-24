@@ -130,10 +130,77 @@ public class ReporteConsolExamenService {
                                 );
                     }
                 };
+
                 //si hay mas de un elemento como resultado del filtro, significa que el examen es positivo
                 Collection<ConsolidadoExamenRespuesta> resExamen = FilterLists.filter(consolidadoRespuestasList, byIdOrdenExamen);
                 if (resExamen.size()>0) dat.setResultado("positivo");
                 else dat.setResultado("");
+
+                if (filtro.isSerotipoDengue()) {
+                    //para cada examen, filtrar sus respuestas serotipo den1
+                    Predicate<ConsolidadoExamenRespuesta> byIdOrdenExamenAndDen1 = new Predicate<ConsolidadoExamenRespuesta>() {
+                        @Override
+                        public boolean apply(ConsolidadoExamenRespuesta examenRespuesta) {
+                            return examenRespuesta.getIdOrdenExamen().equalsIgnoreCase(dat.getIdOrdenExamen()) &&
+                                    (examenRespuesta.getValor().toLowerCase().contains("den1")
+                                    );
+                        }
+                    };
+                    //si hay mas de un elemento como resultado del filtro, significa que el examen es den1
+                    Collection<ConsolidadoExamenRespuesta> resExamenDen1 = FilterLists.filter(consolidadoRespuestasList, byIdOrdenExamenAndDen1);
+                    if (resExamenDen1.size()>0) {
+                        dat.setSerotipo("den1");
+                    } else {
+                        //para cada examen, filtrar sus respuestas serotipo den2
+                        Predicate<ConsolidadoExamenRespuesta> byIdOrdenExamenAndDen2 = new Predicate<ConsolidadoExamenRespuesta>() {
+                            @Override
+                            public boolean apply(ConsolidadoExamenRespuesta examenRespuesta) {
+                                return examenRespuesta.getIdOrdenExamen().equalsIgnoreCase(dat.getIdOrdenExamen()) &&
+                                        (examenRespuesta.getValor().toLowerCase().contains("den2")
+                                        );
+                            }
+                        };
+                        //si hay mas de un elemento como resultado del filtro, significa que el examen es den2
+                        Collection<ConsolidadoExamenRespuesta> resExamenDen2 = FilterLists.filter(consolidadoRespuestasList, byIdOrdenExamenAndDen2);
+                        if (resExamenDen2.size()>0) {
+                            dat.setSerotipo("den2");
+                        } else {
+                            //para cada examen, filtrar sus respuestas serotipo den3
+                            Predicate<ConsolidadoExamenRespuesta> byIdOrdenExamenAndDen3 = new Predicate<ConsolidadoExamenRespuesta>() {
+                                @Override
+                                public boolean apply(ConsolidadoExamenRespuesta examenRespuesta) {
+                                    return examenRespuesta.getIdOrdenExamen().equalsIgnoreCase(dat.getIdOrdenExamen()) &&
+                                            (examenRespuesta.getValor().toLowerCase().contains("den3")
+                                            );
+                                }
+                            };
+                            //si hay mas de un elemento como resultado del filtro, significa que el examen es den2
+                            Collection<ConsolidadoExamenRespuesta> resExamenDen3 = FilterLists.filter(consolidadoRespuestasList, byIdOrdenExamenAndDen3);
+                            if (resExamenDen3.size()>0) {
+                                dat.setSerotipo("den3");
+                            } else {
+                                //para cada examen, filtrar sus respuestas serotipo den4
+                                Predicate<ConsolidadoExamenRespuesta> byIdOrdenExamenAndDen4 = new Predicate<ConsolidadoExamenRespuesta>() {
+                                    @Override
+                                    public boolean apply(ConsolidadoExamenRespuesta examenRespuesta) {
+                                        return examenRespuesta.getIdOrdenExamen().equalsIgnoreCase(dat.getIdOrdenExamen()) &&
+                                                (examenRespuesta.getValor().toLowerCase().contains("den4")
+                                                );
+                                    }
+                                };
+                                //si hay mas de un elemento como resultado del filtro, significa que el examen es den2
+                                Collection<ConsolidadoExamenRespuesta> resExamenDen4 = FilterLists.filter(consolidadoRespuestasList, byIdOrdenExamenAndDen4);
+                                if (resExamenDen4.size()>0) {
+                                    dat.setSerotipo("den4");
+                                } else {
+                                    dat.setSerotipo("");
+                                }
+                            }
+                        }
+
+                    }
+                }
+
                 consolidadoList.add(dat);
             }
         }
@@ -232,5 +299,4 @@ public class ReporteConsolExamenService {
 
         return consolidadoList;
     }
-
 }

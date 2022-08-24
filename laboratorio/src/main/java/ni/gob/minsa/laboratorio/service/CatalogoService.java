@@ -1047,7 +1047,7 @@ public class CatalogoService {
         //Retrieve session Hibernate
         Session session = sessionFactory.getCurrentSession();
         //Create a hibernate query (HQL)
-        Query query = session.createQuery("FROM Anios where pasivo = false order by orden");
+        Query query = session.createQuery("FROM Anios where pasivo = false order by orden desc");
         //retrieve all
         return query.list();
     }

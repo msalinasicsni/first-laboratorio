@@ -25,6 +25,8 @@ public class Catalogo_Dx implements Serializable, Auditable, Comparable<Catalogo
     private Integer prioridad; //indica la prioridad de recepción respecto a otros dx de la misma mx
     private Date fechaRegistro;
     private User usuarioRegistro;
+    private Integer conceptoDefResulExam; //id del concepto por defecto a aplicar de resultado en recepción laboratorio para todos sus examenes
+    private String valorDefResulExam; //valor por defecto a aplicar de resultado en recepción laboratorio para todos sus examenes
 
     public Catalogo_Dx() {
     }
@@ -109,6 +111,26 @@ public class Catalogo_Dx implements Serializable, Auditable, Comparable<Catalogo
     public boolean isFieldAuditable(String fieldname) {
         if (fieldname.matches("fechaRegistro") || fieldname.matches("usuarioRegistro")) return false;
         return  true;
+    }
+
+    @Basic
+    @Column(name = "CONCEPTO_DEF_RES_EXAMENES", nullable = true, insertable = true, updatable = true)
+    public Integer getConceptoDefResulExam() {
+        return conceptoDefResulExam;
+    }
+
+    public void setConceptoDefResulExam(Integer conceptoDefResulExam) {
+        this.conceptoDefResulExam = conceptoDefResulExam;
+    }
+
+    @Basic
+    @Column(name = "VALOR_DEF_RES_EXAMENES", nullable = true, insertable = true, updatable = true)
+    public String getValorDefResulExam() {
+        return valorDefResulExam;
+    }
+
+    public void setValorDefResulExam(String valorDefResulExam) {
+        this.valorDefResulExam = valorDefResulExam;
     }
 
     @Override

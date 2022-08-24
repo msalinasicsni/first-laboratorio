@@ -1402,7 +1402,7 @@ public class TomaMxService {
     }
 
     public List<DatosSolicitud> getDatosSolicitudesPrioridadByIdToma(String idTomaMx){
-        String query = "select sdx.idSolicitudDx as idSolicitud, sdx.codDx.nombre as nombre, sdx.aprobada as aprobada from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc, sdx.fechaHSolicitud asc ";
+        String query = "select sdx.idSolicitudDx as idSolicitud, sdx.codDx.nombre as nombre, sdx.codDx.conceptoDefResulExam as conceptoDefResulExam, sdx.codDx.valorDefResulExam as valorDefResulExam , sdx.aprobada as aprobada from DaSolicitudDx as sdx inner join sdx.codDx dx where sdx.anulado = false and sdx.idTomaMx.idTomaMx = :idTomaMx ORDER BY dx.prioridad asc, sdx.fechaHSolicitud asc ";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("idTomaMx",idTomaMx);
         q.setResultTransformer(Transformers.aliasToBean(DatosSolicitud.class));

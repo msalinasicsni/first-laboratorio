@@ -33,6 +33,7 @@ public class ExcelDocumentDxExams{
         Integer anioReporte = (Integer) model.get("anio");
         List<List<Object[]>> consolidados = (List<List<Object[]>>) model.get("consol");
         List<List<Object[]>> datos = (List<List<Object[]>>) model.get("datos");
+        boolean esSerotipoDengue = (boolean) model.get("esSerotipoDengue");
         // create style for header cells
         CellStyle headerStyle = workbook.createCellStyle();
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
@@ -114,12 +115,12 @@ public class ExcelDocumentDxExams{
                     if(registrosPorTabla == indiceRegistroTabla){
                         indiceUltimafila = rowCount;
                         //poner celdad de totales
-                        setRowTotalsConsol(sheet, contentCellStyle, totalCellStyle, percentCellStyle, rowCount++, meses.size() * 2, indicePrimeraFila, indiceUltimafila);
+                        setRowTotalsConsol(sheet, contentCellStyle, totalCellStyle, percentCellStyle, rowCount++, meses.size() * (esSerotipoDengue ? 7 : 2), indicePrimeraFila, indiceUltimafila, esSerotipoDengue);
                     }
                 } else {
                     // poner encabezado de tablas
                     if (rowCount > 1) rowCount += 2;
-                    setHeaderTableConsolExams(sheet, headerStyle, headerStyle2, meses, rowCount, registro[0].toString(), anioReporte);
+                    setHeaderTableConsolExams(sheet, headerStyle, headerStyle2, meses, rowCount, registro[0].toString(), anioReporte, esSerotipoDengue);
                     rowCount += 3;
                     indiceRegistroTabla = 0;
                     indicePrimeraFila = rowCount+1;
@@ -140,13 +141,13 @@ public class ExcelDocumentDxExams{
                     if(registrosPorTabla == indiceRegistroTabla){
                         indiceUltimafila = rowCountDat;
                         //poner celdas de totales
-                        setRowTotalsDat(sheetDatos, contentCellStyle, totalCellStyle, rowCountDat++, columnas.size() * 2, indicePrimeraFila, indiceUltimafila);
+                        setRowTotalsDat(sheetDatos, contentCellStyle, totalCellStyle, rowCountDat++, columnas.size() * (esSerotipoDengue ? 7 : 2), indicePrimeraFila, indiceUltimafila);
                     }
 
                 } else {
                     // poner encabezado de tablas
                     if (rowCountDat > 1) rowCountDat += 2;
-                    setHeaderTableDatExams(sheetDatos, headerStyle, headerStyle2, columnas, meses, rowCountDat, registro[0].toString());
+                    setHeaderTableDatExams(sheetDatos, headerStyle, headerStyle2, columnas, meses, rowCountDat, registro[0].toString(), esSerotipoDengue);
                     rowCountDat += 4;
                     indiceRegistroTabla = 0;
                     indicePrimeraFila = rowCountDat+1;
@@ -158,12 +159,12 @@ public class ExcelDocumentDxExams{
     /**
      * Método para poner los encabezados de las tablas de datos en la hoja de datos del respectivo dx
      */
-    protected void setHeaderTableDatExams(HSSFSheet sheet, CellStyle style, CellStyle style2, List<String> semanas, List<String> meses, int rowcount, String examen){
-        int indiceSem = 1, indiceSubSem=1, indiceMes=0;
+    protected void setHeaderTableDatExams(HSSFSheet sheet, CellStyle style, CellStyle style2, List<String> semanas, List<String> meses, int rowcount, String examen, boolean esSerotipoDengue){
+        int indiceSem = 1, indiceSubSem=1, indiceMes=0; int columnasSemana = ( esSerotipoDengue ? 7 : 2 );
 
         //Se crea etiqueta "TOTAL DE (Examen)"
         HSSFRow headerExamen = sheet.createRow(rowcount);
-        ExcelBuilder.createCell(headerExamen, "TOTAL DE "+examen.toUpperCase(),0,false, style2);
+        ExcelBuilder.createCell(headerExamen, "TOTAL DE "+examen.toUpperCase() + (esSerotipoDengue ? " - SEROTIPO": ""),0,false, style2);
 
         //Se crea encabezado de tabla dónde van los meses
         HSSFRow headerMeses = sheet.createRow(rowcount+1);
@@ -176,7 +177,7 @@ public class ExcelDocumentDxExams{
             String[] partesMes = mes.split(",");
             semanasMes = Integer.valueOf(partesMes[1]);
             //para cada mes se unen todas las celdas (sheet.addMergedRegion) según la cantidad de semanas * 2 (esto porque la semana a su vez contiene T y P)
-            int indiceCeldaFinMes = indiceMes+(semanasMes*2)-1;
+            int indiceCeldaFinMes = indiceMes+(semanasMes*columnasSemana)-1;
             ExcelBuilder.createHorizontalCellRange(sheet, headerMeses, getNombreMes(Integer.valueOf(partesMes[0])),indiceMes, indiceCeldaFinMes, false, style);
             //el siguiente mes, iniciará inmediatamente después de la última celda creada para el mes actual
             indiceMes=indiceCeldaFinMes+1;
@@ -187,15 +188,32 @@ public class ExcelDocumentDxExams{
         HSSFRow subHeaderSemanas = sheet.createRow(rowcount+3);
         for(String columna : semanas){
             //cada semana contiene dos celdas (sheet.addMergedRegion), para poder crear bajo cada semana T y P
-            ExcelBuilder.createHorizontalCellRange(sheet, headerSemanas, Integer.valueOf(columna), indiceSem, indiceSem+1, false, style);
+            ExcelBuilder.createHorizontalCellRange(sheet, headerSemanas, Integer.valueOf(columna), indiceSem, indiceSem + (columnasSemana - 1), false, style);
             //inicio de la siguiente semana
-            indiceSem+=2;
+            indiceSem+= columnasSemana;
             //Totales
             ExcelBuilder.createCell(subHeaderSemanas, "T", indiceSubSem, false, style);
             indiceSubSem++;
             //Positivos
             ExcelBuilder.createCell(subHeaderSemanas, "P", indiceSubSem, false, style);
             indiceSubSem++;
+            if (esSerotipoDengue) {
+                //Den1
+                ExcelBuilder.createCell(subHeaderSemanas, "Den1", indiceSubSem, false, style);
+                indiceSubSem++;
+                //Den2
+                ExcelBuilder.createCell(subHeaderSemanas, "Den2", indiceSubSem, false, style);
+                indiceSubSem++;
+                //Den3
+                ExcelBuilder.createCell(subHeaderSemanas, "Den3", indiceSubSem, false, style);
+                indiceSubSem++;
+                //Den4
+                ExcelBuilder.createCell(subHeaderSemanas, "Den4", indiceSubSem, false, style);
+                indiceSubSem++;
+                //SIN
+                ExcelBuilder.createCell(subHeaderSemanas, "SinSerotipo", indiceSubSem, false, style);
+                indiceSubSem++;
+            }
         }
 
     }
@@ -217,8 +235,8 @@ public class ExcelDocumentDxExams{
     /**
      * Método para poner los encabezados de las tablas de consolidades en la hoja de consolidado del respectivo dx
      */
-    private void setHeaderTableConsolExams(HSSFSheet sheet, CellStyle style, CellStyle style2, List<String> meses, int rowcount, String examen, int anioReporte){
-        int indiceSubMes=1, indiceColumnaMes=1;
+    private void setHeaderTableConsolExams(HSSFSheet sheet, CellStyle style, CellStyle style2, List<String> meses, int rowcount, String examen, int anioReporte, boolean esSerotipoDengue){
+        int indiceSubMes=1, indiceColumnaMes=1;  int columnasMes = ( esSerotipoDengue ? 7 : 2 );
 
         //Se crea etiqueta "TOTAL DE (Examen)"
         HSSFRow headerExamen = sheet.createRow(rowcount);
@@ -235,15 +253,33 @@ public class ExcelDocumentDxExams{
         for(String mes : meses){
             String[] partesMes = mes.split(",");
             //para cada mes se unen 2 celdas (sheet.addMergedRegion)  (esto porque luego cada mes contiene T y P)
-            ExcelBuilder.createHorizontalCellRange(sheet, headerMeses, getNombreMes(Integer.valueOf(partesMes[0])).toUpperCase(), indiceColumnaMes, indiceColumnaMes+1, false, style2);
+            ExcelBuilder.createHorizontalCellRange(sheet, headerMeses, getNombreMes(Integer.valueOf(partesMes[0])).toUpperCase(), indiceColumnaMes, indiceColumnaMes + (columnasMes - 1), false, style2);
             //Totales
             ExcelBuilder.createCell(subHeadermeses, "T", indiceSubMes, false, style2);
             indiceSubMes++;
             //Positivos
             ExcelBuilder.createCell(subHeadermeses, "P", indiceSubMes, false, style2);
             indiceSubMes++;
+            if (esSerotipoDengue) {
+                //Den1
+                ExcelBuilder.createCell(subHeadermeses, "Den1", indiceSubMes, false, style);
+                indiceSubMes++;
+                //Den2
+                ExcelBuilder.createCell(subHeadermeses, "Den2", indiceSubMes, false, style);
+                indiceSubMes++;
+                //Den3
+                ExcelBuilder.createCell(subHeadermeses, "Den3", indiceSubMes, false, style);
+                indiceSubMes++;
+                //Den4
+                ExcelBuilder.createCell(subHeadermeses, "Den4", indiceSubMes, false, style);
+                indiceSubMes++;
+                //SIN
+                ExcelBuilder.createCell(subHeadermeses, "SinSerotipo", indiceSubMes, false, style);
+                indiceSubMes++;
+            }
+
             //el siguiente mes, iniciará inmediatamente después de la última celda creada para el mes actual
-            indiceColumnaMes+=2;
+            indiceColumnaMes+=columnasMes;
 
             if (indiceMes == 0) primerMes = getNombreMes(Integer.valueOf(partesMes[0]));
             if (indiceMes == meses.size()-1) ultimoMes = getNombreMes(Integer.valueOf(partesMes[0]));
@@ -252,7 +288,7 @@ public class ExcelDocumentDxExams{
         //combinar todas las celdas de arriba de los meses
         ExcelBuilder.createHorizontalCellRange(sheet, headerExamen, "", 1, indiceColumnaMes-1, false, style2);
         //en la primera fila poner hasta el final la etiqueta "Total (Examen)"
-        ExcelBuilder.createHorizontalCellRange(sheet, headerExamen, "Total "+examen, indiceColumnaMes, indiceColumnaMes+2, false, style2);
+        ExcelBuilder.createHorizontalCellRange(sheet, headerExamen, "Total "+examen + (esSerotipoDengue ? " - SEROTIPO": ""), indiceColumnaMes, indiceColumnaMes+2, false, style2);
         ExcelBuilder.createHorizontalCellRange(sheet, headerMeses, primerMes+"-"+ultimoMes+" "+anioReporte, indiceColumnaMes, indiceColumnaMes+2, false, style );
         ExcelBuilder.createCell(subHeadermeses, "T", indiceSubMes, false, style2);
         ExcelBuilder.createCell(subHeadermeses, "P", indiceSubMes+1, false, style2);
@@ -281,15 +317,17 @@ public class ExcelDocumentDxExams{
     /**
      * Método para totalizar cada columna y fila de consolidado en la hoja de consolidado del respectivo dx
      */
-    private void setRowTotalsConsol(HSSFSheet sheet, CellStyle style, CellStyle styleTot, CellStyle percentCellStyle, int rowCount, int totalColumnas, int indicePrimeraFila, int indiceUltimafila){
+    private void setRowTotalsConsol(HSSFSheet sheet, CellStyle style, CellStyle styleTot, CellStyle percentCellStyle, int rowCount, int totalColumnas, int indicePrimeraFila, int indiceUltimafila, boolean esSerotipoDengue){
+        int columnasMes = ( esSerotipoDengue ? 7 : 2 );
         HSSFRow aRowTot = sheet.createRow(rowCount);
+
         ExcelBuilder.createCell(aRowTot, "Total", 0, false, styleTot);
 
         for (int i = indicePrimeraFila; i <= indiceUltimafila; i++){
             HSSFRow row = sheet.getRow(i-1);
             //aplicar fórmula para sumar los totales de cada mes
             String formulaTotales = "SUM(";
-            for(int j = 1; j <= totalColumnas ; j+=2){
+            for(int j = 1; j <= totalColumnas ; j+=columnasMes){
                 String columnLetter = CellReference.convertNumToColString(row.getCell(j).getColumnIndex());
                 formulaTotales += (j==1?"":",")+columnLetter+i;
             }
@@ -298,9 +336,9 @@ public class ExcelDocumentDxExams{
             ExcelBuilder.createCell(row, formulaTotales, totalColumnas+1, true, style);
             //aplicar fórmula para sumar los positivos de cada mes
             String formulaPos = "SUM(";
-            for(int j = 2; j <= totalColumnas ; j+=2){
+            for(int j = 2; j <= totalColumnas ; j+=columnasMes){
                 String columnLetter = CellReference.convertNumToColString(row.getCell(j).getColumnIndex());
-                formulaPos += (j==1?"":",")+columnLetter+i;
+                formulaPos += (j==2?"":",")+columnLetter+i;
             }
             formulaPos += ")";
             //poner la sumatoria de los positivos

@@ -180,8 +180,6 @@ var resultReport = function () {
                     filtro['porSilais'] = "true"; //$('input[name="rbNivelPais"]:checked', '#result_form').val();
                     //filtro['codZona'] = $('#codZona').find('option:selected').val();
                     filtro['idDx'] = $('#idDx').find('option:selected').val();
-                    console.log($('#idDx').find('option:selected').text());
-                    var descTipoConsolidado = $('#tipoConsolidado').find('option:selected').text();
                     filtro['codLabo'] = $('#codigoLab').find('option:selected').val();
                     filtro['consolidarPor'] = $('input[name="rbFechaBusqueda"]:checked', '#result_form').val();
                     $(this).attr("href",parametros.sExcelResultDx+"?filtro="+JSON.stringify(filtro));

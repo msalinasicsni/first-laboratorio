@@ -639,10 +639,6 @@ public class RecepcionMxController {
                 //si tiene traslado activo marcarlo como recepcionado
                 TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
                 if (trasladoActivo!=null) esControlCalidad = trasladoActivo.isControlCalidad();
-                //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. S�lo para rutinas, que no vengan por traslado externo o control de calidad
-                if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
-                    tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
-                }
                 if (recepcionMx.getIdRecepcion() != null)
                     recepcionMxService.updateRecepcionMx(recepcionMx);
                 else
@@ -720,20 +716,22 @@ public class RecepcionMxController {
                     }
                 }
             }catch (Exception ex){
-                if (recepcionMx.getIdRecepcion() != null) recepcionMxService.deleteRecepcionMx(recepcionMx);
                 resultado = messageSource.getMessage("msg.add.receipt.error",null,null);
                 resultado=resultado+". \n "+ex.getMessage();
                 ex.printStackTrace();
             }
             if (!idRecepcion.isEmpty()) {
                //se tiene que actualizar la tomaMx
+                //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. S�lo para rutinas, que no vengan por traslado externo o control de calidad
+                if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
+                    tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
+                }
                 tomaMx.setEstadoMx(estadoMx);
                 tomaMx.setCodigoValidacion(GuidGenerator.next()); //servicios en linea. 17/02/2021
                 try {
                     tomaMxService.updateTomaMx(tomaMx);
                     codigoLabMx = esEstudio?tomaMx.getCodigoUnicoMx():tomaMx.getCodigoLab();
                 }catch (Exception ex){
-                    recepcionMxService.deleteRecepcionMx(recepcionMx);
                     resultado = messageSource.getMessage("msg.update.order.error",null,null);
                     resultado=resultado+". \n "+ex.getMessage();
                     ex.printStackTrace();
@@ -944,52 +942,26 @@ public class RecepcionMxController {
                             }
                         }
                     } else {
-                        //Registrar resultados por defecto como negativo para dx ifi virus respiratorio y Biologia Molecular Covid19
-                        Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
-                        Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
-                        Parametro conceptoCovid19Negativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_BMCOV19");
-                        Parametro valorCovid19Negativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_BMCOV19");
-                        if ((conceptoIFINegativo != null && valorIFINegativo != null) || (conceptoCovid19Negativo != null && valorCovid19Negativo != null)) {
-                            for (DaSolicitudDx solicitudDx : solicitudDxList) {
-                                if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getNombre().toLowerCase().contains("ifi virus respiratorio")) {
-                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
-                                    for (OrdenExamen examen : ordenesExamen) {
-                                        //no tiene resultado registrado aún
-                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
-                                            RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoIFINegativo.getValor()));
-                                            if (conceptoTmp != null) {
-                                                DetalleResultado detalleResultado = new DetalleResultado();
-                                                detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
-                                                detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
-                                                detalleResultado.setValor(valorIFINegativo.getValor());
-                                                detalleResultado.setRespuesta(conceptoTmp);
-                                                detalleResultado.setExamen(examen);
-                                                detalleResultado.setUsuarioRegistro(usuario);
-                                                if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
-                                                    resultadosService.addDetalleResultado(detalleResultado);
-                                            }
-                                        }
-                                    }
-                                } else if (!solicitudDx.getAprobada() && //Biologia Molecular Covid19 (viajeros) o Biologia Molecular SARS-CoV-2(vigilancia). 14/07/2022
-                                        (solicitudDx.getCodDx().getNombre().toLowerCase().contains("molecular covid19") || solicitudDx.getCodDx().getNombre().toLowerCase().contains("sars-cov-2"))) {
-                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
-                                    boolean soloUnExamen = ordenesExamen.size()==1;
-                                    for (OrdenExamen examen : ordenesExamen) {
-                                        //no tiene resultado registrado aún
-                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
-                                            RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), Integer.valueOf(conceptoCovid19Negativo.getValor()));
-                                            if (conceptoTmp != null) {
-                                                DetalleResultado detalleResultado = new DetalleResultado();
-                                                detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
-                                                detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
-                                                detalleResultado.setValor(valorCovid19Negativo.getValor());
-                                                detalleResultado.setRespuesta(conceptoTmp);
-                                                detalleResultado.setExamen(examen);
-                                                detalleResultado.setUsuarioRegistro(usuario);
-                                                if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
-                                                    resultadosService.addDetalleResultado(detalleResultado);
-                                                if (soloUnExamen) guardarResultadoFinal(detalleResultado, false);
-                                            }
+                        //Registrar resultados por defecto. Se toman el concepto y el valor por defecto para los examenes de la tabla catalogo_dx, para que sea mas dinamico. 03/08/2022. Ya no se usan parametros
+                        for (DaSolicitudDx solicitudDx : solicitudDxList) {
+                            if (!solicitudDx.getAprobada() && solicitudDx.getCodDx().getConceptoDefResulExam() != null && solicitudDx.getCodDx().getValorDefResulExam() != null) {
+                                List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitudDx());
+                                boolean soloUnExamen = ordenesExamen.size()==1;
+                                for (OrdenExamen examen : ordenesExamen) {
+                                    //no tiene resultado registrado aún
+                                    if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
+                                        RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), solicitudDx.getCodDx().getConceptoDefResulExam());
+                                        if (conceptoTmp != null) {
+                                            DetalleResultado detalleResultado = new DetalleResultado();
+                                            detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                            detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                            detalleResultado.setValor(solicitudDx.getCodDx().getValorDefResulExam());
+                                            detalleResultado.setRespuesta(conceptoTmp);
+                                            detalleResultado.setExamen(examen);
+                                            detalleResultado.setUsuarioRegistro(usuario);
+                                            if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                resultadosService.addDetalleResultado(detalleResultado);
+                                            if (soloUnExamen) guardarResultadoFinal(detalleResultado, false);
                                         }
                                     }
                                 }
@@ -1415,10 +1387,6 @@ public class RecepcionMxController {
                     //si tiene traslado activo marcarlo como recepcionado
                     TrasladoMx trasladoActivo = trasladosService.getTrasladoActivoMx(idTomaMx);
                     if (trasladoActivo!=null) esControlCalidad = trasladoActivo.isControlCalidad();
-                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. S�lo para rutinas, que no vengan por traslado externo o control de calidad
-                    if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
-                        tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
-                    }
                     if (recepcionMx.getIdRecepcion() != null)
                         recepcionMxService.updateRecepcionMx(recepcionMx);
                     else
@@ -1437,13 +1405,16 @@ public class RecepcionMxController {
                         }
                     }
                 } catch (Exception ex) {
-                    if (recepcionMx.getIdRecepcion() != null) recepcionMxService.deleteRecepcionMx(recepcionMx);
                     resultado = messageSource.getMessage("msg.add.receipt.error", null, null);
                     resultado = resultado + ". \n " + ex.getMessage();
                     ex.printStackTrace();
                 }
                 if (!idRecepcion.isEmpty()) {
                     //se tiene que actualizar la tomaMx
+                    //se setea consecutivo codigo lab. Formato COD_LAB-CONSECUTIVO-ANIO. S�lo para rutinas, que no vengan por traslado externo o control de calidad
+                    if (!esEstudio && tomaMx.getCodigoLab()==null && !esControlCalidad) {
+                        tomaMx.setCodigoLab(recepcionMxService.obtenerCodigoLab(labUsuario.getCodigo(), 1));
+                    }
                     tomaMx.setEstadoMx(estadoMx);
                     tomaMx.setCodigoValidacion(GuidGenerator.next()); //servicios en linea. 17/02/2021
                     try {
@@ -1500,7 +1471,6 @@ public class RecepcionMxController {
                             fechasNacimiento += "," + fechaNac;
                         }
                     } catch (Exception ex) {
-                        recepcionMxService.deleteRecepcionMx(recepcionMx);
                         resultado = messageSource.getMessage("msg.update.order.error", null, null);
                         resultado = resultado + ". \n " + ex.getMessage();
                         ex.printStackTrace();
@@ -1770,6 +1740,33 @@ public class RecepcionMxController {
                             recepcionMxService.updateRecepcionMx(recepcionMx);
                             if (actualizarTraslado)
                                 trasladosService.saveTrasladoMx(trasladoMxActivo);
+                            //Registrar resultados por defecto. Se toman el concepto y el valor por defecto para los examenes de la tabla catalogo_dx, para que sea mas dinamico. 03/08/2022. Ya no se usan parametros
+                            List<DatosSolicitud> solicitudDxList = tomaMxService.getDatosSolicitudesPrioridadByIdToma(recepcionMx.getTomaMx().getIdTomaMx());
+                            for (DatosSolicitud solicitudDx : solicitudDxList) {
+                                if (!solicitudDx.getAprobada() && solicitudDx.getConceptoDefResulExam() != null && solicitudDx.getValorDefResulExam() != null) {
+                                    List<OrdenExamen> ordenesExamen = ordenExamenMxService.getOrdenesExamenNoAnuladasByIdSolicitud(solicitudDx.getIdSolicitud());
+                                    boolean soloUnExamen = ordenesExamen.size()==1;
+                                    for (OrdenExamen examen : ordenesExamen) {
+                                        //no tiene resultado registrado aún
+                                        if (resultadosService.getDetallesResultadoActivosByExamen(examen.getIdOrdenExamen()).size() <= 0) {
+                                            RespuestaExamen conceptoTmp = respuestasExamenService.getRespuestaByExamenAndConcepto(examen.getCodExamen().getIdExamen(), solicitudDx.getConceptoDefResulExam());
+                                            if (conceptoTmp != null) {
+                                                DetalleResultado detalleResultado = new DetalleResultado();
+                                                detalleResultado.setFechahProcesa(recepcionMxLab.getFechaHoraRecepcion());
+                                                detalleResultado.setFechahoraRegistro(recepcionMxLab.getFechaHoraRegistro());
+                                                detalleResultado.setValor(solicitudDx.getValorDefResulExam());
+                                                detalleResultado.setRespuesta(conceptoTmp);
+                                                detalleResultado.setExamen(examen);
+                                                detalleResultado.setUsuarioRegistro(user);
+                                                if (detalleResultado.getValor() != null && !detalleResultado.getValor().isEmpty())
+                                                    resultadosService.addDetalleResultado(detalleResultado);
+                                                if (soloUnExamen) guardarResultadoFinal(detalleResultado, false);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            /*
                             //Registrar resultados por defecto como negativo para dx ifi virus respiratorio
                             Parametro conceptoIFINegativo = parametrosService.getParametroByName("CONCEPTO_RES_EXAM_DX_IFIVR");
                             Parametro valorIFINegativo = parametrosService.getParametroByName("NEGATIVO_CONCEPTO_RES_EXAM_DX_IFIVR");
@@ -1823,6 +1820,7 @@ public class RecepcionMxController {
                                     }
                                 }
                             }
+                            */
                         }
                         //VALIDA SI ES NECESARIO ENVIAR PRE ORDEN A SISTEMA INFINITY
                         try {

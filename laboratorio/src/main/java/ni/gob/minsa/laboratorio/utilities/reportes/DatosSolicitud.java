@@ -15,6 +15,8 @@ public class DatosSolicitud {
     private Date fechaAprobacion;
     private List<ValorResultado> resultado;
     private String usuarioAprobacion;
+    private Integer conceptoDefResulExam; //id del concepto por defecto a aplicar de resultado en recepción laboratorio para todos sus examenes
+    private String valorDefResulExam; //valor por defecto a aplicar de resultado en recepción laboratorio para todos sus examenes
 
     public String getIdSolicitud() {
         return idSolicitud;
@@ -102,5 +104,21 @@ public class DatosSolicitud {
 
     public void setUsuarioAprobacion(String usuarioAprobacion) {
         this.usuarioAprobacion = usuarioAprobacion;
+    }
+
+    public Integer getConceptoDefResulExam() {
+        return conceptoDefResulExam;
+    }
+
+    public void setConceptoDefResulExam(Integer conceptoDefResulExam) {
+        this.conceptoDefResulExam = conceptoDefResulExam;
+    }
+
+    public String getValorDefResulExam() {
+        return valorDefResulExam;
+    }
+
+    public void setValorDefResulExam(String valorDefResulExam) {
+        this.valorDefResulExam = valorDefResulExam;
     }
 }
