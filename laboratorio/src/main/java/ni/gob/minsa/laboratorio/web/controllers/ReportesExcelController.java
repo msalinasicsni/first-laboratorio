@@ -1500,6 +1500,8 @@ public class ReportesExcelController {
         columnas.add(messageSource.getMessage("lbl.approve.date.2", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.res.final", null, null).toUpperCase());
         columnas.add(messageSource.getMessage("lbl.num.cedula", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("person.ocupacion", null, null).toUpperCase());
+        columnas.add(messageSource.getMessage("lbl.irag.trab.salud.short", null, null).toUpperCase());
     }
 
     private void setNombreColumnasDefecto(List<String> columnas){
@@ -2383,6 +2385,11 @@ public class ReportesExcelController {
             registro[14] = DateUtil.DateToString(solicitudDx.getFechaAprobacion(),"dd/MM/yyyy");
             registro[15] = parseFinalResultDetails(solicitudDx.getIdSolicitud());
             registro[16] = solicitudDx.getIdentificacion();
+            //poner ocupacion y si es trabajador de la salud
+            DatosDaIrag irag = daIragService.getFormByIdV2(solicitudDx.getIdNotificacion());
+            registro[17] = (irag.getOcupacion()!=null?irag.getOcupacion():"");
+            registro[18] = (irag.getTrabajadorSalud()!=null?irag.getTrabajadorSalud():"");
+
             if (registro[15].toString().toLowerCase().contains("positivo")) {
                 registro[0]= rowCountPos++;
                 registrosPos.add(registro);

@@ -464,8 +464,14 @@ public class SeguridadService {
         else return  false;
     }
 
+    /***
+     * 25/08/2022. Se solicita habilitar el dx para todos los usuarios sin restricción
+     * Cuándo el parámetro tiene el valor ALL se permite acceso a todos, sino se valida el username
+     * @param username usuario a validar
+     * @return true habilitado
+     */
     public boolean usuarioAutorizadoCovid19(String username){
-        String query = "from Parametro where nombre='USUARIOS_AUT_COVID19' and valor like :username";
+        String query = "from Parametro where nombre='USUARIOS_AUT_COVID19' and (valor = 'ALL' or valor like :username)";
         Query q = sessionFactory.getCurrentSession().createQuery(query);
         q.setParameter("username", "%,"+username+",%");
         Parametro parametro = (Parametro)q.uniqueResult();

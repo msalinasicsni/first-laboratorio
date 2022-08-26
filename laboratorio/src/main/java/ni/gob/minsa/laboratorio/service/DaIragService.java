@@ -61,7 +61,9 @@ public class DaIragService {
                 "coalesce((select c.nombreCie10 from Cie10 c where c.codigoCie10 = vi.diagnostico.codigoCie10), null) as diagnostico, " +
                 " vi.fechaConsulta as fechaConsulta, vi.fechaPrimeraConsulta as  fechaPrimeraConsulta, vi.fechaEgreso as fechaEgreso, vi.uci as uci, vi.nombreMadreTutor as nombreMadreTutor, " +
                 " vi.noDiasHospitalizado as noDiasHospitalizado, vi.ventilacionAsistida as ventilacionAsistida, vi.diagnostico1Egreso as diagnostico1Egreso, vi.diagnostico2Egreso as diagnostico2Egreso, " +
-                " vi.condiciones as condiciones " +
+                " vi.condiciones as condiciones, " +
+                "coalesce((select c.valor from Respuesta c where c.codigo = vi.trabajadorSalud.codigo), null) as trabajadorSalud, " +
+                "coalesce((select c.nombre from Ocupacion c where c.codigo = vi.ocupacion.codigo), null) as ocupacion " +
                 "FROM DaIrag vi where vi.idNotificacion.idNotificacion = '" + id + "'");
 
         query.setResultTransformer(Transformers.aliasToBean(DatosDaIrag.class));

@@ -54,6 +54,8 @@ public class DatosDaIrag {
     private String otraCondicion;
     private Date fechaRegistro;
     private String usuario;
+    private String ocupacion;
+    private String trabajadorSalud;
 
     public String getId() {
         return id;
@@ -421,5 +423,21 @@ public class DatosDaIrag {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+
+    public String getOcupacion() {
+        return ocupacion;
+    }
+
+    public void setOcupacion(String ocupacion) {
+        this.ocupacion = ocupacion;
+    }
+
+    public String getTrabajadorSalud() {
+        return trabajadorSalud;
+    }
+
+    public void setTrabajadorSalud(String trabajadorSalud) {
+        this.trabajadorSalud = trabajadorSalud;
     }
 }
