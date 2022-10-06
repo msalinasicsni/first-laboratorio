@@ -2939,7 +2939,19 @@ public class RecepcionMxController {
                                             nombres = tomaMx.getIdNotificacion().getSolicitante().getNombre();
                                         }*/
                                 } else {
-                                    nombres = tomaMx.getCodigoVIH();
+                                    if (tomaMx.getCodigoVIH() != null) {
+                                        nombres = tomaMx.getCodigoVIH();
+                                    } else {
+                                        if (tomaMx.getPrimerNombre() != null) {
+                                            nombres = tomaMx.getPrimerNombre();
+                                            if (tomaMx.getSegundoNombre() != null)
+                                                nombres = nombres + " " + tomaMx.getSegundoNombre();
+
+                                            apellidos = tomaMx.getPrimerApellido();
+                                            if (tomaMx.getSegundoApellido() != null)
+                                                apellidos = apellidos + " " + tomaMx.getSegundoApellido();
+                                        }
+                                    }
                                 }
 
                                 String[] arrEdad = DateUtil.calcularEdad(tomaMx.getFechaNacimiento(), new Date()).split("/");
